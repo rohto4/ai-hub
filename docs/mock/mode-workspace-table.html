@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Trend Hub - Mode C Workspace Table</title>
+  <style>
+    :root{--bg:#f7f6f3;--paper:#fff;--ink:#23211d;--muted:#6f6a60;--line:#e3dfd6}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif}
+    .shell{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
+    .side{background:#f3f1ec;border-right:1px solid #ddd6c8;padding:12px}
+    .title{font-size:14px;font-weight:700;padding:7px 8px}
+    .search{width:100%;padding:8px;border:1px solid #d8d2c4;border-radius:8px;background:#fff}
+    .m{font-size:13px;padding:8px;border-radius:8px;color:#5f594f;cursor:pointer}
+    .m.on{background:#ece9e2;color:#2e2a23}
+    .main{padding:14px}
+    .head{position:sticky;top:0;background:rgba(247,246,243,.92);backdrop-filter:blur(8px);padding-bottom:8px;z-index:6}
+    h1{font-size:24px;margin:0}.sub{font-size:12px;color:var(--muted)}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:7px}
+    .chip{font-size:11px;padding:6px 8px;border:1px solid #ddd8ce;border-radius:999px;background:#fff;color:#6b6559;cursor:pointer}
+    .chip.on{background:#eef3ff;border-color:#d1ddfa;color:#355ca8}
+    .db{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+    .db-head,.row{display:grid;grid-template-columns:70px 1.1fr 1.4fr 130px 200px}
+    .db-head{background:#faf9f6;border-bottom:1px solid var(--line);font-size:12px;color:#6e695e}
+    .db-head div,.row>div{padding:10px}
+    .row{border-bottom:1px solid #eeebe4;font-size:13px}
+    .row:last-child{border-bottom:0}
+    .rank{font-weight:700}.topic{font-weight:600}
+    .sum{line-height:1.7;color:#3f3b33}
+    .sum[data-mode]{display:none}
+    .critic{display:none;margin-top:6px;padding:7px;border-left:3px solid #ced8ea;background:#f6f9ff;color:#4a5e7e;font-size:12px}
+    .critic.show{display:block}
+    .tag{display:inline-block;font-size:11px;background:#eef3ff;color:#355ca8;border:1px solid #d8e4ff;padding:4px 7px;border-radius:999px}
+    .tag.mid{background:#fff4ea;color:#a85308;border-color:#ffe2c2}
+    .act{display:flex;gap:6px;flex-wrap:wrap}
+    .btn{font-size:11px;border:1px solid #d8d2c7;padding:5px 7px;border-radius:8px;color:#5f594e;background:#fff;cursor:pointer}
+    .btn.share{background:#2f6feb;color:#fff;border-color:#2f6feb}
+    .btn.saved{background:#eef4ff;border-color:#cad9fb;color:#31599f}
+    .bottom{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+    .log{font-size:11px;line-height:1.5;color:#6b665d;border:1px dashed #d8d2c6;border-radius:8px;padding:8px;max-height:220px;overflow:auto;background:#fcfbf8}
+    .modal{position:fixed;inset:0;background:rgba(18,17,15,.28);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+    .modal.show{display:flex}
+    .sheet{width:min(520px,100%);background:#fff;border:1px solid #d8d2c7;border-radius:12px;padding:12px}
+    .input{width:100%;padding:9px;border:1px solid #d8d2c7;border-radius:8px}
+    @media (max-width:1080px){.shell{grid-template-columns:1fr}.side{display:none}.db-head,.row{grid-template-columns:60px 1fr}.db-head div:nth-child(n+3),.row>div:nth-child(n+3){display:none}.bottom{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">
+      <div class="title">AI Trend Hub / Mode C Workspace</div>
+      <input class="search" id="search" placeholder="タイトル検索..." />
+      <div class="m on">ホーム</div>
+      <div class="m">Topic Groups</div>
+      <div class="m">ダイジェスト</div>
+      <div class="m">共有テンプレ</div>
+      <div class="m">設定</div>
+    </aside>
+    <main class="main">
+      <div class="head">
+        <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">
+          <div>
+            <h1>今日の AI トレンド</h1>
+            <div class="sub">100字を標準表示。必要時のみ200/300字に展開。</div>
+          </div>
+          <div class="toolbar" id="modeBar"></div>
+        </div>
+      </div>
+      <section class="db">
+        <div class="db-head"><div>Rank</div><div>Topic</div><div>Summary</div><div>Risk</div><div>Actions</div></div>
+        <div id="table"></div>
+      </section>
+      <section class="bottom">
+        <article class="panel">
+          <strong>Topic Group / 通知</strong>
+          <p style="font-size:13px;color:#5f594e;margin:8px 0 4px">動画・公式・ブログを横断表示。通知は 07:00 / 12:00 / 18:00。</p>
+          <button class="btn" id="notifyBtn">通知設定を開く</button>
+        </article>
+        <article class="panel"><strong>操作ログ</strong><div class="log" id="log"></div></article>
+      </section>
+    </main>
+  </div>
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <div style="font-weight:600;margin-bottom:8px">OGP共有</div>
+      <input class="input" id="shareInput" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn share" id="copy">コピー</button><button class="btn" id="close">閉じる</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const modes=["100","200","300"]; let mode="100", query="";
+    const data=Array.from({length:20},(_,i)=>({
+      topic:i%2?"低遅延推論エンジン公開":"Agent連携ワークフロー拡張",
+      risk:i%2?"low":"mid",
+      s100:i%2?"同精度で推論単価を抑え導入しやすい。差分は推論経路最適化。":"工程自動化の価値が高い。差分は外部サービス統合。過大広告は少なめ。",
+      s200:i%2?"同精度で推論単価を抑え導入しやすい。差分は推論経路最適化で、運用担当向けでも短期導入につながる。":"Agent連携で複数工程を自動化。既存RPAとの差分は文脈保持と失敗時リカバリ。運用設計を先に決めると効果が高い。",
+      s300:i%2?"同精度で推論単価を抑えつつ精度低下を最小化。差分は推論経路最適化とキャッシュ戦略。運用担当でも短期導入に届く。誇大広告は少ないが、初期データ整備は必要。":"Agent連携ワークフローで複数工程を自動化。既存RPAとの差分は文脈保持と失敗時の分岐処理。実務向けに適しており、導入前に権限設計とログ設計を決めると定着しやすい。",
+      critic:i%2?"既存推論最適化との比較で優位性あり。":"失敗時リカバリ設計が未提示。導入前評価が必要。"
+    }));
+    const table=document.getElementById("table"), log=document.getElementById("log"), modeBar=document.getElementById("modeBar");
+    function addLog(msg){const t=new Date().toLocaleTimeString("ja-JP",{hour12:false});log.innerHTML=`<div>[${t}] ${msg}</div>`+log.innerHTML;}
+    function renderModes(){modeBar.innerHTML=modes.map(m=>`<button class="chip ${m===mode?'on':''}" data-mode="${m}">${m}字</button>`).join("")+`<button class="chip" id="digest">Digest 7/12/18</button>`;document.getElementById("digest").onclick=()=>addLog("ダイジェスト設定を表示");}
+    function rows(){return data.filter(d=>d.topic.includes(query));}
+    function render(){
+      renderModes();
+      table.innerHTML=rows().map((d,idx)=>`<div class="row"><div class="rank">#${idx+1}</div><div><div class="topic">${d.topic}</div><div class="critic">${d.critic}</div></div><div><div class="sum" data-mode="100">${d.s100}</div><div class="sum" data-mode="200">${d.s200}</div><div class="sum" data-mode="300">${d.s300}</div></div><div>${d.risk==="low"?'<span class="tag">Low</span>':'<span class="tag mid">Mid</span>'}</div><div class="act"><button class="btn">動画</button><button class="btn">公式</button><button class="btn share share-btn" data-topic="${d.topic}">OGP共有</button><button class="btn save-btn">保存</button><button class="btn critic-btn">批評</button></div></div>`).join("");
+      document.querySelectorAll('.sum').forEach(el=>el.style.display=el.dataset.mode===mode?"block":"none");
+      document.querySelectorAll('.critic-btn').forEach(btn=>btn.onclick=e=>{const c=e.target.closest('.row').querySelector('.critic');c.classList.toggle('show');addLog("批評の表示を切替");});
+      document.querySelectorAll('.save-btn').forEach(btn=>btn.onclick=e=>{e.target.classList.toggle('saved');e.target.textContent=e.target.classList.contains('saved')?'保存済み':'保存';addLog("保存状態を更新");});
+      document.querySelectorAll('.share-btn').forEach(btn=>btn.onclick=()=>{document.getElementById("shareInput").value=`AI Trend Hub: ${btn.dataset.topic} https://aitrendhub.example/article`;document.getElementById("modal").classList.add('show');addLog("共有モーダルを表示");});
+    }
+    document.addEventListener("click",e=>{if(e.target.matches("[data-mode]")){mode=e.target.dataset.mode;render();addLog(`要約モードを${mode}字に変更`);}});
+    document.getElementById("search").addEventListener("input",e=>{query=e.target.value.trim();render();});
+    document.getElementById("notifyBtn").onclick=()=>addLog("通知設定を確認（07:00/12:00/18:00）");
+    document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(document.getElementById("shareInput").value);addLog("共有文をコピー");}catch{addLog("コピーに失敗");}};
+    document.getElementById("close").onclick=()=>document.getElementById("modal").classList.remove('show');
+    document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")e.target.classList.remove('show');};
+    render();addLog("ページを読み込みました");
+  </script>
+</body>
+</html>
