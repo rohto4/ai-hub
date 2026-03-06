@@ -1,6 +1,6 @@
 # 技術アーキテクチャ設計
 
-最終更新: 2026-03-05
+最終更新: 2026-03-06
 
 ## 1. 技術スタック
 
@@ -9,13 +9,20 @@
 2. Backend:
    - Next.js Route Handlers + Server Actions
 3. Database:
-   - Supabase (PostgreSQL, RLS)
-4. Batch:
-   - Supabase Cron または外部スケジューラ
-5. OGP:
+   - Neon (サーバーレス PostgreSQL)
+4. 認証:
+   - Firebase Auth（管理者・ユーザー共通）
+   - Internal API: 環境変数シークレットトークン（`x-internal-secret` ヘッダー）
+5. AI:
+   - Gemini Flash API（要約・批評生成）
+6. Batch:
+   - Vercel Cron
+7. OGP:
    - `@vercel/og`
-6. Notification:
+8. Notification:
    - Web Push（Service Worker）
+9. 問い合わせ通知:
+   - Email + Discord Webhook
 
 ## 2. 論理構成
 
