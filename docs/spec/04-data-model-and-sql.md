@@ -1,6 +1,6 @@
-# データモデル設計（Supabase/PostgreSQL）v2
+# データモデル設計（Supabase/PostgreSQL）v3
 
-最終更新: 2026-03-05
+最終更新: 2026-03-07
 
 ## 1. 設計意図
 
@@ -18,8 +18,10 @@
 3. `articles`
 4. `article_genres`
 5. `topic_groups`
-6. `summaries`
-7. `rank_scores`
+6. `topic_group_members`（推奨追加）
+7. `summaries`
+8. `rank_scores`
+9. `rank_weight_log`（推奨追加）
 
 ## 2.2 ユーザー/設定系
 
@@ -79,7 +81,8 @@ create table if not exists feeds (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   rss_url text not null unique,
-  source_type text not null default 'google_alert',
+  source_type text not null default 'google_alert'
+    check (source_type in ('google_alert','official_blog','news','youtube')),
   enabled boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -101,7 +104,18 @@ create table if not exists topic_groups (
   slug text not null unique,
   topic_label text not null,
   confidence numeric(5,4) not null default 0.0,
+  representative_article_id uuid references articles(id),
+  member_count integer not null default 1,
   created_at timestamptz not null default now()
+);
+
+-- 推奨追加: トピックグループのメンバー管理（どの記事がどのグループに属するかを明示）
+create table if not exists topic_group_members (
+  topic_group_id uuid not null references topic_groups(id) on delete cascade,
+  article_id uuid not null references articles(id) on delete cascade,
+  similarity_score numeric(5,4) not null,
+  added_at timestamptz not null default now(),
+  primary key (topic_group_id, article_id)
 );
 
 create table if not exists articles (
@@ -126,10 +140,34 @@ create table if not exists summaries (
   summary_300 varchar(300),
   innovation_delta text,
   hype_risk text not null check (hype_risk in ('low','medium','high')),
+  evidence_strength text check (evidence_strength in ('weak','moderate','strong')),
   target_audience text,
   tags text[] default '{}',
   model_name text not null,
   created_at timestamptz not null default now()
+);
+
+-- rank_scores: エンティティ一覧に記載済みだったがテーブル定義が未記載のため追加
+create table if not exists rank_scores (
+  id uuid primary key default gen_random_uuid(),
+  article_id uuid not null references articles(id) on delete cascade,
+  period text not null check (period in ('24h','7d','30d')),
+  external_stats_score numeric(10,4) not null default 0.0,
+  site_activity_score numeric(10,4) not null default 0.0,
+  total_score numeric(10,4) not null default 0.0,
+  calculated_at timestamptz not null default now(),
+  unique (article_id, period)
+);
+
+-- 推奨追加: ランキング係数変更ログ（spec06「係数調整ログを保持」に対応）
+create table if not exists rank_weight_log (
+  id bigserial primary key,
+  w_external numeric(5,4) not null,
+  w_site numeric(5,4) not null,
+  decay_lambda numeric(8,6) not null,
+  reason text,
+  applied_at timestamptz not null default now(),
+  applied_by text
 );
 ```
 
@@ -212,6 +250,8 @@ create table if not exists notification_delivery_log (
 2. `articles(topic_group_id)` 横断表示高速化
 3. `event_log(event_name, occurred_at desc)` 行動集計高速化
 4. `notification_delivery_log(status, scheduled_for)` 配信監視高速化
+5. `rank_scores(period, total_score desc)` ランキング一覧取得高速化
+6. `topic_group_members(topic_group_id)` グループメンバー参照高速化
 
 ## 6. RLS 方針（要約）
 
