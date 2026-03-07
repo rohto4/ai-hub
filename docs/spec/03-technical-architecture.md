@@ -81,3 +81,22 @@
 1. ドメインロジックは UI から分離
 2. 収集処理と表示 API を疎結合化
 3. 生成系 AI 処理は冪等化（同一 hash 再実行抑止）
+
+## 8. 主要ドキュメント URL
+
+1. Next.js:
+   - https://nextjs.org/docs
+2. Neon:
+   - https://neon.tech/docs
+3. Firebase Auth:
+   - https://firebase.google.com/docs/auth
+4. Gemini API:
+   - https://ai.google.dev/gemini-api/docs
+5. Vercel Cron:
+   - https://vercel.com/docs/cron-jobs
+6. `@vercel/og`:
+   - https://vercel.com/docs/og-image-generation
+7. Web Push（MDN）:
+   - https://developer.mozilla.org/docs/Web/API/Push_API
+8. Pencil:
+   - https://docs.pencil.dev/
