@@ -2,7 +2,7 @@
 
 ## 🏗️ Architectural Guiding Principles
 - **Pattern**: Next.js App Router + shadcn/ui.
-- **Data Flow**: Server Actions for mutations, Supabase SSR for data fetching.
+- **Data Flow**: Server Actions for mutations, Neon (PostgreSQL) via Route Handlers for data fetching. Auth via Firebase Admin SDK.
 - **Conventions**: 
   - Components go in `src/components/`.
   - Server Actions go in `src/lib/actions/`.

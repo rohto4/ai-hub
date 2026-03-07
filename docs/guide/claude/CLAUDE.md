@@ -53,9 +53,10 @@
 2. **Tailwind v4 & Spatial UI**
    - v4 の 3D transform ユーティリティを利用し、ペタンコのUIを避けてZ軸の奥行き（Spatial UI）を表現する。
    - `col-span-` や `row-span-` を駆使したBento Gridレイアウトを積極的に提案する。
-3. **Supabase RLS 究極の最適化**
-   - ポリシーの `USING` 句に含まれるカラム（`user_id` 等）には**必ずインデックスを付与**する（100倍のパフォーマンス向上）。
-   - ポリシー内で `auth.uid()` を呼ぶ際は `(SELECT auth.uid())` とラップし、PGキャッシュを効かせること。
+3. **Neon PostgreSQL RLS 最適化**
+   - ポリシーの `USING` 句に含まれるカラム（`user_id` 等）には**必ずインデックスを付与**する（パフォーマンス向上）。
+   - 本プロジェクトは Firebase Auth + Neon 構成のため Supabase の `auth.uid()` は使用不可。
+   - Server Action / Route Handler 内で Firebase Admin SDK の `verifyIdToken()` でUID検証後、アプリ層で所有者チェックを行うこと。
 
 ---
 

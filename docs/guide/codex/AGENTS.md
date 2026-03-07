@@ -9,8 +9,8 @@
 ## ⚠️ Human-In-The-Loop
 以下の場合は、必ず `AGENTS.md` のステップに従い、ユーザーに確認を求める：
 - 新規依存ライブラリの追加
-- `docs/specs/data-schema.md` の破壊的な変更
-- `docs/guides/AGENTS.md` の根本的なルール変更
+- `docs/spec/04-data-model-and-sql.md` の破壊的な変更
+- `docs/guide/codex/AGENTS.md` の根本的なルール変更
 
 ---
 
