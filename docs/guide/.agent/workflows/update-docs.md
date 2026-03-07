@@ -9,5 +9,5 @@ description: "実装されたコードベースの現状を逆引きし、プロ
 
 ## 実行時に自動で行われる推論とアクション (Actions)
 1. `src/` 配下にあるデータベースファイル、またはAPIやコンポーネント構造の変更内容を走査・解析する。
-2. 現在の `docs/imp/implementation-plan.md` や `docs/specs/data-schema.md` と比較・照合する。
+2. 現在の `docs/imp/implementation-plan.md` や `docs/spec/04-data-model-and-sql.md` と比較・照合する。
 3. コードに合わせてドキュメントのスキーマや仕様部分を書き換え、更新差分をユーザーに通知・コミット提案を行う。

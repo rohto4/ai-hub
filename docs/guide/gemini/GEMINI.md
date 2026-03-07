@@ -1,4 +1,4 @@
-# GEMINI.md - Optimization for Uni-Verse-Canvas
+# GEMINI.md - Optimization for AI Trend Hub
 
 ## 🌌 Core Philosophy: DDD (Document-Driven Development)
 
@@ -17,7 +17,7 @@
 > アーキテクチャやデータスキーマの変更、新規機能の設計を行う場合。
 
 - `gemini-3-ultra-thinking` を優先使用。
-- `docs/specs/data-schema.md` を常に参照。
+- `docs/spec/04-data-model-and-sql.md` を常に参照。
 - Google Searchを使用して、最新のライブラリ（Next.js 15+, Tailwind 4+等）の仕様を確認。
 
 ### 💻 Situation B: 機能実装 (Implementation)

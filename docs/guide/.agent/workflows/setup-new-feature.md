@@ -12,12 +12,12 @@ description: "DDDに基づいて新規フルスタック機能の骨組みから
 ## 手順 (Steps)
 
 1. **ドメインモデリング (Strategic Design)**
-   - ユーザーへの要件ヒアリングが終わったら、まず `docs/specs/` 配下に新機能のデータスキーマ設計（エンティティ、値オブジェクト、集約ルート）をMarkdownで記述する。
-   - Supabaseのテーブル定義（CREATE TABLE, RLS, Trigger）を記述し、ユーザーの承認を得る。
+   - ユーザーへの要件ヒアリングが終わったら、まず `docs/spec/` 配下に新機能のデータスキーマ設計（エンティティ、値オブジェクト、集約ルート）をMarkdownで記述する。
+   - Neon（PostgreSQL）のテーブル定義（CREATE TABLE, RLS）を記述し、ユーザーの承認を得る。
 
 2. **インフラ層の構築 (Database & API)**
-   - 承認されたスキーマに基づき、Supabase DashboardのSQLエディタで実行するためのマイグレーションスクリプトを作成する。
-   - Next.js側の `types/supabase.ts` に相当する型定義のアップデート手順を明記する。
+   - 承認されたスキーマに基づき、Neon向けのマイグレーションSQLスクリプトを作成し `docs/spec/04-data-model-and-sql.md` に追記する。
+   - Next.js側の `src/types/db.ts` の型定義アップデート手順を明記する。
 
 3. **サーバーアクションの定義 (Server Actions)**
    - `src/actions/[featureName].ts` を作成する。
