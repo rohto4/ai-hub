@@ -15,8 +15,8 @@
 
 ## 1.2 データモデル
 
-- [ ] `feeds`, `source_items`, `articles`, `topic_groups`, `summaries`, `rank_scores` 作成
-- [ ] インデックス最適化（`genre+hash`, `published_at`, `topic_group_id`）
+- [ ] `feeds`, `source_items`, `articles`, `topic_groups`, `topic_group_members`, `summaries`, `rank_scores`, `rank_weight_log` 作成
+- [ ] インデックス最適化（`genre+hash`, `published_at`, `topic_group_id`, `rank_scores(period,total_score)`, `topic_group_members(topic_group_id)`）
 - [ ] RLS ポリシー（公開読取/内部書込）
 
 ## 1.3 収集・解析

@@ -1,6 +1,6 @@
-# データモデル設計（Supabase/PostgreSQL）v2
+# データモデル設計（Supabase/PostgreSQL）v3
 
-最終更新: 2026-03-05
+最終更新: 2026-03-07
 
 ## 1. 設計意図
 
@@ -18,8 +18,10 @@
 3. `articles`
 4. `article_genres`
 5. `topic_groups`
-6. `summaries`
-7. `rank_scores`
+6. `topic_group_members`（推奨追加）
+7. `summaries`
+8. `rank_scores`
+9. `rank_weight_log`（推奨追加）
 
 ## 2.2 ユーザー/設定系
 
@@ -79,7 +81,8 @@ create table if not exists feeds (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   rss_url text not null unique,
-  source_type text not null default 'google_alert',
+  source_type text not null default 'google_alert'
+    check (source_type in ('google_alert','official_blog','news','youtube')),
   enabled boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -101,7 +104,18 @@ create table if not exists topic_groups (
   slug text not null unique,
   topic_label text not null,
   confidence numeric(5,4) not null default 0.0,
+  representative_article_id uuid references articles(id) on delete set null,
+  member_count integer not null default 1,
   created_at timestamptz not null default now()
+);
+
+-- 推奨追加: トピックグループのメンバー管理（どの記事がどのグループに属するかを明示）
+create table if not exists topic_group_members (
+  topic_group_id uuid not null references topic_groups(id) on delete cascade,
+  article_id uuid not null references articles(id) on delete cascade,
+  similarity_score numeric(5,4) not null,
+  added_at timestamptz not null default now(),
+  primary key (topic_group_id, article_id)
 );
 
 create table if not exists articles (
@@ -126,10 +140,35 @@ create table if not exists summaries (
   summary_300 varchar(300),
   innovation_delta text,
   hype_risk text not null check (hype_risk in ('low','medium','high')),
+  evidence_strength text check (evidence_strength in ('weak','moderate','strong')),
   target_audience text,
   tags text[] default '{}',
   model_name text not null,
   created_at timestamptz not null default now()
+);
+
+-- rank_scores: エンティティ一覧に記載済みだったがテーブル定義が未記載のため追加
+create table if not exists rank_scores (
+  id uuid primary key default gen_random_uuid(),
+  article_id uuid not null references articles(id) on delete cascade,
+  period text not null check (period in ('24h','7d','30d')),
+  external_stats_score numeric(10,4) not null default 0.0,
+  site_activity_score numeric(10,4) not null default 0.0,
+  total_score numeric(10,4) not null default 0.0,
+  calculated_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (article_id, period)
+);
+
+-- 推奨追加: ランキング係数変更ログ（spec06「係数調整ログを保持」に対応）
+create table if not exists rank_weight_log (
+  id bigserial primary key,
+  w_external numeric(5,4) not null,
+  w_site numeric(5,4) not null,
+  decay_lambda numeric(8,6) not null,
+  reason text,
+  applied_at timestamptz not null default now(),
+  applied_by text
 );
 ```
 
@@ -212,6 +251,10 @@ create table if not exists notification_delivery_log (
 2. `articles(topic_group_id)` 横断表示高速化
 3. `event_log(event_name, occurred_at desc)` 行動集計高速化
 4. `notification_delivery_log(status, scheduled_for)` 配信監視高速化
+5. `rank_scores(period, total_score desc)` ランキング一覧取得高速化
+6. `topic_group_members(topic_group_id)` グループメンバー参照高速化
+7. `source_items(ingested_at)` 保持期間超過レコードのパージ高速化
+8. `rank_scores(updated_at)` 増分再計算対象の絞り込み高速化
 
 ## 6. RLS 方針（要約）
 
@@ -228,7 +271,43 @@ create table if not exists notification_delivery_log (
 2. `event_log`: 明細 180 日、日次集計は長期保持
 3. `notification_delivery_log`: 180 日
 
-## 8. 分析で最初に見るダッシュボード項目
+## 8. スケール設計方針
+
+### 8.1 ユーザー負荷（読み取り集中）
+
+1. **DB接続プール**
+   - Neon の Pooler モード（PgBouncer 互換）を必ず使用
+   - アプリサーバーからは pooler エンドポイントのみ接続する
+   - 直接接続はマイグレーション実行時のみ許可
+
+2. **`rank_scores` の読み取り最適化**
+   - 一覧取得は Materialized View (`mv_rank_scores_current`) を参照する
+   - バッチが `rank_scores` を更新後に `REFRESH MATERIALIZED VIEW CONCURRENTLY` を実行
+   - 一般ユーザー向けには更新中でも旧データを返せるよう CONCURRENTLY 必須
+
+3. **`event_log` の書き込み集中**
+   - 書き込みは Route Handler から直接ではなく非同期キュー（Vercel Queue or 簡易バッファ）経由を推奨
+   - `event_log` は `occurred_at` による月次パーティションを将来的に導入（初期は単一テーブル、DAU 10k 超で検討）
+
+### 8.2 記事の入れ替わり（書き込み集中）
+
+1. **インジェストの同時実行制限**
+   - `ingest-feeds` ジョブの並列数を最大 5 ジョブに制限
+   - 超過分はキュー待機とし、DB コネクション枯渇を防ぐ
+
+2. **`rank_scores` の増分更新**
+   - 全記事の全量再計算ではなく、`updated_at` を基準に直近 N 分以内の変更分のみ再計算
+   - 全量再計算は深夜バッチ（日次1回）のみに限定
+
+3. **`source_items` の肥大化対策**
+   - 保持期間 90 日を超えたレコードの定期 DELETE を Vercel Cron で自動化
+   - `ingested_at` インデックスを追加してパージ処理を高速化
+
+4. **`topic_groups.member_count` の整合性**
+   - `topic_group_members` への INSERT/DELETE 時にアプリ側で `member_count` を同時更新する
+   - DB トリガーは使わず、サービス層（`src/lib/topic-grouping`）の責務とする
+
+## 9. 分析で最初に見るダッシュボード項目
 
 1. ジャンル別 CTR
 2. Topic Group 横断遷移率
