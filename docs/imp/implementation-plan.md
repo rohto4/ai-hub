@@ -43,7 +43,7 @@
 - `GET /api/search` 正常
 - Home 一覧は `/api/trends` ベースの暫定 live 化済み（失敗時はモックへフォールバック）
 - 検索 UI は Enter / ボタン submit で `/api/search` 接続済み
-- 次の主対象は「OGP 実装」「PWA 導線」「ingestion / AI / notification の仕上げ」
+- 次の主対象は「ingestion / AI / notification / auth の仕上げ」「setup / status ドキュメント整備」
 
 ## 実装フェイズ方針（Sprint 1）
 
@@ -356,13 +356,13 @@ CREATE POLICY ps_own ON push_subscriptions
 - [x] rank_scoresバッチ（`/api/cron/compute-ranks`、30分おき）
 
 ### Phase 5: シェア・OGP
-- [ ] `@vercel/og` 画像API（1テンプレ + ジャンル色分岐）
-- [ ] metadata設定（Open Graph + Twitter Card）
+- [x] `@vercel/og` 画像API（site-level テンプレ）
+- [x] metadata設定（Open Graph + Twitter Card）
 - [ ] OGPキャッシュ（ISR）
 - [ ] 共有文面テンプレート生成
 
 ### Phase 6: 通知
-- [ ] Web Push購読導線
+- [~] Web Push / PWA 導線（manifest + service worker + install banner）
 - [ ] 07:00 / 12:00 / 18:00 ダイジェスト配信Cron
 - [ ] digest_logs + 失敗再送（retry_count ≤ 3）
 

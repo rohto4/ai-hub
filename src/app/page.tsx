@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArticleCard } from '@/components/card/ArticleCard'
 import { Header } from '@/components/layout/Header'
+import { PwaInstallBanner } from '@/components/pwa/PwaInstallBanner'
 import { RightSidebar } from '@/components/sidebar/RightSidebar'
 import { Toolbar } from '@/components/toolbar/Toolbar'
 import {
@@ -644,6 +645,9 @@ export default function HomePage() {
                 ))}
               </div>
             </BoxSection>
+
+            <SectionLabel>[8] PWA</SectionLabel>
+            <PwaInstallBanner />
           </div>
 
           <RightSidebar
