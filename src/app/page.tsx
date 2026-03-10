@@ -5,6 +5,18 @@ import { ArticleCard } from '@/components/card/ArticleCard'
 import { Header } from '@/components/layout/Header'
 import { RightSidebar } from '@/components/sidebar/RightSidebar'
 import { Toolbar } from '@/components/toolbar/Toolbar'
+import {
+  consumeReturnFocusArticleId,
+  getMisskeyInstance,
+  getOrCreateSessionId,
+  getSavedArticleIds,
+  getShareAppendTag,
+  setMisskeyInstance,
+  setReturnFocusArticleId,
+  setShareAppendTag,
+  toggleSavedArticleId,
+  trackAction,
+} from '@/lib/client/home'
 import type { ActionType, Article, ArticleWithScore, RankPeriod, SearchResponse, TrendsResponse } from '@/lib/db/types'
 
 type TabId = 'ranking' | 'latest' | 'unique'
@@ -139,6 +151,10 @@ async function fetchJson<T>(url: string): Promise<T> {
   return (await response.json()) as T
 }
 
+function buildShareText(article: UiArticle, appendTag: boolean): string {
+  return [article.title, article.summary_100 ?? '要約準備中', appendTag ? `${article.url}\n#AIHub` : article.url].join('\n\n')
+}
+
 export default function HomePage() {
   const [searchDraft, setSearchDraft] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
@@ -149,6 +165,13 @@ export default function HomePage() {
   const [showCritique, setShowCritique] = useState(false)
   const [notifTimes, setNotifTimes] = useState(initialNotifTimes)
   const [shareTarget, setShareTarget] = useState<UiArticle | null>(null)
+  const [appendAiHubTag, setAppendAiHubTagState] = useState(true)
+  const [misskeyInstance, setMisskeyInstanceState] = useState('')
+  const [savedArticleIds, setSavedArticleIds] = useState<string[]>([])
+  const [expandedArticleId, setExpandedArticleId] = useState<string | null>(null)
+  const [focusedArticleId, setFocusedArticleId] = useState<string | null>(null)
+  const [topicGroupArticleId, setTopicGroupArticleId] = useState<string | null>(null)
+  const [shareStatus, setShareStatus] = useState<string | null>(null)
   const [trendState, setTrendState] = useState<LoadState>({
     articles: mockArticles,
     loading: true,
@@ -156,6 +179,40 @@ export default function HomePage() {
     message: '初期表示を準備しています。',
   })
   const [searchState, setSearchState] = useState<LoadState>(initialSearchState)
+
+  useEffect(() => {
+    getOrCreateSessionId()
+    setSavedArticleIds(getSavedArticleIds())
+    setAppendAiHubTagState(getShareAppendTag())
+    setMisskeyInstanceState(getMisskeyInstance())
+    setFocusedArticleId(consumeReturnFocusArticleId())
+  }, [])
+
+  useEffect(() => {
+    if (!focusedArticleId) return
+    const target = window.document.getElementById(`article-card-${focusedArticleId}`)
+    target?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }, [focusedArticleId])
+
+  useEffect(() => {
+    function handleFocus() {
+      const nextFocused = consumeReturnFocusArticleId()
+      if (!nextFocused) return
+      setFocusedArticleId(nextFocused)
+      void trackAction({
+        actionType: 'return_focus',
+        articleId: nextFocused,
+        source: 'direct',
+      })
+    }
+
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleFocus)
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleFocus)
+    }
+  }, [])
 
   useEffect(() => {
     let ignore = false
@@ -285,29 +342,145 @@ export default function HomePage() {
   )
 
   const topicGroupItems = useMemo(() => {
-    const featured = filteredArticles.find((article) => article.topic_group_id) ?? filteredArticles[0] ?? null
+    const featured =
+      filteredArticles.find((article) => article.id === topicGroupArticleId) ??
+      filteredArticles.find((article) => article.topic_group_id) ??
+      filteredArticles[0] ??
+      null
     if (!featured) return { title: 'Topic Group', items: [] as UiArticle[] }
     const items = filteredArticles
-      .filter((article) => article.topic_group_id === featured.topic_group_id || article.id === featured.id)
-      .slice(0, 3)
+      .filter((article) =>
+        featured.topic_group_id ? article.topic_group_id === featured.topic_group_id || article.id === featured.id : article.id === featured.id
+      )
+      .slice(0, 6)
     return {
-      title: `${featured.title.slice(0, 32)}${featured.title.length > 32 ? '…' : ''}`,
+      title: `${featured.title.slice(0, 40)}${featured.title.length > 40 ? '…' : ''}`,
       items,
     }
-  }, [filteredArticles])
+  }, [filteredArticles, topicGroupArticleId])
+
+  const shareText = shareTarget ? buildShareText(shareTarget, appendAiHubTag) : ''
+
+  function handleSearchSubmit() {
+    const nextQuery = searchDraft.trim()
+    setSearchQuery(nextQuery)
+    if (!nextQuery) return
+    void trackAction({
+      actionType: 'search',
+      source: 'search',
+      meta: { query: nextQuery },
+    })
+  }
+
+  function handleSaveToggle(articleId: string) {
+    const nextSavedIds = toggleSavedArticleId(articleId)
+    const isNowSaved = nextSavedIds.includes(articleId)
+    setSavedArticleIds(nextSavedIds)
+    void trackAction({
+      actionType: isNowSaved ? 'save' : 'unsave',
+      articleId,
+      source: 'direct',
+    })
+  }
+
+  function handleOpenArticle(articleId: string) {
+    const article = filteredArticles.find((item) => item.id === articleId) ?? visibleSearchArticles.find((item) => item.id === articleId)
+    if (!article) return
+    setReturnFocusArticleId(article.id)
+    window.open(article.url, '_blank', 'noopener,noreferrer')
+    void trackAction({
+      actionType: 'article_open',
+      articleId: article.id,
+      source: 'direct',
+    })
+  }
+
+  async function handleShareAction(target: 'copy' | 'x' | 'threads' | 'slack' | 'misskey') {
+    if (!shareTarget) return
+
+    const encodedText = encodeURIComponent(shareText)
+    if (target === 'copy') {
+      await navigator.clipboard.writeText(shareText)
+      setShareStatus('共有文をコピーしました。')
+      void trackAction({ actionType: 'share_copy', articleId: shareTarget.id, source: 'direct' })
+      return
+    }
+
+    if (target === 'misskey' && !misskeyInstance) {
+      setShareStatus('Misskey のインスタンスを設定してください。')
+      return
+    }
+
+    const shareUrlMap = {
+      x: `https://x.com/intent/post?text=${encodedText}`,
+      threads: `https://www.threads.net/intent/post?text=${encodedText}`,
+      slack: `https://slack.com/app_redirect?channel=&team=&text=${encodedText}`,
+      misskey: `https://${misskeyInstance}/share?text=${encodedText}`,
+    }
+    window.open(shareUrlMap[target], '_blank', 'noopener,noreferrer')
+
+    const actionMap = {
+      x: 'share_x',
+      threads: 'share_threads',
+      slack: 'share_slack',
+      misskey: 'share_misskey',
+    } as const
+
+    void trackAction({
+      actionType: actionMap[target],
+      articleId: shareTarget.id,
+      source: 'direct',
+      meta: target === 'misskey' ? { instance: misskeyInstance } : undefined,
+    })
+  }
 
   function handleArticleAction(type: ActionType, articleId: string) {
-    const article = filteredArticles.find((item) => item.id === articleId) ?? visibleSearchArticles.find((item) => item.id === articleId) ?? null
+    const article =
+      filteredArticles.find((item) => item.id === articleId) ??
+      visibleSearchArticles.find((item) => item.id === articleId) ??
+      null
     if (!article) return
 
     if (type === 'share_open') {
       setShareTarget(article)
+      setShareStatus(null)
+      void trackAction({ actionType: 'share_open', articleId, source: 'direct' })
       return
     }
 
     if (type === 'critique_expand') {
       setShowCritique((current) => !current)
+      void trackAction({ actionType: 'critique_expand', articleId, source: 'direct' })
       return
+    }
+
+    if (type === 'expand_300') {
+      const nextExpanded = expandedArticleId === articleId ? null : articleId
+      setExpandedArticleId(nextExpanded)
+      setFocusedArticleId(articleId)
+      void trackAction({
+        actionType: nextExpanded ? 'expand_300' : 'expand_200',
+        articleId,
+        source: 'direct',
+      })
+      return
+    }
+
+    if (type === 'save' || type === 'unsave') {
+      handleSaveToggle(articleId)
+      return
+    }
+
+    if (type === 'topic_group_open') {
+      setTopicGroupArticleId(articleId)
+      setFocusedArticleId(articleId)
+      document.getElementById('topic-group-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      void trackAction({
+        actionType: 'topic_group_open',
+        articleId,
+        source: 'topic_group',
+        meta: { topic_group_id: article.topic_group_id },
+      })
     }
   }
 
@@ -317,7 +490,7 @@ export default function HomePage() {
         searchValue={searchDraft}
         critiqueVisible={showCritique}
         onSearchChange={setSearchDraft}
-        onSearchSubmit={() => setSearchQuery(searchDraft.trim())}
+        onSearchSubmit={handleSearchSubmit}
       />
 
       <div className="fixed bottom-0 left-0 top-[52px] hidden w-[120px] bg-dim-fg xl:block" />
@@ -365,9 +538,12 @@ export default function HomePage() {
                     key={article.id}
                     article={article}
                     rank={index + 1}
-                    summaryMode={summaryMode}
+                    summaryMode={expandedArticleId === article.id ? 300 : summaryMode}
                     showCritique={showCritique}
+                    isFocused={focusedArticleId === article.id}
+                    isSaved={savedArticleIds.includes(article.id)}
                     onAction={handleArticleAction}
+                    onOpenArticle={handleOpenArticle}
                   />
                 ))
               ) : (
@@ -375,29 +551,31 @@ export default function HomePage() {
               )}
             </div>
 
-            <SectionLabel>[5] Topic Group</SectionLabel>
-            <BoxSection
-              title={topicGroupItems.title}
-              subtitle="暫定実装です。カード導線を後で別ページ / ドロワー / インライン展開へ差し替えられる構成にします。"
-            >
-              <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-3">
-                <TopicColumn
-                  title="動画"
-                  tone="bg-[#fef3c7] text-[#92400e]"
-                  items={topicGroupItems.items.filter((article) => article.source_type === 'youtube')}
-                />
-                <TopicColumn
-                  title="公式"
-                  tone="bg-[#dbeafe] text-[#1e40af]"
-                  items={topicGroupItems.items.filter((article) => article.source_type === 'official')}
-                />
-                <TopicColumn
-                  title="ブログ"
-                  tone="bg-[#d1fae5] text-[#065f46]"
-                  items={topicGroupItems.items.filter((article) => article.source_type === 'blog')}
-                />
-              </div>
-            </BoxSection>
+            <div id="topic-group-section">
+              <SectionLabel>[5] Topic Group</SectionLabel>
+              <BoxSection
+                title={topicGroupItems.title}
+                subtitle="暫定実装です。いまはカード押下でこのセクションへスクロールし、対象トピックを固定表示します。"
+              >
+                <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-3">
+                  <TopicColumn
+                    title="動画"
+                    tone="bg-[#fef3c7] text-[#92400e]"
+                    items={topicGroupItems.items.filter((article) => article.source_type === 'youtube')}
+                  />
+                  <TopicColumn
+                    title="公式"
+                    tone="bg-[#dbeafe] text-[#1e40af]"
+                    items={topicGroupItems.items.filter((article) => article.source_type === 'official')}
+                  />
+                  <TopicColumn
+                    title="ブログ"
+                    tone="bg-[#d1fae5] text-[#065f46]"
+                    items={topicGroupItems.items.filter((article) => article.source_type === 'blog')}
+                  />
+                </div>
+              </BoxSection>
+            </div>
 
             <SectionLabel>[6] 検索結果</SectionLabel>
             <BoxSection
@@ -432,9 +610,12 @@ export default function HomePage() {
                       <ArticleCard
                         key={`search-${article.id}`}
                         article={article}
-                        summaryMode={summaryMode}
+                        summaryMode={expandedArticleId === article.id ? 300 : summaryMode}
                         showCritique={showCritique}
+                        isFocused={focusedArticleId === article.id}
+                        isSaved={savedArticleIds.includes(article.id)}
                         onAction={handleArticleAction}
+                        onOpenArticle={handleOpenArticle}
                       />
                     ))}
                   </div>
@@ -468,9 +649,9 @@ export default function HomePage() {
           <RightSidebar
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
-            unread={0}
+            unread={savedArticleIds.length}
             topRated={trendState.articles.filter((article) => (article.score ?? 0) >= 90).length}
-            savedLater={0}
+            savedLater={savedArticleIds.length}
             notifTimes={notifTimes}
             onNotifToggle={(index) =>
               setNotifTimes((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, on: !item.on } : item)))
@@ -482,7 +663,7 @@ export default function HomePage() {
       {shareTarget ? (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/10 px-4" onClick={() => setShareTarget(null)}>
           <div
-            className="w-full max-w-[480px] rounded-xl border border-black/5 bg-card-second shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
+            className="w-full max-w-[560px] rounded-xl border border-black/5 bg-card-second shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-black/5 px-4 py-3">
@@ -494,25 +675,50 @@ export default function HomePage() {
             <div className="flex flex-col gap-3 p-4">
               <textarea
                 className="min-h-24 rounded-lg border border-black/5 p-2 text-[12px] leading-6 outline-none"
-                value={`${shareTarget.title}\n\n${shareTarget.summary_100 ?? '要約準備中'}\n\n${shareTarget.url}`}
+                value={shareText}
                 readOnly
               />
-              <div className="flex flex-wrap gap-2">
-                {['X', 'Threads', 'Slack', 'Misskey', 'URLをコピー'].map((label, index) => (
+              <label className="flex items-center gap-2 text-[11px] text-muted">
+                <input
+                  type="checkbox"
+                  checked={appendAiHubTag}
+                  onChange={(event) => {
+                    setAppendAiHubTagState(event.target.checked)
+                    setShareAppendTag(event.target.checked)
+                  }}
+                />
+                <span>#AIHub タグを URL の後ろに付ける</span>
+              </label>
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
+                <ShareButton label="X" onClick={() => void handleShareAction('x')} />
+                <ShareButton label="Threads" onClick={() => void handleShareAction('threads')} />
+                <ShareButton label="Slack" onClick={() => void handleShareAction('slack')} />
+                <ShareButton label="Misskey" onClick={() => void handleShareAction('misskey')} />
+                <ShareButton label="URLをコピー" accent onClick={() => void handleShareAction('copy')} />
+              </div>
+              <div className="flex flex-col gap-2 rounded-lg border border-black/5 bg-white/70 p-3">
+                <span className="text-[11px] font-bold text-ink">Misskey 設定</span>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={misskeyInstance}
+                    onChange={(event) => setMisskeyInstanceState(event.target.value)}
+                    placeholder="misskey.io"
+                    className="flex-1 rounded-lg border border-black/5 px-3 py-2 text-[12px] outline-none"
+                  />
                   <button
-                    key={label}
                     type="button"
-                    className="rounded-lg border px-3 py-1.5 text-[11px] font-bold"
-                    style={{
-                      background: index === 4 ? 'var(--color-orange)' : '#fff',
-                      color: index === 4 ? '#fff' : 'var(--color-ink)',
-                      borderColor: index === 4 ? 'var(--color-orange)' : 'rgba(0,0,0,0.05)',
+                    className="rounded-lg border border-black/5 px-3 py-2 text-[11px] font-bold"
+                    onClick={() => {
+                      setMisskeyInstance(misskeyInstance)
+                      setShareStatus('Misskey インスタンスを保存しました。')
                     }}
                   >
-                    {label}
+                    保存
                   </button>
-                ))}
+                </div>
               </div>
+              {shareStatus ? <p className="text-[11px] text-accent-darker">{shareStatus}</p> : null}
             </div>
           </div>
         </div>
@@ -612,5 +818,22 @@ function LoadingGrid({ compact = false }: { compact?: boolean }) {
         </div>
       ))}
     </>
+  )
+}
+
+function ShareButton({ label, accent = false, onClick }: { label: string; accent?: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className="rounded-lg border px-3 py-2 text-[11px] font-bold"
+      style={{
+        background: accent ? 'var(--color-orange)' : '#fff',
+        color: accent ? '#fff' : 'var(--color-ink)',
+        borderColor: accent ? 'var(--color-orange)' : 'rgba(0,0,0,0.05)',
+      }}
+      onClick={onClick}
+    >
+      {label}
+    </button>
   )
 }

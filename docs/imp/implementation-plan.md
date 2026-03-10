@@ -43,7 +43,7 @@
 - `GET /api/search` 正常
 - Home 一覧は `/api/trends` ベースの暫定 live 化済み（失敗時はモックへフォールバック）
 - 検索 UI は Enter / ボタン submit で `/api/search` 接続済み
-- 次の主対象は「行動ログ送信」「保存/共有の状態管理」「SP/TB 対応」
+- 次の主対象は「SP/TB 対応」「OGP 実装」「PWA 導線」
 
 ## 実装フェイズ方針（Sprint 1）
 
@@ -349,8 +349,8 @@ CREATE POLICY ps_own ON push_subscriptions
 - [x] 一覧ページの暫定 live 化（PC優先）
 - [x] 検索 UI の submit 接続
 - [ ] 行動ログ送信
-- [ ] 保存のローカル状態管理
-- [ ] Topic Groupページ / 暫定導線
+- [x] 保存のローカル状態管理（ブラウザ依存）
+- [x] Topic Group の暫定導線
 - [ ] SP UI
 - [ ] TB UI
 - [x] rank_scoresバッチ（`/api/cron/compute-ranks`、30分おき）

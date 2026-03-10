@@ -29,13 +29,13 @@
 | `TLB001` | 一覧ツールバー | Home 一覧 | local + config | local/mock | 高 | 一部モック | タブ状態は local、ボタン文言は固定 |
 | `MOD001` | 表示モード群 | Home 一覧直下 | local + user prefs | local/mock | 高 | 一部モック | 要約モード、批評表示 |
 | `LST001` | 記事カード一覧 | Home 一覧 | `api:/api/trends` | api/mock fallback | 最優先 | 暫定 live化 | API失敗時のみモックへフォールバック |
-| `TOP001` | Topic Group セクション | Home セクション[5] | `topic_groups` + `articles` | mock | 中 | モックのみ | 仮実装対象 |
+| `TOP001` | Topic Group セクション | Home セクション[5] | `topic_groups` + `articles` | derived/local | 中 | 暫定実装 | Home 内スクロール固定表示で仮導線化 |
 | `SRC001` | 検索結果セクション | Home セクション[6] | `api:/api/search` | api/mock fallback | 高 | 暫定 live化 | submit 型検索へ切替済み |
 | `DGT001` | ダイジェストセクション | Home セクション[7] | `digest_logs` + derived | derived | 中 | 暫定実装 | 一覧上位3件から暫定構成 |
-| `SDB001` | サイドバーカテゴリ/保存 | Home 右サイド | local + derived | mock/local | 高 | 一部モック | カテゴリ state は local、件数は固定 |
+| `SDB001` | サイドバーカテゴリ/保存 | Home 右サイド | local + derived | local/derived | 高 | 一部 live化 | 保存件数は local save 反映済み |
 | `ACT001` | リアルタイム活動 | Home 右サイド | derived / action_logs | mock | 低 | モックのみ | P0 では固定でも進行可能 |
 | `NTF001` | 通知設定 | Home 右サイド | local + `push_subscriptions` | local/mock | 中 | 一部モック | ON/OFF のみ確定済み |
-| `SHR001` | 共有モーダル | Home モーダル | article + share template | local/mock | 中 | 一部モック | 記事文面は記事依存、送信先ボタンは固定 |
+| `SHR001` | 共有モーダル | Home モーダル | article + share template | local/derived | 中 | 暫定 live化 | コピー・タグ切替・Misskey設定を先行実装 |
 | `EMP001` | 空状態 | Home 検索空結果 | derived | mock | 中 | モックのみ | 文言は仮でも進められる |
 
 ## 項目台帳
@@ -87,14 +87,14 @@
 | `LST018` | `LST001` | 保存ボタン文言 | `保存` | `config.ui.card.buttons.save` | 可 | string | config | mock_only | `保存` |
 | `LST019` | `LST001` | 批評ボタン文言 | `批評` | `config.ui.card.buttons.critique` | 可 | string | config | mock_only | `批評` |
 | `TOP001` | `TOP001` | セクションラベル | `[5] Topic Group` | `config.ui.sections.topic_group.label` | 可 | string | config | mock_only | `[5] Topic Group` |
-| `TOP002` | `TOP001` | セクションタイトル | `Gemini 2.0 Flash 関連コンテンツ一覧` | `derived.topic_group.title` | 否 | string | mock/derived | mock_only | `Topic Group` |
+| `TOP002` | `TOP001` | セクションタイトル | `Gemini 2.0 Flash 関連コンテンツ一覧` | `derived.topic_group.title` | 否 | string | derived | switchable | `Topic Group` |
 | `TOP003` | `TOP001` | セクションサブタイトル | `動画・公式・ブログの導線を同一画面で比較` | `config.ui.sections.topic_group.subtitle` | 可 | string | mock/config | mock_only | `関連コンテンツ一覧` |
 | `TOP004` | `TOP001` | カラム1タイトル | `動画` | `derived.topic_group.columns[0].label` | 否 | string | mock/derived | mock_only | `動画` |
-| `TOP005` | `TOP001` | カラム1件数文言 | `YouTube 解説 3 件` | `derived.topic_group.columns[0].headline` | 否 | string | mock/derived | mock_only | `0件` |
+| `TOP005` | `TOP001` | カラム1件数文言 | `YouTube 解説 3 件` | `derived.topic_group.columns[0].headline` | 否 | string | derived | switchable | `0件` |
 | `TOP006` | `TOP001` | カラム2タイトル | `公式` | `derived.topic_group.columns[1].label` | 否 | string | mock/derived | mock_only | `公式` |
-| `TOP007` | `TOP001` | カラム2件数文言 | `Google 公式発表 2 件` | `derived.topic_group.columns[1].headline` | 否 | string | mock/derived | mock_only | `0件` |
+| `TOP007` | `TOP001` | カラム2件数文言 | `Google 公式発表 2 件` | `derived.topic_group.columns[1].headline` | 否 | string | derived | switchable | `0件` |
 | `TOP008` | `TOP001` | カラム3タイトル | `ブログ` | `derived.topic_group.columns[2].label` | 否 | string | mock/derived | mock_only | `ブログ` |
-| `TOP009` | `TOP001` | カラム3件数文言 | `実装比較ブログ 5 件` | `derived.topic_group.columns[2].headline` | 否 | string | mock/derived | mock_only | `0件` |
+| `TOP009` | `TOP001` | カラム3件数文言 | `実装比較ブログ 5 件` | `derived.topic_group.columns[2].headline` | 否 | string | derived | switchable | `0件` |
 | `TOP010` | `TOP001` | カラム補助文言 | `同一トピックの読み分け導線をここに集約` | `config.ui.sections.topic_group.helper` | 可 | string | config | mock_only | `関連導線` |
 | `SRC001` | `SRC001` | セクションラベル | `[6] 検索結果` | `config.ui.sections.search.label` | 可 | string | config | mock_only | `[6] 検索結果` |
 | `SRC002` | `SRC001` | セクションタイトル | `検索 / タグ絞り込み` | `config.ui.sections.search.title` | 可 | string | config | mock_only | `検索` |
@@ -108,9 +108,9 @@
 | `DGT005` | `DGT001` | ダイジェスト補助文 | `上位記事を100字要約で再構成...` | `config.ui.sections.digest.item_helper` | 可 | string | mock/config | mock_only | `上位記事を再構成` |
 | `SDB001` | `SDB001` | サイドバーカテゴリ配列 | `総合, 動画, 公式, ブログ, Agent` | `config.ui.sidebar.categories` | 可 | array | config | mock_only | 既存配列 |
 | `SDB002` | `SDB001` | 選択中カテゴリ | `all` | `local.sidebar.active_category` | 否 | enum | local | switchable | `all` |
-| `SDB003` | `SDB001` | 未読件数 | `24` | `derived.sidebar.saved.unread` | 否 | number | mock/derived | mock_only | `0` |
-| `SDB004` | `SDB001` | 高評価件数 | `41` | `derived.sidebar.saved.top_rated` | 否 | number | mock/derived | mock_only | `0` |
-| `SDB005` | `SDB001` | 後で読む件数 | `64` | `derived.sidebar.saved.read_later` | 否 | number | mock/derived | mock_only | `0` |
+| `SDB003` | `SDB001` | 未読件数 | `24` | `derived.sidebar.saved.unread` | 否 | number | derived/local | switchable | `0` |
+| `SDB004` | `SDB001` | 高評価件数 | `41` | `derived.sidebar.saved.top_rated` | 否 | number | derived | switchable | `0` |
+| `SDB005` | `SDB001` | 後で読む件数 | `64` | `derived.sidebar.saved.read_later` | 否 | number | derived/local | switchable | `0` |
 | `ACT001` | `ACT001` | 活動メイン文 | `この1時間で 28 件シェア` | `derived.sidebar.activity.main` | 否 | string | mock/derived | mock_only | `活動データなし` |
 | `ACT002` | `ACT001` | 活動補助文 | `+3 件が急上昇` | `derived.sidebar.activity.sub` | 否 | string | mock/derived | mock_only | `変動なし` |
 | `NTF001` | `NTF001` | 通知時刻配列 | `07:00 ダイジェスト / true` | `local.notifications.times` | 否 | array | local | switchable | 既存配列 |
@@ -118,7 +118,7 @@
 | `SHR001` | `SHR001` | モーダル表示対象記事 | `shareTarget article` | `local.share.target_article` | 否 | object/null | local | switchable | `null` |
 | `SHR002` | `SHR001` | モーダルタイトル | `この記事を共有` | `config.ui.share.modal_title` | 可 | string | config | mock_only | `この記事を共有` |
 | `SHR003` | `SHR001` | 共有文面テンプレ | `タイトル\n\n要約\n\nURL\n#AIHub` | `derived.share.template` | 否 | string | local/derived | switchable | `''` |
-| `SHR004` | `SHR001` | 共有先ボタン配列 | `X, Threads, Slack, Misskey, URLをコピー` | `config.ui.share.targets` | 可 | array | config | mock_only | 既存配列 |
+| `SHR004` | `SHR001` | 共有先ボタン配列 | `X, Threads, Slack, Misskey, URLをコピー` | `config.ui.share.targets` | 可 | array | local/config | switchable | 既存配列 |
 | `EMP001` | `EMP001` | 空状態アイコン文言 | `NO` | `config.ui.empty.icon_label` | 可 | string | config | mock_only | `NO` |
 | `EMP002` | `EMP001` | 空状態タイトル | `該当記事なし` | `config.ui.empty.title` | 可 | string | config | mock_only | `該当記事なし` |
 | `EMP003` | `EMP001` | 空状態説明 | `検索語またはカテゴリを変更してください。` | `config.ui.empty.description` | 可 | string | config | mock_only | `条件を変更してください。` |
