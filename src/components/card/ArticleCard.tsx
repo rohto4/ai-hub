@@ -48,15 +48,15 @@ export function ArticleCard({
     <article
       className="relative overflow-hidden rounded-xl border bg-card-second"
       style={{
-        minHeight: summaryMode === 300 || showCritique ? 248 : 210,
+        minHeight: summaryMode === 300 || showCritique ? 320 : 272,
         borderColor: isFocused || showCritique ? 'var(--color-orange)' : '#e5e5e5',
         boxShadow: '0 4px 4px rgba(0,0,0,0.25)',
       }}
       id={`article-card-${article.id}`}
     >
-      <div className="flex gap-3 p-2.5 pb-12">
+      <div className="flex gap-3 p-2.5 pb-24 md:pb-12">
         <div
-          className="relative mt-0.5 h-[163px] w-[94px] shrink-0 overflow-hidden rounded-lg"
+          className="relative mt-0.5 h-[128px] w-[84px] shrink-0 overflow-hidden rounded-lg md:h-[163px] md:w-[94px]"
           style={{ background: 'linear-gradient(145deg, #ffe8d6, #ffd8bd)' }}
         >
           {article.thumbnail_url ? (
@@ -91,7 +91,7 @@ export function ArticleCard({
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-[7px] px-2">
+      <div className="absolute inset-x-0 bottom-2 grid grid-cols-3 gap-1.5 px-2 md:flex md:items-center md:justify-center md:gap-[7px]">
         <ActButton label={summaryMode === 300 ? '折りたたむ' : '300字'} onClick={() => onAction('expand_300', article.id)} />
         <ActButton label="Topic Group" onClick={() => onAction('topic_group_open', article.id)} />
         <ActButton label="共有" variant="share" onClick={() => onAction('share_open', article.id)} />
@@ -116,7 +116,7 @@ function ActButton({
     <button
       type="button"
       onClick={onClick}
-      className="min-w-[72px] rounded-full border-none text-[11px]"
+      className="min-w-0 rounded-full border-none px-2 text-[10px] md:min-w-[72px] md:text-[11px]"
       style={{
         height: 26,
         background: isShare ? 'var(--color-orange)' : 'transparent',
