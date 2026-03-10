@@ -335,11 +335,11 @@ CREATE POLICY ps_own ON push_subscriptions
 - [ ] EXPLAIN ANALYZEで主要クエリ検証
 
 ### Phase 3: 収集・解析パイプライン
-- [ ] RSS収集ジョブ（`/api/cron/ingest-feeds`）
+- [~] RSS収集ジョブ（`/api/cron/ingest-feeds`）
 - [ ] URL正規化 + url_hash重複排除
 - [ ] 本文抽出器（cheerio + 抽象化レイヤー）
-- [ ] AI要約サービス（Gemini Flash → テンプレートフォールバック）
-- [ ] 100字バリデーション + 禁止語チェック
+- [~] AI要約サービス（Gemini Flash → テンプレートフォールバック）
+- [~] 100字バリデーション + 禁止語チェック
 - [ ] embedding生成 → pgvector格納
 - [ ] Topic Groupバッチ（IVFFlat近傍 → 閾値0.8クラスタリング）
 
@@ -363,12 +363,13 @@ CREATE POLICY ps_own ON push_subscriptions
 
 ### Phase 6: 通知
 - [~] Web Push / PWA 導線（manifest + service worker + install banner）
+- [~] Push購読API（`POST /api/push/subscribe`）
 - [ ] 07:00 / 12:00 / 18:00 ダイジェスト配信Cron
 - [ ] digest_logs + 失敗再送（retry_count ≤ 3）
 
 ### Phase 7: パーソナライズ
 - [ ] 匿名設定ローカル保存
-- [ ] Firebaseログイン後のサーバープロファイル同期
+- [~] Firebaseログイン後のサーバープロファイル同期（client 初期化まで）
 - [ ] 匿名↔ログイン設定マージ処理
 
 ---
