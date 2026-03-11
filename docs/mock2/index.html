@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Trend Hub / Mock2 Flow Prototype</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="rail">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div>
+            <strong>AI Trend Hub</strong>
+            <span>Flow Prototype</span>
+          </div>
+        </div>
+        <nav class="nav" id="global-nav"></nav>
+        <div class="rail-card">
+          <p class="eyebrow">Tonight</p>
+          <strong>導線確認優先</strong>
+          <span>画面の見た目より、どこからどこへ行けるかを検証するための mock2。</span>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Current Route</p>
+            <h1 id="route-title">Home</h1>
+          </div>
+          <div class="topbar-actions">
+            <div class="search-pill">
+              <input id="global-search" type="search" placeholder="Gemini / Agent / Safety" />
+              <button id="search-submit" type="button">Search</button>
+            </div>
+            <button class="ghost-btn" id="open-digest">07:00 Digest</button>
+          </div>
+        </header>
+
+        <section class="canvas">
+          <div class="main-pane">
+            <div class="route-meta" id="route-meta"></div>
+            <div id="view-root"></div>
+          </div>
+
+          <aside class="context-pane">
+            <section class="context-card">
+              <p class="eyebrow">Focused State</p>
+              <div id="context-root"></div>
+            </section>
+            <section class="context-card">
+              <p class="eyebrow">Transition Log</p>
+              <div id="flow-log" class="flow-log"></div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop hidden" id="share-modal">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-head">
+          <strong>Share Composer</strong>
+          <button type="button" id="close-share">×</button>
+        </div>
+        <div class="modal-body">
+          <textarea id="share-text" readonly></textarea>
+          <label class="toggle-row">
+            <input type="checkbox" id="share-tag-toggle" checked />
+            <span>#AIHub を URL の後ろに付ける</span>
+          </label>
+          <div class="share-grid">
+            <button type="button" data-share="x">X</button>
+            <button type="button" data-share="threads">Threads</button>
+            <button type="button" data-share="slack">Slack</button>
+            <button type="button" data-share="misskey">Misskey</button>
+            <button type="button" data-share="copy" class="accent">URLをコピー</button>
+          </div>
+          <div class="mini-card">
+            <p class="eyebrow">Misskey Instance</p>
+            <div class="inline-form">
+              <input id="misskey-instance" type="text" value="misskey.io" />
+              <button type="button" id="save-misskey">保存</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

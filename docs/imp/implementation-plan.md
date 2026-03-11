@@ -1,6 +1,6 @@
 ﻿# AI Trend Hub — P0 実装計画
 
-最終更新: 2026-03-11
+最終更新: 2026-03-12
 
 ---
 
@@ -34,26 +34,25 @@
 - 先行着手対象は UI 実装、バリデーション、非DBロジック、マイグレーション整備。
 - Neon 接続後の初期確認は `npm run db:migrate` → `npm run db:seed` → `npm run dev` の順で行う。
 
-## 現在ステータス（2026-03-11）
+## 現在ステータス（2026-03-12）
 
 - Neon 接続確認済み
 - migration 適用済み（`001`〜`009`）
 - 開発用 seed 投入済み（feeds / topic_groups / articles / rank_scores）
 - `GET /api/trends` 正常
 - `GET /api/search` 正常
-- Home 一覧は `/api/trends` ベースの暫定 live 化済み（失敗時はモックへフォールバック）
-- 検索 UI は Enter / ボタン submit で `/api/search` 接続済み
-- 次の主対象は「ingestion / AI / notification / auth の仕上げ」「setup / status ドキュメント整備」
+- 先行実装よりも導線確認用モックの不足が大きいと判断し、今夜は `docs/mock2/` を正として再設計に戻す
+- `docs/mock/pastel-orange-intel-v6.html` は断面の参照元として残す
+- 非モック化ステータスは全件リセット済み
+- 次の主対象は「mock2 の導線確認」「採用断面の確定」「その後の非モック化台帳再作成」
 
-## 実装フェイズ方針（Sprint 1）
+## 今夜のフェイズ方針（mock2-first）
 
-1. ホーム画面をモック配列から `/api/trends` ベースへ切替
-2. 検索 UI は Enter / ボタン submit で `/api/search` へ接続
-3. `actions` API は速度優先で接続し、重いものは表示後非同期送信を許容する
-4. Topic Group は仮実装を先行し、後で最終確定させる
-5. SP / TB UI を OGP 実装前に入れ、公開面の情報量出し分けを先に固める
-6. Firebase Auth / Web Push / ingest cron は Sprint 2 以降へ送る
-7. 管理画面の MVP は「フィード管理 + 要約監査キュー + ジョブ履歴」を前提に設計する
+1. 参考入力を取り直し、導線の強いプロトタイプ構成を再選定する
+2. `docs/mock2/` に route と動的状態を持つ導線確認モックを作る
+3. 採用案以外は `docs/mock2/options.md` に残す
+4. 遷移メモは `docs/mock2/site-flow.md` に残す
+5. その後で非モック化台帳を作り直す
 
 ## ソース取得方針（2026-03-10 確定）
 
