@@ -133,6 +133,12 @@ function categoryMatches(category: CategoryId, article: UiArticle): boolean {
 function hydrateArticle(article: UiArticle): UiArticle {
   return {
     ...article,
+    score:
+      typeof article.score === 'number'
+        ? article.score
+        : typeof article.score === 'string'
+          ? Number(article.score)
+          : article.score,
     published_at: new Date(article.published_at),
     created_at: new Date(article.created_at),
     updated_at: new Date(article.updated_at),

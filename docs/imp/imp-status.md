@@ -36,6 +36,7 @@
 |---|---|---|---|
 | 型検査 | `npm run type-check` | 成功 | `.next/types` 依存があるため、必要に応じて build 後に再実行 |
 | 本番ビルド | `npm run build` | 成功 | `/opengraph-image` `/manifest.webmanifest` `/api/push/subscribe` `/api/cron/send-digest` を含めてビルド済み |
+| 開発サーバー | `npm run dev` | 既定を変更 | Windows では Turbopack 由来の `_buildManifest.js.tmp.*` ENOENT を避けるため `next dev` を既定化 |
 | Home API | `/api/trends` | 既存確認済み | Home はこの API を基準に描画 |
 | Search API | `/api/search` | 既存確認済み | submit 型 UI で接続済み |
 | UI フォールバック | DB 失敗時の Home / Search | 実装済み | モックへフォールバックして UI を止めない |

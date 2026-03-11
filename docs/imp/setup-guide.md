@@ -48,4 +48,5 @@
 ## 補足
 
 - `npm run type-check` は `.next/types` に依存するため、環境によっては `npm run build` の後に実行した方が安定する。
+- Windows では `next dev --turbopack` で `.next/static/development/_buildManifest.js.tmp.*` の ENOENT が出ることがあるため、既定の開発コマンドは `npm run dev` = `next dev` にしている。Turbopack を試す場合は `npm run dev:turbo` を使う。
 - 保存機能は現在 `localStorage` ベース。Firebase 連携後にサーバー同期へ差し替える前提。
