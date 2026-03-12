@@ -2,7 +2,7 @@
 
 ## 🏗️ Architectural Guiding Principles
 - **Pattern**: Next.js App Router + shadcn/ui.
-- **Data Flow**: Server Actions for mutations, Supabase SSR for data fetching.
+- **Data Flow**: Server Actions for mutations, Neon/PostgreSQL をサーバー側から参照する。
 - **Conventions**: 
   - Components go in `src/components/`.
   - Server Actions go in `src/lib/actions/`.
