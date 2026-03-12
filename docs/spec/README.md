@@ -1,6 +1,6 @@
 # AI Trend Hub 仕様書インデックス
 
-最終更新: 2026-03-06
+最終更新: 2026-03-12
 
 ## 目的
 このディレクトリは、AI Trend Hub の実装前検討（要件・技術・運用）の SSOT です。
@@ -16,7 +16,8 @@
 8. `07-frontend-pwa-share.md`
 9. `08-security-quality-operations.md`
 10. `09-kpi-rollout.md`
-11. `research-links.md`
+11. `10-ingestion-layer-design.md`
+12. `research-links.md`
 
 ## 実装連携
 - 実装待ちタスク: `../imp/implementation-plan.md`

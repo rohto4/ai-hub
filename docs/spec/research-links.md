@@ -1,6 +1,6 @@
 # Research Links（見た目 + 情報収集重視版）
 
-最終更新: 2026-03-05
+最終更新: 2026-03-12
 
 ## 1. 競合/隣接競合（情報収集・要約・ランキング）
 
@@ -104,12 +104,12 @@
 
 ## 5. データ基盤/分析の公式仕様
 
-1. Supabase RLS
-   - https://supabase.com/docs/guides/database/postgres/row-level-security
-2. Supabase Realtime
-   - https://supabase.com/docs/guides/realtime
-3. Supabase Cron
-   - https://supabase.com/docs/guides/cron
+1. Neon 接続
+   - https://neon.com/docs/get-started-with-neon/connect-neon
+2. Neon connection pooling
+   - https://neon.com/docs/connect/connection-pooling
+3. pgvector
+   - https://github.com/pgvector/pgvector
 4. Postgres JSONB
    - https://www.postgresql.org/docs/current/datatype-json.html
 

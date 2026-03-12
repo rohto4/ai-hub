@@ -1,237 +1,302 @@
-# データモデル設計（Supabase/PostgreSQL）v2
+# データモデル設計（Neon/PostgreSQL v4）
 
-最終更新: 2026-03-05
+最終更新: 2026-03-12
 
-## 1. 設計意図
+## 1. 設計原則
 
-1. コンテンツ収集と表示を分離
-2. 重複排除と Topic Group 横断を両立
-3. プロダクト改善に必要な行動データを最初から蓄積
-4. 日本語運用と通知配信を初期リリースで成立
+1. データ取得から公開までを `layer1` から `layer4` に分ける
+2. `layer1` と `layer2` を先に独立実装する
+3. `layer3` は手動承認層ではなく、運用データ層として扱う
+4. サイトは `layer4` だけを読む
+5. 確定重複と類似重複を分けて扱う
 
-## 2. エンティティ一覧
+## 2. レイヤーと主テーブル
 
-## 2.1 コンテンツ系
+1. `layer1`
+   - `articles_raw`
+   - `articles_raw_history`
+2. `layer2`
+   - `articles_enriched`
+   - `articles_enriched_history`
+   - `articles_enriched_tags`
+   - `tags_master`
+   - `tag_aliases`
+   - `tag_candidate_pool`
+3. `layer3`
+   - `activity_logs`
+   - `activity_metrics_hourly`
+   - `admin_operation_logs`
+   - `priority_processing_queue`
+4. `layer4`
+   - `public_articles`
+   - `public_article_sources`
+   - `public_article_tags`
+   - `public_rankings`
 
-1. `feeds`
-2. `source_items`
-3. `articles`
-4. `article_genres`
-5. `topic_groups`
-6. `summaries`
-7. `rank_scores`
+## 3. 補助テーブル
 
-## 2.2 ユーザー/設定系
+1. `source_targets`
+   - 取得元定義
+2. `source_priority_rules`
+   - 同一引用元の代表ソース優先度
+3. `push_subscriptions`
+   - Push 購読
+4. `digest_logs`
+   - Digest 配信履歴
 
-1. `users_profile`
-2. `user_interest_profiles`
-3. `user_summary_preferences`
-4. `user_notification_preferences`
-5. `push_subscriptions`
+## 4. 主テーブル概要
 
-## 2.3 行動分析系（Data Science）
+### 4.1 `source_targets`
 
-1. `event_log`
-2. `session_log`
-3. `daily_user_metrics`
-4. `content_performance_daily`
+用途:
 
-## 2.4 通知運用系
+1. 毎時取得対象の定義
+2. 取得方式、更新検知可否、取得間隔の保持
 
-1. `digest_queue`
-2. `notification_delivery_log`
+主な列:
 
-## 3. データサイエンス用に保存すべき情報
+1. `source_key`
+2. `display_name`
+3. `fetch_kind`
+4. `source_category`
+5. `fetch_interval_minutes`
+6. `supports_update_detection`
 
-## 3.1 行動イベント
+### 4.2 `articles_raw`
 
-1. 一覧表示（impression）
-2. 詳細閲覧（open）
-3. Topic Group 切替（switch_source）
-4. 共有クリック（share_click）
-5. 外部リンク遷移（source_open）
-6. 批評展開（critic_expand）
-7. 要約モード切替（summary_mode_change）
-8. 通知開封（push_open）
+用途:
 
-## 3.2 最低限の文脈情報
+1. 生データ保管
+2. 更新検知材料保管
+3. 未処理 raw のキュー
 
-1. `device_type`（mobile/tablet/desktop）
-2. `referrer_type`（direct/search/social/push）
-3. `genre_context`
-4. `topic_group_id`
-5. `ab_bucket`（将来用、初期は固定）
+主な列:
 
-## 3.3 ユーザー傾向分析に必要な派生指標
+1. `source_target_id`
+2. `source_item_id`
+3. `source_url`
+4. `cited_url`
+5. `normalized_url`
+6. `title`
+7. `snippet`
+8. `snippet_hash`
+9. `source_published_at`
+10. `source_updated_at`
+11. `source_meta`
+12. `is_processed`
+13. `has_source_update`
+14. `process_after`
+15. `last_error`
 
-1. 分野別閲覧比率
-2. 共有率（シェア/閲覧）
-3. 通知反応率（開封/配信）
-4. 要約モード選好（100/200/300）
-5. デバイス別滞在分布
+### 4.3 `articles_raw_history`
 
-## 4. 主要テーブル定義（抜粋）
+用途:
 
-## 4.1 コンテンツ
+1. 1 か月超の raw アーカイブ
 
-```sql
-create table if not exists feeds (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  rss_url text not null unique,
-  source_type text not null default 'google_alert',
-  enabled boolean not null default true,
-  created_at timestamptz not null default now()
-);
+補足:
 
-create table if not exists source_items (
-  id uuid primary key default gen_random_uuid(),
-  feed_id uuid not null references feeds(id) on delete cascade,
-  raw_title text not null,
-  raw_url text not null,
-  normalized_url text not null,
-  published_at timestamptz,
-  status text not null default 'pending'
-    check (status in ('pending','processed','failed','duplicate')),
-  ingested_at timestamptz not null default now()
-);
+1. `articles_raw` と同等カラムを持ち、`archived_at` を追加する
 
-create table if not exists topic_groups (
-  id uuid primary key default gen_random_uuid(),
-  slug text not null unique,
-  topic_label text not null,
-  confidence numeric(5,4) not null default 0.0,
-  created_at timestamptz not null default now()
-);
+### 4.4 `tags_master`
 
-create table if not exists articles (
-  id uuid primary key default gen_random_uuid(),
-  canonical_url text not null unique,
-  title text not null,
-  domain text not null,
-  content_hash text not null,
-  title_fingerprint text not null,
-  primary_genre text not null check (primary_genre in ('video','official','blog')),
-  topic_group_id uuid references topic_groups(id),
-  language text not null default 'ja',
-  published_at timestamptz,
-  created_at timestamptz not null default now()
-);
+用途:
 
-create table if not exists summaries (
-  id uuid primary key default gen_random_uuid(),
-  article_id uuid not null unique references articles(id) on delete cascade,
-  summary_100 varchar(100) not null,
-  summary_200 varchar(200),
-  summary_300 varchar(300),
-  innovation_delta text,
-  hype_risk text not null check (hype_risk in ('low','medium','high')),
-  target_audience text,
-  tags text[] default '{}',
-  model_name text not null,
-  created_at timestamptz not null default now()
-);
-```
+1. 許可タグの標準マスタ
 
-## 4.2 ユーザー設定
+主な列:
 
-```sql
-create table if not exists users_profile (
-  id uuid primary key default gen_random_uuid(),
-  auth_user_id uuid unique,
-  locale text not null default 'ja-JP',
-  created_at timestamptz not null default now()
-);
+1. `tag_key`
+2. `display_name`
+3. `trend_keyword`
+4. `is_active`
+5. `article_count`
+6. `last_seen_at`
 
-create table if not exists user_interest_profiles (
-  user_id uuid not null references users_profile(id) on delete cascade,
-  interest_key text not null,
-  weight numeric(5,4) not null default 1.0,
-  updated_at timestamptz not null default now(),
-  primary key (user_id, interest_key)
-);
+### 4.5 `tag_aliases`
 
-create table if not exists user_summary_preferences (
-  user_id uuid primary key references users_profile(id) on delete cascade,
-  default_mode smallint not null default 100 check (default_mode in (100,200,300)),
-  critic_default_open boolean not null default false,
-  updated_at timestamptz not null default now()
-);
+用途:
 
-create table if not exists user_notification_preferences (
-  user_id uuid primary key references users_profile(id) on delete cascade,
-  enabled boolean not null default true,
-  notify_at_1 time not null default '07:00',
-  notify_at_2 time not null default '12:00',
-  notify_at_3 time not null default '18:00',
-  timezone text not null default 'Asia/Tokyo',
-  updated_at timestamptz not null default now()
-);
-```
+1. 同義語や表記揺れを `tags_master` に束ねる
 
-## 4.3 通知と分析ログ
+### 4.6 `tag_candidate_pool`
 
-```sql
-create table if not exists push_subscriptions (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references users_profile(id) on delete cascade,
-  endpoint text not null unique,
-  p256dh text not null,
-  auth text not null,
-  user_agent text,
-  created_at timestamptz not null default now()
-);
+用途:
 
-create table if not exists event_log (
-  id bigserial primary key,
-  user_id uuid,
-  session_id uuid,
-  event_name text not null,
-  article_id uuid,
-  topic_group_id uuid,
-  device_type text not null check (device_type in ('mobile','tablet','desktop')),
-  referrer_type text,
-  payload jsonb not null default '{}'::jsonb,
-  occurred_at timestamptz not null default now()
-);
+1. マスタ未登録タグ候補の蓄積
+2. 日次の Google Trends 照合対象管理
+3. 手動確認が必要な候補の保管
 
-create table if not exists notification_delivery_log (
-  id bigserial primary key,
-  user_id uuid not null,
-  scheduled_for timestamptz not null,
-  delivered_at timestamptz,
-  opened_at timestamptz,
-  status text not null check (status in ('queued','sent','failed','opened')),
-  reason text
-);
-```
+主な列:
 
-## 5. インデックス方針
+1. `candidate_key`
+2. `display_name`
+3. `seen_count`
+4. `review_status`
+5. `manual_review_required`
+6. `latest_trends_score`
+7. `promoted_tag_id`
 
-1. `articles(primary_genre, content_hash)` 重複判定高速化
-2. `articles(topic_group_id)` 横断表示高速化
-3. `event_log(event_name, occurred_at desc)` 行動集計高速化
-4. `notification_delivery_log(status, scheduled_for)` 配信監視高速化
+### 4.7 `articles_enriched`
 
-## 6. RLS 方針（要約）
+用途:
 
-1. 公開データ:
-   - `articles`, `summaries`, 公開ランキングビューは読み取り可
-2. ユーザー設定:
-   - 本人のみ読書き
-3. イベントログ:
-   - 書き込みはアプリサーバー経由のみ
+1. AI 要約と確定重複判定済みデータの保持
+2. 公開反映の元データ
 
-## 7. データ保持ポリシー
+主な列:
 
-1. `source_items`: 90 日
-2. `event_log`: 明細 180 日、日次集計は長期保持
-3. `notification_delivery_log`: 180 日
+1. `raw_article_id`
+2. `source_target_id`
+3. `normalized_url`
+4. `cited_url`
+5. `canonical_url`
+6. `title`
+7. `thumbnail_url`
+8. `summary_100`
+9. `summary_200`
+10. `summary_300`
+11. `content_path`
+12. `dedupe_status`
+13. `dedupe_group_key`
+14. `publish_candidate`
+15. `score`
+16. `score_reason`
+17. `source_updated_at`
+18. `processed_at`
 
-## 8. 分析で最初に見るダッシュボード項目
+### 4.8 `articles_enriched_history`
 
-1. ジャンル別 CTR
-2. Topic Group 横断遷移率
-3. 共有率（デバイス別）
-4. 要約モード利用分布
-5. 通知送信成功率・開封率
+用途:
+
+1. `articles_enriched` 更新時の旧版保管
+
+### 4.9 `articles_enriched_tags`
+
+用途:
+
+1. 整形済記事と標準タグの紐付け
+
+主な列:
+
+1. `enriched_article_id`
+2. `tag_id`
+3. `tag_source`
+4. `is_primary`
+
+### 4.10 `activity_logs`
+
+用途:
+
+1. ウェブサイトの行動明細
+
+### 4.11 `activity_metrics_hourly`
+
+用途:
+
+1. 毎時ランキング計算の集計ソース
+
+### 4.12 `admin_operation_logs`
+
+用途:
+
+1. 運営操作の監査ログ
+
+### 4.13 `priority_processing_queue`
+
+用途:
+
+1. 即時運営操作の反映
+2. 再タグ付け、再公開、非表示化、順位再計算の優先処理
+
+### 4.14 `public_articles`
+
+用途:
+
+1. サイトが読む公開記事本体
+
+### 4.15 `public_article_sources`
+
+用途:
+
+1. 公開記事と関連ソースの紐付け
+
+### 4.16 `public_article_tags`
+
+用途:
+
+1. 公開記事と表示タグの紐付け
+
+### 4.17 `public_rankings`
+
+用途:
+
+1. 各時間窓の公開順位
+
+## 5. 確定重複と類似重複
+
+### 5.1 確定重複
+
+1. `normalized_url` 一致
+2. 同一引用元一致
+
+この判定は `layer1 -> layer2` で行い、`dedupe_status` に保存する。
+
+### 5.2 類似重複
+
+1. 類似要約や類似本文の AI 判定は後段で使う
+2. `layer2` では `similar_candidate` として保持するに留める
+3. 自動削除しない
+
+## 6. インデックス方針
+
+1. `articles_raw(is_processed, process_after, created_at desc)`
+2. `articles_raw(source_target_id, normalized_url, fetch_run_at desc)`
+3. `tag_candidate_pool(review_status, seen_count desc, last_seen_at desc)`
+4. `articles_enriched(publish_candidate, processed_at desc)`
+5. `articles_enriched(dedupe_status, dedupe_group_key)`
+6. `activity_logs(public_article_id, occurred_at desc)`
+7. `priority_processing_queue(status, priority asc, available_at asc)`
+8. `public_rankings(ranking_window, rank_position, score desc)`
+
+## 7. RLS 方針
+
+1. 公開読取:
+   - `public_articles`
+   - `public_article_sources`
+   - `public_article_tags`
+   - `public_rankings`
+2. セッション単位読書き:
+   - `push_subscriptions`
+3. それ以外:
+   - 内部処理専用
+
+## 8. 保持ポリシー
+
+1. `articles_raw`
+   - 1 か月保持後 `articles_raw_history` へ移動
+2. `articles_enriched`
+   - 1 年保持を初期方針とする
+3. `articles_enriched_history`
+   - 版追跡のため保持
+4. `activity_logs`
+   - 長期保持可
+5. `digest_logs`
+   - 再送制御と監査のため保持
+
+## 9. layer3 / layer4 に受け渡す最低項目
+
+1. `display_title`
+2. `display_summary_100`
+3. `display_summary_200`
+4. `display_summary_300`
+5. `thumbnail_url`
+6. `primary_source_target_id`
+7. `public_refreshed_at`
+
+## 10. 実装時の注意
+
+1. `layer3` は人手承認前提で作らない
+2. タグ追加だけ、必要なら人手レビューを挟めるようにする
+3. `layer4` はサイト表示専用の安定層として扱う
+4. 公開面は `layer2` を直接参照しない

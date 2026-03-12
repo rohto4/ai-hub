@@ -1,6 +1,6 @@
 # AI Trend Hub セットアップガイド
 
-最終更新: 2026-03-11
+最終更新: 2026-03-12
 
 ## 目的
 
@@ -22,7 +22,7 @@
 
 | 項目 | 何を決めるか | 使う場所 | 備考 |
 |---|---|---|---|
-| 重要ソース初期リスト | RSS / Atom / 公式 API の URL 一覧 | `feeds` seed / ingestion | Google Alerts 比率の暫定運用を具体化する |
+| 重要ソース初期リスト | RSS / Atom / 公式 API の URL 一覧 | `articles_raw` への投入元定義 / ingestion | Google Alerts 比率の暫定運用を具体化する |
 | Firebase プロジェクト構成 | user / admin の auth provider 方針 | 保存同期 / 管理画面 | Google ログインを入れるならここで決める |
 | Push 配信文面 | digest の title/body 方針 | `send-digest` cron | いまは 24h ランキング上位3件の先頭要約を送る骨格のみ |
 | Misskey 対応範囲 | 対応インスタンスを固定するか自由入力のままにするか | share popup | 現在は自由入力を local 保存 |

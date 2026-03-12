@@ -1,395 +1,273 @@
-﻿# AI Trend Hub — P0 実装計画
-
-最終更新: 2026-03-12
+# AI Trend Hub 実装計画
 
----
+最終更新: 2026-03-13
 
-## 確定済み技術決定
-
-| # | 項目 | 決定内容 |
-|---|---|---|
-| 1 | DB | Neon (PostgreSQL 16) |
-| 2 | Auth | Firebase Auth (Admin SDK + Client SDK) |
-| 3 | AI | Gemini Flash → テンプレートフォールバック（2段） |
-| 4 | OGP | @vercel/og |
-| 5 | 通知 | Web Push (07:00 / 12:00 / 18:00 固定) |
-| 6 | Topic Group | 同ジャンル内コサイン類似度 ≥ 0.8（クロスジャンルなし） |
-| 7 | パーソナライズ | 匿名ブラウザ保存 + 任意ログイン同期 |
-| 8 | ポーリング | なし（手動リロードのみ） |
-| 9 | 要約モード | 100字標準 + 200/300展開 |
-| 10 | 本文キャッシュ | 7日間（メタデータ・要約は永続） |
-| 11 | 収集元 | Google Alerts 中心 + 重要ソース限定追加 |
-| 12 | サムネ生成 | プロバイダ抽象化（AIフォールバック層と共通） |
-| 13 | 検索 | P0 でキーワード検索（ILIKEベース、拡張は後段で再評価） |
-| A | pgvector | 最初から導入（embedding vector(768)、IVFFlat） |
-| B | action_logs | 細粒度15種類・セッション単位・週次パーティション |
-| C | rank_scores更新 | 30分バッチ（Vercel Cron） |
-
-**未確定**: #17 Topic Group遷移方式（別ページ / ドロワー / インライン展開）
-
-## ローカル開発メモ（2026-03-10）
-
-- Neon アカウント未準備の間は `DATABASE_URL` / `DATABASE_URL_UNPOOLED` を未設定のままでよい。
-- その状態でもアプリ本体は起動可能とし、DB依存APIは `503 database unavailable` を返す。
-- 先行着手対象は UI 実装、バリデーション、非DBロジック、マイグレーション整備。
-- Neon 接続後の初期確認は `npm run db:migrate` → `npm run db:seed` → `npm run dev` の順で行う。
-
-## 現在ステータス（2026-03-12）
-
-- Neon 接続確認済み
-- migration 適用済み（`001`〜`009`）
-- 開発用 seed 投入済み（feeds / topic_groups / articles / rank_scores）
-- `GET /api/trends` 正常
-- `GET /api/search` 正常
-- 先行実装よりも導線確認用モックの不足が大きいと判断し、今夜は `docs/mock2/` を正として再設計に戻す
-- `docs/mock/pastel-orange-intel-v6.html` は断面の参照元として残す
-- 非モック化ステータスは全件リセット済み
-- 次の主対象は「mock2 の導線確認」「採用断面の確定」「その後の非モック化台帳再作成」
-
-## 今夜のフェイズ方針（mock2-first）
-
-1. 参考入力を取り直し、導線の強いプロトタイプ構成を再選定する
-2. `docs/mock2/` に route と動的状態を持つ導線確認モックを作る
-3. 採用案以外は `docs/mock2/options.md` に残す
-4. 遷移メモは `docs/mock2/site-flow.md` に残す
-5. その後で非モック化台帳を作り直す
-
-## ソース取得方針（2026-03-10 確定）
-
-- 重要ソース 20% を自動取得対象にすること自体は可能。
-- ただし「どの URL でも自動収集」ではなく、取得手段を限定する。
-- 実装方針は **`RSS / Atom / 公式 API / 利用条件が明示された公開 feed のみ自動取得`** とする。
-
-### 実務上の判断
-
-1. `Google Alerts 100%` は立ち上げは楽。
-2. ただし品質と速度が不安定になりやすい。
-3. 一方で「重要ソース20%」を雑にスクレイピングすると、規約確認・変更追従・例外処理が重い。
-4. そのため中間案として、`Google Alerts` を母集団にしつつ、重要ソースは自動取得してよいものだけを追加する。
-
-### 追加条件
-
-- 公式 RSS / Atom がある
-- 公式 API がある
-- robots / 利用条件上、機械取得を明確に拒否していない
-- ログイン不要の公開面
-- 保存・再配布の扱いが今の設計と矛盾しない
-
-### 運用ルール
-
-- 上記条件を満たす重要ソースのみ、自動取得対象にする
-- それ以外は「候補として管理画面に出すが、自動取得対象にはしない」
-- P0 は `Google Alerts` 中心 + `RSS / Atom / 公式 API` 限定の重要ソース追加で進める
-- P1 以降で source ごとの取得方式と要確認フラグを管理画面に持つ
-
-### 初期投入方針
-
-- 初期投入する重要ソースは、**公式 RSS / Atom / API がある範囲に限定してよい**
-- 理由:
-  - 規約面の不確実性を減らせる
-  - 取得方式を標準化しやすい
-  - 例外処理や保守コストを抑えられる
-  - P0 の目的である「安定運用開始」に合う
-
-## 未確定仕様の扱い（2026-03-10）
-
-- 未確定事項は `docs/imp/implementation-wait.md` に集約する。
-- `implementation-plan.md` では、未確定事項のうち「暫定仕様で前進するもの」と「判断確定後に着手するもの」を実装手順に反映する。
-
----
-
-## DBスキーマ（確定版）
-
-### 拡張機能
-
-```sql
-CREATE EXTENSION IF NOT EXISTS vector;    -- Topic Group類似度計算
-```
-
-### feeds — RSSフィード管理
-
-```sql
-CREATE TABLE feeds (
-  id               uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  name             text        NOT NULL,
-  url              text        NOT NULL UNIQUE,
-  genre            text        NOT NULL,        -- 'llm'|'agent'|'coding'|...
-  source_type      text        NOT NULL,        -- 'youtube'|'blog'|'official'|'news'
-  active           boolean     DEFAULT true,
-  fetch_interval_m int         DEFAULT 60,
-  last_fetched_at  timestamptz,
-  error_count      int         DEFAULT 0,
-  created_at       timestamptz DEFAULT now()
-);
-```
-
-### source_items — RSS生データ（月次パーティション）
-
-```sql
-CREATE TABLE source_items (
-  id                 uuid        DEFAULT gen_random_uuid(),
-  feed_id            uuid        REFERENCES feeds(id),
-  url                text        NOT NULL,
-  url_hash           text        NOT NULL,      -- SHA-256(正規化URL)
-  title              text,
-  published_at       timestamptz,
-  raw_content        text,                      -- 本文キャッシュ（7日）
-  content_expires_at timestamptz,
-  processed          boolean     DEFAULT false,
-  fetched_at         timestamptz DEFAULT now()
-) PARTITION BY RANGE (fetched_at);
-
--- 月次パーティション（Cronで月初に自動作成）
-CREATE TABLE source_items_2026_03
-  PARTITION OF source_items
-  FOR VALUES FROM ('2026-03-01') TO ('2026-04-01');
-
-CREATE UNIQUE INDEX si_url_hash_month ON source_items (url_hash, fetched_at);
-CREATE INDEX        si_unprocessed    ON source_items (fetched_at) WHERE processed = false;
-```
-
-### articles — 正規記事（中核テーブル）
-
-```sql
-CREATE TABLE articles (
-  id              uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  url             text        NOT NULL UNIQUE,
-  url_hash        text        GENERATED ALWAYS AS (
-                    encode(sha256(url::bytea), 'hex')) STORED,
-  title           text        NOT NULL,
-  genre           text        NOT NULL,
-  source_type     text        NOT NULL,
-  thumbnail_url   text,
-  published_at    timestamptz NOT NULL,
-  summary_100     text,
-  summary_200     text,
-  summary_300     text,
-  critique        text,
-  ai_model        text,                         -- 'gemini-flash'|'template'
-  topic_group_id  uuid        REFERENCES topic_groups(id),
-  embedding       vector(768),                  -- pgvector（Topic Group用）
-  created_at      timestamptz DEFAULT now(),
-  updated_at      timestamptz DEFAULT now()
-);
-
-CREATE INDEX articles_genre_published   ON articles (genre, published_at DESC);
-CREATE INDEX articles_topic_group       ON articles (topic_group_id)
-  WHERE topic_group_id IS NOT NULL;
-CREATE INDEX articles_url_hash          ON articles (url_hash);
-CREATE INDEX articles_published_at      ON articles (published_at DESC);
-CREATE INDEX articles_embedding_ivfflat ON articles
-  USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
-```
-
-### topic_groups — トピッククラスタ
-
-```sql
-CREATE TABLE topic_groups (
-  id            uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  genre         text        NOT NULL,
-  label         text        NOT NULL,
-  article_count int         DEFAULT 0,
-  created_at    timestamptz DEFAULT now(),
-  updated_at    timestamptz DEFAULT now()
-);
-```
-
-### rank_scores — 事前計算ランキング（30分更新）
-
-```sql
-CREATE TABLE rank_scores (
-  article_id   uuid    REFERENCES articles(id) ON DELETE CASCADE,
-  period       text    NOT NULL,   -- '24h'|'7d'|'30d'
-  genre        text    NOT NULL,   -- 'all'|'llm'|'agent'|...
-  score        numeric NOT NULL,
-  breakdown    jsonb,              -- {share,save,view,expand} 管理画面用のみ
-  computed_at  timestamptz DEFAULT now(),
-  PRIMARY KEY (article_id, period, genre)
-);
-
-CREATE INDEX rank_scores_lookup      ON rank_scores (period, genre, score DESC);
-CREATE INDEX rank_scores_computed_at ON rank_scores (computed_at);
-```
-
-**スコア計算式:**
-```
-score =
-  share_count    × 5.0   -- SNS拡散（最重要）
-  + save_count   × 4.0   -- 保存（高意図）
-  + expand_300   × 3.0   -- 深読み
-  + article_open × 2.0   -- 外部遷移
-  + expand_200   × 1.5
-  + critique_exp × 1.0
-  + view_count   × 0.1   -- 表示は弱め
-  × exp(-0.1 * hours_since_published)   -- 時間減衰
-```
-
-### action_logs — 行動ログ（週次パーティション）
-
-```sql
-CREATE TABLE action_logs (
-  id          bigserial,
-  article_id  uuid        REFERENCES articles(id),  -- NULLable（search等）
-  action_type text        NOT NULL,
-  session_id  text        NOT NULL,
-  user_id     text,                                  -- Firebase UID（任意）
-  platform    text,                                  -- 'pc'|'sp'|'tb'
-  source      text,                                  -- 'direct'|'digest'|'search'|'topic_group'
-  meta        jsonb,
-  created_at  timestamptz DEFAULT now()
-) PARTITION BY RANGE (created_at);
-
-CREATE TABLE action_logs_2026_w10
-  PARTITION OF action_logs
-  FOR VALUES FROM ('2026-03-02') TO ('2026-03-09');
-
-CREATE INDEX al_article_action ON action_logs (article_id, action_type, created_at);
-CREATE INDEX al_session        ON action_logs (session_id, created_at);
-```
-
-**action_type 定義（15種類）:**
-
-| action_type | 説明 | meta |
-|---|---|---|
-| `view` | カードがビューポートに入った | `{duration_ms}` |
-| `expand_200` | 200字展開 | — |
-| `expand_300` | 300字展開 | — |
-| `article_open` | 外部記事を開く | — |
-| `return_focus` | 記事から戻りフォーカス | — |
-| `share_open` | シェアポップアップを開く | — |
-| `share_copy` | URLコピー | — |
-| `share_x` | X(Twitter)投稿 | — |
-| `share_threads` | Threads投稿 | — |
-| `share_slack` | Slack投稿 | — |
-| `share_misskey` | Misskey投稿 | `{instance}` |
-| `save` | 保存 | — |
-| `unsave` | 保存解除 | — |
-| `topic_group_open` | Topic Group遷移 | `{topic_group_id}` |
-| `critique_expand` | 批評展開 | — |
-| `search` | 検索実行 | `{query, result_count}` |
-| `digest_click` | ダイジェスト通知クリック | `{scheduled_at}` |
-
-### push_subscriptions / digest_logs
-
-```sql
-CREATE TABLE push_subscriptions (
-  id          uuid    PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     text,
-  session_id  text    NOT NULL,
-  endpoint    text    NOT NULL UNIQUE,
-  keys        jsonb   NOT NULL,   -- {auth, p256dh}
-  genres      text[]  DEFAULT '{}',
-  active      boolean DEFAULT true,
-  created_at  timestamptz DEFAULT now()
-);
-
-CREATE TABLE digest_logs (
-  id              uuid    PRIMARY KEY DEFAULT gen_random_uuid(),
-  subscription_id uuid    REFERENCES push_subscriptions(id),
-  scheduled_at    timestamptz NOT NULL,
-  sent_at         timestamptz,
-  status          text    DEFAULT 'pending',  -- 'pending'|'sent'|'failed'
-  article_ids     uuid[],
-  error_msg       text,
-  retry_count     int     DEFAULT 0
-);
-
-CREATE INDEX digest_logs_retry
-  ON digest_logs (status, scheduled_at) WHERE status != 'sent';
-```
-
----
-
-## RLS ポリシー
-
-```sql
--- 記事・ランキングは全員読み取り可
-ALTER TABLE articles     ENABLE ROW LEVEL SECURITY;
-ALTER TABLE rank_scores  ENABLE ROW LEVEL SECURITY;
-CREATE POLICY articles_read    ON articles    FOR SELECT USING (true);
-CREATE POLICY rank_scores_read ON rank_scores FOR SELECT USING (true);
-
--- 書き込みはサービスロールのみ（RLSバイパス）
--- push_subscriptionsは自分のセッションのみ
-ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY ps_own ON push_subscriptions
-  FOR ALL USING (session_id = current_setting('app.session_id', true));
-```
-
----
-
-## 実装フェーズ（推奨順）
-
-### Phase 1: 基盤
-- [x] Next.js 15 App Router + TypeScript 初期構成
-- [x] Neon接続（`@neondatabase/serverless` シングルトン）
-- [ ] Firebase Auth（Admin SDK + クライアントSDK）
-- [x] マイグレーション基盤（`/migrations/*.sql` 管理）
-- [ ] 型生成フロー（DB型 → TypeScript型）
-
-### Phase 2: データモデル
-- [x] 拡張機能 + 全テーブル + インデックス作成
-- [ ] パーティション自動作成 Cron（月初/週初）
-- [x] RLSポリシー適用
-- [ ] EXPLAIN ANALYZEで主要クエリ検証
-
-### Phase 3: 収集・解析パイプライン
-- [~] RSS収集ジョブ（`/api/cron/ingest-feeds`）
-- [ ] URL正規化 + url_hash重複排除
-- [ ] 本文抽出器（cheerio + 抽象化レイヤー）
-- [~] AI要約サービス（Gemini Flash → テンプレートフォールバック）
-- [~] 100字バリデーション + 禁止語チェック
-- [ ] embedding生成 → pgvector格納
-- [ ] Topic Groupバッチ（IVFFlat近傍 → 閾値0.8クラスタリング）
-
-### Phase 4: 公開API・UI
-- [x] `GET /api/trends?period=24h&genre=all`
-- [x] `GET /api/search?q=...`
-- [x] 一覧ページの暫定 live 化（PC優先）
-- [x] 検索 UI の submit 接続
-- [ ] 行動ログ送信
-- [x] 保存のローカル状態管理（ブラウザ依存）
-- [x] Topic Group の暫定導線
-- [x] SP UI（公開面の情報量出し分け）
-- [x] TB UI（サイドバー再配置を含む）
-- [x] rank_scoresバッチ（`/api/cron/compute-ranks`、30分おき）
-
-### Phase 5: シェア・OGP
-- [x] `@vercel/og` 画像API（site-level テンプレ）
-- [x] metadata設定（Open Graph + Twitter Card）
-- [ ] OGPキャッシュ（ISR）
-- [ ] 共有文面テンプレート生成
-
-### Phase 6: 通知
-- [~] Web Push / PWA 導線（manifest + service worker + install banner）
-- [~] Push購読API（`POST /api/push/subscribe`）
-- [ ] 07:00 / 12:00 / 18:00 ダイジェスト配信Cron
-- [ ] digest_logs + 失敗再送（retry_count ≤ 3）
-
-### Phase 7: パーソナライズ
-- [ ] 匿名設定ローカル保存
-- [~] Firebaseログイン後のサーバープロファイル同期（client 初期化まで）
-- [ ] 匿名↔ログイン設定マージ処理
-
----
-
-## 完了条件（DoD）
-
-1. 新着反映 15分以内（95%ile）
-2. 100字要約違反率 1% 未満
-3. Topic Group 同ジャンル内グループ遷移可能
-4. X / Slack でOGP意図通り表示
-5. 通知配信成功率 98% 以上
-6. 重大障害なしで7日連続運用
-
----
-
-## P1以降（スコープ外）
-
-- ジャンル横断Topic Group統合
-- メール通知
-- 通知時刻ユーザーカスタマイズ
-- スコア内訳のユーザー向け公開
-- 管理画面（フィード管理 / 要約監査キュー / 行動ログダッシュボード）
-- SP / TB デバイス別UI最適化
-
+## 1. 現在の実装方針
+
+1. Neon/PostgreSQL を正として進める
+2. データ設計は `layer1 -> layer2 -> layer3 -> layer4`
+3. サイトは `layer4` のみを参照する
+4. `layer3` は手動承認層ではなく運用データ層
+5. タグマスタ追加だけ、人の確認余地を残す
+6. タグ候補昇格閾値は暫定で `seen_count >= 5`
+7. Google Trends 一致判定は日本語基準の類似一致で進める
+8. 類似重複は P0 では本格実装せず、後続は `pgvector` 寄りで扱う
+9. `public_rankings` は 1 週間でスコアが `1/5` になる時間減衰を暫定採用する
+10. `share_count` と `save_count` は同重み、`source_open_count` はその 2 倍、`impression_count` はその 1/2 とする
+11. ソース別優先度は初期未実装とし、`source_priority_rules` 初期値はソース間優先差なしで始める
+12. 運営即時反映は P0 では `hide_article` を優先対象にする
+13. `layer4` は P0 はテーブル中心とし、一部 view を許容する
+14. タグ人手レビュー UI は実装対象とし、自動モードと判断待ちモードを持てる前提で進める
+
+## 2. 直近で完了したこと
+
+1. `layer1` から `layer4` の設計を文書化した
+2. migrations を新設計に合わせて刷新した
+3. `docs/spec` を取得系中心に更新した
+4. `docs/mock3` を追加し、公開層中心のモックを作成した
+
+## 3. 全体の次フェーズ
+
+### Phase A: DB 基盤
+
+1. `migrations/001` から `009` までの整合確認
+2. Neon 上で migration 適用確認
+3. 初期 seed 方針の確定
+
+### Phase B: Layer1
+
+1. `source_targets` seed
+2. URL 正規化 utility
+3. hourly fetch job
+4. `articles_raw` insert / update detection helper
+
+### Phase C: Layer2
+
+1. extractor abstraction
+2. summarizer
+3. tag matcher
+4. `articles_enriched` writer
+5. `articles_enriched_history` 保存
+6. `tag_candidate_pool` 更新
+
+### Phase D: Publish
+
+1. representative source selector
+2. `public_articles` projector
+3. `public_article_sources` projector
+4. `public_article_tags` projector
+5. `public_rankings` calculator
+6. 暫定ランキング式の実装
+
+### Phase E: Layer3
+
+1. `activity_logs` 収集 API
+2. `activity_metrics_hourly` 集計
+3. `admin_operation_logs` 記録
+4. `priority_processing_queue` 実行 worker
+5. P0 は `hide_article` 即時反映を優先
+
+### Phase F: Tag Operations
+
+1. 日次タグ候補集計
+2. Google Trends 照合
+3. `tags_master` / `tag_aliases` 昇格
+4. 再タグ付け処理
+5. タグ人手レビュー UI 前提の review 状態管理
+
+### Phase G: Archive / Operations
+
+1. `articles_raw` 週次アーカイブ
+2. 履歴・補助データ整理
+3. 監視ログ整備
+
+## 4. Layer1 / Layer2 実装区画
+
+この区画は、NeonDB に migration を適用し、実際に `layer1` と `layer2` を動かすための実装だけに絞る。  
+再開時はこの区画から順に着手する。
+
+### 4.1 ゴール
+
+1. Neon 上に `source_targets` / `articles_raw` / `articles_enriched` 系テーブルを作成する
+2. 外部取得データを `articles_raw` へ投入できる
+3. `articles_raw` から `articles_enriched` を生成できる
+4. 更新検知時に再整形できる
+5. 記事単位失敗でスキップしつつジョブ全体を継続できる
+
+### 4.2 対象 migration
+
+1. `migrations/001_extensions.sql`
+   - `pgcrypto`, `vector`
+2. `migrations/002_source_targets.sql`
+   - `source_targets`, `source_priority_rules`
+3. `migrations/003_articles_raw.sql`
+   - `articles_raw`, `articles_raw_history`
+4. `migrations/004_articles_enriched.sql`
+   - `tags_master`, `tag_aliases`, `tag_candidate_pool`, `articles_enriched`, `articles_enriched_history`, `articles_enriched_tags`
+5. `migrations/008_batch_support.sql`
+   - `updated_at` trigger
+6. `migrations/009_rls.sql`
+   - 公開 / 内部の権限境界
+
+### 4.3 Neon 適用手順
+
+1. `DATABASE_URL` と `DATABASE_URL_UNPOOLED` を確認する
+2. Neon の対象 branch を確認する
+3. migration を順番に適用する
+4. `source_targets` の seed を投入する
+5. `source_priority_rules` の seed を投入する
+6. `tags_master` の初期 seed を投入する
+
+### 4.4 Layer1 実装タスク
+
+1. `source_targets` を読む collector registry を作る
+2. URL 正規化 utility を作る
+3. `articles_raw` insert helper を作る
+4. `source_target_id + normalized_url + source_updated_at / snippet_hash` で更新検知する
+5. hourly fetch job を実装する
+6. 失敗時は `articles_raw.last_error` に記録する
+
+### 4.5 Layer2 実装タスク
+
+1. 未処理 `articles_raw` を取得する reader を作る
+2. `full` / `snippet` 判定付きの extractor abstraction を作る
+3. summarizer を作る
+4. tag matcher を作る
+5. `tag_candidate_pool` updater を作る
+6. Google Trends 照合対象の暫定閾値 `seen_count >= 5` を定数化する
+6. 確定重複判定を `dedupe_status` に反映する
+7. `articles_enriched` writer を作る
+8. 更新時は旧版を `articles_enriched_history` に退避する
+9. `articles_enriched_tags` を同期する
+
+### 4.6 ジョブ分割
+
+1. `hourly-fetch`
+   - 取得して `articles_raw` に入れる
+2. `daily-enrich`
+   - `articles_raw` から `articles_enriched` を生成する
+3. `daily-tag-promote`
+   - `tag_candidate_pool` を集計し `tags_master` へ昇格する
+   - 日本語基準の類似一致で Google Trends を照合する
+4. `weekly-archive`
+   - `articles_raw` を `articles_raw_history` へ移す
+
+### 4.6.1 暫定運用ルール
+
+1. タグ昇格:
+   - `seen_count >= 5` を Google Trends 照合対象にする
+2. Google Trends:
+   - 日本語基準の類似一致で評価する
+3. 類似重複:
+   - P0 では確定重複のみ実装し、類似重複は後続へ送る
+4. ランキング:
+   - 1 週間でスコアが `1/5` になる時間減衰を採用する
+   - `share_count` と `save_count` は同重み
+   - `source_open_count` はその 2 倍重み
+   - `impression_count` はその 1/2 重み
+5. 即時反映キュー:
+   - P0 では `hide_article` を優先対象にする
+6. `source_priority_rules`:
+   - 初期はソース間優先差なしで開始する
+
+### 4.7 実行順チェックリスト
+
+1. Neon 接続情報を確認する
+   - `DATABASE_URL`
+   - `DATABASE_URL_UNPOOLED`
+2. migration を適用する
+   - `001_extensions.sql`
+   - `002_source_targets.sql`
+   - `003_articles_raw.sql`
+   - `004_articles_enriched.sql`
+   - `008_batch_support.sql`
+   - `009_rls.sql`
+3. 初期 seed を投入する
+   - `source_targets`
+   - `source_priority_rules`
+   - `tags_master`
+4. `hourly-fetch` を手動実行し、`articles_raw` へ投入確認する
+5. `daily-enrich` を手動実行し、`articles_enriched` / `articles_enriched_tags` / `tag_candidate_pool` を確認する
+6. 更新データを再投入し、`articles_enriched_history` への退避を確認する
+
+### 4.8 実装単位
+
+1. `src/lib/collectors`
+   - `source_targets` を読む collector registry
+2. `src/lib/dedupe`
+   - URL 正規化
+   - 確定重複判定
+3. `src/lib/extractors`
+   - `full` / `snippet` 判定
+4. `src/lib/ai`
+   - summarizer
+5. `src/lib/tags`
+   - tag matcher
+   - candidate updater
+6. `src/lib/db`
+   - `articles_raw` helper
+   - `articles_enriched` helper
+   - history writer
+7. `src/app/api/cron`
+   - `hourly-fetch`
+   - `daily-enrich`
+
+### 4.9 検証観点
+
+1. `articles_raw`
+   - `normalized_url` が期待通りに入る
+   - `is_processed` 初期値が `false`
+   - 更新時に `has_source_update` が立つ
+2. `articles_enriched`
+   - `summary_100` / `summary_200` / `summary_300` が入る
+   - `content_path` が `full` または `snippet`
+   - `dedupe_status` が確定重複条件に応じて更新される
+3. `articles_enriched_tags`
+   - マスタ一致タグだけ入る
+4. `tag_candidate_pool`
+   - 未採用タグだけ入る
+5. `articles_enriched_history`
+   - 更新時のみ旧版が残る
+
+### 4.10 完了条件
+
+1. 手動で `source_targets` を 1 件以上投入すると `articles_raw` へデータが入る
+2. `articles_raw` に未処理データがあると `articles_enriched` が生成される
+3. `articles_enriched_tags` と `tag_candidate_pool` が更新される
+4. 同一記事更新時に `articles_enriched_history` へ旧版が残る
+5. 1 件失敗しても残り記事は継続処理される
+
+### 4.11 2026-03-13 時点の実績
+
+1. `npm run db:migrate` 実行済み
+2. `npm run db:seed` を `layer1 / layer2` 向け seed に刷新して実行済み
+3. 確認済み件数
+   - `source_targets`: 3
+   - `articles_raw`: 3
+   - `articles_enriched`: 3
+4. `articles_raw.is_processed = true` まで確認済み
+
+## 5. ウェブサイト側が進められる状態
+
+現時点で、ウェブサイト側は次を前に進められる。
+
+1. `layer4` を前提にした一覧 API 設計
+2. `public_articles` / `public_article_tags` / `public_rankings` を前提にした UI 実装
+3. 関連ソース表示の設計
+4. タグレーダー、運用キュー、Digest 表示の UI 検討
+
+## 6. 実装チェックポイント
+
+1. 確定重複は `normalized_url` / 同一引用元だけで扱う
+2. 類似重複は後段判定に回す
+3. 更新検知は `source_updated_at` または `snippet_hash` 差分で行う
+4. 記事単位失敗でスキップし、ジョブ全体は止めない
+5. サイトは `layer2` を直接参照しない
+
+## 7. 関連ドキュメント
+
+1. `docs/memo/20260312-data-design.md`
+2. `docs/spec/04-data-model-and-sql.md`
+3. `docs/spec/05-ingestion-and-ai-pipeline.md`
+4. `docs/spec/10-ingestion-layer-design.md`
+5. `docs/mock3/`

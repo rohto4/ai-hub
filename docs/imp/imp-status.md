@@ -2,67 +2,43 @@
 
 最終更新: 2026-03-12
 
-## 重要更新
-
-2026-03-12 時点で、先行実装よりも導線確認モックの不足がボトルネックだと判明したため、今夜の正は `docs/mock2/` に切り替えた。`docs/mock/pastel-orange-intel-v6.html` は断面参照として残し、非モック化台帳はリセット済み。
-
 ## 進捗サマリ
 
-| タスク | 内容 | 状態 | 備考 |
-|---|---|---|---|
-| 1 | Home 非モック化 | 完了 | `/api/trends` を基準にし、失敗時のみモックへフォールバック |
-| 2 | 検索接続 | 完了 | Enter / ボタン submit で `/api/search` に接続 |
-| 3 | 保存 / 共有 / 行動ログ / Topic Group 暫定導線 | 完了 | local save、share popup、return focus、Topic Group スクロール導線を実装 |
-| 4 | SP / TB UI 対応 | 完了 | Header / card action bar / sidebar をレスポンシブ化 |
-| 5 | OGP / metadata / PWA 基礎 | 完了 | `opengraph-image.tsx`、manifest、service worker、install banner を追加 |
-| 6 | ingestion / AI / notification / auth groundwork | 完了 | summary validation、push subscribe API、digest cron 骨格、Firebase client 初期化 |
-| 7 | 実装運用ドキュメント | 完了 | `setup-guide.md` と本ファイルを追加 |
-
-## 暫定実装の残し先
-
-- 暫定仕様一覧: `docs/imp/implementation-wait.md`
-- 非モック化進行台帳: `docs/imp/non-mock-ledger.md`
-- 実装順 / P0 状態: `docs/imp/implementation-plan.md`
-
-## コミット記録
-
-| 順番 | コミット | 内容 |
-|---|---|---|
-| 1 | `cd622ec` | Home live 化 / 検索接続 |
-| 2 | `b77e631` | local save / share / return focus / temporary Topic Group |
-| 3 | `545a829` | mobile / tablet UI 対応 |
-| 4 | `a15020c` | OGP / metadata / PWA groundwork |
-| 5 | `5e25ee0` | notification / auth groundwork |
-
-## 検証結果
-
-| 検証方法 | コマンド / 観点 | 結果 | 補足 |
-|---|---|---|---|
-| 型検査 | `npm run type-check` | 成功 | `.next/types` 依存があるため、必要に応じて build 後に再実行 |
-| 本番ビルド | `npm run build` | 成功 | `/opengraph-image` `/manifest.webmanifest` `/api/push/subscribe` `/api/cron/send-digest` を含めてビルド済み |
-| 開発サーバー | `npm run dev` | 既定を変更 | Windows では Turbopack 由来の `_buildManifest.js.tmp.*` ENOENT を避けるため `next dev` を既定化 |
-| Home API | `/api/trends` | 既存確認済み | Home はこの API を基準に描画 |
-| Search API | `/api/search` | 既存確認済み | submit 型 UI で接続済み |
-| UI フォールバック | DB 失敗時の Home / Search | 実装済み | モックへフォールバックして UI を止めない |
-| Share popup | コピー / AIHub トグル / Misskey 設定 | 実装済み | 実際の投稿先検証は環境依存 |
-| PWA | manifest / service worker / install banner | 実装済み | 実機 install / push は VAPID 設定後に要再確認 |
-| digest cron | `/api/cron/send-digest` | 骨格実装 | VAPID 未設定時は `503` 返却 |
+1. `layer1 -> layer4` のデータ設計を文書化した
+2. Neon 向け migration を新設計へ刷新した
+3. `docs/spec` を取得・整形・公開反映の流れに合わせて更新した
+4. `docs/mock3` を追加し、公開データ中心の閲覧モックを作成した
+5. `docs/imp` を、再開時にそのまま進めやすい形へ整理した
+6. Neon 上で `layer1 / layer2` 用 migration を適用し、seed で `source_targets=3`, `articles_raw=3`, `articles_enriched=3` まで投入確認した
 
 ## いま残っている主要タスク
 
-| 領域 | 残件 |
-|---|---|
-| Topic Group | 最終 UX を別ページ / ドロワー / インライン展開から確定 |
-| OGP | article 単位テンプレ、共有文面との接続、必要なら ISR キャッシュ |
-| Notifications | 実購読 UI、push payload 調整、再送制御の詰め |
-| Auth | Firebase login UI、local save とのマージ |
-| Ingestion | feed 実投入、embedding / topic grouping 本実装、失敗監視 |
-| Setup | Neon / Firebase / VAPID / `NEXT_PUBLIC_APP_URL` の本番値投入 |
+1. Neon 上で migration 適用確認
+2. `source_targets` / `source_priority_rules` の本番初期 seed 作成
+3. hourly fetch 実装
+4. daily enrich 実装
+5. hourly publish 実装
+6. 日次タグ昇格バッチ実装
+7. 週次アーカイブ実装
+8. `public_articles` 系を読む本実装 API 接続
 
 ## 再開時の推奨確認順
 
-1. `docs/imp/implementation-plan.md`
-2. `docs/imp/implementation-wait.md`
-3. `docs/imp/non-mock-ledger.md`
-4. `docs/imp/setup-guide.md`
-5. `docs/imp/imp-status.md`
+1. `docs/imp/implementation-wait.md`
+2. `docs/memo/20260312-data-design.md`
+3. `docs/spec/04-data-model-and-sql.md`
+4. `docs/spec/05-ingestion-and-ai-pipeline.md`
+5. `docs/spec/10-ingestion-layer-design.md`
+6. `migrations/001_extensions.sql` から `migrations/009_rls.sql`
+7. `docs/mock3/`
+
+## 今回の一連のタスクで使った入力トークン量と出力トークン量
+
+この実行環境では、ターン単位の正確な入力トークン量・出力トークン量は取得できません。  
+そのため、数値は未記録です。
+
+## 追加メモ
+
+1. `layer3` は手動承認層ではなく、自動運用データ層として固定
+2. タグマスタ追加だけ、人手確認の余地を残す
+3. サイトは `layer4` だけを参照する前提で進める

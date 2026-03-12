@@ -19,8 +19,8 @@
         <nav class="nav" id="global-nav"></nav>
         <div class="rail-card">
           <p class="eyebrow">Tonight</p>
-          <strong>導線確認優先</strong>
-          <span>画面の見た目より、どこからどこへ行けるかを検証するための mock2。</span>
+          <strong>導線の確認を最優先</strong>
+          <span>どこからどこへ移動するかを迷わず確認できる mock2。主要操作はカード内で揃える。</span>
         </div>
       </aside>
 
@@ -28,7 +28,7 @@
         <header class="topbar">
           <div>
             <p class="eyebrow">Current Route</p>
-            <h1 id="route-title">Home</h1>
+            <h1 id="route-title">Home Feed</h1>
           </div>
           <div class="topbar-actions">
             <div class="search-pill">
@@ -63,20 +63,20 @@
       <div class="modal" role="dialog" aria-modal="true">
         <div class="modal-head">
           <strong>Share Composer</strong>
-          <button type="button" id="close-share">×</button>
+          <button type="button" id="close-share" aria-label="閉じる">×</button>
         </div>
         <div class="modal-body">
           <textarea id="share-text" readonly></textarea>
           <label class="toggle-row">
             <input type="checkbox" id="share-tag-toggle" checked />
-            <span>#AIHub を URL の後ろに付ける</span>
+            <span>#AIHub と URL を一緒に載せる</span>
           </label>
           <div class="share-grid">
-            <button type="button" data-share="x">X</button>
-            <button type="button" data-share="threads">Threads</button>
-            <button type="button" data-share="slack">Slack</button>
-            <button type="button" data-share="misskey">Misskey</button>
-            <button type="button" data-share="copy" class="accent">URLをコピー</button>
+            <button type="button" data-share-target="x">X</button>
+            <button type="button" data-share-target="threads">Threads</button>
+            <button type="button" data-share-target="slack">Slack</button>
+            <button type="button" data-share-target="misskey">Misskey</button>
+            <button type="button" data-share-target="copy" class="accent">URLをコピー</button>
           </div>
           <div class="mini-card">
             <p class="eyebrow">Misskey Instance</p>

@@ -1,6 +1,6 @@
 ﻿# 技術アーキテクチャ設計
 
-最終更新: 2026-03-10
+最終更新: 2026-03-12
 
 ## 1. 技術スタック
 
@@ -25,24 +25,28 @@
    - Web Push（Service Worker）
 9. 問い合わせ通知:
    - Email + Discord Webhook
-10. UX / Prototype:
+10. Diagram:
+   - Mermaid
+11. UX / Prototype:
    - `docs/mock2/` は HTML / CSS / Vanilla JS のインタラクティブプロトタイプで作成する
    - 導線確認を優先し、画面遷移しない要素も動的状態として表現する
 
 ## 2. 論理構成
 
 1. Ingestion Layer
-   - RSS 取得、URL 正規化、source_items 保持
+   - RSS / API 取得、URL 正規化、`articles_raw` 保持
 2. Intelligence Layer
-   - 本文抽出、要約、批評、タグ、クラスタ判定
-3. Presentation Layer
-   - 一覧/詳細/共有、PWA、アクティビティ表示
+   - 本文抽出、要約、タグ照合、確定重複判定、`articles_enriched` 生成
+3. Curation Layer
+   - 行動ログ、運営ログ、優先処理、集計データの保持
+4. Presentation Layer
+   - `public_articles` / `public_article_tags` / `public_rankings` を参照して一覧/詳細/共有、PWA、アクティビティ表示
    - デバイス別表示制御（SP/TB/PC）
-4. Observability Layer
+5. Observability Layer
    - ジョブ監視、品質監査、異常通知
-5. Personalization Layer
+6. Personalization Layer
    - 興味分野設定、要約モード設定、通知設定
-6. UX Research Layer
+7. UX Research Layer
    - Feedly / Product Hunt / Linear / Raycast 系の導線パターンを入力に、情報探索と回遊のしやすさを先に検証する
 
 ## 3. コンポーネント境界
@@ -50,14 +54,18 @@
 1. `src/lib/collectors`
    - RSS 取得器
 2. `src/lib/extractors`
-   - 本文抽出器
+   - 本文抽出器 / 引用元解決
 3. `src/lib/ai`
    - プロンプト/バリデータ/プロバイダ抽象
-4. `src/lib/ranking`
+4. `src/lib/dedupe`
+   - URL 正規化、確定重複判定、類似候補化
+5. `src/lib/tags`
+   - タグ候補抽出、タグマスタ照合、Google Trends 昇格判定
+6. `src/lib/ranking`
    - スコア計算
-5. `src/lib/topic-grouping`
-   - クラスタ統合判定
-6. `docs/mock2`
+7. `src/lib/topic-grouping`
+   - 後続フェーズでのクラスタ統合判定
+8. `docs/mock2`
    - 導線確認用モック
    - SPA 風プロトタイプと画面遷移メモ
 
@@ -75,7 +83,8 @@
 1. 一覧 API: 30-60 秒
 2. 詳細 API: 5 分
 3. OGP: CDN 1 日 + 手動 purge
-4. AI 結果: `content_hash` をキーに半永続化
+4. AI 結果: `source_name + normalized_url + snippet_hash` をキーに再利用
+5. 公開面: 1 時間ごとの `public_articles` 更新を前提とする
 
 ## 6. 障害時フォールバック
 
@@ -92,8 +101,9 @@
 
 1. ドメインロジックは UI から分離
 2. 収集処理と表示 API を疎結合化
-3. 生成系 AI 処理は冪等化（同一 hash 再実行抑止）
-4. Neon 接続は pooled / direct を役割分離する
+3. `layer1` / `layer2` はサイト表示層から独立して実装する
+4. 生成系 AI 処理は冪等化（同一 raw 再実行抑止）
+5. Neon 接続は pooled / direct を役割分離する
    - `DATABASE_URL`: アプリ通常接続
    - `DATABASE_URL_UNPOOLED`: migration / 管理処理
 

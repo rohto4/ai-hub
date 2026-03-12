@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Trend Hub / Mock3 Public Data Prototype</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="rail">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div>
+            <strong>AI Trend Hub</strong>
+            <span>Mock3 Public Data Prototype</span>
+          </div>
+        </div>
+        <nav class="nav" id="global-nav"></nav>
+        <div class="rail-card">
+          <p class="eyebrow">Current Focus</p>
+          <strong>公開データのまとまり方を確認する</strong>
+          <span>`layer4` を中心に表示しつつ、`layer3` 由来の補助情報も確認する。</span>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Current Route</p>
+            <h1 id="route-title">Public Feed</h1>
+          </div>
+          <div class="topbar-actions">
+            <div class="search-pill">
+              <input id="global-search" type="search" placeholder="Gemini / Agent / Safety / Voice" />
+              <button id="search-submit" type="button">Search</button>
+            </div>
+          </div>
+        </header>
+
+        <section class="canvas">
+          <div class="main-pane">
+            <div class="route-meta" id="route-meta"></div>
+            <div id="view-root"></div>
+          </div>
+          <aside class="context-pane">
+            <section class="context-card">
+              <p class="eyebrow">Focused Public Record</p>
+              <div id="context-root"></div>
+            </section>
+            <section class="context-card">
+              <p class="eyebrow">System Notes</p>
+              <div id="flow-log" class="flow-log"></div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

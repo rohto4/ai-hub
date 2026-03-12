@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "\"allowedTools\": [\"Read\", \"Write\", \"Edit\", \"Bash\", \"Glob\", \"Grep\", \"Agent\"]"
+    ]
+  }
+}
