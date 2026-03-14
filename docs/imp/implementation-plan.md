@@ -46,6 +46,8 @@
 6. `cdt.org` は現在 `domain_snippet_only` として扱う
 7. `dedupe_status` は `similar_candidate` が出始めている
 8. `ai-news-roundup` は placeholder source のため `is_active=false` に切り替えた
+9. `axios.com`, `bloomberg.com`, `youtube.com` は `domain_snippet_only` に寄せた
+10. `nvidia` は `tags_master` へ昇格済み
 
 ### 2.4 今の主課題
 
@@ -55,7 +57,8 @@
 4. blocked domain と通常 fetch failure の切り分け
 5. 毎時バッチの直列実行と小分け処理の運用固定
 6. source ごとの 404 / feed 廃止候補の見直し
-7. Bloomberg / Axios / YouTube など residual snippet/fetch_error 群の扱い整理
+7. residual snippet-only domain 群の整理
+8. `tag_candidate_pool` の昇格後ノイズ抑制
 
 ## 3. 全体タスク一覧
 
