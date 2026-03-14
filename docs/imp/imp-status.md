@@ -149,3 +149,4 @@
 - This is an intentional regression in `full` count, not a bug: the previous `full=30` state relied on destination-page fetching for sources that are now treated as `feed_only`.
 - Added ops scripts `db:check-source-policies` and `db:set-source-policy` so source-by-source promotion to `fulltext_allowed` can be done explicitly and requeue can be coupled to the policy change.
 - Added `articles_enriched.summary_basis` so Layer2 can distinguish summaries built from `full_content`, `feed_snippet`, `blocked_snippet`, or `fallback_snippet`.
+- Added `observed_article_domains` plus `db:sync-observed-domains`, `db:check-domain-policies`, and `db:set-domain-policy` so fetched destination domains can be reviewed and flagged in DB one-by-one.

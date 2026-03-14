@@ -1,5 +1,6 @@
 import { createHash } from 'crypto'
 import { getSql } from '@/lib/db'
+import { upsertObservedDomain } from '@/lib/db/observed-domains'
 import { normalizeUrl } from '@/lib/rss/normalize'
 import type { CollectedItem, SourceTarget } from '@/lib/collectors/types'
 
@@ -101,6 +102,8 @@ export async function persistCollectedItem({
       null
     )
   `
+
+  await upsertObservedDomain(item.citedUrl ?? normalizedUrl, fetchRunAt)
 
   return existing ? 'updated' : 'inserted'
 }
