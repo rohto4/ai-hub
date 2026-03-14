@@ -103,7 +103,7 @@ export async function persistCollectedItem({
     )
   `
 
-  await upsertObservedDomain(item.citedUrl ?? normalizedUrl, fetchRunAt)
+  await upsertObservedDomain(item.citedUrl ?? normalizedUrl, fetchRunAt, sourceTarget)
 
   return existing ? 'updated' : 'inserted'
 }
