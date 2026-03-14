@@ -3,6 +3,13 @@ import { extractContent } from '@/lib/rss/extract'
 const SNIPPET_ONLY_HOSTS = new Set([
   'cdt.org',
   'www.cdt.org',
+  'axios.com',
+  'www.axios.com',
+  'bloomberg.com',
+  'www.bloomberg.com',
+  'youtube.com',
+  'www.youtube.com',
+  'm.youtube.com',
 ])
 
 export interface ExtractedContentResult {

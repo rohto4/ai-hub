@@ -115,3 +115,19 @@
   - `enriched_ready_total=30`
   - `enriched_provisional_total=132`
   - `candidate_pool_total=972`
+
+## 2026-03-15 Blocked Domain + Tag Ops Push
+
+- Added `axios.com`, `bloomberg.com`, and `youtube.com` to known `domain_snippet_only` handling, then re-enriched those rows so they no longer show as mixed snippet/fetch failures.
+- Latest `db:check-snippet-domains` now shows:
+  - `youtube.com domain_snippet_only = 3`
+  - `axios.com domain_snippet_only = 3`
+  - `bloomberg.com domain_snippet_only = 2`
+  - `cdt.org domain_snippet_only = 1`
+- Promoted `nvidia` from `tag_candidate_pool` to `tags_master`, then re-enriched two NVIDIA articles. `tags_master.nvidia.article_count = 2`.
+- Current latest observation:
+  - `source_targets=11`
+  - `content_path full = 30`
+  - `provisional_reason=domain_snippet_only` rows = `9`
+  - `dedupe_status similar_candidate = 2`
+  - `enriched_tags_total = 208`

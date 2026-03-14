@@ -32,9 +32,10 @@ function normalizeTagKey(value) {
 }
 
 async function run() {
-  const apply = hasFlag('--apply')
-  const positional = args.find((arg) => !arg.startsWith('--')) ?? null
-  const minSeen = Math.max(1, Number(readArg('--min-seen', positional ?? '8')))
+  const positionalArgs = args.filter((arg) => !arg.startsWith('--'))
+  const minSeenArg = positionalArgs.find((arg) => /^\d+$/.test(arg)) ?? null
+  const apply = hasFlag('--apply') || positionalArgs.includes('apply')
+  const minSeen = Math.max(1, Number(readArg('--min-seen', minSeenArg ?? '8')))
   const limit = Math.max(1, Number(readArg('--limit', '20')))
   const candidates = await pool.query(
     `
