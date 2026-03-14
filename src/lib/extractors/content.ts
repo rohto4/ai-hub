@@ -24,6 +24,7 @@ export interface ExtractedContentResult {
     | 'fetch_error'
     | 'domain_snippet_only'
     | 'feed_only_policy'
+    | 'domain_needs_review'
   extractionError?: string | null
 }
 
@@ -39,6 +40,7 @@ export async function resolveArticleContent(
   url: string,
   snippet: string | null,
   contentAccessPolicy: ContentAccessPolicy,
+  observedDomainFetchPolicy: 'needs_review' | 'fulltext_allowed' | 'snippet_only' | 'blocked' | null,
 ): Promise<ExtractedContentResult> {
   const normalizedSnippet = snippet?.trim() ?? ''
   const hostname = getHostname(url)
@@ -62,6 +64,28 @@ export async function resolveArticleContent(
       snippetLength: normalizedSnippet.length,
       extractionStage: 'domain_snippet_only',
       extractionError: 'blocked_snippet_only_policy',
+    }
+  }
+
+  if (observedDomainFetchPolicy === 'blocked' || observedDomainFetchPolicy === 'snippet_only') {
+    return {
+      content: normalizedSnippet,
+      contentPath: 'snippet',
+      extractedLength: 0,
+      snippetLength: normalizedSnippet.length,
+      extractionStage: 'domain_snippet_only',
+      extractionError: observedDomainFetchPolicy === 'blocked' ? 'blocked_domain_policy' : 'snippet_only_domain_policy',
+    }
+  }
+
+  if (contentAccessPolicy === 'fulltext_allowed' && observedDomainFetchPolicy !== 'fulltext_allowed') {
+    return {
+      content: normalizedSnippet,
+      contentPath: 'snippet',
+      extractedLength: 0,
+      snippetLength: normalizedSnippet.length,
+      extractionStage: 'domain_needs_review',
+      extractionError: 'domain_policy_pending',
     }
   }
 

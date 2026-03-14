@@ -211,7 +211,7 @@ async function run() {
         LIMIT 1
       )
         AND (
-          detail->>'extractionStage' IN ('fetch_error', 'extracted_below_threshold', 'domain_snippet_only', 'feed_only_policy')
+          detail->>'extractionStage' IN ('fetch_error', 'extracted_below_threshold', 'domain_snippet_only', 'feed_only_policy', 'domain_needs_review')
         )
       ORDER BY item_key DESC
       LIMIT 10

@@ -7,6 +7,8 @@ export interface RawArticleForEnrichment {
   sourceKey: string
   sourceCategory: string
   contentAccessPolicy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
+  observedDomain: string | null
+  observedDomainFetchPolicy: 'needs_review' | 'fulltext_allowed' | 'snippet_only' | 'blocked' | null
   normalizedUrl: string
   citedUrl: string | null
   title: string | null
@@ -22,6 +24,8 @@ type RawArticleRow = {
   source_key: string
   source_category: string
   content_access_policy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
+  observed_domain: string | null
+  observed_domain_fetch_policy: 'needs_review' | 'fulltext_allowed' | 'snippet_only' | 'blocked' | null
   normalized_url: string
   cited_url: string | null
   title: string | null
@@ -84,6 +88,7 @@ export interface UpsertEnrichedInput {
     | 'fetch_error'
     | 'extracted_below_threshold'
     | 'feed_only_policy'
+    | 'domain_needs_review'
     | null
   dedupeStatus: DedupeStatus
   dedupeGroupKey: string | null
@@ -108,6 +113,8 @@ export async function listRawArticlesForEnrichment(limit = 50): Promise<RawArtic
       st.source_key,
       st.source_category,
       st.content_access_policy,
+      lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS observed_domain,
+      od.fetch_policy AS observed_domain_fetch_policy,
       ar.normalized_url,
       ar.cited_url,
       ar.title,
@@ -117,6 +124,8 @@ export async function listRawArticlesForEnrichment(limit = 50): Promise<RawArtic
       ar.has_source_update
     FROM articles_raw ar
     JOIN source_targets st ON st.id = ar.source_target_id
+    LEFT JOIN observed_article_domains od
+      ON od.domain = lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', ''))
     WHERE ar.is_processed = false
       AND ar.process_after <= now()
     ORDER BY ar.created_at ASC
@@ -129,6 +138,8 @@ export async function listRawArticlesForEnrichment(limit = 50): Promise<RawArtic
     sourceKey: row.source_key,
     sourceCategory: row.source_category,
     contentAccessPolicy: row.content_access_policy,
+    observedDomain: row.observed_domain,
+    observedDomainFetchPolicy: row.observed_domain_fetch_policy,
     normalizedUrl: row.normalized_url,
     citedUrl: row.cited_url,
     title: row.title,
