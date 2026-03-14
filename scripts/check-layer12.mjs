@@ -56,7 +56,9 @@ async function run() {
     enrichedTotals,
     rawBySource,
     contentPathCounts,
+    provisionalCounts,
     dedupeCounts,
+    provisionalDomains,
     latestRawErrors,
     topCandidates,
     latestEnriched,
@@ -80,9 +82,11 @@ async function run() {
     queryOne(`
       SELECT
         COUNT(*)::int AS enriched_total,
+        COUNT(*) FILTER (WHERE is_provisional = true)::int AS provisional_total,
+        COUNT(*) FILTER (WHERE is_provisional = false)::int AS ready_total,
         (SELECT COUNT(*)::int FROM articles_enriched_tags) AS enriched_tags_total,
         (SELECT COUNT(*)::int FROM tag_candidate_pool) AS candidate_pool_total,
-        (SELECT COUNT(*)::int FROM tag_candidate_pool WHERE seen_count >= 5) AS candidate_pool_over_threshold
+        (SELECT COUNT(*)::int FROM tag_candidate_pool WHERE seen_count >= 8) AS candidate_pool_over_threshold
       FROM articles_enriched
     `),
     queryMany(`
@@ -105,10 +109,30 @@ async function run() {
       ORDER BY count DESC
     `),
     queryMany(`
+      SELECT
+        is_provisional,
+        COALESCE(provisional_reason, 'none') AS provisional_reason,
+        COUNT(*)::int AS count
+      FROM articles_enriched
+      GROUP BY is_provisional, COALESCE(provisional_reason, 'none')
+      ORDER BY is_provisional DESC, count DESC
+    `),
+    queryMany(`
       SELECT dedupe_status, COUNT(*)::int AS count
       FROM articles_enriched
       GROUP BY dedupe_status
       ORDER BY count DESC
+    `),
+    queryMany(`
+      SELECT
+        lower(regexp_replace(split_part(split_part(coalesce(cited_url, canonical_url, normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS domain,
+        COALESCE(provisional_reason, 'snippet_only') AS provisional_reason,
+        COUNT(*)::int AS count
+      FROM articles_enriched
+      WHERE is_provisional = true
+      GROUP BY 1, 2
+      ORDER BY count DESC, domain ASC
+      LIMIT 10
     `),
     queryMany(`
       SELECT id, title, last_error, updated_at
@@ -124,7 +148,7 @@ async function run() {
       LIMIT 15
     `),
     queryMany(`
-      SELECT id, title, content_path, dedupe_status, publish_candidate, score, processed_at
+      SELECT id, title, content_path, is_provisional, provisional_reason, dedupe_status, publish_candidate, score, processed_at
       FROM articles_enriched
       ORDER BY processed_at DESC
       LIMIT 10
@@ -186,13 +210,17 @@ async function run() {
     },
     enriched: {
       total: toNumber(enrichedTotals?.enriched_total),
+      readyTotal: toNumber(enrichedTotals?.ready_total),
+      provisionalTotal: toNumber(enrichedTotals?.provisional_total),
       tagsTotal: toNumber(enrichedTotals?.enriched_tags_total),
       candidatePoolTotal: toNumber(enrichedTotals?.candidate_pool_total),
       candidatePoolOverThreshold: toNumber(enrichedTotals?.candidate_pool_over_threshold),
     },
     rawBySource,
     contentPathCounts,
+    provisionalCounts,
     dedupeCounts,
+    provisionalDomains,
     latestRawErrors,
     topCandidates,
     latestEnriched,
@@ -214,9 +242,11 @@ async function run() {
   printKeyValue('raw_unprocessed', summary.raw.unprocessed)
   printKeyValue('raw_with_error', summary.raw.withError)
   printKeyValue('enriched_total', summary.enriched.total)
+  printKeyValue('enriched_ready_total', summary.enriched.readyTotal)
+  printKeyValue('enriched_provisional_total', summary.enriched.provisionalTotal)
   printKeyValue('enriched_tags_total', summary.enriched.tagsTotal)
   printKeyValue('candidate_pool_total', summary.enriched.candidatePoolTotal)
-  printKeyValue('candidate_pool_over_threshold', summary.enriched.candidatePoolOverThreshold)
+  printKeyValue('candidate_pool_over_threshold(>=8)', summary.enriched.candidatePoolOverThreshold)
 
   printSection('Raw By Source')
   for (const row of summary.rawBySource) {
@@ -233,10 +263,24 @@ async function run() {
     console.log(`${row.dedupe_status}: ${row.count}`)
   }
 
+  printSection('Provisional Status')
+  for (const row of summary.provisionalCounts) {
+    console.log(`provisional=${row.is_provisional} reason=${row.provisional_reason} count=${row.count}`)
+  }
+
+  printSection('Provisional Domains')
+  if (summary.provisionalDomains.length === 0) {
+    console.log('none')
+  } else {
+    for (const row of summary.provisionalDomains) {
+      console.log(`${row.domain} ${row.provisional_reason}: ${row.count}`)
+    }
+  }
+
   printSection('Latest Enriched')
   for (const row of summary.latestEnriched) {
     console.log(
-      `#${row.id} ${row.content_path} ${row.dedupe_status} publish=${row.publish_candidate} score=${row.score} ${row.title}`,
+      `#${row.id} ${row.content_path} provisional=${row.is_provisional}:${row.provisional_reason ?? 'none'} ${row.dedupe_status} publish=${row.publish_candidate} score=${row.score} ${row.title}`,
     )
   }
 

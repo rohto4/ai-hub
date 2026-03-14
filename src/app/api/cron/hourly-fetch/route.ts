@@ -16,6 +16,10 @@ export async function POST(request: NextRequest) {
     return databaseUnavailableResponse()
   }
 
-  const result = await runHourlyFetch()
+  const limitParam = request.nextUrl.searchParams.get('limit')
+  const parsedLimit = limitParam ? Number(limitParam) : 20
+  const limit = Number.isFinite(parsedLimit) ? Math.max(1, Math.min(100, parsedLimit)) : 20
+
+  const result = await runHourlyFetch(limit)
   return NextResponse.json(result)
 }

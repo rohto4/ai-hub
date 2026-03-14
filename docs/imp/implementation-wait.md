@@ -86,6 +86,7 @@
 2. `activity_logs.referrer_type` の正式一覧
 3. タグ人手レビュー UI の詳細要件
 4. `hourly-fetch` の source 単位失敗ログの正式な保存先
+5. `ai-news-roundup` の 404 を feed 廃止として扱うか、source 差し替えで維持するか
 
 補足:
 
@@ -93,6 +94,7 @@
 2. ただし collector 自体の失敗や「新規 raw 挿入前」の失敗は紐付く `articles_raw` 行が存在しない
 3. P0 実装では API 応答に失敗内容を返し、既存 raw がある場合だけ `last_error` を更新する
 4. source 単位の失敗を永続化するなら、`source_targets` 側カラム追加か専用ジョブログの追加が必要
+5. `ai-news-roundup` は local `hourly-layer12` 実行時に `Status code 404` を返したため、明日 source 登録見直し候補
 
 補足:
 
