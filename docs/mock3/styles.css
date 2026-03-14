@@ -211,7 +211,8 @@ input {
 .panel-grid,
 .tag-grid,
 .ops-grid,
-.digest-grid {
+.digest-grid,
+.admin-shell {
   display: grid;
   gap: 12px;
 }
@@ -233,6 +234,10 @@ input {
   grid-template-columns: repeat(2, 1fr);
 }
 
+.admin-shell {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .hero-card,
 .article-card,
 .panel-card,
@@ -244,6 +249,10 @@ input {
 .article-card {
   display: grid;
   gap: 12px;
+}
+
+.admin-wide {
+  grid-column: span 2;
 }
 
 .thumb {
@@ -275,6 +284,28 @@ input {
 .flow-log {
   display: grid;
   gap: 10px;
+}
+
+.admin-table {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.admin-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 72px 120px 140px;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.admin-head {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 700;
 }
 
 .log-item {
@@ -313,7 +344,16 @@ input {
   .hero-grid,
   .article-grid,
   .panel-grid,
-  .digest-grid {
+  .digest-grid,
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-wide {
+    grid-column: auto;
+  }
+
+  .admin-row {
     grid-template-columns: 1fr;
   }
 }

@@ -14,9 +14,12 @@
    - `priority_processing_queue` と `admin_operation_logs` の反映を見る想定
 5. Digest
    - `public_rankings` の上位から再構成する想定
+6. Admin Console
+   - タグレビュー、即時反映、取得元管理の運営 UI を見る想定
 
 ## 目的
 
 1. `layer4` の公開データがどうまとまるかを見る
 2. `layer3` の運用データがどこで表示に効くかを見る
 3. タグ運用、関連ソース、優先処理の見え方を確認する
+4. 管理画面を後から別実装しても、必要な情報密度が何かを先に確認する

@@ -15,7 +15,7 @@ type TrendRow = {
   published_at: string
   summary_100: string | null
   topic_group_id: string | null
-  score: number
+  score: number | string
   breakdown: unknown
 }
 
@@ -54,7 +54,10 @@ export async function GET(request: NextRequest) {
   ` as TrendRow[]
 
   return NextResponse.json({
-    articles: rows,
+    articles: rows.map((row) => ({
+      ...row,
+      score: typeof row.score === 'string' ? Number(row.score) : row.score,
+    })),
     period,
     genre,
     total: rows.length,

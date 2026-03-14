@@ -26,6 +26,285 @@
 3. `docs/spec` を取得系中心に更新した
 4. `docs/mock3` を追加し、公開層中心のモックを作成した
 
+## 2.5 現在地
+
+### いま進めているフェーズ
+
+1. 現在の主対象は `Layer1 -> Layer2` の品質改善
+2. 目的は「情報蓄積を高品質で安定開始できる状態」にすること
+3. `Layer3` と `Layer4` はいったん保留
+
+### このフェーズで完了したもの
+
+1. `source_targets` 本番 seed
+2. `source_priority_rules` 初期 seed
+3. `tags_master` 初期 seed
+4. `hourly-fetch` 実装
+5. `daily-enrich` 実装
+6. `job_runs` / `job_run_items` によるジョブ監視
+7. Google Alerts redirect URL の補正
+8. `db:check-layer12` による抽出診断
+9. `similar_candidate` による初期 dedupe
+
+### いま改善中のもの
+
+1. `content_path=full` の比率改善
+2. `tag_candidate_pool` のノイズ削減
+3. URL 一致より先の dedupe 強化
+4. blocked domain と通常 fetch failure の切り分け
+
+### 現時点で分かっていること
+
+1. 本文抽出率が低かった主因は、Google Alerts が実記事 URL ではなく `google.com/url` を保存していたこと
+2. URL 補正後、`content_path=full` は `2` から `10` まで改善
+3. `time.com` は取得・抽出可能
+4. `cdt.org` は現在 Cloudflare により `domain_snippet_only` 扱い
+5. dedupe は `similar_candidate` が出始めている
+
+### 次の優先
+
+1. 候補タグの条件をさらに厳しくして一般名詞ノイズを減らす
+2. title ベース dedupe を広げて `similar_candidate` の検出精度を上げる
+3. snippet-only にすべき blocked domain を増やして切り分けを明確にする
+4. `content_path=full` をさらに増やす
+5. Layer2 品質が十分になってから `Layer3` と `Layer4` を再開する
+
+## 2.6 全体タスク一覧
+
+### A. Layer1 / Layer2 品質改善
+
+1. Google Alerts 系 source のノイズ削減
+2. `content_path=full` 抽出率の改善
+3. blocked domain / snippet-only domain の整理
+4. dedupe の精度改善
+5. `tag_candidate_pool` のノイズ削減
+6. `publish_candidate` 判定の見直し
+7. `db:check-layer12` と `job_runs` の監視拡張
+
+### B. Layer1 / Layer2 運用整備
+
+1. seed / repair / check 系スクリプトの整理
+2. 定期実行時の再処理方針整理
+3. source 単位エラーの蓄積と可視化
+4. 初回投入後の運用チェック手順の固定化
+
+### C. Tag 運用
+
+1. `tag_candidate_pool` から `tags_master` への昇格基準整理
+2. alias 整備
+3. Google Trends 連携の前提整理
+4. タグ review 用の運用フロー整理
+
+### D. Publish 系
+
+1. `hourly-publish`
+2. `public_articles`
+3. `public_article_sources`
+4. `public_article_tags`
+5. `public_rankings`
+
+### E. Layer3
+
+1. `activity_logs`
+2. `activity_metrics_hourly`
+3. `admin_operation_logs`
+4. `priority_processing_queue`
+5. `hide_article` などの運用系処理
+
+### F. Layer4
+
+1. 公開 API 接続
+2. 閲覧 UI
+3. ランキング表示
+4. タグページ
+5. 運用 UI
+
+### 推奨着手順
+
+1. まず `Layer1 -> Layer2` の品質改善を完了する
+2. 次に Layer2 運用整備と tag 運用を固める
+3. そのあと publish 系を実装する
+4. 最後に `Layer3` と `Layer4` を再開する
+
+## 2.7 タスクごとの進め方
+
+### A. Layer1 / Layer2 品質改善
+
+#### A-1. Google Alerts 系 source のノイズ削減
+
+- 何をやるか:
+  - source ごとの relevance 判定を強めて、alert 語に引っ張られた誤収集を減らす
+- どうやるか:
+  - `source_key` ごとに title / snippet の必須語・除外語を見直す
+  - Google redirect URL は unwrap 済み前提で、実記事 URL ベースに判定する
+  - `db:check-layer12` の `Latest Enriched` と `score=34/59` 群を見て誤判定を潰す
+- 完了条件:
+  - 明らかなノイズ記事が `publish_candidate=true` に乗らない
+
+#### A-2. `content_path=full` 抽出率の改善
+
+- 何をやるか:
+  - snippet ではなく本文を使える記事を増やす
+- どうやるか:
+  - extractor の selector を追加する
+  - blocked domain は `domain_snippet_only` として分離する
+  - `db:check-layer12` の `Latest Enrich Diagnostics` で `extracted` / `fetch_error` / `domain_snippet_only` を追う
+- 完了条件:
+  - 対象 source のうち、本文取得できる媒体は安定して `full` に入る
+
+#### A-3. blocked domain / snippet-only domain の整理
+
+- 何をやるか:
+  - 取得できない媒体を「障害」ではなく「仕様として snippet-only」に切り分ける
+- どうやるか:
+  - Cloudflare / 403 / bot block の媒体を洗い出す
+  - `resolveArticleContent` で domain 単位の扱いを追加する
+- 完了条件:
+  - fetch block が一般的な `fetch_error` と混ざらない
+
+#### A-4. dedupe の精度改善
+
+- 何をやるか:
+  - URL 一致だけでなく、見出し近似で同一話題を束ねる
+- どうやるか:
+  - `buildHeadlineSignature()` を使って `similar_candidate` を増やす
+  - 再処理で同一話題の別 URL 記事を流し、`dedupe_status` を確認する
+- 完了条件:
+  - 同一話題の複数記事が `similar_candidate` でまとまり始める
+
+#### A-5. `tag_candidate_pool` のノイズ削減
+
+- 何をやるか:
+  - 一般名詞や文脈依存語ではなく、昇格候補になる語だけを残す
+- どうやるか:
+  - candidate 生成を `full` 記事中心に寄せる
+  - stopword / generic phrase を増やす
+  - 必要なら既存候補を prune する
+- 完了条件:
+  - `player`, `china`, `buffet` のような汎用語が上位に出続けない
+
+#### A-6. `publish_candidate` 判定の見直し
+
+- 何をやるか:
+  - `full=true` だけで publish 候補になりすぎるのを防ぐ
+- どうやるか:
+  - relevance, dedupe, tag 数, source 種別を組み合わせて条件を調整する
+- 完了条件:
+  - 明らかに公開向きでない記事が `publish_candidate=true` になりにくい
+
+#### A-7. `db:check-layer12` と `job_runs` の監視拡張
+
+- 何をやるか:
+  - 改善サイクルを DB とターミナルだけで回せるようにする
+- どうやるか:
+  - 最新ジョブ結果、失敗記事、抽出段階、候補タグ上位を見える化する
+- 完了条件:
+  - 「何が失敗したか」「どこを直すべきか」が毎回すぐ分かる
+
+### B. Layer1 / Layer2 運用整備
+
+#### B-1. seed / repair / check 系スクリプトの整理
+
+- 何をやるか:
+  - 初期化・補正・確認の作業を定型化する
+- どうやるか:
+  - `db:seed`, `db:repair-google-alerts-urls`, `db:prune-tag-candidates`, `db:check-layer12` を整理する
+- 完了条件:
+  - 手動運用時の実行順が固定できる
+
+#### B-2. 定期実行時の再処理方針整理
+
+- 何をやるか:
+  - 失敗時・仕様変更時の再実行方法を決める
+- どうやるか:
+  - `is_processed=false`, `process_after=now()` の再処理手順を文書化する
+- 完了条件:
+  - 再実行手順が人に依存しない
+
+#### B-3. source 単位エラーの蓄積と可視化
+
+- 何をやるか:
+  - source 単位の失敗をあとから追えるようにする
+- どうやるか:
+  - `job_runs` / `job_run_items` に source 情報を積む
+  - 必要なら `implementation-wait.md` の pending を解消する
+- 完了条件:
+  - source ごとの失敗傾向を確認できる
+
+#### B-4. 初回投入後の運用チェック手順の固定化
+
+- 何をやるか:
+  - 新環境で同じ確認を再現できるようにする
+- どうやるか:
+  - setup 手順、確認 SQL、監視コマンドを plan / status に残す
+- 完了条件:
+  - 別タイミングでも同じ品質確認ができる
+
+### C. Tag 運用
+
+#### C-1. `tag_candidate_pool` から `tags_master` への昇格基準整理
+
+- 何をやるか:
+  - どの候補を本タグに昇格させるか決める
+- どうやるか:
+  - `seen_count`, source の広がり、Google Trends, 手動 review を条件化する
+- 完了条件:
+  - 昇格基準が定義される
+
+#### C-2. alias 整備
+
+- 何をやるか:
+  - 同義語・表記揺れを tag match に吸収させる
+- どうやるか:
+  - `tag_aliases` を更新し、match 精度を上げる
+- 完了条件:
+  - 同じ概念が複数 candidate に割れにくくなる
+
+#### C-3. Google Trends 連携の前提整理
+
+- 何をやるか:
+  - tag 候補の裏取り方法を決める
+- どうやるか:
+  - 取得方法、頻度、スコア保存先を整理する
+- 完了条件:
+  - 実装前提が固まる
+
+#### C-4. タグ review 用の運用フロー整理
+
+- 何をやるか:
+  - 人手確認が必要な箇所を限定する
+- どうやるか:
+  - `manual_review`, `promoted`, `rejected` の扱いを決める
+- 完了条件:
+  - tag review の運用が説明できる
+
+### D. Publish 系
+
+- 何をやるか:
+  - Layer2 から公開用テーブル群を作る
+- どうやるか:
+  - `hourly-publish` で representative source, tags, rankings を投影する
+- 完了条件:
+  - `public_*` テーブルを UI が読める
+
+### E. Layer3
+
+- 何をやるか:
+  - 運用ログ・行動ログ・優先処理キューを整備する
+- どうやるか:
+  - `activity_logs`, `activity_metrics_hourly`, `admin_operation_logs`, `priority_processing_queue` を順に実装する
+- 完了条件:
+  - 運用系の変更や後続処理を記録できる
+
+### F. Layer4
+
+- 何をやるか:
+  - 公開 UI と API をつなぐ
+- どうやるか:
+  - `public_articles` 系を読む API / 画面を実装する
+- 完了条件:
+  - サイトが `Layer4` だけを参照して表示できる
+
 ## 3. 全体の次フェーズ
 
 ### Phase A: DB 基盤
@@ -86,6 +365,16 @@
 この区画は、NeonDB に migration を適用し、実際に `layer1` と `layer2` を動かすための実装だけに絞る。  
 再開時はこの区画から順に着手する。
 
+### 4.0 先に開くドキュメント
+
+1. `docs/imp/imp-hangover.md`
+2. `docs/spec/11-batch-job-design.md`
+3. `docs/memo/20260313_source_target_candidates.md`
+4. `docs/spec/10-ingestion-layer-design.md`
+5. `docs/spec/05-ingestion-and-ai-pipeline.md`
+6. `docs/spec/04-data-model-and-sql.md`
+7. `migrations/001_extensions.sql` から `migrations/009_rls.sql`
+
 ### 4.1 ゴール
 
 1. Neon 上に `source_targets` / `articles_raw` / `articles_enriched` 系テーブルを作成する
@@ -135,10 +424,10 @@
 4. tag matcher を作る
 5. `tag_candidate_pool` updater を作る
 6. Google Trends 照合対象の暫定閾値 `seen_count >= 5` を定数化する
-6. 確定重複判定を `dedupe_status` に反映する
-7. `articles_enriched` writer を作る
-8. 更新時は旧版を `articles_enriched_history` に退避する
-9. `articles_enriched_tags` を同期する
+7. 確定重複判定を `dedupe_status` に反映する
+8. `articles_enriched` writer を作る
+9. 更新時は旧版を `articles_enriched_history` に退避する
+10. `articles_enriched_tags` を同期する
 
 ### 4.6 ジョブ分割
 
@@ -270,4 +559,106 @@
 2. `docs/spec/04-data-model-and-sql.md`
 3. `docs/spec/05-ingestion-and-ai-pipeline.md`
 4. `docs/spec/10-ingestion-layer-design.md`
-5. `docs/mock3/`
+5. `docs/spec/11-batch-job-design.md`
+6. `docs/memo/20260313_source_target_candidates.md`
+7. `docs/imp/imp-hangover.md`
+## 現在地
+
+最終更新: 2026-03-14
+
+### いま進めているフェーズ
+
+- 現在の主対象: `Layer1 -> Layer2` の品質改善
+- 現在の主目的: 情報蓄積を高品質で安定開始できる状態にする
+- いったん保留: `Layer3`, `Layer4`
+
+### このフェーズで完了したもの
+
+- `source_targets` 本番 seed
+- `source_priority_rules` 初期 seed
+- `tags_master` 初期 seed
+- `hourly-fetch` 実装
+- `daily-enrich` 実装
+- `job_runs` / `job_run_items` によるジョブ監視
+- Google Alerts redirect URL の補正
+- `db:check-layer12` による抽出診断
+- `similar_candidate` による初期重複判定
+
+### いま改善中のもの
+
+- `content_path=full` の比率改善
+- `tag_candidate_pool` のノイズ削減
+- URL 一致より先の dedupe 強化
+- blocked domain と通常 fetch failure の切り分け
+
+### 現時点で分かっていること
+
+- 本文抽出率が低かった主因は、Google Alerts が実記事 URL ではなく `google.com/url` を保存していたこと
+- URL 補正後、`content_path=full` は `2` から `10` まで改善
+- `time.com` は取得・抽出可能
+- `cdt.org` は現在 Cloudflare により `domain_snippet_only` 扱い
+- dedupe は `similar_candidate` が出始めている
+
+### 次の優先
+
+1. 候補タグの条件をさらに厳しくして一般名詞ノイズを減らす
+2. title ベース dedupe を広げて `similar_candidate` の検出精度を上げる
+3. snippet-only にすべき blocked domain を増やして切り分けを明確にする
+4. `content_path=full` をさらに増やす
+5. Layer2 品質が十分になってから `Layer3` と `Layer4` を再開する
+### 全体タスク一覧
+
+#### A. Layer1 / Layer2 品質改善
+
+1. Google Alerts 系 source のノイズ削減
+2. `content_path=full` 抽出率の改善
+3. blocked domain / snippet-only domain の整理
+4. dedupe の精度改善
+5. `tag_candidate_pool` のノイズ削減
+6. `publish_candidate` 判定の見直し
+7. `db:check-layer12` と `job_runs` の監視拡張
+
+#### B. Layer1 / Layer2 運用整備
+
+1. seed / repair / check 系スクリプトの整理
+2. 定期実行時の再処理方針整理
+3. source 単位エラーの蓄積と可視化
+4. 初回投入後の運用チェック手順の固定化
+
+#### C. Tag 運用
+
+1. `tag_candidate_pool` から `tags_master` への昇格基準整理
+2. alias 整備
+3. Google Trends 連携の前提整理
+4. タグ review 用の運用フロー整理
+
+#### D. Publish 系
+
+1. `hourly-publish`
+2. `public_articles`
+3. `public_article_sources`
+4. `public_article_tags`
+5. `public_rankings`
+
+#### E. Layer3
+
+1. `activity_logs`
+2. `activity_metrics_hourly`
+3. `admin_operation_logs`
+4. `priority_processing_queue`
+5. `hide_article` などの運用系処理
+
+#### F. Layer4
+
+1. 公開 API 接続
+2. 閲覧 UI
+3. ランキング表示
+4. タグページ
+5. 運用 UI
+
+### 推奨着手順
+
+1. まず `Layer1 -> Layer2` の品質改善を完了する
+2. 次に Layer2 運用整備と tag 運用を固める
+3. そのあと publish 系を実装する
+4. 最後に `Layer3` と `Layer4` を再開する

@@ -1,12 +1,26 @@
 import { createHash } from 'crypto'
 
+export function unwrapGoogleRedirectUrl(rawUrl: string): string {
+  try {
+    const url = new URL(rawUrl)
+    if (url.hostname !== 'www.google.com' || url.pathname !== '/url') {
+      return rawUrl
+    }
+
+    const target = url.searchParams.get('url')
+    return target ? decodeURIComponent(target) : rawUrl
+  } catch {
+    return rawUrl
+  }
+}
+
 /**
  * URL正規化 + ハッシュ生成
  * 同一記事の重複収集を防ぐ
  */
 export function normalizeUrl(rawUrl: string): string {
   try {
-    const url = new URL(rawUrl)
+    const url = new URL(unwrapGoogleRedirectUrl(rawUrl))
 
     // トラッキングパラメータを除去
     const REMOVE_PARAMS = [

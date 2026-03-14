@@ -34,6 +34,7 @@
 | `08-security-quality-operations.md` | セキュリティ、品質保証、監視、アラート、運用フロー。 |
 | `09-kpi-rollout.md` | KPI定義、計測イベント、段階的リリース計画。 |
 | `10-ingestion-layer-design.md` | Layer1/2に特化した取得・整形パイプラインの安定化設計。 |
+| `11-batch-job-design.md` | 定期実行ジョブと即時実行ジョブの責務分割、入力、更新先、実装順のSSOT。 |
 | `research-links.md` | 競合サービス、デザインギャラリー、技術ドキュメント等の参考URL集。 |
 
 ### 3. `docs/imp/` (実装管理)
@@ -85,6 +86,7 @@
 - `docs/memo/20260312-data-design.md` : レイヤー分離の意図。
 - `docs/memo/20260312_dataflow.md` : データがどう流れるかの図解（Mermaid）。
 - `docs/spec/05-ingestion-and-ai-pipeline.md` : バッチ責務と更新検知ルール。
+- `docs/spec/11-batch-job-design.md` : ジョブ分割、入力、更新先、実装順。
 
 ### 🏗️ 【DB設計・移行時】データ構造と権限を扱う
 - `docs/spec/04-data-model-and-sql.md` : テーブル設計の正解。
@@ -95,6 +97,7 @@
 ### 📡 【パイプライン構築時】データ収集・AI要約を実装する
 - `docs/spec/10-ingestion-layer-design.md` : 取得・整形の詳細。
 - `docs/spec/05-ingestion-and-ai-pipeline.md` : バッチの責務と更新検知。
+- `docs/spec/11-batch-job-design.md` : バッチをどの単位で切るかの正解。
 - `docs/init/getdata_youken_prompt.md` : 外部バッチの構造参考。
 
 ### 🎨 【ウェブサイト・UI/UX設計時】画面と体験を作る

@@ -10,7 +10,10 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "db:migrate": "node scripts/migrate.mjs",
-    "db:seed": "node scripts/seed.mjs"
+    "db:seed": "node scripts/seed.mjs",
+    "db:check-layer12": "node scripts/check-layer12.mjs",
+    "db:prune-tag-candidates": "node scripts/prune-tag-candidates.mjs",
+    "db:repair-google-alerts-urls": "node scripts/repair-google-alerts-urls.mjs"
   },
   "dependencies": {
     "next": "^15.2.0",

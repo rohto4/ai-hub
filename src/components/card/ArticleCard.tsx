@@ -30,6 +30,13 @@ export function ArticleCard({
   onAction,
   onOpenArticle,
 }: Props) {
+  const numericScore =
+    typeof article.score === 'number'
+      ? article.score
+      : typeof article.score === 'string'
+        ? Number(article.score)
+        : undefined
+
   const summary =
     (summaryMode === 300 ? article.summary_300 : summaryMode === 200 ? article.summary_200 : article.summary_100) ??
     article.summary_100 ??
@@ -39,7 +46,7 @@ export function ArticleCard({
     rank ? `#${rank}` : null,
     article.genre,
     `${summaryMode}字`,
-    article.score ? `Score ${article.score.toFixed(1)}` : null,
+    typeof numericScore === 'number' && Number.isFinite(numericScore) ? `Score ${numericScore.toFixed(1)}` : null,
   ]
     .filter(Boolean)
     .join(' ・ ')
