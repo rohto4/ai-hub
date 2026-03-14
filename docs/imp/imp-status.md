@@ -100,3 +100,18 @@
   - `daily-enrich` reprocessed raw `#160` as `snippet + provisional + domain_snippet_only`
   - latest `db:check-layer12` now shows `enriched_ready_total=10`, `enriched_provisional_total=152`
   - `hourly-fetch` on `ai-news-roundup` returned `Status code 404`; source registration / source repair candidate for tomorrow
+
+## 2026-03-15 Layer2 Quality Push
+
+- Added `db:set-source-state` and disabled `ai-news-roundup` because it was still pointing at the placeholder URL `https://example.com/ai-news`; active sources are now `11`.
+- Extended `db:requeue-raw` so provisional rows can be requeued by domain, not only by raw id / source key.
+- Requeued provisional articles for `theverge.com`, `wired.com`, `9to5google.com`, `androidcentral.com`, `bloomberg.com`, `cnbc.com`, `engadget.com`, `fortune.com`, `theguardian.com`, and `techcrunch.com`.
+- After re-enrichment, `content_path=full` improved from `10` to `30`, while provisional rows dropped from `152` to `132`.
+- `bloomberg.com` moved from generic snippet-only to explicit `fetch_error`, which is better than silent fallback because it separates extractor gaps from hard fetch failures.
+- Added `db:repair-stale-job-runs` and repaired stale `daily-enrich` runs so `job_runs` monitoring no longer shows old phantom `running` entries.
+- Tightened tag-candidate suppression for currently noisy terms such as `player`, `bills`, `china`, `buffet`, `lobster`, and related bigrams; then pruned existing noisy rows from `tag_candidate_pool`.
+- Latest `db:check-layer12` observation:
+  - `raw_processed=162 / raw_unprocessed=0`
+  - `enriched_ready_total=30`
+  - `enriched_provisional_total=132`
+  - `candidate_pool_total=972`

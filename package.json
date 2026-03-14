@@ -16,7 +16,9 @@
     "db:prune-tag-candidates": "node scripts/prune-tag-candidates.mjs",
     "db:promote-tag-candidates": "node scripts/promote-tag-candidates.mjs",
     "db:repair-google-alerts-urls": "node scripts/repair-google-alerts-urls.mjs",
-    "db:requeue-raw": "node scripts/requeue-raw.mjs"
+    "db:repair-stale-job-runs": "node scripts/repair-stale-job-runs.mjs",
+    "db:requeue-raw": "node scripts/requeue-raw.mjs",
+    "db:set-source-state": "node scripts/set-source-state.mjs"
   },
   "dependencies": {
     "next": "^15.2.0",

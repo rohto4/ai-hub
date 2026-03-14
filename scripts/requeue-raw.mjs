@@ -24,13 +24,19 @@ function readArg(name) {
 }
 
 async function run() {
-  const positional = args.find((arg) => !arg.startsWith('--')) ?? null
+  const positionalArgs = args.filter((arg) => !arg.startsWith('--'))
+  const positional = positionalArgs[0] ?? null
+  const secondPositional = positionalArgs[1] ?? null
   const rawId = readArg('--raw-id') ?? (positional && /^\d+$/.test(positional) ? positional : null)
   const sourceKey = readArg('--source-key')
-  const limit = Number(readArg('--limit') ?? '20')
+  const domain =
+    readArg('--domain') ??
+    (positional && !/^\d+$/.test(positional) && !positional.includes(':') && !sourceKey ? positional : null)
+  const provisionalOnly = args.includes('--provisional-only') || secondPositional === 'provisional'
+  const limit = Number(readArg('--limit') ?? (secondPositional && /^\d+$/.test(secondPositional) ? secondPositional : '20'))
 
-  if (!rawId && !sourceKey) {
-    throw new Error('Specify --raw-id <id> or --source-key <key>')
+  if (!rawId && !sourceKey && !domain) {
+    throw new Error('Specify --raw-id <id>, --source-key <key>, or --domain <hostname>')
   }
 
   let sql
@@ -49,7 +55,7 @@ async function run() {
       RETURNING id, normalized_url
     `
     params = [Number(rawId)]
-  } else {
+  } else if (sourceKey) {
     sql = `
       WITH target_rows AS (
         SELECT ar.id
@@ -71,6 +77,29 @@ async function run() {
       RETURNING ar.id, ar.normalized_url
     `
     params = [sourceKey, Number.isFinite(limit) ? Math.max(1, limit) : 20]
+  } else {
+    sql = `
+      WITH target_rows AS (
+        SELECT ar.id
+        FROM articles_raw ar
+        ${provisionalOnly ? 'JOIN articles_enriched ae ON ae.raw_article_id = ar.id' : ''}
+        WHERE lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) = $1
+          ${provisionalOnly ? 'AND ae.is_provisional = true' : ''}
+        ORDER BY ar.created_at DESC
+        LIMIT $2
+      )
+      UPDATE articles_raw ar
+      SET
+        is_processed = false,
+        has_source_update = true,
+        process_after = now(),
+        last_error = null,
+        updated_at = now()
+      FROM target_rows tr
+      WHERE ar.id = tr.id
+      RETURNING ar.id, ar.normalized_url
+    `
+    params = [domain.toLowerCase().replace(/^www\./, ''), Number.isFinite(limit) ? Math.max(1, limit) : 20]
   }
 
   const result = await pool.query(sql, params)

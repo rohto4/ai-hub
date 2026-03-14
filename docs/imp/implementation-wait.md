@@ -87,6 +87,7 @@
 3. タグ人手レビュー UI の詳細要件
 4. `hourly-fetch` の source 単位失敗ログの正式な保存先
 5. `ai-news-roundup` の 404 を feed 廃止として扱うか、source 差し替えで維持するか
+6. `bloomberg.com` の fetch block を `fetch_error` のまま維持するか、snippet-only domain へ寄せるか
 
 補足:
 
@@ -94,7 +95,8 @@
 2. ただし collector 自体の失敗や「新規 raw 挿入前」の失敗は紐付く `articles_raw` 行が存在しない
 3. P0 実装では API 応答に失敗内容を返し、既存 raw がある場合だけ `last_error` を更新する
 4. source 単位の失敗を永続化するなら、`source_targets` 側カラム追加か専用ジョブログの追加が必要
-5. `ai-news-roundup` は local `hourly-layer12` 実行時に `Status code 404` を返したため、明日 source 登録見直し候補
+5. `ai-news-roundup` は local `hourly-layer12` 実行時に `Status code 404` を返したため、いったん `is_active=false` に切り替え済み
+6. `bloomberg.com` は provisional 再処理で `snippet_only` ではなく `fetch_error` になったため、今後の扱いを決める余地がある
 
 補足:
 
