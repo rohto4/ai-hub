@@ -40,21 +40,20 @@
 
 1. `articles_raw = 162`
 2. `articles_enriched = 162`
-3. `content_path=full` は `2 -> 10` まで改善
-4. provisional 再処理により `content_path=full = 30`, `is_provisional = 132` まで改善
-5. `time.com` は取得・抽出可能
-6. `cdt.org` は現在 `domain_snippet_only` として扱う
+3. `source_targets` の有効件数は `11`
+4. `content_access_policy` は `feed_only=9`, `fulltext_allowed=2`
+5. 厳格運用へ切り替えた結果、現時点の `content_path=full = 2`, `is_provisional = 160`
+6. `cdt.org` など blocked domain は `domain_snippet_only` で扱うが、P0 の主方針は source policy 優先
 7. `dedupe_status` は `similar_candidate` が出始めている
 8. `ai-news-roundup` は placeholder source のため `is_active=false` に切り替えた
-9. `axios.com`, `bloomberg.com`, `youtube.com` は `domain_snippet_only` に寄せた
-10. `nvidia` は `tags_master` へ昇格済み
+9. `nvidia` は `tags_master` へ昇格済み
 
 ### 2.4 今の主課題
 
-1. `content_path=full` の比率改善
+1. `source_targets.content_access_policy` の整理と維持
 2. `tag_candidate_pool` のノイズ削減
 3. URL 一致より先の dedupe 強化
-4. blocked domain と通常 fetch failure の切り分け
+4. blocked domain と source policy の切り分け
 5. 毎時バッチの直列実行と小分け処理の運用固定
 6. source ごとの 404 / feed 廃止候補の見直し
 7. residual snippet-only domain 群の整理
@@ -129,13 +128,13 @@
 #### A-2. `content_path=full` 抽出率の改善
 
 - 何をやるか:
-  - snippet ではなく本文を使える記事を増やす
+  - 許可された source だけ本文を使い、それ以外は snippet で評価継続する
 - どうやるか:
-  - extractor の selector を追加する
-  - blocked domain は `domain_snippet_only` として分離する
-  - `db:check-layer12` の `Latest Enrich Diagnostics` で `extracted` / `fetch_error` / `domain_snippet_only` を追う
+ - `source_targets.content_access_policy` を `feed_only` / `fulltext_allowed` / `blocked_snippet_only` で管理する
+  - `fulltext_allowed` source に限って extractor 改善を行う
+  - `db:check-layer12` の `Latest Enrich Diagnostics` / `Latest Enrich Failures` と `provisional_reason=feed_only_policy` で policy 起因の snippet 蓄積を確認する
 - 完了条件:
-  - 取得可能な媒体は安定して `full` に入る
+  - 本文取得可否が policy に反しない形で安定する
 
 #### A-3. blocked domain / snippet-only domain の整理
 

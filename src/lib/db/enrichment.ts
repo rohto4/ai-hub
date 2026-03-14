@@ -6,6 +6,7 @@ export interface RawArticleForEnrichment {
   sourceTargetId: string
   sourceKey: string
   sourceCategory: string
+  contentAccessPolicy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
   normalizedUrl: string
   citedUrl: string | null
   title: string | null
@@ -20,6 +21,7 @@ type RawArticleRow = {
   source_target_id: string
   source_key: string
   source_category: string
+  content_access_policy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
   normalized_url: string
   cited_url: string | null
   title: string | null
@@ -74,7 +76,13 @@ export interface UpsertEnrichedInput {
   summary300: string
   contentPath: 'full' | 'snippet'
   isProvisional: boolean
-  provisionalReason: 'snippet_only' | 'domain_snippet_only' | 'fetch_error' | 'extracted_below_threshold' | null
+  provisionalReason:
+    | 'snippet_only'
+    | 'domain_snippet_only'
+    | 'fetch_error'
+    | 'extracted_below_threshold'
+    | 'feed_only_policy'
+    | null
   dedupeStatus: DedupeStatus
   dedupeGroupKey: string | null
   publishCandidate: boolean
@@ -97,6 +105,7 @@ export async function listRawArticlesForEnrichment(limit = 50): Promise<RawArtic
       ar.source_target_id,
       st.source_key,
       st.source_category,
+      st.content_access_policy,
       ar.normalized_url,
       ar.cited_url,
       ar.title,
@@ -117,6 +126,7 @@ export async function listRawArticlesForEnrichment(limit = 50): Promise<RawArtic
     sourceTargetId: row.source_target_id,
     sourceKey: row.source_key,
     sourceCategory: row.source_category,
+    contentAccessPolicy: row.content_access_policy,
     normalizedUrl: row.normalized_url,
     citedUrl: row.cited_url,
     title: row.title,

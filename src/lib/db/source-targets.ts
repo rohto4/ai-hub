@@ -8,6 +8,7 @@ type SourceTargetRow = {
   fetch_kind: SourceTarget['fetchKind']
   source_category: string
   base_url: string | null
+  content_access_policy: SourceTarget['contentAccessPolicy']
   fetch_interval_minutes: number
   supports_update_detection: boolean
   requires_auth: boolean
@@ -23,6 +24,7 @@ export async function listDueSourceTargets(limit = 20): Promise<SourceTarget[]> 
       st.fetch_kind,
       st.source_category,
       st.base_url,
+      st.content_access_policy,
       st.fetch_interval_minutes,
       st.supports_update_detection,
       st.requires_auth
@@ -49,6 +51,7 @@ export async function listDueSourceTargets(limit = 20): Promise<SourceTarget[]> 
     fetchKind: row.fetch_kind,
     sourceCategory: row.source_category,
     baseUrl: row.base_url,
+    contentAccessPolicy: row.content_access_policy,
     fetchIntervalMinutes: row.fetch_interval_minutes,
     supportsUpdateDetection: row.supports_update_detection,
     requiresAuth: row.requires_auth,

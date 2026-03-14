@@ -73,7 +73,9 @@
 
 - 主処理
   - 未処理または再整形対象の raw を小分けで取得する
-  - 本文取得を試みる
+  - まず `source_targets.content_access_policy` を見る
+  - `fulltext_allowed` source に限って本文取得を試みる
+  - `feed_only` source は snippet ベースで継続する
   - `full` / `snippet` を判定する
   - 本文未取得時は `snippet` ベースで仮蓄積する
   - `is_provisional` / `provisional_reason` を更新する

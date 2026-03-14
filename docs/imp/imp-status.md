@@ -131,3 +131,19 @@
   - `provisional_reason=domain_snippet_only` rows = `9`
   - `dedupe_status similar_candidate = 2`
   - `enriched_tags_total = 208`
+
+## 2026-03-15 Source Policy Enforcement
+
+- Added `source_targets.content_access_policy` with `feed_only / fulltext_allowed / blocked_snippet_only`.
+- Backfilled current source policies to:
+  - `feed_only = 9` active Google Alerts sources
+  - `fulltext_allowed = 2` active official sources (`anthropic-news`, `google-ai-blog`)
+- Changed enrich so `feed_only` sources do not fetch article HTML at all; they are evaluated from feed title/snippet only.
+- Added `feed_only_policy` as a distinct Layer2 `provisional_reason` so policy-driven snippet accumulation is separated from extractor weakness (`extracted_below_threshold`) and transport failure (`fetch_error`).
+- Requeued and re-enriched all active Google Alerts raw rows (`159` rows) so Layer2 state is consistent with the stricter policy.
+- Result after policy enforcement:
+  - `raw_processed=162 / raw_unprocessed=0`
+  - `enriched_ready_total=2`
+  - `enriched_provisional_total=160`
+  - `content_path full = 2 / snippet = 160`
+- This is an intentional regression in `full` count, not a bug: the previous `full=30` state relied on destination-page fetching for sources that are now treated as `feed_only`.

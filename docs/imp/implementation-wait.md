@@ -87,6 +87,7 @@
 3. タグ人手レビュー UI の詳細要件
 4. `hourly-fetch` の source 単位失敗ログの正式な保存先
 5. `ai-news-roundup` の 404 を feed 廃止として扱うか、source 差し替えで維持するか
+6. `content_access_policy=fulltext_allowed` に昇格してよい source の判定基準をどこまで厳格に運用するか
 
 補足:
 
@@ -95,6 +96,7 @@
 3. P0 実装では API 応答に失敗内容を返し、既存 raw がある場合だけ `last_error` を更新する
 4. source 単位の失敗を永続化するなら、`source_targets` 側カラム追加か専用ジョブログの追加が必要
 5. `ai-news-roundup` は local `hourly-layer12` 実行時に `Status code 404` を返したため、いったん `is_active=false` に切り替え済み
+6. P0 は `Google Alerts -> feed_only`, `公式 source -> fulltext_allowed` を基本線にした
 
 補足:
 

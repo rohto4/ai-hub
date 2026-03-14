@@ -19,7 +19,13 @@ export interface DailyEnrichItemResult {
   status: 'processed' | 'failed'
   contentPath?: 'full' | 'snippet'
   isProvisional?: boolean
-  provisionalReason?: 'snippet_only' | 'domain_snippet_only' | 'fetch_error' | 'extracted_below_threshold' | null
+  provisionalReason?:
+    | 'snippet_only'
+    | 'domain_snippet_only'
+    | 'fetch_error'
+    | 'extracted_below_threshold'
+    | 'feed_only_policy'
+    | null
   error?: string
 }
 
@@ -32,10 +38,21 @@ export interface DailyEnrichResult {
 
 function determineProvisionalState(
   contentPath: 'full' | 'snippet',
-  extractionStage: 'extracted' | 'extracted_below_threshold' | 'fetch_error' | 'domain_snippet_only',
+  extractionStage:
+    | 'extracted'
+    | 'extracted_below_threshold'
+    | 'fetch_error'
+    | 'domain_snippet_only'
+    | 'feed_only_policy',
 ): {
   isProvisional: boolean
-  provisionalReason: 'snippet_only' | 'domain_snippet_only' | 'fetch_error' | 'extracted_below_threshold' | null
+  provisionalReason:
+    | 'snippet_only'
+    | 'domain_snippet_only'
+    | 'fetch_error'
+    | 'extracted_below_threshold'
+    | 'feed_only_policy'
+    | null
 } {
   if (contentPath === 'full') {
     return {
@@ -55,6 +72,13 @@ function determineProvisionalState(
     return {
       isProvisional: true,
       provisionalReason: 'fetch_error',
+    }
+  }
+
+  if (extractionStage === 'feed_only_policy') {
+    return {
+      isProvisional: true,
+      provisionalReason: 'feed_only_policy',
     }
   }
 
@@ -100,7 +124,11 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
     try {
       const title = rawArticle.title ? normalizeHeadline(rawArticle.title) : rawArticle.normalizedUrl
       const normalizedSnippet = rawArticle.snippet ? decodeAndNormalizeText(rawArticle.snippet) : ''
-      const contentResult = await resolveArticleContent(rawArticle.citedUrl ?? rawArticle.sourceUrl, normalizedSnippet)
+      const contentResult = await resolveArticleContent(
+        rawArticle.citedUrl ?? rawArticle.sourceUrl,
+        normalizedSnippet,
+        rawArticle.contentAccessPolicy,
+      )
       const summaries = await generateEnrichedSummary(title, contentResult.content || title)
       const relevance = assessSourceTargetRelevance(rawArticle.sourceKey, title, normalizedSnippet)
       const tagResult = matchTags(

@@ -24,12 +24,42 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL_UNPOOLED })
 
 const sourceTargets = [
   {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000103',
+    sourceKey: 'google-ai-blog',
+    displayName: 'Google AI Blog',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    baseUrl: 'https://blog.google/technology/ai/rss/',
+    contentAccessPolicy: 'fulltext_allowed',
+  },
+  {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000104',
+    sourceKey: 'anthropic-news',
+    displayName: 'Anthropic News',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    baseUrl: 'https://www.anthropic.com/news/rss.xml',
+    contentAccessPolicy: 'fulltext_allowed',
+  },
+  {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000105',
+    sourceKey: 'ai-news-roundup',
+    displayName: 'AI News Roundup',
+    fetchKind: 'rss',
+    sourceCategory: 'news',
+    baseUrl: 'https://example.com/ai-news',
+    contentAccessPolicy: 'feed_only',
+    isActive: false,
+  },
+  {
     id: '7d4c0b20-1a1b-41d1-a111-000000000101',
     sourceKey: 'google-alerts-voice-ai-voice-agent',
     displayName: 'Google Alerts: Voice AI / Voice Agent',
     fetchKind: 'alerts',
     sourceCategory: 'voice',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/1546181015068281061',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
   {
     id: '7d4c0b20-1a1b-41d1-a111-000000000102',
@@ -38,6 +68,8 @@ const sourceTargets = [
     fetchKind: 'alerts',
     sourceCategory: 'agent',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/16203284553843939981',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
   {
     id: '7d4c0b20-1a1b-41d1-a111-000000000103',
@@ -46,6 +78,8 @@ const sourceTargets = [
     fetchKind: 'alerts',
     sourceCategory: 'policy',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/14504957906878978853',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
   {
     id: '7d4c0b20-1a1b-41d1-a111-000000000104',
@@ -54,6 +88,8 @@ const sourceTargets = [
     fetchKind: 'alerts',
     sourceCategory: 'safety',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/6373579163630166292',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
   {
     id: '7d4c0b20-1a1b-41d1-a111-000000000105',
@@ -62,6 +98,8 @@ const sourceTargets = [
     fetchKind: 'alerts',
     sourceCategory: 'llm',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/11283218415457465409',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
   {
     id: '7d4c0b20-1a1b-41d1-a111-000000000106',
@@ -70,6 +108,8 @@ const sourceTargets = [
     fetchKind: 'alerts',
     sourceCategory: 'agent',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/13098842776851540914',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
   {
     id: '7d4c0b20-1a1b-41d1-a111-000000000107',
@@ -78,6 +118,8 @@ const sourceTargets = [
     fetchKind: 'alerts',
     sourceCategory: 'llm',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/4650888718584175059',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
   {
     id: '7d4c0b20-1a1b-41d1-a111-000000000108',
@@ -86,6 +128,8 @@ const sourceTargets = [
     fetchKind: 'alerts',
     sourceCategory: 'llm',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/4748134521054786223',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
   {
     id: '7d4c0b20-1a1b-41d1-a111-000000000109',
@@ -94,6 +138,8 @@ const sourceTargets = [
     fetchKind: 'alerts',
     sourceCategory: 'search',
     baseUrl: 'https://www.google.com/alerts/feeds/03032972658729420425/13334698373516515488',
+    contentAccessPolicy: 'feed_only',
+    isActive: true,
   },
 ]
 
@@ -121,14 +167,15 @@ async function run() {
         `
           INSERT INTO source_targets (
             id, source_key, display_name, fetch_kind, source_category, base_url,
-            is_active, fetch_interval_minutes, supports_update_detection, requires_auth
+            content_access_policy, is_active, fetch_interval_minutes, supports_update_detection, requires_auth
           )
-          VALUES ($1, $2, $3, $4, $5, $6, true, 60, true, false)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 60, true, false)
           ON CONFLICT (source_key) DO UPDATE SET
             display_name = EXCLUDED.display_name,
             fetch_kind = EXCLUDED.fetch_kind,
             source_category = EXCLUDED.source_category,
             base_url = EXCLUDED.base_url,
+            content_access_policy = EXCLUDED.content_access_policy,
             is_active = EXCLUDED.is_active,
             fetch_interval_minutes = EXCLUDED.fetch_interval_minutes,
             supports_update_detection = EXCLUDED.supports_update_detection,
@@ -141,6 +188,8 @@ async function run() {
           sourceTarget.fetchKind,
           sourceTarget.sourceCategory,
           sourceTarget.baseUrl,
+          sourceTarget.contentAccessPolicy,
+          sourceTarget.isActive ?? true,
         ],
       )
     }

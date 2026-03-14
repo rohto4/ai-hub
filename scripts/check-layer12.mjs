@@ -175,7 +175,7 @@ async function run() {
         ORDER BY started_at DESC
         LIMIT 1
       )
-      GROUP BY detail->>'extractionStage'
+      GROUP BY 1
       ORDER BY count DESC
     `),
     queryMany(`
@@ -193,7 +193,9 @@ async function run() {
         ORDER BY started_at DESC
         LIMIT 1
       )
-        AND detail->>'extractionStage' IN ('fetch_error', 'extracted_below_threshold', 'domain_snippet_only')
+        AND (
+          detail->>'extractionStage' IN ('fetch_error', 'extracted_below_threshold', 'domain_snippet_only', 'feed_only_policy')
+        )
       ORDER BY item_key DESC
       LIMIT 10
     `),
