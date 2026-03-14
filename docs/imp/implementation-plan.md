@@ -57,6 +57,7 @@
   - `db:sync-observed-domains` で取得済みドメイン一覧を DB に同期する
   - `db:check-domain-policies -- --needs-review` で未判定ドメインを上から潰す
   - `db:set-domain-policy` で `fulltext_allowed / snippet_only / blocked` を付ける
+  - `db:promote-domain-policy` で policy 更新と provisional 再キューを一体で回す
 3. `tag_candidate_pool` のノイズ削減
 4. URL 一致より先の dedupe 強化
 5. blocked domain と source policy の切り分け
