@@ -37,11 +37,13 @@
 
 1. `source_targets`
    - 取得元定義
-2. `source_priority_rules`
+2. `observed_article_domains`
+   - 観測済みドメイン一覧とドメイン単位の取得方針
+3. `source_priority_rules`
    - 同一引用元の代表ソース優先度
-3. `push_subscriptions`
+4. `push_subscriptions`
    - Push 購読
-4. `digest_logs`
+5. `digest_logs`
    - Digest 配信履歴
 
 ## 4. 主テーブル概要
@@ -89,7 +91,28 @@
 14. `process_after`
 15. `last_error`
 
-### 4.3 `articles_raw_history`
+### 4.3 `observed_article_domains`
+
+用途:
+
+1. 取得済み記事の行き先ドメイン一覧を持つ
+2. ドメイン単位で本文取得可否をレビューする
+3. 将来の `domain -> fetch/summarize template` 運用の起点にする
+
+主なカラム:
+
+1. `domain`
+2. `fetch_policy`
+   - `needs_review / fulltext_allowed / snippet_only / blocked`
+3. `summary_policy`
+   - `domain_default / summarize_full / summarize_snippet`
+4. `observed_article_count`
+5. `latest_article_url`
+6. `first_seen_at`
+7. `last_seen_at`
+8. `notes`
+
+### 4.4 `articles_raw_history`
 
 用途:
 
@@ -99,7 +122,7 @@
 
 1. `articles_raw` と同等カラムを持ち、`archived_at` を追加する
 
-### 4.4 `tags_master`
+### 4.5 `tags_master`
 
 用途:
 
@@ -114,13 +137,13 @@
 5. `article_count`
 6. `last_seen_at`
 
-### 4.5 `tag_aliases`
+### 4.6 `tag_aliases`
 
 用途:
 
 1. 同義語や表記揺れを `tags_master` に束ねる
 
-### 4.6 `tag_candidate_pool`
+### 4.7 `tag_candidate_pool`
 
 用途:
 
@@ -138,7 +161,7 @@
 6. `latest_trends_score`
 7. `promoted_tag_id`
 
-### 4.7 `articles_enriched`
+### 4.8 `articles_enriched`
 
 用途:
 
@@ -171,13 +194,13 @@
 20. `source_updated_at`
 21. `processed_at`
 
-### 4.8 `articles_enriched_history`
+### 4.9 `articles_enriched_history`
 
 用途:
 
 1. `articles_enriched` 更新時の旧版保管
 
-### 4.9 `articles_enriched_tags`
+### 4.10 `articles_enriched_tags`
 
 用途:
 
@@ -190,50 +213,50 @@
 3. `tag_source`
 4. `is_primary`
 
-### 4.10 `activity_logs`
+### 4.11 `activity_logs`
 
 用途:
 
 1. ウェブサイトの行動明細
 
-### 4.11 `activity_metrics_hourly`
+### 4.12 `activity_metrics_hourly`
 
 用途:
 
 1. 毎時ランキング計算の集計ソース
 
-### 4.12 `admin_operation_logs`
+### 4.13 `admin_operation_logs`
 
 用途:
 
 1. 運営操作の監査ログ
 
-### 4.13 `priority_processing_queue`
+### 4.14 `priority_processing_queue`
 
 用途:
 
 1. 即時運営操作の反映
 2. 再タグ付け、再公開、非表示化、順位再計算の優先処理
 
-### 4.14 `public_articles`
+### 4.15 `public_articles`
 
 用途:
 
 1. サイトが読む公開記事本体
 
-### 4.15 `public_article_sources`
+### 4.16 `public_article_sources`
 
 用途:
 
 1. 公開記事と関連ソースの紐付け
 
-### 4.16 `public_article_tags`
+### 4.17 `public_article_tags`
 
 用途:
 
 1. 公開記事と表示タグの紐付け
 
-### 4.17 `public_rankings`
+### 4.18 `public_rankings`
 
 用途:
 

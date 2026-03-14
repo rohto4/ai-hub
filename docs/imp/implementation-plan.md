@@ -53,13 +53,17 @@
 1. `source_targets.content_access_policy` の整理と維持
   - `db:check-source-policies` で source ごとの `policy / raw / full / provisional` を見る
   - `db:set-source-policy -- --requeue` で昇格と再処理を一体で行う
-2. `tag_candidate_pool` のノイズ削減
-3. URL 一致より先の dedupe 強化
-4. blocked domain と source policy の切り分け
-5. 毎時バッチの直列実行と小分け処理の運用固定
-6. source ごとの 404 / feed 廃止候補の見直し
-7. residual snippet-only domain 群の整理
-8. `tag_candidate_pool` の昇格後ノイズ抑制
+2. `observed_article_domains` の整理
+  - `db:sync-observed-domains` で取得済みドメイン一覧を DB に同期する
+  - `db:check-domain-policies -- --needs-review` で未判定ドメインを上から潰す
+  - `db:set-domain-policy` で `fulltext_allowed / snippet_only / blocked` を付ける
+3. `tag_candidate_pool` のノイズ削減
+4. URL 一致より先の dedupe 強化
+5. blocked domain と source policy の切り分け
+6. 毎時バッチの直列実行と小分け処理の運用固定
+7. source ごとの 404 / feed 廃止候補の見直し
+8. residual snippet-only domain 群の整理
+9. `tag_candidate_pool` の昇格後ノイズ抑制
 
 ## 3. 全体タスク一覧
 
