@@ -25,6 +25,7 @@ export interface DailyEnrichItemResult {
     | 'fetch_error'
     | 'extracted_below_threshold'
     | 'feed_only_policy'
+    | 'domain_needs_review'
     | null
   error?: string
 }
@@ -43,7 +44,8 @@ function determineProvisionalState(
     | 'extracted_below_threshold'
     | 'fetch_error'
     | 'domain_snippet_only'
-    | 'feed_only_policy',
+    | 'feed_only_policy'
+    | 'domain_needs_review'
 ): {
   isProvisional: boolean
   provisionalReason:
@@ -52,6 +54,7 @@ function determineProvisionalState(
     | 'fetch_error'
     | 'extracted_below_threshold'
     | 'feed_only_policy'
+    | 'domain_needs_review'
     | null
 } {
   if (contentPath === 'full') {
@@ -82,6 +85,13 @@ function determineProvisionalState(
     }
   }
 
+  if (extractionStage === 'domain_needs_review') {
+    return {
+      isProvisional: true,
+      provisionalReason: 'domain_needs_review',
+    }
+  }
+
   if (extractionStage === 'extracted_below_threshold') {
     return {
       isProvisional: true,
@@ -103,6 +113,7 @@ function determineSummaryBasis(
     | 'fetch_error'
     | 'extracted_below_threshold'
     | 'feed_only_policy'
+    | 'domain_needs_review'
     | null,
 ): 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet' {
   if (contentPath === 'full') {
@@ -153,6 +164,7 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
         rawArticle.citedUrl ?? rawArticle.sourceUrl,
         normalizedSnippet,
         rawArticle.contentAccessPolicy,
+        rawArticle.observedDomainFetchPolicy,
       )
       const summaries = await generateEnrichedSummary(title, contentResult.content || title)
       const relevance = assessSourceTargetRelevance(rawArticle.sourceKey, title, normalizedSnippet)
