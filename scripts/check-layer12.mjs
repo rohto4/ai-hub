@@ -57,6 +57,7 @@ async function run() {
     enrichedTotals,
     rawBySource,
     contentPathCounts,
+    summaryBasisCounts,
     provisionalCounts,
     dedupeCounts,
     provisionalDomains,
@@ -119,6 +120,12 @@ async function run() {
       ORDER BY count DESC
     `),
     queryMany(`
+      SELECT summary_basis, COUNT(*)::int AS count
+      FROM articles_enriched
+      GROUP BY summary_basis
+      ORDER BY count DESC, summary_basis ASC
+    `),
+    queryMany(`
       SELECT
         is_provisional,
         COALESCE(provisional_reason, 'none') AS provisional_reason,
@@ -158,7 +165,7 @@ async function run() {
       LIMIT 15
     `),
     queryMany(`
-      SELECT id, title, content_path, is_provisional, provisional_reason, dedupe_status, publish_candidate, score, processed_at
+      SELECT id, title, summary_basis, content_path, is_provisional, provisional_reason, dedupe_status, publish_candidate, score, processed_at
       FROM articles_enriched
       ORDER BY processed_at DESC
       LIMIT 10
@@ -231,6 +238,7 @@ async function run() {
     },
     rawBySource,
     contentPathCounts,
+    summaryBasisCounts,
     provisionalCounts,
     dedupeCounts,
     provisionalDomains,
@@ -275,6 +283,11 @@ async function run() {
     console.log(`${row.content_path}: ${row.count}`)
   }
 
+  printSection('Summary Basis')
+  for (const row of summary.summaryBasisCounts) {
+    console.log(`${row.summary_basis}: ${row.count}`)
+  }
+
   printSection('Dedupe Status')
   for (const row of summary.dedupeCounts) {
     console.log(`${row.dedupe_status}: ${row.count}`)
@@ -297,7 +310,7 @@ async function run() {
   printSection('Latest Enriched')
   for (const row of summary.latestEnriched) {
     console.log(
-      `#${row.id} ${row.content_path} provisional=${row.is_provisional}:${row.provisional_reason ?? 'none'} ${row.dedupe_status} publish=${row.publish_candidate} score=${row.score} ${row.title}`,
+      `#${row.id} ${row.content_path} basis=${row.summary_basis} provisional=${row.is_provisional}:${row.provisional_reason ?? 'none'} ${row.dedupe_status} publish=${row.publish_candidate} score=${row.score} ${row.title}`,
     )
   }
 

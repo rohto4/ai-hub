@@ -43,6 +43,7 @@ type ExistingEnrichedRow = {
   summary_100: string
   summary_200: string | null
   summary_300: string | null
+  summary_basis: 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet'
   content_path: 'full' | 'snippet'
   is_provisional: boolean
   provisional_reason: string | null
@@ -74,6 +75,7 @@ export interface UpsertEnrichedInput {
   summary100: string
   summary200: string
   summary300: string
+  summaryBasis: 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet'
   contentPath: 'full' | 'snippet'
   isProvisional: boolean
   provisionalReason:
@@ -260,6 +262,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         summary_100,
         summary_200,
         summary_300,
+        summary_basis,
         content_path,
         is_provisional,
         provisional_reason,
@@ -285,6 +288,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         ${existing.summary_100},
         ${existing.summary_200},
         ${existing.summary_300},
+        ${existing.summary_basis},
         ${existing.content_path},
         ${existing.is_provisional},
         ${existing.provisional_reason},
@@ -311,6 +315,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         summary_100 = ${input.summary100},
         summary_200 = ${input.summary200},
         summary_300 = ${input.summary300},
+        summary_basis = ${input.summaryBasis},
         content_path = ${input.contentPath},
         is_provisional = ${input.isProvisional},
         provisional_reason = ${input.provisionalReason},
@@ -343,6 +348,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       summary_100,
       summary_200,
       summary_300,
+      summary_basis,
       content_path,
       is_provisional,
       provisional_reason,
@@ -363,6 +369,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       ${input.summary100},
       ${input.summary200},
       ${input.summary300},
+      ${input.summaryBasis},
       ${input.contentPath},
       ${input.isProvisional},
       ${input.provisionalReason},

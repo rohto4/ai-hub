@@ -95,6 +95,31 @@ function determineProvisionalState(
   }
 }
 
+function determineSummaryBasis(
+  contentPath: 'full' | 'snippet',
+  provisionalReason:
+    | 'snippet_only'
+    | 'domain_snippet_only'
+    | 'fetch_error'
+    | 'extracted_below_threshold'
+    | 'feed_only_policy'
+    | null,
+): 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet' {
+  if (contentPath === 'full') {
+    return 'full_content'
+  }
+
+  if (provisionalReason === 'feed_only_policy') {
+    return 'feed_snippet'
+  }
+
+  if (provisionalReason === 'domain_snippet_only') {
+    return 'blocked_snippet'
+  }
+
+  return 'fallback_snippet'
+}
+
 function scoreArticle(
   contentPath: 'full' | 'snippet',
   matchedTagCount: number,
@@ -145,6 +170,10 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
       )
       const similarDuplicate = duplicate ? null : await findSimilarTitleDuplicate(title, rawArticle.id)
       const provisionalState = determineProvisionalState(contentResult.contentPath, contentResult.extractionStage)
+      const summaryBasis = determineSummaryBasis(
+        contentResult.contentPath,
+        provisionalState.provisionalReason,
+      )
 
       const dedupeStatus = duplicate?.dedupeStatus ?? similarDuplicate?.dedupeStatus ?? 'unique'
       const dedupeGroupKey =
@@ -175,6 +204,7 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
         summary100: summaries.summary100,
         summary200: summaries.summary200,
         summary300: summaries.summary300,
+        summaryBasis,
         contentPath: contentResult.contentPath,
         isProvisional: provisionalState.isProvisional,
         provisionalReason: provisionalState.provisionalReason,
@@ -199,6 +229,7 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
           contentPath: contentResult.contentPath,
           isProvisional: provisionalState.isProvisional,
           provisionalReason: provisionalState.provisionalReason,
+          summaryBasis,
           publishCandidate,
           dedupeStatus,
           relevanceMatchedKeyword: relevance.matchedKeyword,
