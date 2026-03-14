@@ -51,6 +51,8 @@
 ### 2.4 今の主課題
 
 1. `source_targets.content_access_policy` の整理と維持
+  - `db:check-source-policies` で source ごとの `policy / raw / full / provisional` を見る
+  - `db:set-source-policy -- --requeue` で昇格と再処理を一体で行う
 2. `tag_candidate_pool` のノイズ削減
 3. URL 一致より先の dedupe 強化
 4. blocked domain と source policy の切り分け

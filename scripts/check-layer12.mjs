@@ -51,6 +51,7 @@ function printKeyValue(label, value) {
 
 async function run() {
   const [
+    sourcePolicyCounts,
     sourceTargets,
     rawTotals,
     enrichedTotals,
@@ -66,6 +67,15 @@ async function run() {
     latestEnrichDiagnostics,
     latestEnrichFailures,
   ] = await Promise.all([
+    queryMany(`
+      SELECT
+        content_access_policy,
+        COUNT(*)::int AS count
+      FROM source_targets
+      WHERE is_active = true
+      GROUP BY content_access_policy
+      ORDER BY count DESC, content_access_policy ASC
+    `),
     queryOne(`
       SELECT COUNT(*)::int AS source_targets
       FROM source_targets
@@ -204,6 +214,7 @@ async function run() {
   const summary = {
     checkedAt: new Date().toISOString(),
     sourceTargets: toNumber(sourceTargets?.source_targets),
+    sourcePolicyCounts,
     raw: {
       total: toNumber(rawTotals?.raw_total),
       processed: toNumber(rawTotals?.raw_processed),
@@ -239,6 +250,10 @@ async function run() {
   printSection('Summary')
   printKeyValue('checked_at', summary.checkedAt)
   printKeyValue('source_targets', summary.sourceTargets)
+  printKeyValue(
+    'source_policy_counts',
+    summary.sourcePolicyCounts.map((row) => `${row.content_access_policy}=${row.count}`).join(', ') || 'none',
+  )
   printKeyValue('raw_total', summary.raw.total)
   printKeyValue('raw_processed', summary.raw.processed)
   printKeyValue('raw_unprocessed', summary.raw.unprocessed)
