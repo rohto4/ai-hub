@@ -18,13 +18,57 @@ export interface DailyEnrichItemResult {
   rawArticleId: number
   status: 'processed' | 'failed'
   contentPath?: 'full' | 'snippet'
+  isProvisional?: boolean
+  provisionalReason?: 'snippet_only' | 'domain_snippet_only' | 'fetch_error' | 'extracted_below_threshold' | null
   error?: string
 }
 
 export interface DailyEnrichResult {
+  attempted: number
   processed: number
   failed: number
   items: DailyEnrichItemResult[]
+}
+
+function determineProvisionalState(
+  contentPath: 'full' | 'snippet',
+  extractionStage: 'extracted' | 'extracted_below_threshold' | 'fetch_error' | 'domain_snippet_only',
+): {
+  isProvisional: boolean
+  provisionalReason: 'snippet_only' | 'domain_snippet_only' | 'fetch_error' | 'extracted_below_threshold' | null
+} {
+  if (contentPath === 'full') {
+    return {
+      isProvisional: false,
+      provisionalReason: null,
+    }
+  }
+
+  if (extractionStage === 'domain_snippet_only') {
+    return {
+      isProvisional: true,
+      provisionalReason: 'domain_snippet_only',
+    }
+  }
+
+  if (extractionStage === 'fetch_error') {
+    return {
+      isProvisional: true,
+      provisionalReason: 'fetch_error',
+    }
+  }
+
+  if (extractionStage === 'extracted_below_threshold') {
+    return {
+      isProvisional: true,
+      provisionalReason: 'extracted_below_threshold',
+    }
+  }
+
+  return {
+    isProvisional: true,
+    provisionalReason: 'snippet_only',
+  }
 }
 
 function scoreArticle(
@@ -72,6 +116,7 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
         rawArticle.id,
       )
       const similarDuplicate = duplicate ? null : await findSimilarTitleDuplicate(title, rawArticle.id)
+      const provisionalState = determineProvisionalState(contentResult.contentPath, contentResult.extractionStage)
 
       const dedupeStatus = duplicate?.dedupeStatus ?? similarDuplicate?.dedupeStatus ?? 'unique'
       const dedupeGroupKey =
@@ -79,7 +124,8 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
         similarDuplicate?.dedupeGroupKey ??
         rawArticle.citedUrl ??
         rawArticle.normalizedUrl
-      const publishCandidate = contentResult.contentPath === 'full' && dedupeStatus === 'unique' && relevance.isRelevant
+      const publishCandidate =
+        !provisionalState.isProvisional && dedupeStatus === 'unique' && relevance.isRelevant
       const shouldPersistCandidateTags = relevance.isRelevant && contentResult.contentPath === 'full'
       const { score, scoreReason } = scoreArticle(
         contentResult.contentPath,
@@ -102,6 +148,8 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
         summary200: summaries.summary200,
         summary300: summaries.summary300,
         contentPath: contentResult.contentPath,
+        isProvisional: provisionalState.isProvisional,
+        provisionalReason: provisionalState.provisionalReason,
         dedupeStatus,
         dedupeGroupKey,
         publishCandidate,
@@ -121,6 +169,9 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
           rawArticleId: rawArticle.id,
           title,
           contentPath: contentResult.contentPath,
+          isProvisional: provisionalState.isProvisional,
+          provisionalReason: provisionalState.provisionalReason,
+          publishCandidate,
           dedupeStatus,
           relevanceMatchedKeyword: relevance.matchedKeyword,
           isRelevant: relevance.isRelevant,
@@ -136,6 +187,8 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
         rawArticleId: rawArticle.id,
         status: 'processed',
         contentPath: contentResult.contentPath,
+        isProvisional: provisionalState.isProvisional,
+        provisionalReason: provisionalState.provisionalReason,
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown enrich error'
@@ -159,6 +212,7 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
   }
 
   const result = {
+    attempted: items.length,
     processed: items.filter((item) => item.status === 'processed').length,
     failed: items.filter((item) => item.status === 'failed').length,
     items,
@@ -171,8 +225,10 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
     successCount: result.processed,
     failedCount: result.failed,
     metadata: {
+      attempted: items.length,
       fullCount: items.filter((item) => item.contentPath === 'full').length,
       snippetCount: items.filter((item) => item.contentPath === 'snippet').length,
+      provisionalCount: items.filter((item) => item.isProvisional).length,
     },
     lastError: items.find((item) => item.error)?.error ?? null,
   })

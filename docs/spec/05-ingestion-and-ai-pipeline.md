@@ -80,7 +80,7 @@
 ### 6.2 日次昇格
 
 1. `tag_candidate_pool` の件数を集計する
-2. 一定件数を超えた候補だけ Google Trends と照合する
+2. P0 は高閾値（`seen_count >= 8` 目安）を超えた候補だけ Google Trends と照合する
 3. Trends と一致した候補は `tags_master` に追加する
 4. 追加済みタグを持つ既存記事は、次の毎時バッチで再タグ付けする
 
@@ -125,12 +125,14 @@
 
 1. `articles_raw` から未処理データを取る
 2. `full` / `snippet` を判定する
-3. 要約 100 / 200 / 300 を生成する
-4. タグ候補抽出とタグ照合を行う
-5. 確定重複判定を行う
-6. `articles_enriched` と `articles_enriched_tags` に保存する
-7. `tag_candidate_pool` を更新する
-8. `articles_raw.is_processed = true` を更新する
+3. `snippet` 行には `is_provisional=true` と `provisional_reason` を付ける
+4. 要約 100 / 200 / 300 を生成する
+5. タグ候補抽出とタグ照合を行う
+6. 確定重複判定を行う
+7. `articles_enriched` と `articles_enriched_tags` に保存する
+8. provisional 行は `publish_candidate=false` にする
+9. `tag_candidate_pool` を更新する
+10. `articles_raw.is_processed = true` を更新する
 
 ### 9.3 毎時: 公開反映
 

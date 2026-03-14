@@ -1,6 +1,6 @@
 # データモデル設計（Neon/PostgreSQL v4）
 
-最終更新: 2026-03-12
+最終更新: 2026-03-15
 
 ## 1. 設計原則
 
@@ -157,13 +157,15 @@
 9. `summary_200`
 10. `summary_300`
 11. `content_path`
-12. `dedupe_status`
-13. `dedupe_group_key`
-14. `publish_candidate`
-15. `score`
-16. `score_reason`
-17. `source_updated_at`
-18. `processed_at`
+12. `is_provisional`
+13. `provisional_reason`
+14. `dedupe_status`
+15. `dedupe_group_key`
+16. `publish_candidate`
+17. `score`
+18. `score_reason`
+19. `source_updated_at`
+20. `processed_at`
 
 ### 4.8 `articles_enriched_history`
 
@@ -255,6 +257,7 @@
 3. `tag_candidate_pool(review_status, seen_count desc, last_seen_at desc)`
 4. `articles_enriched(publish_candidate, processed_at desc)`
 5. `articles_enriched(dedupe_status, dedupe_group_key)`
+6. `articles_enriched(is_provisional, provisional_reason, processed_at desc)`
 6. `activity_logs(public_article_id, occurred_at desc)`
 7. `priority_processing_queue(status, priority asc, available_at asc)`
 8. `public_rankings(ranking_window, rank_position, score desc)`

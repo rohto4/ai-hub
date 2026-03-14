@@ -12,8 +12,11 @@
     "db:migrate": "node scripts/migrate.mjs",
     "db:seed": "node scripts/seed.mjs",
     "db:check-layer12": "node scripts/check-layer12.mjs",
+    "db:check-snippet-domains": "node scripts/check-snippet-domains.mjs",
     "db:prune-tag-candidates": "node scripts/prune-tag-candidates.mjs",
-    "db:repair-google-alerts-urls": "node scripts/repair-google-alerts-urls.mjs"
+    "db:promote-tag-candidates": "node scripts/promote-tag-candidates.mjs",
+    "db:repair-google-alerts-urls": "node scripts/repair-google-alerts-urls.mjs",
+    "db:requeue-raw": "node scripts/requeue-raw.mjs"
   },
   "dependencies": {
     "next": "^15.2.0",

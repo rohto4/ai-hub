@@ -1,6 +1,6 @@
 # AI Trend Hub 実装ステータス
 
-最終更新: 2026-03-14
+最終更新: 2026-03-15
 
 ## 進捗サマリ
 
@@ -80,3 +80,23 @@
   - reducing false-positive Google Alerts matches before Layer3/Layer4 work,
   - increasing `content_path=full`,
   - keeping `job_runs` and `db:check-layer12` as the quality loop.
+- Updated `docs/imp/implementation-plan.md` so the current phase, full task list, and task-by-task execution approach are readable in Japanese from the top of the file.
+- Rewrote `docs/memo/20260312_dataflow.md` to match the current `hourly-fetch -> enrich -> Layer2 provisional accumulation` understanding.
+- Updated `docs/spec/11-batch-job-design.md` to reflect GitHub Actions scheduling, serial `fetch -> enrich`, and snippet-based provisional accumulation.
+
+## 2026-03-15 Hourly Layer2 Ops Update
+
+- Added migrations `011_layer2_provisional_and_ops.sql` and `012_backfill_layer2_provisional.sql` to introduce `articles_enriched.is_provisional` / `provisional_reason` and backfill existing snippet rows.
+- `publish_candidate` is now forced to `false` for provisional snippet-based Layer2 rows so provisional accumulation and publish readiness are no longer conflated.
+- Added `src/lib/jobs/hourly-layer12.ts` and `/api/cron/hourly-layer12` to orchestrate `hourly-fetch -> daily-enrich` serially with configurable enrich batch splitting.
+- Added GitHub Actions workflow `.github/workflows/hourly-layer12.yml` using `APP_URL` and `CRON_SECRET`.
+- Added ops scripts:
+  - `npm run db:requeue-raw -- 160` style raw requeue
+  - `npm run db:check-snippet-domains`
+  - `npm run db:promote-tag-candidates`
+- Expanded `db:check-layer12` to show provisional totals, provisional reasons, snippet domain distribution, and conservative tag threshold tracking (`seen_count >= 8`).
+- Verified `npm run type-check`, `npm run db:migrate`, `npm run db:check-layer12`, `npm run db:check-snippet-domains`, and a local `/api/cron/hourly-layer12?fetchLimit=1&enrichBatchSize=1&maxEnrichBatches=1` execution after requeueing raw `#160`.
+- Local orchestration test results:
+  - `daily-enrich` reprocessed raw `#160` as `snippet + provisional + domain_snippet_only`
+  - latest `db:check-layer12` now shows `enriched_ready_total=10`, `enriched_provisional_total=152`
+  - `hourly-fetch` on `ai-news-roundup` returned `Status code 404`; source registration / source repair candidate for tomorrow

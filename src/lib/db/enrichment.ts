@@ -42,6 +42,8 @@ type ExistingEnrichedRow = {
   summary_200: string | null
   summary_300: string | null
   content_path: 'full' | 'snippet'
+  is_provisional: boolean
+  provisional_reason: string | null
   dedupe_status: 'unique' | 'url_duplicate' | 'source_duplicate' | 'similar_candidate'
   dedupe_group_key: string | null
   publish_candidate: boolean
@@ -71,6 +73,8 @@ export interface UpsertEnrichedInput {
   summary200: string
   summary300: string
   contentPath: 'full' | 'snippet'
+  isProvisional: boolean
+  provisionalReason: 'snippet_only' | 'domain_snippet_only' | 'fetch_error' | 'extracted_below_threshold' | null
   dedupeStatus: DedupeStatus
   dedupeGroupKey: string | null
   publishCandidate: boolean
@@ -247,6 +251,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         summary_200,
         summary_300,
         content_path,
+        is_provisional,
+        provisional_reason,
         dedupe_status,
         dedupe_group_key,
         publish_candidate,
@@ -270,6 +276,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         ${existing.summary_200},
         ${existing.summary_300},
         ${existing.content_path},
+        ${existing.is_provisional},
+        ${existing.provisional_reason},
         ${existing.dedupe_status},
         ${existing.dedupe_group_key},
         ${existing.publish_candidate},
@@ -294,6 +302,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         summary_200 = ${input.summary200},
         summary_300 = ${input.summary300},
         content_path = ${input.contentPath},
+        is_provisional = ${input.isProvisional},
+        provisional_reason = ${input.provisionalReason},
         dedupe_status = ${input.dedupeStatus},
         dedupe_group_key = ${input.dedupeGroupKey},
         publish_candidate = ${input.publishCandidate},
@@ -324,6 +334,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       summary_200,
       summary_300,
       content_path,
+      is_provisional,
+      provisional_reason,
       dedupe_status,
       dedupe_group_key,
       publish_candidate,
@@ -342,6 +354,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       ${input.summary200},
       ${input.summary300},
       ${input.contentPath},
+      ${input.isProvisional},
+      ${input.provisionalReason},
       ${input.dedupeStatus},
       ${input.dedupeGroupKey},
       ${input.publishCandidate},
