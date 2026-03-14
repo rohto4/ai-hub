@@ -36,6 +36,7 @@
 - Google Alerts 系 source は `feed_only`
 - 公式 source / 公式 blog / 明示的に本文取得を許容してよい source だけ `fulltext_allowed`
 - 既知 blocked source は `blocked_snippet_only`
+- ただし `feed_only` source でも、review 済み official domain が `fulltext_allowed` なら本文取得に進めてよい
 
 ### 3.2 Domain review first
 
@@ -128,6 +129,9 @@ Layer2 には要約の根拠を残す。
 - `anthropic.com`
 - `blog.google`
 - `research.google`
+- `safe.ai`
+- `databricks.com`
+- `blogs.cisco.com`
 
 ## 5. 主要テーブルと意味
 
@@ -168,9 +172,10 @@ Layer2 には要約の根拠を残す。
 現在の実装上の振る舞い:
 
 - source が `feed_only` のとき
-  - 本文 fetch しない
-  - `provisional_reason = feed_only_policy`
-  - `summary_basis = feed_snippet`
+  - 原則本文 fetch しない
+  - ただし domain が `fulltext_allowed` なら本文 fetch に進める
+  - snippet fallback 時は `provisional_reason = feed_only_policy`
+  - snippet fallback 時は `summary_basis = feed_snippet`
 - source が `fulltext_allowed` でも domain が `needs_review` のとき
   - 本文 fetch しない
   - `provisional_reason = domain_needs_review`

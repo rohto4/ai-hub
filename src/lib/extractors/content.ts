@@ -44,8 +44,9 @@ export async function resolveArticleContent(
 ): Promise<ExtractedContentResult> {
   const normalizedSnippet = snippet?.trim() ?? ''
   const hostname = getHostname(url)
+  const canFetchByReviewedDomain = observedDomainFetchPolicy === 'fulltext_allowed'
 
-  if (contentAccessPolicy === 'feed_only') {
+  if (contentAccessPolicy === 'feed_only' && !canFetchByReviewedDomain) {
     return {
       content: normalizedSnippet,
       contentPath: 'snippet',
@@ -78,7 +79,11 @@ export async function resolveArticleContent(
     }
   }
 
-  if (contentAccessPolicy === 'fulltext_allowed' && observedDomainFetchPolicy !== 'fulltext_allowed') {
+  if (
+    contentAccessPolicy === 'fulltext_allowed' &&
+    observedDomainFetchPolicy !== null &&
+    observedDomainFetchPolicy !== 'fulltext_allowed'
+  ) {
     return {
       content: normalizedSnippet,
       contentPath: 'snippet',

@@ -152,3 +152,24 @@
 - Added `observed_article_domains` plus `db:sync-observed-domains`, `db:check-domain-policies`, and `db:set-domain-policy` so fetched destination domains can be reviewed and flagged in DB one-by-one.
 - Changed enrich to consult `observed_article_domains.fetch_policy` before article fetch. `needs_review` domains now stop at snippet accumulation with `provisional_reason=domain_needs_review` until they are explicitly approved.
 - Expanded `db:check-domain-policies` to show `provisional / ready / source_keys`, and added `db:promote-domain-policy` to combine `domain policy update + provisional raw requeue` in one step.
+
+## 2026-03-15 Domain Review Throughput Update
+
+- Reviewed the current high-volume `needs_review` queue and confirmed it is very skewed:
+  - `needs_review = 130 domains / 148 articles`
+  - but only `12 domains / 30 articles` had `observed_article_count >= 2`
+- Added automatic domain-policy promotion for official source traffic:
+  - when a `fulltext_allowed` source observes its own official domain, `observed_article_domains` now auto-promotes that domain to `fulltext_allowed / summarize_full`
+  - current covered official domains include `anthropic.com`, `blog.google`, and `research.google`
+- Adjusted enrich so `feed_only` sources still skip HTML fetch by default, but a reviewed `domain=fulltext_allowed` is allowed to break out of feed-only fallback and fetch full content.
+- Reviewed and classified the top repeated non-official publisher domains as `snippet_only`:
+  - `theverge.com`, `cnbc.com`, `theguardian.com`, `wired.com`, `techbuzz.ai`, `engadget.com`, `fortune.com`, `finance.yahoo.com`, `androidcentral.com`, `theregister.com`, `9to5google.com`, `pymnts.com`
+- Promoted reviewed official / organization domains from Google Alerts to `fulltext_allowed` and re-enriched them:
+  - `safe.ai`
+  - `databricks.com`
+  - `blogs.cisco.com`
+- After re-enrichment:
+  - `enriched_ready_total` improved from `2` to `5`
+  - `content_path full` improved from `2` to `5`
+  - `needs_review_domains` dropped from `130` to `115`
+  - `needs_review_articles` dropped from `148` to `115`
