@@ -4,6 +4,7 @@ const navItems = [
   { id: "tags", label: "Tag Radar", hint: "タグマスタと新語候補を見る" },
   { id: "ops", label: "Ops Queue", hint: "即時反映キューを見る" },
   { id: "digest", label: "Digest", hint: "ランキング上位の再構成を見る" },
+  { id: "admin", label: "Admin Console", hint: "運営画面の見え方を確認する" },
 ];
 
 const publicArticles = [
@@ -48,6 +49,26 @@ const opsQueue = [
   { type: "rebuild_rank", target: "feed-hourly", note: "行動集計更新後の順位再計算", status: "queued", priority: 3 },
 ];
 
+const adminHighlights = [
+  { label: "Queued Ops", value: "3", note: "hide_article 優先" },
+  { label: "Tag Reviews", value: "2", note: "判断待ちモード" },
+  { label: "Source Targets", value: "12", note: "RSS / Alerts / API" },
+  { label: "Batch Health", value: "OK", note: "直近 24h 異常なし" },
+];
+
+const adminActivity = [
+  { at: "18:05", type: "hide_article", target: "regulation-watch", actor: "ops-admin", status: "queued" },
+  { at: "18:00", type: "daily-tag-promote", target: "agent-observability", actor: "system", status: "matched" },
+  { at: "17:40", type: "retag", target: "agent-ops", actor: "ops-admin", status: "processing" },
+  { at: "17:10", type: "source_target update", target: "Google Alerts / AI Agents", actor: "ops-admin", status: "saved" },
+];
+
+const adminReviewQueue = [
+  { label: "agent-observability", seen: 11, trend: "matched", mode: "auto-ready" },
+  { label: "compliance-runtime", seen: 4, trend: "candidate", mode: "manual-review" },
+  { label: "voice-ops", seen: 7, trend: "watch", mode: "watching" },
+];
+
 const systemNotes = [
   "取得元は source_targets を参照して layer1 へ投入する",
   "layer1 から layer2 で要約とタグ照合を行う",
@@ -68,6 +89,7 @@ const routeMeta = {
   tags: "tags_master と tag_candidate_pool の流れを確認する。",
   ops: "運営操作と priority_processing_queue の優先反映を見る。",
   digest: "public_rankings 上位から再構成した digest の見え方を見る。",
+  admin: "タグレビュー、即時反映、取得元管理を含む運営画面イメージを確認する。",
 };
 
 const root = document.getElementById("view-root");
@@ -244,6 +266,73 @@ function renderDigest() {
   `;
 }
 
+function renderAdmin() {
+  return `
+    <section class="hero-grid">
+      ${adminHighlights.map((item) => `
+        <article class="hero-card">
+          <p class="eyebrow">${item.label}</p>
+          <strong>${item.value}</strong>
+          <span class="meta">${item.note}</span>
+        </article>
+      `).join("")}
+    </section>
+    <section class="admin-shell">
+      <article class="panel-card admin-wide">
+        <p class="eyebrow">Tag Review Console</p>
+        <h3>タグ追加の自動モード / 判断待ちモード</h3>
+        <span class="meta">tag_candidate_pool と review_status を見ながら、人手判断対象と自動昇格対象を切り分ける。</span>
+        <div class="admin-table">
+          <div class="admin-row admin-head">
+            <span>candidate</span>
+            <span>seen</span>
+            <span>trend</span>
+            <span>mode</span>
+          </div>
+          ${adminReviewQueue.map((item) => `
+            <div class="admin-row">
+              <span>${item.label}</span>
+              <span>${item.seen}</span>
+              <span>${item.trend}</span>
+              <span>${item.mode}</span>
+            </div>
+          `).join("")}
+        </div>
+      </article>
+      <article class="panel-card">
+        <p class="eyebrow">Queue Control</p>
+        <h3>priority_processing_queue</h3>
+        <span class="meta">P0 は hide_article を優先し、他 queue_type は後続実装とする。</span>
+        <div class="tag-row">
+          <span class="pill strong">hide_article</span>
+          <span class="pill ghost">retag</span>
+          <span class="pill ghost">republish</span>
+          <span class="pill ghost">rebuild_rank</span>
+        </div>
+      </article>
+      <article class="panel-card admin-wide">
+        <p class="eyebrow">Operation Timeline</p>
+        <h3>直近の運営操作とバッチ反映</h3>
+        <div class="ops-grid">
+          ${adminActivity.map((item) => `
+            <article class="note-card">
+              <p class="eyebrow">${item.at} / ${item.status}</p>
+              <h3>${item.type}</h3>
+              <p>target: ${item.target}</p>
+              <span class="meta">actor: ${item.actor}</span>
+            </article>
+          `).join("")}
+        </div>
+      </article>
+      <article class="panel-card">
+        <p class="eyebrow">Source Target Control</p>
+        <h3>取得元の有効化と優先度の管理</h3>
+        <span class="meta">P0 では source_targets の active / interval を中心に管理し、source_priority_rules は初期差なしで開始する。</span>
+      </article>
+    </section>
+  `;
+}
+
 function renderContext() {
   const article = selectedArticle();
   contextRoot.innerHTML = `
@@ -276,6 +365,7 @@ function render() {
     tags: renderTags,
     ops: renderOps,
     digest: renderDigest,
+    admin: renderAdmin,
   };
 
   root.innerHTML = viewByRoute[state.route]();

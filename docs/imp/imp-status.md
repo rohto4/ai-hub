@@ -1,6 +1,6 @@
 # AI Trend Hub 実装ステータス
 
-最終更新: 2026-03-12
+最終更新: 2026-03-14
 
 ## 進捗サマリ
 
@@ -9,18 +9,28 @@
 3. `docs/spec` を取得・整形・公開反映の流れに合わせて更新した
 4. `docs/mock3` を追加し、公開データ中心の閲覧モックを作成した
 5. `docs/imp` を、再開時にそのまま進めやすい形へ整理した
-6. Neon 上で `layer1 / layer2` 用 migration を適用し、seed で `source_targets=3`, `articles_raw=3`, `articles_enriched=3` まで投入確認した
+6. Neon 上で `layer1 / layer2` 用 migration を適用し、seed で `source_targets=9`, `source_priority_rules=18`, `tags_master=8` を投入できる状態にした
+7. `hourly-fetch` を実装し、Google Alerts 系取得元から `articles_raw=162` まで投入確認した
+8. `daily-enrich` を実装し、`articles_enriched=53`, `articles_enriched_tags=55`, `tag_candidate_pool=388` まで生成確認した
+9. `scripts/check-layer12.mjs` を追加し、Layer1 / Layer2 の件数・エラー・候補タグをまとめて確認できるようにした
+10. RSS 取得時の HTML 除去を追加し、候補タグ生成を title 中心に絞ってノイズ削減を始めた
+11. `daily-enrich` は `limit` 指定で小分け実行可能にした
+12. `job_runs` / `job_run_items` の監視テーブルと記録ロジックを追加し、長時間ジョブの可視化基盤を入れた
+13. enrich 前の title / snippet 正規化を追加し、媒体名サフィックスや HTML エンティティ混入を減らした
+14. 候補タグの stopword / generic phrase 除外を強化した
 
 ## いま残っている主要タスク
 
 1. Neon 上で migration 適用確認
-2. `source_targets` / `source_priority_rules` の本番初期 seed 作成
-3. hourly fetch 実装
-4. daily enrich 実装
-5. hourly publish 実装
-6. 日次タグ昇格バッチ実装
-7. 週次アーカイブ実装
-8. `public_articles` 系を読む本実装 API 接続
+2. `daily-enrich` の処理時間短縮
+3. `tag_candidate_pool` のノイズ削減
+4. `content_path=full` の抽出率改善
+5. `job_runs` migration 適用と監視結果の実データ確認
+6. 旧 raw を再処理して title 正規化と候補タグ改善の効果確認
+7. hourly publish 実装
+8. 日次タグ昇格バッチ実装
+9. 週次アーカイブ実装
+10. `public_articles` 系を読む本実装 API 接続
 
 ## 再開時の推奨確認順
 
@@ -42,3 +52,31 @@
 1. `layer3` は手動承認層ではなく、自動運用データ層として固定
 2. タグマスタ追加だけ、人手確認の余地を残す
 3. サイトは `layer4` だけを参照する前提で進める
+4. 現時点の Layer2 観測値では `content_path` が `snippet: 51 / full: 2` に偏っている
+5. 現時点の Layer2 観測値では `dedupe_status` は全件 `unique`
+6. `tag_candidate_pool` は候補ノイズが多く、媒体名・一般語の除外を継続改善対象にする
+7. `daily-enrich` は `limit` 指定で小分け実行できるようにした
+8. `scripts/check-layer12.mjs` はジョブ監視結果も出す前提で拡張中
+9. 既存 raw に対しても enrich 時に title / snippet 正規化が効くようにした
+## 2026-03-14 Layer1/Layer2 Update
+
+- Tightened `source target relevance` so Google Alerts matches are now `title-first`, with `snippet` treated as auxiliary evidence.
+- Added source-specific context rules for `google-alerts-antigravity` to reject obvious drone noise such as `DJI`, `Avata`, and `drone`.
+- Suppressed candidate tags for more generic nouns and phrases including `search`, `risks`, `governance`, `pentagon`, `health risks`, `vector search`, and `antigravity pro`.
+- Expanded article extraction with extra article selectors and `application/ld+json` parsing to improve `content_path=full`.
+- Added `scripts/prune-tag-candidates.mjs` and `npm run db:prune-tag-candidates` to clean previously accumulated noisy candidates from `tag_candidate_pool`.
+- Reduced candidate mining to unigram/bigram only and currently disabled candidate extraction for non-Latin headlines to avoid long noisy phrase accumulation.
+- Added enrich diagnostics to `job_run_items` and `db:check-layer12` so extraction stage and average extracted/snippet lengths can be inspected per run.
+- Switched article fetch headers to a browser-like profile and made diagnostics read the latest completed `daily-enrich` run instead of a still-running one.
+- Split snippet fallback diagnostics into `fetch_error` and `extracted_below_threshold` so the failure stage can be identified from `db:check-layer12`.
+- Found the current root cause for low `content_path=full`: Google Alerts feed links were being stored as `google.com/url` redirects instead of destination article URLs. Added unwrap logic in the RSS collector and a repair script for existing rows.
+- After repairing Google Alerts URLs and re-enriching a sample batch, `content_path=full` improved from `2` to `8`, and the latest completed batch showed `extracted: 6 / fetch_error: 2`.
+- `db:check-layer12` now prints the latest failed extraction items so fetch-blocked domains can be identified directly from the terminal.
+- Confirmed `time.com` can be fetched and parsed with the current approach; added `#article-body`, browser-like `Referer`, and retry logic to reduce transient fetch misses. `cdt.org` is currently blocked by Cloudflare and should be treated as a snippet-only domain unless a stronger fetch path is introduced.
+- Added explicit snippet-only domain handling for `cdt.org` so known Cloudflare-blocked pages stop appearing as generic fetch failures.
+- Candidate tag accumulation is now limited to `content_path=full` articles to stop snippet-based noise from dominating `tag_candidate_pool`.
+- Expanded dedupe beyond URL equality: normalized headline signatures are now used to mark near-duplicate items as `similar_candidate` when titles converge on the same topic.
+- Current improvement focus remains:
+  - reducing false-positive Google Alerts matches before Layer3/Layer4 work,
+  - increasing `content_path=full`,
+  - keeping `job_runs` and `db:check-layer12` as the quality loop.

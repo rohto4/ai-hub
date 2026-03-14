@@ -1,6 +1,6 @@
 # AI Trend Hub 仕様書インデックス
 
-最終更新: 2026-03-12
+最終更新: 2026-03-13
 
 ## 目的
 このディレクトリは、AI Trend Hub の実装前検討（要件・技術・運用）の SSOT です。
@@ -17,16 +17,14 @@
 9. `08-security-quality-operations.md`
 10. `09-kpi-rollout.md`
 11. `10-ingestion-layer-design.md`
-12. `research-links.md`
+12. `11-batch-job-design.md`
+13. `research-links.md`
 
 ## 実装連携
 - 実装待ちタスク: `../imp/implementation-plan.md`
 - 実装判断待ち: `../imp/implementation-wait.md`
 
 ## モック（最新のみ）
-- 統合比較: `../mock/overview.html`
-- 意思決定ハブ: `../mock/decision-hub.html`
-- Mode A Command Board: `../mock/mode-command-board.html`
-- Mode B Focus Feed: `../mock/mode-focus-feed.html`
-- Mode C Workspace Table: `../mock/mode-workspace-table.html`
-- Mode D Card Grid Fixed: `../mock/mode-card-grid-fixed.html`
+- 現行プロトタイプ: `../mock3/index.html`
+- モックの見方: `../mock3/site-flow.md`
+- モック概要: `../mock3/README.md`

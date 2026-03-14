@@ -1,0 +1,181 @@
+import { generateEnrichedSummary } from '@/lib/ai/enrich'
+import {
+  findDuplicateMatch,
+  findSimilarTitleDuplicate,
+  listRawArticlesForEnrichment,
+  markRawError,
+  markRawProcessed,
+  upsertEnrichedArticle,
+} from '@/lib/db/enrichment'
+import { finishJobRun, recordJobRunItem, startJobRun } from '@/lib/db/job-runs'
+import { listActiveTagReferences } from '@/lib/db/tags'
+import { resolveArticleContent } from '@/lib/extractors/content'
+import { assessSourceTargetRelevance } from '@/lib/relevance/source-target'
+import { matchTags } from '@/lib/tags/match'
+import { decodeAndNormalizeText, normalizeHeadline } from '@/lib/text/normalize'
+
+export interface DailyEnrichItemResult {
+  rawArticleId: number
+  status: 'processed' | 'failed'
+  contentPath?: 'full' | 'snippet'
+  error?: string
+}
+
+export interface DailyEnrichResult {
+  processed: number
+  failed: number
+  items: DailyEnrichItemResult[]
+}
+
+function scoreArticle(
+  contentPath: 'full' | 'snippet',
+  matchedTagCount: number,
+  summarySource: 'gemini' | 'template',
+): { score: number; scoreReason: string } {
+  const base = contentPath === 'full' ? 70 : 45
+  const summaryBonus = summarySource === 'gemini' ? 6 : 0
+  const score = Math.min(100, base + matchedTagCount * 8 + summaryBonus)
+  const scoreReason =
+    contentPath === 'full'
+      ? `full extraction, ${matchedTagCount} matched tags, ${summarySource} summary`
+      : `snippet fallback, ${matchedTagCount} matched tags, ${summarySource} summary`
+
+  return { score, scoreReason }
+}
+
+export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
+  const jobRunId = await startJobRun({
+    jobName: 'daily-enrich',
+    metadata: { limit },
+  })
+  const rawArticles = await listRawArticlesForEnrichment(limit)
+  const tagReferences = await listActiveTagReferences()
+  const items: DailyEnrichItemResult[] = []
+
+  for (const rawArticle of rawArticles) {
+    try {
+      const title = rawArticle.title ? normalizeHeadline(rawArticle.title) : rawArticle.normalizedUrl
+      const normalizedSnippet = rawArticle.snippet ? decodeAndNormalizeText(rawArticle.snippet) : ''
+      const contentResult = await resolveArticleContent(rawArticle.citedUrl ?? rawArticle.sourceUrl, normalizedSnippet)
+      const summaries = await generateEnrichedSummary(title, contentResult.content || title)
+      const relevance = assessSourceTargetRelevance(rawArticle.sourceKey, title, normalizedSnippet)
+      const tagResult = matchTags(
+        tagReferences,
+        title,
+        contentResult.content || normalizedSnippet,
+        rawArticle.sourceCategory,
+      )
+      const duplicate = await findDuplicateMatch(
+        rawArticle.normalizedUrl,
+        rawArticle.citedUrl,
+        title,
+        rawArticle.id,
+      )
+      const similarDuplicate = duplicate ? null : await findSimilarTitleDuplicate(title, rawArticle.id)
+
+      const dedupeStatus = duplicate?.dedupeStatus ?? similarDuplicate?.dedupeStatus ?? 'unique'
+      const dedupeGroupKey =
+        duplicate?.dedupeGroupKey ??
+        similarDuplicate?.dedupeGroupKey ??
+        rawArticle.citedUrl ??
+        rawArticle.normalizedUrl
+      const publishCandidate = contentResult.contentPath === 'full' && dedupeStatus === 'unique' && relevance.isRelevant
+      const shouldPersistCandidateTags = relevance.isRelevant && contentResult.contentPath === 'full'
+      const { score, scoreReason } = scoreArticle(
+        contentResult.contentPath,
+        tagResult.matchedTagIds.length,
+        summaries.summarySource,
+      )
+      const adjustedScore = relevance.isRelevant ? score : Math.max(0, score - 25)
+      const adjustedScoreReason = relevance.isRelevant
+        ? scoreReason
+        : `${scoreReason}; low source relevance`
+
+      await upsertEnrichedArticle({
+        rawArticleId: rawArticle.id,
+        sourceTargetId: rawArticle.sourceTargetId,
+        normalizedUrl: rawArticle.normalizedUrl,
+        citedUrl: rawArticle.citedUrl,
+        canonicalUrl: rawArticle.citedUrl ?? rawArticle.normalizedUrl,
+        title,
+        summary100: summaries.summary100,
+        summary200: summaries.summary200,
+        summary300: summaries.summary300,
+        contentPath: contentResult.contentPath,
+        dedupeStatus,
+        dedupeGroupKey,
+        publishCandidate,
+        score: adjustedScore,
+        scoreReason: adjustedScoreReason,
+        sourceUpdatedAt: rawArticle.sourceUpdatedAt,
+        matchedTagIds: tagResult.matchedTagIds,
+        candidateTags: shouldPersistCandidateTags ? tagResult.candidateTags : [],
+      })
+
+      await markRawProcessed(rawArticle.id)
+      await recordJobRunItem({
+        jobRunId,
+        itemKey: String(rawArticle.id),
+        itemStatus: 'processed',
+        detail: {
+          rawArticleId: rawArticle.id,
+          title,
+          contentPath: contentResult.contentPath,
+          dedupeStatus,
+          relevanceMatchedKeyword: relevance.matchedKeyword,
+          isRelevant: relevance.isRelevant,
+          extractionStage: contentResult.extractionStage,
+          extractedLength: contentResult.extractedLength,
+          snippetLength: contentResult.snippetLength,
+          extractionError: contentResult.extractionError ?? null,
+          matchedTagCount: tagResult.matchedTagIds.length,
+          candidateTagCount: shouldPersistCandidateTags ? tagResult.candidateTags.length : 0,
+        },
+      })
+      items.push({
+        rawArticleId: rawArticle.id,
+        status: 'processed',
+        contentPath: contentResult.contentPath,
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown enrich error'
+      await markRawError(rawArticle.id, message)
+      await recordJobRunItem({
+        jobRunId,
+        itemKey: String(rawArticle.id),
+        itemStatus: 'failed',
+        detail: {
+          rawArticleId: rawArticle.id,
+          title: rawArticle.title,
+        },
+        errorMessage: message,
+      })
+      items.push({
+        rawArticleId: rawArticle.id,
+        status: 'failed',
+        error: message,
+      })
+    }
+  }
+
+  const result = {
+    processed: items.filter((item) => item.status === 'processed').length,
+    failed: items.filter((item) => item.status === 'failed').length,
+    items,
+  }
+
+  await finishJobRun({
+    jobRunId,
+    status: result.failed > 0 ? 'failed' : 'completed',
+    processedCount: rawArticles.length,
+    successCount: result.processed,
+    failedCount: result.failed,
+    metadata: {
+      fullCount: items.filter((item) => item.contentPath === 'full').length,
+      snippetCount: items.filter((item) => item.contentPath === 'snippet').length,
+    },
+    lastError: items.find((item) => item.error)?.error ?? null,
+  })
+
+  return result
+}

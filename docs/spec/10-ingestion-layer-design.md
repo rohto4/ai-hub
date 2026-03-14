@@ -168,6 +168,8 @@
 
 ## 9. バッチ責務
 
+ジョブの責務分割と実装順の詳細は `11-batch-job-design.md` を参照する。
+
 ### 9.1 Hourly fetch
 
 1. 外部取得
@@ -202,7 +204,5 @@
 
 ## 11. 後続で決めること
 
-1. タグ候補昇格の件数閾値
-2. Google Trends 一致判定ルール
-3. 類似重複の AI / pgvector 方針
-4. `public_rankings` の計算式
+1. 類似重複の `pgvector` 距離閾値
+2. `public_rankings` の厳密な計算式
