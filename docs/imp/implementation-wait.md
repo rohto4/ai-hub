@@ -88,6 +88,7 @@
 4. `hourly-fetch` の source 単位失敗ログの正式な保存先
 5. `ai-news-roundup` の 404 を feed 廃止として扱うか、source 差し替えで維持するか
 6. `content_access_policy=fulltext_allowed` に昇格してよい source の判定基準をどこまで厳格に運用するか
+   - 現在は `db:check-source-policies` / `db:set-source-policy` を用意済みで、昇格作業そのものは明示オペレーションで回せる
 
 補足:
 

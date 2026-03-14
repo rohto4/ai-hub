@@ -147,3 +147,4 @@
   - `enriched_provisional_total=160`
   - `content_path full = 2 / snippet = 160`
 - This is an intentional regression in `full` count, not a bug: the previous `full=30` state relied on destination-page fetching for sources that are now treated as `feed_only`.
+- Added ops scripts `db:check-source-policies` and `db:set-source-policy` so source-by-source promotion to `fulltext_allowed` can be done explicitly and requeue can be coupled to the policy change.
