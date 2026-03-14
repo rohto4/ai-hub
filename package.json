@@ -16,6 +16,7 @@
     "db:check-source-policies": "node scripts/check-source-policies.mjs",
     "db:check-snippet-domains": "node scripts/check-snippet-domains.mjs",
     "db:prune-tag-candidates": "node scripts/prune-tag-candidates.mjs",
+    "db:promote-domain-policy": "node scripts/promote-domain-policy.mjs",
     "db:promote-tag-candidates": "node scripts/promote-tag-candidates.mjs",
     "db:repair-google-alerts-urls": "node scripts/repair-google-alerts-urls.mjs",
     "db:repair-stale-job-runs": "node scripts/repair-stale-job-runs.mjs",

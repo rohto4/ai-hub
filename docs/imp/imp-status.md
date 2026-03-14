@@ -151,3 +151,4 @@
 - Added `articles_enriched.summary_basis` so Layer2 can distinguish summaries built from `full_content`, `feed_snippet`, `blocked_snippet`, or `fallback_snippet`.
 - Added `observed_article_domains` plus `db:sync-observed-domains`, `db:check-domain-policies`, and `db:set-domain-policy` so fetched destination domains can be reviewed and flagged in DB one-by-one.
 - Changed enrich to consult `observed_article_domains.fetch_policy` before article fetch. `needs_review` domains now stop at snippet accumulation with `provisional_reason=domain_needs_review` until they are explicitly approved.
+- Expanded `db:check-domain-policies` to show `provisional / ready / source_keys`, and added `db:promote-domain-policy` to combine `domain policy update + provisional raw requeue` in one step.
