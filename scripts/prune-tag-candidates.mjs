@@ -34,6 +34,19 @@ const CANDIDATE_KEYS = [
   'severe',
   'solutions',
   'nikhil',
+  'player',
+  'bills',
+  'china',
+  'buffet',
+  'lobster',
+  'accused',
+  'murdering',
+  'player accused',
+  'bills player',
+  'accused murdering',
+  'china tech',
+  'buffet china',
+  'lobster buffet',
 ]
 
 const DISPLAY_NAME_PATTERNS = [
@@ -41,6 +54,7 @@ const DISPLAY_NAME_PATTERNS = [
   'Can Now%',
   'You Can%',
   'Maps Gets%',
+  'Ex Bills%',
 ]
 
 async function main() {

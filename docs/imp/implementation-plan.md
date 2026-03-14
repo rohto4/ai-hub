@@ -41,10 +41,11 @@
 1. `articles_raw = 162`
 2. `articles_enriched = 162`
 3. `content_path=full` は `2 -> 10` まで改善
-4. `time.com` は取得・抽出可能
-5. `cdt.org` は現在 `domain_snippet_only` として扱う
-6. `dedupe_status` は `similar_candidate` が出始めている
-7. `is_provisional=false` は `10`, `is_provisional=true` は `152`
+4. provisional 再処理により `content_path=full = 30`, `is_provisional = 132` まで改善
+5. `time.com` は取得・抽出可能
+6. `cdt.org` は現在 `domain_snippet_only` として扱う
+7. `dedupe_status` は `similar_candidate` が出始めている
+8. `ai-news-roundup` は placeholder source のため `is_active=false` に切り替えた
 
 ### 2.4 今の主課題
 
@@ -54,6 +55,7 @@
 4. blocked domain と通常 fetch failure の切り分け
 5. 毎時バッチの直列実行と小分け処理の運用固定
 6. source ごとの 404 / feed 廃止候補の見直し
+7. Bloomberg / Axios / YouTube など residual snippet/fetch_error 群の扱い整理
 
 ## 3. 全体タスク一覧
 

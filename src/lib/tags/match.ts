@@ -15,6 +15,8 @@ const STOPWORDS = new Set([
   'search', 'risk', 'risks', 'governance', 'defense', 'pentagon', 'mobile',
   'industry', 'uniformity', 'pilot', 'effort', 'users', 'pricing',
   'building', 'backs', 'coded', 'global', 'former', 'joint',
+  'player', 'players', 'bills', 'china', 'chinas', 'buffet', 'lobster',
+  'accused', 'murdering',
 ])
 
 const GENERIC_PHRASES = new Set([
@@ -28,6 +30,12 @@ const GENERIC_PHRASES = new Set([
   'health risks',
   'vector search',
   'antigravity pro',
+  'player accused',
+  'bills player',
+  'accused murdering',
+  'china tech',
+  'buffet china',
+  'lobster buffet',
 ])
 
 export interface TagReference {
