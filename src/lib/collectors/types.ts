@@ -1,4 +1,5 @@
 export type FetchKind = 'rss' | 'api' | 'alerts' | 'manual'
+export type ContentAccessPolicy = 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
 
 export interface SourceTarget {
   id: string
@@ -7,6 +8,7 @@ export interface SourceTarget {
   fetchKind: FetchKind
   sourceCategory: string
   baseUrl: string | null
+  contentAccessPolicy: ContentAccessPolicy
   fetchIntervalMinutes: number
   supportsUpdateDetection: boolean
   requiresAuth: boolean

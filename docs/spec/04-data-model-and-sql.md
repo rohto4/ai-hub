@@ -59,8 +59,9 @@
 2. `display_name`
 3. `fetch_kind`
 4. `source_category`
-5. `fetch_interval_minutes`
-6. `supports_update_detection`
+5. `content_access_policy`
+6. `fetch_interval_minutes`
+7. `supports_update_detection`
 
 ### 4.2 `articles_raw`
 
@@ -159,6 +160,7 @@
 11. `content_path`
 12. `is_provisional`
 13. `provisional_reason`
+   - `snippet_only / domain_snippet_only / fetch_error / extracted_below_threshold / feed_only_policy`
 14. `dedupe_status`
 15. `dedupe_group_key`
 16. `publish_candidate`

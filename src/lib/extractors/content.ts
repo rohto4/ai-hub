@@ -1,3 +1,4 @@
+import type { ContentAccessPolicy } from '@/lib/collectors/types'
 import { extractContent } from '@/lib/rss/extract'
 
 const SNIPPET_ONLY_HOSTS = new Set([
@@ -17,7 +18,12 @@ export interface ExtractedContentResult {
   contentPath: 'full' | 'snippet'
   extractedLength: number
   snippetLength: number
-  extractionStage: 'extracted' | 'extracted_below_threshold' | 'fetch_error' | 'domain_snippet_only'
+  extractionStage:
+    | 'extracted'
+    | 'extracted_below_threshold'
+    | 'fetch_error'
+    | 'domain_snippet_only'
+    | 'feed_only_policy'
   extractionError?: string | null
 }
 
@@ -32,9 +38,32 @@ function getHostname(url: string): string | null {
 export async function resolveArticleContent(
   url: string,
   snippet: string | null,
+  contentAccessPolicy: ContentAccessPolicy,
 ): Promise<ExtractedContentResult> {
   const normalizedSnippet = snippet?.trim() ?? ''
   const hostname = getHostname(url)
+
+  if (contentAccessPolicy === 'feed_only') {
+    return {
+      content: normalizedSnippet,
+      contentPath: 'snippet',
+      extractedLength: 0,
+      snippetLength: normalizedSnippet.length,
+      extractionStage: 'feed_only_policy',
+      extractionError: 'feed_only_policy',
+    }
+  }
+
+  if (contentAccessPolicy === 'blocked_snippet_only') {
+    return {
+      content: normalizedSnippet,
+      contentPath: 'snippet',
+      extractedLength: 0,
+      snippetLength: normalizedSnippet.length,
+      extractionStage: 'domain_snippet_only',
+      extractionError: 'blocked_snippet_only_policy',
+    }
+  }
 
   if (hostname && SNIPPET_ONLY_HOSTS.has(hostname)) {
     return {
