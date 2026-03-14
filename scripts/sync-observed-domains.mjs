@@ -61,6 +61,30 @@ async function run() {
     RETURNING domain
   `)
 
+  await pool.query(`
+    UPDATE observed_article_domains od
+    SET
+      fetch_policy = 'fulltext_allowed',
+      summary_policy = 'summarize_full',
+      updated_at = now()
+    FROM (
+      SELECT DISTINCT
+        lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS article_domain
+      FROM articles_raw ar
+      JOIN source_targets st ON st.id = ar.source_target_id
+      WHERE st.content_access_policy = 'fulltext_allowed'
+        AND lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) IN (
+          lower(regexp_replace(split_part(split_part(st.base_url, '://', 2), '/', 1), '^www\\.', '')),
+          CASE
+            WHEN st.source_key = 'google-ai-blog' THEN 'research.google'
+            WHEN st.source_key = 'anthropic-news' THEN 'anthropic.com'
+            ELSE ''
+          END
+        )
+    ) official_domains
+    WHERE od.domain = official_domains.article_domain
+  `)
+
   console.log(`synced_domains=${result.rowCount}`)
 }
 
