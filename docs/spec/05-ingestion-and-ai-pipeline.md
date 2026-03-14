@@ -129,11 +129,12 @@
 3. `feed_only` source は本文 fetch せず title/snippet だけで継続する
 4. `fulltext_allowed` source だけ本文 fetch を試みる
 5. `full` / `snippet` を判定する
-6. `snippet` 行には `is_provisional=true` と `provisional_reason` を付ける
+6. `summary_basis` を `full_content / feed_snippet / blocked_snippet / fallback_snippet` で付ける
+7. `snippet` 行には `is_provisional=true` と `provisional_reason` を付ける
    - `feed_only` source は `provisional_reason=feed_only_policy`
-7. 要約 100 / 200 / 300 を生成する
-8. タグ候補抽出とタグ照合を行う
-9. 確定重複判定を行う
+8. 要約 100 / 200 / 300 を生成する
+9. タグ候補抽出とタグ照合を行う
+10. 確定重複判定を行う
 10. `articles_enriched` と `articles_enriched_tags` に保存する
 11. provisional 行は `publish_candidate=false` にする
 12. `tag_candidate_pool` を更新する

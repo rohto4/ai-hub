@@ -157,17 +157,19 @@
 8. `summary_100`
 9. `summary_200`
 10. `summary_300`
-11. `content_path`
-12. `is_provisional`
-13. `provisional_reason`
+11. `summary_basis`
+   - `full_content / feed_snippet / blocked_snippet / fallback_snippet`
+12. `content_path`
+13. `is_provisional`
+14. `provisional_reason`
    - `snippet_only / domain_snippet_only / fetch_error / extracted_below_threshold / feed_only_policy`
-14. `dedupe_status`
-15. `dedupe_group_key`
-16. `publish_candidate`
-17. `score`
-18. `score_reason`
-19. `source_updated_at`
-20. `processed_at`
+15. `dedupe_status`
+16. `dedupe_group_key`
+17. `publish_candidate`
+18. `score`
+19. `score_reason`
+20. `source_updated_at`
+21. `processed_at`
 
 ### 4.8 `articles_enriched_history`
 
