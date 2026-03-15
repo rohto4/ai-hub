@@ -173,3 +173,31 @@
   - `content_path full` improved from `2` to `5`
   - `needs_review_domains` dropped from `130` to `115`
   - `needs_review_articles` dropped from `148` to `115`
+
+## 2026-03-15 Official Source Preseed Update
+
+- Confirmed feed endpoints for additional official sources and seeded them into `source_targets` as `fulltext_allowed`:
+  - `openai-news`
+  - `microsoft-foundry-blog`
+  - `aws-machine-learning-blog`
+  - `huggingface-blog`
+  - `nvidia-developer-blog`
+- Seeded matching official domains into `observed_article_domains` with `fulltext_allowed / summarize_full`:
+  - `openai.com`
+  - `devblogs.microsoft.com`
+  - `aws.amazon.com`
+  - `huggingface.co`
+  - `developer.nvidia.com`
+- Fixed `scripts/seed.mjs` so `source_priority_rules` uses the effective post-upsert source IDs instead of assuming the original seed IDs.
+- Triggered fetch for the new official sources and confirmed raw ingestion:
+  - `openai-news raw=278`
+  - `huggingface-blog raw=277`
+  - `nvidia-developer-blog raw=100`
+  - `aws-machine-learning-blog raw=20`
+  - `microsoft-foundry-blog raw=10`
+- Ran a sample enrich batch afterwards; current partial outcome:
+  - `source_targets = 16`
+  - `fulltext_allowed sources = 7`
+  - `enriched_ready_total = 19`
+  - `content_path full = 19`
+- Also fixed `observed_article_domains` upsert typing so new official-source fetches no longer fail on nullable policy parameters.

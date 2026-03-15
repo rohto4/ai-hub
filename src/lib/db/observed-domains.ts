@@ -16,6 +16,11 @@ const BLOCKED_DOMAIN_PATTERNS = ['cdt.org', 'axios.com', 'bloomberg.com', 'youtu
 const OFFICIAL_DOMAIN_ALLOWLIST_BY_SOURCE_KEY: Record<string, string[]> = {
   'anthropic-news': ['anthropic.com'],
   'google-ai-blog': ['blog.google', 'research.google'],
+  'openai-news': ['openai.com'],
+  'microsoft-foundry-blog': ['devblogs.microsoft.com'],
+  'aws-machine-learning-blog': ['aws.amazon.com'],
+  'huggingface-blog': ['huggingface.co'],
+  'nvidia-developer-blog': ['developer.nvidia.com'],
 }
 
 function normalizeObservedDomain(url: string | null): string | null {
@@ -81,6 +86,8 @@ export async function upsertObservedDomain(
   }
 
   const inferredPolicy = inferObservedDomainPolicy(domain, sourceTarget)
+  const inferredFetchPolicy = inferredPolicy?.fetchPolicy ?? null
+  const inferredSummaryPolicy = inferredPolicy?.summaryPolicy ?? null
   const sql = getSql()
   await sql`
     INSERT INTO observed_article_domains (
@@ -103,11 +110,11 @@ export async function upsertObservedDomain(
     )
     ON CONFLICT (domain) DO UPDATE SET
       fetch_policy = CASE
-        WHEN ${inferredPolicy?.fetchPolicy ?? null} IS NOT NULL THEN ${inferredPolicy?.fetchPolicy ?? null}
+        WHEN ${inferredFetchPolicy}::text IS NOT NULL THEN ${inferredFetchPolicy}::text
         ELSE observed_article_domains.fetch_policy
       END,
       summary_policy = CASE
-        WHEN ${inferredPolicy?.summaryPolicy ?? null} IS NOT NULL THEN ${inferredPolicy?.summaryPolicy ?? null}
+        WHEN ${inferredSummaryPolicy}::text IS NOT NULL THEN ${inferredSummaryPolicy}::text
         ELSE observed_article_domains.summary_policy
       END,
       observed_article_count = observed_article_domains.observed_article_count + 1,
