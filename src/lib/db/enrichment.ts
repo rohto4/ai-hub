@@ -102,33 +102,63 @@ type UpsertEnrichedResult = {
   enrichedArticleId: number
 }
 
-export async function listRawArticlesForEnrichment(limit = 50): Promise<RawArticleForEnrichment[]> {
+export async function listRawArticlesForEnrichment(
+  limit = 50,
+  sourceKey?: string | null,
+): Promise<RawArticleForEnrichment[]> {
   const sql = getSql()
-  const rows = (await sql`
-    SELECT
-      ar.id,
-      ar.source_target_id,
-      st.source_key,
-      st.source_category,
-      st.content_access_policy,
-      lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS observed_domain,
-      od.fetch_policy AS observed_domain_fetch_policy,
-      ar.normalized_url,
-      ar.cited_url,
-      ar.title,
-      ar.snippet,
-      ar.source_url,
-      ar.source_updated_at,
-      ar.has_source_update
-    FROM articles_raw ar
-    JOIN source_targets st ON st.id = ar.source_target_id
-    LEFT JOIN observed_article_domains od
-      ON od.domain = lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', ''))
-    WHERE ar.is_processed = false
-      AND ar.process_after <= now()
-    ORDER BY ar.created_at ASC
-    LIMIT ${limit}
-  `) as RawArticleRow[]
+  const rows = (sourceKey
+    ? await sql`
+        SELECT
+          ar.id,
+          ar.source_target_id,
+          st.source_key,
+          st.source_category,
+          st.content_access_policy,
+          lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS observed_domain,
+          od.fetch_policy AS observed_domain_fetch_policy,
+          ar.normalized_url,
+          ar.cited_url,
+          ar.title,
+          ar.snippet,
+          ar.source_url,
+          ar.source_updated_at,
+          ar.has_source_update
+        FROM articles_raw ar
+        JOIN source_targets st ON st.id = ar.source_target_id
+        LEFT JOIN observed_article_domains od
+          ON od.domain = lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', ''))
+        WHERE ar.is_processed = false
+          AND ar.process_after <= now()
+          AND st.source_key = ${sourceKey}
+        ORDER BY ar.created_at ASC
+        LIMIT ${limit}
+      `
+    : await sql`
+        SELECT
+          ar.id,
+          ar.source_target_id,
+          st.source_key,
+          st.source_category,
+          st.content_access_policy,
+          lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS observed_domain,
+          od.fetch_policy AS observed_domain_fetch_policy,
+          ar.normalized_url,
+          ar.cited_url,
+          ar.title,
+          ar.snippet,
+          ar.source_url,
+          ar.source_updated_at,
+          ar.has_source_update
+        FROM articles_raw ar
+        JOIN source_targets st ON st.id = ar.source_target_id
+        LEFT JOIN observed_article_domains od
+          ON od.domain = lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', ''))
+        WHERE ar.is_processed = false
+          AND ar.process_after <= now()
+        ORDER BY ar.created_at ASC
+        LIMIT ${limit}
+      `) as RawArticleRow[]
 
   return rows.map((row) => ({
     id: row.id,
