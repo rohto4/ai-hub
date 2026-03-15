@@ -17,6 +17,7 @@ const STOPWORDS = new Set([
   'building', 'backs', 'coded', 'global', 'former', 'joint',
   'player', 'players', 'bills', 'china', 'chinas', 'buffet', 'lobster',
   'accused', 'murdering',
+  'introducing', 'amazon', 'offline', 'chatbots',
 ])
 
 const GENERIC_PHRASES = new Set([
