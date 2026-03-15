@@ -21,6 +21,7 @@ const OFFICIAL_DOMAIN_ALLOWLIST_BY_SOURCE_KEY: Record<string, string[]> = {
   'aws-machine-learning-blog': ['aws.amazon.com'],
   'huggingface-blog': ['huggingface.co'],
   'nvidia-developer-blog': ['developer.nvidia.com'],
+  'meta-ai-news': ['about.fb.com'],
 }
 
 function normalizeObservedDomain(url: string | null): string | null {
