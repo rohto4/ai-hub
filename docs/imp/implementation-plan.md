@@ -59,11 +59,11 @@
 11. `huggingface-blog` は `91/277` まで enrich 完了、残り `186`
 12. 残 official backlog `186` 件は AI 入力ファイルへ export 済み
 13. export ファイル内訳は `full_content=100 / title_only=86`
-11. `GEMINI_API_KEY` に加えて `GEMINI_API_KEY2` も要約 fallback に利用可能
-12. `OPENAI_API_KEY` は有効で、`gpt-5-mini` 応答自体は取得できる
-13. `gpt-5-mini` は `reasoning.effort=minimal` と十分な `max_output_tokens` がないと空応答化し得る
-14. template fallback は公開要約には使わず `hold` に寄せる方針へ修正済み
-15. DB 主キー列は `id` ではなく `raw_article_id` / `enriched_article_id` / `job_run_id` などへ統一済み
+14. `GEMINI_API_KEY` に加えて `GEMINI_API_KEY2` も要約 fallback に利用可能
+15. `OPENAI_API_KEY` は有効で、`gpt-5-mini` 応答自体は取得できる
+16. `gpt-5-mini` は `reasoning.effort=minimal` と十分な `max_output_tokens` がないと空応答化し得る
+17. template fallback は公開要約には使わず `hold` に寄せる方針へ修正済み
+18. DB 主キー列は `id` ではなく `raw_article_id` / `enriched_article_id` / `job_run_id` などへ統一済み
 
 ## 3. 現在の実行モード
 
@@ -197,17 +197,16 @@ npm run db:skip-raw-backlog -- --through-raw-id <raw_article_id>
 
 ## 9. Post-Launch Maintenance Kit
 
-This is intentionally a late-phase task. Do not prioritize it while the specification is still moving.
+これは後期タスクとして扱う。現在の実装フェイズの blocker にはしない。
 
-1. Create the maintenance kit only after the current implementation is broadly complete and the web publishing flow is stable.
-2. The kit should include:
+1. サイト公開フローが安定してから作る
+2. 内容には以下を含める
    - operator runbook
-   - incident and failure triage checklist
-   - standard SQL snippets for inspection
+   - incident / failure triage checklist
+   - inspection 用 SQL 集
    - requeue / repair / backfill command catalog
-   - source review / domain review templates
+   - source review / domain review template
    - publish verification checklist
-3. This is a hardening task for after the current implementation phase, not a current blocking deliverable.
 
 ## 10. 2026-03-16 現在の到達点
 
