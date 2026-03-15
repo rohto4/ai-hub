@@ -206,10 +206,10 @@ function isSnippetPublicationEligible(
 function scoreArticle(
   contentPath: 'full' | 'snippet',
   matchedTagCount: number,
-  summarySource: 'gemini' | 'template',
+  summarySource: 'gemini' | 'openai' | 'template',
 ): { score: number; scoreReason: string } {
   const base = contentPath === 'full' ? 70 : 45
-  const summaryBonus = summarySource === 'gemini' ? 6 : 0
+  const summaryBonus = summarySource === 'template' ? 0 : 6
   const score = Math.min(100, base + matchedTagCount * 8 + summaryBonus)
   const scoreReason =
     contentPath === 'full'

@@ -286,3 +286,16 @@
   - full-content publication flow is working
   - snippet-summary publication flow is now also working inside Layer2
   - the next natural task is the web-side publishing view that distinguishes full summaries from snippet-based summaries
+
+## 2026-03-15 Summary Provider Fallback Update
+
+- `generateEnrichedSummary()` now tries providers in this order:
+  - `Gemini`
+  - `OpenAI gpt-5-mini`
+  - `template fallback`
+- Reason:
+  - current Gemini failures are `429` with `spending cap` wording
+  - moving to a lower Gemini model is unlikely to help because it is the same Gemini billing/quota path
+- New env knobs:
+  - `OPENAI_API_KEY`
+  - `OPENAI_SUMMARY_MODEL` (default: `gpt-5-mini`)
