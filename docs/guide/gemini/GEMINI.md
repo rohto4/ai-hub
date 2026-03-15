@@ -34,6 +34,7 @@
 2. 実装中に方針が変わったら、そのターンで docs も更新する。
 3. 未解決事項や判断待ちは `implementation-wait.md` に残す。
 4. 後で検証すべき項目や引き継ぎ事項は `imp-hangover.md` に残す。
+5. 調査時は `docs/spec/04-data-model-and-sql.md` と `docs/spec/11-batch-job-design.md` を優先参照する。
 
 ## 6. タスク完了時の更新ルール
 

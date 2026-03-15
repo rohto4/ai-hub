@@ -43,10 +43,6 @@
    - `articles_enriched_history.enriched_history_id`
    - `job_runs.job_id`
    - `job_run_items.job_item_id`
-4. 命名形式:
-   - `raw-00000001`
-   - `enriched-00000001`
-   - `job-00000001`
 
 ## 2. レイヤーと主テーブル
 
@@ -74,24 +70,14 @@
 ## 3. 補助テーブル
 
 1. `source_targets`
-   - 取得元定義
 2. `observed_article_domains`
-   - 観測済みドメイン一覧とドメイン単位の取得方針
 3. `source_priority_rules`
-   - 同一引用元の代表ソース優先度
 4. `push_subscriptions`
-   - Push 購読
 5. `digest_logs`
-   - Digest 配信履歴
 
 ## 4. 主テーブル概要
 
 ### 4.1 `source_targets`
-
-用途:
-
-1. 毎時取得対象の定義
-2. 取得方式、更新検知可否、取得間隔の保持
 
 主な列:
 
@@ -104,12 +90,6 @@
 7. `supports_update_detection`
 
 ### 4.2 `articles_raw`
-
-用途:
-
-1. 生データ保管
-2. 更新検知材料保管
-3. 未処理 raw のキュー
 
 主な列:
 
@@ -131,19 +111,11 @@
 
 ### 4.3 `observed_article_domains`
 
-用途:
-
-1. 取得済み記事の行き先ドメイン一覧を持つ
-2. ドメイン単位で本文取得可否をレビューする
-3. 将来の `domain -> fetch/summarize template` 運用の起点にする
-
-主なカラム:
+主な列:
 
 1. `domain`
 2. `fetch_policy`
-   - `needs_review / fulltext_allowed / snippet_only / blocked`
 3. `summary_policy`
-   - `domain_default / summarize_full / summarize_snippet`
 4. `observed_article_count`
 5. `latest_article_url`
 6. `first_seen_at`
@@ -152,19 +124,9 @@
 
 ### 4.4 `articles_raw_history`
 
-用途:
-
-1. 1 か月超の raw アーカイブ
-
-補足:
-
 1. `articles_raw` と同等カラムを持ち、`archived_at` を追加する
 
 ### 4.5 `tags_master`
-
-用途:
-
-1. 許可タグの標準マスタ
 
 主な列:
 
@@ -177,17 +139,9 @@
 
 ### 4.6 `tag_aliases`
 
-用途:
-
 1. 同義語や表記揺れを `tags_master` に束ねる
 
 ### 4.7 `tag_candidate_pool`
-
-用途:
-
-1. マスタ未登録タグ候補の蓄積
-2. 日次の Google Trends 照合対象管理
-3. 手動確認が必要な候補の保管
 
 主な列:
 
@@ -201,11 +155,6 @@
 
 ### 4.8 `articles_enriched`
 
-用途:
-
-1. AI 要約と確定重複判定済みデータの保持
-2. 公開反映の元データ
-
 主な列:
 
 1. `raw_article_id`
@@ -218,37 +167,25 @@
 8. `summary_100`
 9. `summary_200`
 10. `summary_basis`
-   - `full_content / feed_snippet / blocked_snippet / fallback_snippet`
-12. `content_path`
-13. `is_provisional`
-14. `provisional_reason`
-   - `snippet_only / domain_snippet_only / fetch_error / extracted_below_threshold / feed_only_policy`
-15. `dedupe_status`
-16. `dedupe_group_key`
-17. `publish_candidate`
-18. `publication_basis`
-   - `hold / full_summary / source_snippet`
-19. `publication_text`
-20. `summary_input_basis`
-   - `full_content / source_snippet / title_only`
-21. `score`
-22. `score_reason`
-23. `source_updated_at`
-24. `processed_at`
+11. `content_path`
+12. `is_provisional`
+13. `provisional_reason`
+14. `dedupe_status`
+15. `dedupe_group_key`
+16. `publish_candidate`
+17. `publication_basis`
+18. `publication_text`
+19. `summary_input_basis`
+20. `score`
+21. `score_reason`
+22. `source_updated_at`
+23. `processed_at`
 
 ### 4.9 `articles_enriched_history`
-
-用途:
 
 1. `articles_enriched` 更新時の旧版保管
 
 ### 4.10 `articles_enriched_tags`
-
-用途:
-
-1. 整形済記事と標準タグの紐付け
-
-主な列:
 
 1. `enriched_article_id`
 2. `tag_id`
@@ -257,50 +194,33 @@
 
 ### 4.11 `activity_logs`
 
-用途:
-
 1. ウェブサイトの行動明細
 
 ### 4.12 `activity_metrics_hourly`
-
-用途:
 
 1. 毎時ランキング計算の集計ソース
 
 ### 4.13 `admin_operation_logs`
 
-用途:
-
 1. 運営操作の監査ログ
 
 ### 4.14 `priority_processing_queue`
 
-用途:
-
 1. 即時運営操作の反映
-2. 再タグ付け、再公開、非表示化、順位再計算の優先処理
 
 ### 4.15 `public_articles`
-
-用途:
 
 1. サイトが読む公開記事本体
 
 ### 4.16 `public_article_sources`
 
-用途:
-
 1. 公開記事と関連ソースの紐付け
 
 ### 4.17 `public_article_tags`
 
-用途:
-
 1. 公開記事と表示タグの紐付け
 
 ### 4.18 `public_rankings`
-
-用途:
 
 1. 各時間窓の公開順位
 
@@ -310,8 +230,6 @@
 
 1. `normalized_url` 一致
 2. 同一引用元一致
-
-この判定は `layer1 -> layer2` で行い、`dedupe_status` に保存する。
 
 ### 5.2 類似重複
 
@@ -327,9 +245,9 @@
 4. `articles_enriched(publish_candidate, processed_at desc)`
 5. `articles_enriched(dedupe_status, dedupe_group_key)`
 6. `articles_enriched(is_provisional, provisional_reason, processed_at desc)`
-6. `activity_logs(public_article_id, occurred_at desc)`
-7. `priority_processing_queue(status, priority asc, available_at asc)`
-8. `public_rankings(ranking_window, rank_position, score desc)`
+7. `activity_logs(public_article_id, occurred_at desc)`
+8. `priority_processing_queue(status, priority asc, available_at asc)`
+9. `public_rankings(ranking_window, rank_position, score desc)`
 
 ## 7. RLS 方針
 
@@ -361,9 +279,9 @@
 1. `display_title`
 2. `display_summary_100`
 3. `display_summary_200`
-5. `thumbnail_url`
-6. `primary_source_target_id`
-7. `public_refreshed_at`
+4. `thumbnail_url`
+5. `primary_source_target_id`
+6. `public_refreshed_at`
 
 ## 10. 実装時の注意
 
