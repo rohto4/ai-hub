@@ -53,6 +53,8 @@ type ExistingEnrichedRow = {
   dedupe_status: 'unique' | 'url_duplicate' | 'source_duplicate' | 'similar_candidate'
   dedupe_group_key: string | null
   publish_candidate: boolean
+  publication_basis: 'hold' | 'full_summary' | 'source_snippet'
+  publication_text: string | null
   score: string | number
   score_reason: string | null
   source_updated_at: string | null
@@ -91,6 +93,8 @@ export interface UpsertEnrichedInput {
   dedupeStatus: DedupeStatus
   dedupeGroupKey: string | null
   publishCandidate: boolean
+  publicationBasis: 'hold' | 'full_summary' | 'source_snippet'
+  publicationText: string | null
   score: number
   scoreReason: string
   sourceUpdatedAt: string | null
@@ -307,6 +311,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         dedupe_status,
         dedupe_group_key,
         publish_candidate,
+        publication_basis,
+        publication_text,
         score,
         score_reason,
         source_updated_at,
@@ -332,6 +338,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         ${existing.dedupe_status},
         ${existing.dedupe_group_key},
         ${existing.publish_candidate},
+        ${existing.publication_basis},
+        ${existing.publication_text},
         ${existing.score},
         ${existing.score_reason},
         ${existing.source_updated_at},
@@ -358,6 +366,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         dedupe_status = ${input.dedupeStatus},
         dedupe_group_key = ${input.dedupeGroupKey},
         publish_candidate = ${input.publishCandidate},
+        publication_basis = ${input.publicationBasis},
+        publication_text = ${input.publicationText},
         score = ${input.score},
         score_reason = ${input.scoreReason},
         source_updated_at = ${input.sourceUpdatedAt},
@@ -390,6 +400,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       dedupe_status,
       dedupe_group_key,
       publish_candidate,
+      publication_basis,
+      publication_text,
       score,
       score_reason,
       source_updated_at
@@ -410,6 +422,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       ${input.dedupeStatus},
       ${input.dedupeGroupKey},
       ${input.publishCandidate},
+      ${input.publicationBasis},
+      ${input.publicationText},
       ${input.score},
       ${input.scoreReason},
       ${input.sourceUpdatedAt}

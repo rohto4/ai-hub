@@ -188,10 +188,13 @@
 15. `dedupe_status`
 16. `dedupe_group_key`
 17. `publish_candidate`
-18. `score`
-19. `score_reason`
-20. `source_updated_at`
-21. `processed_at`
+18. `publication_basis`
+   - `hold / full_summary / source_snippet`
+19. `publication_text`
+20. `score`
+21. `score_reason`
+22. `source_updated_at`
+23. `processed_at`
 
 ### 4.9 `articles_enriched_history`
 

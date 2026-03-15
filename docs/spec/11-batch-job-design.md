@@ -79,6 +79,7 @@
   - `full` / `snippet` を判定する
   - 本文未取得時は `snippet` ベースで仮蓄積する
   - `is_provisional` / `provisional_reason` を更新する
+  - `publication_basis` / `publication_text` を更新する
   - blocked domain は `domain_snippet_only` として区別する
   - 要約を生成する
     - `summary_100`
@@ -91,7 +92,7 @@
   - `articles_enriched` を upsert する
   - 更新時は旧版を `articles_enriched_history` に退避する
   - `articles_raw.is_processed = true` を更新する
-  - provisional 行は `publish_candidate=false` に固定する
+  - `hold` 行だけ `publish_candidate=false` に固定する
   - 抽出段階や失敗理由をジョブ監視へ残す
 
 - 更新先

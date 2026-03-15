@@ -1,5 +1,6 @@
 import { generateEnrichedSummary } from '@/lib/ai/enrich'
 import {
+  type DedupeStatus,
   findDuplicateMatch,
   findSimilarTitleDuplicate,
   listRawArticlesForEnrichment,
@@ -136,6 +137,43 @@ function determineSummaryBasis(
   return 'fallback_snippet'
 }
 
+function isSnippetPublicationEligible(
+  summaryBasis: 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet',
+  contentPath: 'full' | 'snippet',
+  snippet: string,
+  dedupeStatus: DedupeStatus,
+  isRelevant: boolean,
+): boolean {
+  if (contentPath !== 'snippet') {
+    return false
+  }
+
+  if (!isRelevant || dedupeStatus !== 'unique') {
+    return false
+  }
+
+  if (!['feed_snippet', 'blocked_snippet'].includes(summaryBasis)) {
+    return false
+  }
+
+  const normalized = snippet.trim()
+  if (normalized.length < 80) {
+    return false
+  }
+
+  if (/^(\.\.\.|…)/.test(normalized)) {
+    return false
+  }
+
+  const tokenCount = normalized
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter(Boolean)
+    .length
+
+  return tokenCount >= 12
+}
+
 function scoreArticle(
   contentPath: 'full' | 'snippet',
   matchedTagCount: number,
@@ -202,8 +240,33 @@ export async function runDailyEnrich(
         similarDuplicate?.dedupeGroupKey ??
         rawArticle.citedUrl ??
         rawArticle.normalizedUrl
+      const snippetPublishable = isSnippetPublicationEligible(
+        summaryBasis,
+        contentResult.contentPath,
+        normalizedSnippet,
+        dedupeStatus,
+        relevance.isRelevant,
+      )
+      const publicationBasis =
+        contentResult.contentPath === 'full'
+          ? 'full_summary'
+          : snippetPublishable
+            ? 'source_snippet'
+            : 'hold'
+      const publicationText =
+        publicationBasis === 'full_summary'
+          ? summaries.summary200 || summaries.summary100
+          : publicationBasis === 'source_snippet'
+            ? normalizedSnippet
+            : null
+      const finalIsProvisional = publicationBasis === 'source_snippet'
+        ? false
+        : provisionalState.isProvisional
+      const finalProvisionalReason = publicationBasis === 'source_snippet'
+        ? null
+        : provisionalState.provisionalReason
       const publishCandidate =
-        !provisionalState.isProvisional && dedupeStatus === 'unique' && relevance.isRelevant
+        publicationBasis !== 'hold' && dedupeStatus === 'unique' && relevance.isRelevant
       const shouldPersistCandidateTags = relevance.isRelevant && contentResult.contentPath === 'full'
       const { score, scoreReason } = scoreArticle(
         contentResult.contentPath,
@@ -226,11 +289,13 @@ export async function runDailyEnrich(
         summary200: summaries.summary200,
         summaryBasis,
         contentPath: contentResult.contentPath,
-        isProvisional: provisionalState.isProvisional,
-        provisionalReason: provisionalState.provisionalReason,
+        isProvisional: finalIsProvisional,
+        provisionalReason: finalProvisionalReason,
         dedupeStatus,
         dedupeGroupKey,
         publishCandidate,
+        publicationBasis,
+        publicationText,
         score: adjustedScore,
         scoreReason: adjustedScoreReason,
         sourceUpdatedAt: rawArticle.sourceUpdatedAt,
@@ -247,9 +312,10 @@ export async function runDailyEnrich(
           rawArticleId: rawArticle.id,
           title,
           contentPath: contentResult.contentPath,
-          isProvisional: provisionalState.isProvisional,
-          provisionalReason: provisionalState.provisionalReason,
+          isProvisional: finalIsProvisional,
+          provisionalReason: finalProvisionalReason,
           summaryBasis,
+          publicationBasis,
           publishCandidate,
           dedupeStatus,
           relevanceMatchedKeyword: relevance.matchedKeyword,
@@ -266,8 +332,8 @@ export async function runDailyEnrich(
         rawArticleId: rawArticle.id,
         status: 'processed',
         contentPath: contentResult.contentPath,
-        isProvisional: provisionalState.isProvisional,
-        provisionalReason: provisionalState.provisionalReason,
+        isProvisional: finalIsProvisional,
+        provisionalReason: finalProvisionalReason,
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown enrich error'
