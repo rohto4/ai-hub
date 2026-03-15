@@ -1,6 +1,6 @@
 # AI Trend Hub 実装判断待ち
 
-最終更新: 2026-03-14
+最終更新: 2026-03-15
 
 ## 1. 目的
 
@@ -128,3 +128,23 @@
 2. `docs/spec/04-data-model-and-sql.md`
 3. `docs/spec/05-ingestion-and-ai-pipeline.md`
 4. `docs/spec/10-ingestion-layer-design.md`
+
+## 6. 2026-03-16 現在の判断待ち
+
+1. `manual_pending` の運用方針
+   - `ai_processing_state=manual_pending` の行を、どの程度の時間 unresolved のまま許容するか
+   - 現在の既定動作は `hold` のまま保持
+2. サービス開始時の公開範囲
+   - 開始時点で `publication_basis=full_summary` のみを公開対象にするか
+   - `source_snippet` まで含めるか
+   - 実装上は両方対応済みだが、運用判断を明文化したい
+3. `manual-pending` artifact の保持方針
+   - `artifacts/manual-pending/` のファイルをどの期間保持するか
+   - import 完了後に自動削除するか
+4. サイクルテスト完了の受け入れ条件
+   - どの条件を満たしたら `cycle test` から `service-start hardening` へ進むか
+   - 推奨 gate:
+     - 正常系の fetch/enrich が通る
+     - `manual_pending` export が通る
+     - manual import 復旧が通る
+     - stale `running` job が残らない

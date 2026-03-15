@@ -39,7 +39,7 @@ async function run() {
       FROM articles_raw
       GROUP BY source_target_id
     ) raw_counts
-      ON raw_counts.source_target_id = st.id
+      ON raw_counts.source_target_id = st.source_target_id
     LEFT JOIN (
       SELECT
         source_target_id,
@@ -50,7 +50,7 @@ async function run() {
       FROM articles_enriched
       GROUP BY source_target_id
     ) enriched_counts
-      ON enriched_counts.source_target_id = st.id
+      ON enriched_counts.source_target_id = st.source_target_id
     ORDER BY st.is_active DESC, st.content_access_policy ASC, st.source_key ASC
   `)
 

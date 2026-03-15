@@ -58,7 +58,7 @@ async function main() {
     await client.query('BEGIN')
 
     const rawRows = await client.query(`
-      SELECT id, source_url, cited_url
+      SELECT raw_article_id, source_url, cited_url
       FROM articles_raw
       WHERE source_url LIKE 'https://www.google.com/url%'
          OR cited_url LIKE 'https://www.google.com/url%'
@@ -77,9 +77,9 @@ async function main() {
           SET cited_url = $2,
               normalized_url = $3,
               updated_at = now()
-          WHERE id = $1
+          WHERE raw_article_id = $1
         `,
-        [row.id, nextCitedUrl, nextNormalizedUrl],
+        [row.raw_article_id, nextCitedUrl, nextNormalizedUrl],
       )
       rawUpdated += 1
 
@@ -96,7 +96,7 @@ async function main() {
               updated_at = now()
           WHERE raw_article_id = $1
         `,
-        [row.id, nextCitedUrl, nextNormalizedUrl],
+        [row.raw_article_id, nextCitedUrl, nextNormalizedUrl],
       )
       enrichedUpdated += enrichedResult.rowCount ?? 0
     }

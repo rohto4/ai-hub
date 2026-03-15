@@ -1,0 +1,286 @@
+{
+  "items": [
+    {
+      "rawArticleId": "586",
+      "titleJa": "NVIDIA Llama Nemotron Nano VLMがHugging Face Hubに登場",
+      "summary100Ja": "NVIDIAがドキュメント処理に特化した8BパラメータのVLM「Llama Nemotron Nano VL」をHugging Face Hubで公開した。OCRBench v2でOCRや表・図解の抽出に高い精度を示す。",
+      "summary200Ja": "NVIDIAがLlama-3.1-8B-InstructとC-RADIOv2-VLMを組み合わせたVLM「Llama Nemotron Nano VL」をHugging Face Hubで公開した。請求書・契約書・PDF等の複雑な文書からテキストや表を高精度で抽出できる。OCRBench v2ベンチマークで業界トップレベルの性能を記録しており、NVIDIAの NeMoを使ったカスタムファインチューニングも可能。"
+    },
+    {
+      "rawArticleId": "588",
+      "titleJa": "Gemma 3nがオープンソースエコシステムで正式利用可能に",
+      "summary100Ja": "GoogleのオンデバイスマルチモーダルLLM「Gemma 3n」がTransformers、MLX、llama.cpp、Ollamaなど主要OSSライブラリで正式利用可能になった。E2B（実質2B）とE4B（実質4B）の2サイズを提供。",
+      "summary200Ja": "GoogleがGoogle I/Oでプレビューを発表していたGemma 3nが、Transformers、MLX、llama.cpp、Transformers.js、Ollamaなど主要OSSライブラリで正式に利用可能になった。MatFormerアーキテクチャとPer-Layer Embeddingsにより、E2Bモデルは2GBのGPU RAMで動作し、E4BはLMArenaでサブ10Bモデル初の1300+スコアを達成。画像・テキスト・音声・動画の4モダリティをサポートし、140言語のテキスト対応も特徴。"
+    },
+    {
+      "rawArticleId": "590",
+      "titleJa": "SGLangにTransformersバックエンドが統合される",
+      "summary100Ja": "高スループット推論エンジンSGLangがHugging Face Transformersをバックエンドとしてサポートし、Transformers互換の任意のモデルを高性能推論で実行できるようになった。",
+      "summary200Ja": "SGLangがHugging Face Transformersをバックエンドとして統合し、ネイティブ対応していないモデルも自動的にTransformers実装にフォールバックして実行できるようになった。これにより、Transformersに新規追加されたモデルやHugging Face Hubのカスタムモデルを、SGLangのRadixAttentionなど高速化機能とともに即座に利用できる。LoRAサポートやVLM対応は今後追加予定。"
+    },
+    {
+      "rawArticleId": "592",
+      "titleJa": "コンシューマー向けハードウェアでFLUX.1-devをLoRAファインチューニング",
+      "summary100Ja": "diffusersライブラリを用いてFLUX.1-devをQLoRAでファインチューニングする手法を解説。VRAM10GB未満の単一GPUでNVIDIA RTX 4090相当の実装が可能。",
+      "summary200Ja": "Hugging Faceがdiffusersライブラリを使ったFLUX.1-devのQLoRAファインチューニング手法を公開した。bitsandbytesによる4ビット量子化、8ビットAdamWオプティマイザ、勾配チェックポイント、潜在変数キャッシュの組み合わせでVRAM使用量を10GB未満に抑える。torchaoによるFP8学習でさらなる高速化も可能。Google Colabで実行可能なノートブックも提供されている。"
+    },
+    {
+      "rawArticleId": "594",
+      "titleJa": "GroqがHugging Face Inference Providersに対応",
+      "summary100Ja": "GroqがHugging Face Hubの推論プロバイダーとして新たに追加された。LPU技術により低レイテンシ・高スループットでMeta Llama 4やQwen QWQ-32Bなどの最新オープンモデルを利用できる。",
+      "summary200Ja": "GroqがHugging Face Hubの推論プロバイダーエコシステムに参加した。GroqのLPU（Language Processing Unit）はGPUの制約を克服し、LLM推論において低レイテンシと高スループットを実現する。HuggingのクライアントSDK（PythonおよびJavaScript）から、HFトークンまたはGroq APIキーを使ってサーバーレス推論を利用できる。PRO会員は月額2ドル分のInferenceクレジットを利用可能。"
+    },
+    {
+      "rawArticleId": "596",
+      "titleJa": "長いプロンプトが他のリクエストをブロックする仕組みと対策",
+      "summary100Ja": "vLLMなどLLM推論サーバーで長いプロンプトが他のリクエストの処理をブロックする問題と、並列プリフィル・プリフィルデコード分離（Disaggregated Prefill）による解決策を解説する。",
+      "summary200Ja": "TNG社がH100 GPUクラスターでLLMを自社ホスティングする中で発見した、長いプロンプトが後続リクエストのキューをブロックする問題を分析している。vLLMの最新アップデートで実装されたリクエスト並列プリフィルは短いリクエストの初回トークン生成時間を改善するが、デコード速度の低下は残る。根本的な解決策としてプリフィルとデコードを異なるGPUで処理する「Disaggregated Prefill」アーキテクチャを紹介し、測定結果を示している。"
+    },
+    {
+      "rawArticleId": "598",
+      "titleJa": "Hugging Face Kernel Hubを5分で習得する",
+      "summary100Ja": "Hugging Face Kernel Hubを使えば、FlashAttentionやカスタム量子化カーネルなどの最適化済みコンピュートカーネルをローカルでコンパイルせず1行で呼び出せる。",
+      "summary200Ja": "Hugging Face Kernel Hubは、FlashAttentionやRMSNorm・GELUなどの最適化済みカーネルをPython/PyTorchバージョンに合わせて自動ダウンロードし、数秒で実行できるリポジトリだ。従来のFlashAttentionビルドに必要だった数時間の作業を1行のコード（get_kernel()呼び出し）に置き換えられる。RMSNormカーネルの実装例ではベースラインと比較したベンチマーク測定方法も解説している。"
+    },
+    {
+      "rawArticleId": "600",
+      "titleJa": "Featherless AIがHugging Face Inference Providersに対応",
+      "summary100Ja": "Featherless AIがHugging Face Hubの推論プロバイダーに追加された。DeepSeek、Meta、Google、Qwenなど多数のオープンモデルをサーバーレス価格で提供する独自のGPUオーケストレーション技術が特徴。",
+      "summary200Ja": "Featherless AIがHugging Face Hubの推論プロバイダーエコシステムに参加した。同社は独自のモデルロードとGPUオーケストレーション技術で、低コストのサーバーレス価格でありながら非常に幅広いモデルカタログを提供する点が特徴。HFクライアントSDK（PythonおよびJavaScript）からHFトークンまたはFeatherless AI APIキーを使ってDeepSeek-R1などのモデルを利用できる。"
+    },
+    {
+      "rawArticleId": "602",
+      "titleJa": "Isaac GR00T N1.5をLeRobot SO-101アームでポストトレーニングする手順",
+      "summary100Ja": "NVIDIAがアップデートしたロボット基盤モデルGR00T N1.5をオープンソースのSO-101アームでファインチューニングするステップバイステップのチュートリアルを公開した。",
+      "summary200Ja": "NVIDIAがIsaac GR00T N1（汎用ヒューマノイドロボット向け世界初のオープン基盤モデル）の最初のメジャーアップデートGR00T N1.5を発表した。本記事では、LeRobot SO-101アームのテレオペレーションデータを使ったポストトレーニング（ファインチューニング）の手順を解説する。EmbodimentTagシステムで多様なロボットプラットフォームへの適応が容易であり、実機デプロイまでの全ステップを示している。"
+    },
+    {
+      "rawArticleId": "604",
+      "titleJa": "Hugging FaceとNVIDIAが「Training Cluster as a Service」を発表",
+      "summary100Ja": "Hugging FaceとNVIDIAがGTC Parisで大規模GPUクラスターをサービスとして提供する「Training Cluster as a Service」を発表。世界中の研究機関が必要な時だけGPUクラスターにアクセスできる。",
+      "summary200Ja": "Hugging FaceとNVIDIAがGTC Parisで共同発表した「Training Cluster as a Service」は、大学・国立研究所・企業など世界中の研究機関が必要な期間だけ大規模GPUクラスターを利用できる仕組みだ。NVIDIA DGX Cloud Leptonで提供されるNVIDIA Hopper・GB200などの最新アクセラレーターをオンデマンドで利用できる。希少遺伝性疾患研究機関TIGEMや数学推論AI組織Numinaなどが既に活用している。"
+    },
+    {
+      "rawArticleId": "606",
+      "titleJa": "ScreenSuite：GUIエージェント向け最大規模の評価スイート",
+      "summary100Ja": "Hugging FaceがGUIエージェントのVLM評価スイート「ScreenSuite」を公開した。知覚・グラウンディング・単一ステップ・マルチステップの13ベンチマークを統合し、DockerでUbuntu/Android環境も構築可能。",
+      "summary200Ja": "Hugging FaceがGUIエージェント向けの包括的評価スイート「ScreenSuite」を公開した。ScreenQA、ScreenSpot、OSWorld、AndroidWorldなど13のベンチマークを統合し、知覚・グラウンディング・単一ステップアクション・マルチステップエージェントの全能力を評価する。ビジョンのみ（アクセシビリティツリーやDOM不使用）で評価する設計で、DockerによるUbuntu/Androidローカル環境の構築もサポートしている。"
+    },
+    {
+      "rawArticleId": "608",
+      "titleJa": "nanoVLMでKVキャッシュをゼロから実装する",
+      "summary100Ja": "nanoVLMリポジトリでKVキャッシュをPyTorchでゼロから実装し、生成速度を38%向上させた実装の詳細と仕組みを解説する。",
+      "summary200Ja": "nanoVLM（純粋なPyTorchで書かれたVLM学習リポジトリ）にKVキャッシュをゼロから実装し、生成速度が38%向上した。自己注意機構でのKey・Valueの再計算を排除し、プリフィルフェーズとデコードフェーズを分離することで、シーケンス長に対して線形の計算量を実現する。実装変更点はAttentionブロック・言語モデル・生成ループの3箇所に及び、コードと理論を併せて丁寧に解説している。"
+    },
+    {
+      "rawArticleId": "610",
+      "titleJa": "ArmチップでリアルタイムAIサウンド生成：クリエイティブな個人ツール",
+      "summary100Ja": "Stability AIのStable Audio OpenモデルをArmベースCPUで動作させ、テキストプロンプトからスタジオ品質の音声を数秒で生成してAbleton Liveに連携させる個人ツールの実装を紹介する。",
+      "summary200Ja": "Arm社のエンジニアがStable Audio Open（Stability AI）とPyTorch/TorchAudioを組み合わせ、GPU不要のArmベースCPUのみでテキストプロンプトから音声を数秒で生成するツールを構築した。マルチスレッド最適化とDPMPP-3M-SDEサンプラーを使って推論を効率化し、生成した.wavファイルをAbleton Liveのプロジェクトフォルダに直接出力することで作曲ワークフローに統合している。"
+    },
+    {
+      "rawArticleId": "612",
+      "titleJa": "Holo1：GUIエージェント「Surfer-H」を駆動するVLMファミリー",
+      "summary100Ja": "H CompanyがGUI自動化に特化したオープンソースAction VLMファミリー「Holo1」（3Bと7B）とWebClickベンチマークを公開した。Holo1-7BはUI位置特定精度で小型モデル最高の76.2%を達成。",
+      "summary200Ja": "H CompanyがUI理解と精密な位置特定に特化したオープンソースAction VLMファミリー「Holo1」をHugging Face Hubで公開した。Qwen2.5-VLアーキテクチャベースのHolo1-7BはUI位置特定ベンチマークで76.2%の平均精度を達成する。これを基盤とするウェブエージェント「Surfer-H」はWebVoyagerベンチマークで1タスクあたり0.13ドルのコストで92.2%の精度を示した。"
+    },
+    {
+      "rawArticleId": "614",
+      "titleJa": "SmolVLA：LeRobotコミュニティデータで学習した軽量Vision-Language-Actionモデル",
+      "summary100Ja": "Hugging Faceが450Mパラメータのオープンソースロボティクスモデル「SmolVLA」を公開した。コンシューマーGPUで動作し、非同期推論でタスクスループットを2倍に向上させる。",
+      "summary200Ja": "SmolVLA-450MはSmolVLM2をVLMバックボーンとし、FlowMatchingトランスフォーマーをアクションエキスパートとして組み合わせたコンパクトなロボティクスVLAモデルだ。公開コミュニティデータセットのみで学習し、視覚トークン削減・レイヤースキップ・非同期推論スタックにより、より大規模なVLAと同等以上の性能をSO-100/101などの低コストハードウェアで実現する。"
+    },
+    {
+      "rawArticleId": "616",
+      "titleJa": "TRLでvLLMをコロケーション実行し、GPUを余さず活用する",
+      "summary100Ja": "TRL v0.18.0からvLLMを学習GPUと同じプロセスで実行する「コロケーション」モードに対応し、GRPOトレーニング時のGPU利用効率と最大1.73倍のスループット向上を実現した。",
+      "summary200Ja": "従来のTRLではvLLMが別プロセスの専用GPUで動作するため、学習・推論間でGPUが交互に待機するボトルネックがあった。TRL v0.18.0からvLLMを学習と同一プロセスグループ内に配置する「コロケーション」モードが追加され、全GPUを学習・推論の両方に活用できるようになった。HTTP通信が不要となり、GRPO設定でvllm_mode=\"colocate\"を指定するだけで利用可能。7Bモデルで最大1.35倍、72BモデルのTP設定次第では最大1.73倍のスループット向上を確認している。"
+    },
+    {
+      "rawArticleId": "618",
+      "titleJa": "CodeAgents＋構造化出力：アクション実行をより信頼性高く行う方法",
+      "summary100Ja": "smolagentsのCodeAgentが思考とコードをJSON形式で出力する「構造化CodeAgent」モードを実装することで、複数ベンチマークで2〜7ポイントの精度向上を達成したことを報告する。",
+      "summary200Ja": "Hugging Faceの研究チームが、CodeAgentに構造化出力（JSON形式でthoughtsとcodeを出力）を組み合わせることでエージェント性能が向上することを実証した。15,724のエージェントトレース分析により、最初のステップのパースエラーが成功率を21.3%低下させることが判明し、構造化生成によるパース信頼性の向上が性能改善の主要因となっている。ただし小規模モデルでは「構造化コスト」として性能低下が見られる場合もある。"
+    },
+    {
+      "rawArticleId": "620",
+      "titleJa": "Liger GRPOがTRLと統合：メモリ使用量を40%削減",
+      "summary100Ja": "LigerのChunked Loss手法をGRPO損失に適用し、TRLと統合することでGRPOトレーニングのピークメモリ使用量を最大40%削減した。FSDP・PEFTのサポートも追加された。",
+      "summary200Ja": "LigerカーネルのChunked Loss手法をGRPO損失に拡張し、TRL（GRPOConfig.use_liger_loss=True）に統合した。バッチ次元でlogitsを分割して処理することでGPUメモリへのフルlogits保存を回避し、大バッチほど効果が大きく最大40%のメモリ削減を達成。FSDP・LoRA/QLoRA（PEFT）のサポートも追加し、vLLMサーバーと組み合わせることで学習時の生成速度も向上する。"
+    },
+    {
+      "rawArticleId": "622",
+      "titleJa": "Dell Enterprise Hub：オンプレミスAI構築のための統合プラットフォーム",
+      "summary100Ja": "Hugging Faceとの連携でアップデートされたDell Enterprise Hubでは、Llama 4・DeepSeek R1などの人気モデルをDell AIサーバーおよびAI PCにワンクリックで展開できる。AIアプリケーションカタログも新規追加。",
+      "summary200Ja": "Dell Tech WorldでHugging FaceとDellが刷新した「Dell Enterprise Hub」を発表した。Llama 4、DeepSeek R1、Gemma 3などの主要モデルをNVIDIA H200・AMD MI300X・Intel Gaudi 3搭載Dell AIサーバー向けに最適化済みコンテナで提供し、DockerやKubernetesで迅速に展開できる。さらにOpenWebUIとAnythingLLMを含むAIアプリケーションカタログ、Dell AI PC向けオンデバイスモデル対応、Python SDK/CLIも新たに追加された。"
+    },
+    {
+      "rawArticleId": "624",
+      "titleJa": "PythonでMCPエージェントを約70行で実装する",
+      "summary100Ja": "huggingface_hub SDKをMCPクライアントとして拡張し、MCPサーバーのツールをLLMに接続するエージェントをPythonで約70行で実装する方法を解説する。",
+      "summary200Ja": "Hugging FaceがPython版「Tiny Agents」を公開した。huggingface_hubのSDKにMCPクライアント機能を追加し、stdio/SSE/HTTPのMCPサーバーに接続してツールを取得・実行するエージェントを構築できる。エージェントの本質はMCPクライアント上のwhileループであり、CLIコマンド（tiny-agents run）またはPythonコードで既存のエージェント設定（agent.json）を読み込んで実行可能。Gradio SpacesをMCPサーバーとして利用する例も示している。"
+    },
+    {
+      "rawArticleId": "626",
+      "titleJa": "Falcon-H1：ハイブリッドヘッドアーキテクチャで効率と性能を刷新する言語モデルファミリー",
+      "summary100Ja": "TII（UAE）がTransformerのAttentionとMamba-2（SSM）を並列統合したハイブリッドアーキテクチャ「Falcon-H1」シリーズを発表した。0.5Bから34Bまで6サイズをApache 2.0ライセンスで公開。",
+      "summary200Ja": "TIIがAttentionとMamba-2 SSMを並列に組み合わせたハイブリッドアーキテクチャ「Falcon-H1」を発表した。0.5B・1.5B・1.5B-Deep・3B・7B・34Bの6サイズ×ベース/インストラクトバリアントをApache 2.0で公開。256Kコンテキスト長・18言語対応・STEM分野での高い性能が特徴で、カスタマイズされたMaximal Update Parametrization（μP）により学習の安定性と効率を高めている。"
+    },
+    {
+      "rawArticleId": "628",
+      "titleJa": "Falcon-Arabic：アラビア語言語モデルの新たな到達点",
+      "summary100Ja": "TIIがFalcon 3ベースのアラビア語特化LLM「Falcon-Arabic」（7B）を発表した。32,000アラビア語固有トークンをトークナイザーに追加し、OALL v2ベンチマークで同サイズ帯の既存モデルを超える精度を示す。",
+      "summary200Ja": "TIIがFalcon 3-7Bをベースにアラビア語向けにアダプトした「Falcon-Arabic」を発表した。トークナイザー語彙を32,000トークン拡張し、テキスト類似性に基づくエンベディング初期化で学習を加速。機械翻訳データを使わず100%ネイティブアラビア語データで継続事前学習を実施し、OALL v2ベンチマークで同サイズ帯のモデルを超え4倍大きいモデルに匹敵する性能を達成した。現在はクローズドソースで公開されている。"
+    },
+    {
+      "rawArticleId": "630",
+      "titleJa": "DiffusersにおけるFLUX.1-devの量子化バックエンドを比較する",
+      "summary100Ja": "Hugging Face Diffusersに統合されたbitsandbytes、GGUF、torchao、Quanto、ネイティブFP8の各量子化バックエンドをFLUX.1-devで比較し、メモリ削減効果と画質への影響を検証する。",
+      "summary200Ja": "FLUX.1-devのBF16フルロードには約31.5GBのメモリが必要だが、Diffusersに統合された各量子化バックエンドを使うと大幅に削減できる。bitsandbytes 4-bitなら12.6GBに、torchao int4なら10.6GBに抑えられる。各バックエンドのメモリ消費・推論時間・出力品質を実測データで比較しており、NF4がメモリ削減と画質のトレードオフとして最善のことが多いと述べている。"
+    },
+    {
+      "rawArticleId": "632",
+      "titleJa": "nanoVLM：純粋なPyTorchでVLMを学習するための最もシンプルなリポジトリ",
+      "summary100Ja": "Andrej KarpathyのnanoGPTに着想を得た軽量VLM学習リポジトリ「nanoVLM」を公開。Google ColabのフリーティアでVLMの学習・推論が可能で、コードベース全体を最小限に保ち学習に適した設計。",
+      "summary200Ja": "Hugging Faceが純粋なPyTorchで書かれた軽量VLM学習リポジトリ「nanoVLM」を公開した。SigLIPビジョンエンコーダとLlama 3アーキテクチャをモダリティプロジェクタで接続したシンプルな構成で、Google ColabフリーティアでもVQAを学習タスクとして訓練できる。事前学習済みバックボーン（google/siglip-base-patch16-224とHugging FaceTB/SmolLM2-135M）を活用し、H100で6時間・約170万サンプルの学習でデモモデルを公開している。"
+    },
+    {
+      "rawArticleId": "634",
+      "titleJa": "MicrosoftとHugging Faceがコラボレーションを拡大",
+      "summary100Ja": "Microsoft BuildでHugging FaceとMicrosoftが協力拡大を発表。Azure AI Foundryで10,000以上のHugging Faceモデルをセキュアにデプロイできるようになった。",
+      "summary200Ja": "Microsoft BuildでSatya Nadellaが発表したHugging Faceとの協力拡大により、Azure AI Foundryで1万以上のHugging Faceモデルを数クリックでデプロイできるようになった。セキュリティテスト通過済みモデルのみを掲載し、safetensors形式・リモートコード不使用を要件とする。今後はデイゼロリリース対応、トレンドモデルの毎日更新、動画・3D・タンパク質など新モダリティへの拡張も予定している。"
+    },
+    {
+      "rawArticleId": "636",
+      "titleJa": "Falcon-Edge：ファインチューニング可能な1.58ビットLLMシリーズ",
+      "summary100Ja": "TIIがBitNetアーキテクチャベースの三値重量（1.58ビット）LLMシリーズ「Falcon-Edge」（1Bと3B）を公開した。BF16・ネイティブBitNet・事前量子化の3バリアントをApache 2.0で提供。",
+      "summary200Ja": "TIIがBitNetの三値重量（{-1,0,1}）を採用した超低ビットLLMシリーズ「Falcon-Edge」を発表した。1Bと3Bの2サイズをベース/インストラクト×BF16/BitNet/事前量子化の3バリアントで提供する。事前量子化ウェイトを公開することで、onebitllmsパッケージを使ったファインチューニングが可能となっており、BitNetモデルのコミュニティエコシステム形成を目指している。"
+    },
+    {
+      "rawArticleId": "638",
+      "titleJa": "Transformersライブラリ：モデル定義の標準化に向けた取り組み",
+      "summary100Ja": "Hugging Face Transformersがvllm、SGLang、TGI、llama.cpp、MLXなどのバックエンドに共通のモデル定義として採用される方向性を示し、新規モデル貢献のさらなる簡素化を目指す方針を発表。",
+      "summary200Ja": "Hugging FaceがTransformersを推論エンジン（vLLM、SGLang、TGI等）のバックエンドとして標準化する方針を発表した。Transformersに追加されたモデルは即座にこれらのエンジンで利用可能になり、学習フレームワーク（Axolotl、UnslothなどもTransformersを利用）とのインターオペラビリティが高まる。今後はモデリングコードの簡素化・冗長コンポーネントの廃止・モジュラー定義の強化を進め、貢献コードを大幅に削減することを目標としている。"
+    },
+    {
+      "rawArticleId": "640",
+      "titleJa": "KaggleユーザーのためのHugging Faceモデルアクセス改善",
+      "summary100Ja": "KaggleがHugging Face Hub上のモデルをKaggleノートブックから直接利用・表示できる統合機能を開始した。モデルページ間の相互ナビゲーションも可能になった。",
+      "summary200Ja": "KaggleとHugging Faceが統合を開始し、Hugging FaceのモデルページからKaggleノートブックに直接遷移してモデルを使用できるようになった。KaggleノートブックでHugging Faceのモデルを参照すると自動でKaggle上にモデルページが生成され、公開ノートブックは「Code」タブに表示される。今後、オフラインノートブック提出を必要とするKaggleコンペへの対応も開発中。"
+    },
+    {
+      "rawArticleId": "642",
+      "titleJa": "Inference Endpointsで高速Whisper音声認識をデプロイ",
+      "summary100Ja": "Hugging FaceがvLLMを活用した新しいWhisper推論エンドポイントを公開した。torch.compile、CUDAグラフ、FP8 KVキャッシュにより従来比最大8倍のRTFx性能向上を達成している。",
+      "summary200Ja": "Hugging Faceが新しいWhisper推論オプションをInference Endpointsで公開した。vLLMベースの実装にtorch.compile・CUDAグラフ・FP8 KVキャッシュを組み合わせ、L4 GPU上でWhisper Large V3の転写速度が従来比最大8倍に向上した。文字誤り率（WER）はTransformersベースラインと同等を維持しており、FastRTCと組み合わせるとリアルタイム転写アプリも構築できる。"
+    },
+    {
+      "rawArticleId": "644",
+      "titleJa": "Vision Language Models（VLM）の最新動向：より良く、速く、強く",
+      "summary100Ja": "2024〜2025年のVLM分野の動向を網羅的に解説する。Any-to-anyモデル、推論VLM、軽量化、MoEデコーダ、VLA、マルチモーダルRAG・エージェント、動画モデルなどの主要トレンドを紹介。",
+      "summary200Ja": "2024年4月以降のVLM進化を包括的にまとめたブログ記事。Qwen 2.5 OmniのようなAny-to-anyモデル、Kimi-VLなどの推論VLM、SmolVLM系の小型化、LLaMA 4などMoEデコーダ搭載VLA、マルチモーダルRAGとエージェント、動画LM、新たなアライメント技術、MMT-BenchやMMPU-Proなどの新ベンチマークを体系的に解説している。"
+    },
+    {
+      "rawArticleId": "646",
+      "titleJa": "LeRobotコミュニティデータセット：ロボティクスの「ImageNet」はいつ実現するか",
+      "summary100Ja": "LeRobotコミュニティが集積するロボティクスデータセットの現状と課題を分析。一般化能力向上にはデータの多様性が鍵であり、タスクアノテーション不足・フィーチャー不整合・低品質エピソードなどの改善点を指摘する。",
+      "summary200Ja": "Hugging Face LeRobotチームが、コミュニティ貢献型ロボティクスデータセットの現状と課題を解説した。VLAモデルの汎化にはImageNetのような多様で大規模なデータが必要だが、ロボティクスデータは依然として断片化している。Hugging Face Hub上のLeRobotデータセット数は急増しているが、不完全なタスクアノテーション・フィーチャー名称の不整合・低品質エピソードなど品質上の課題も明らかになっており、具体的な改善ガイドラインを示している。"
+    },
+    {
+      "rawArticleId": "648",
+      "titleJa": "GradioでMCPサーバーを構築する方法",
+      "summary100Ja": "Gradioアプリをmcp_server=Trueで起動するだけで任意のPython関数をMCPサーバーとして公開でき、LLMからツールとして呼び出せる。Hugging Face Spacesでの無料ホストも可能。",
+      "summary200Ja": "Gradioがアプリをモデルコンテキストプロトコル（MCP）サーバーとして公開する機能をリリースした。launch(mcp_server=True)の1行追加で各APIエンドポイントがMCPツールに変換される。ツール・リソース・プロンプトのデコレータ対応、ローカルファイルの自動アップロード、進捗通知、OpenAPIからMCPへの変換、認証強化など複数の改善も加えられており、Hugging Face Spacesに公開すれば無料でホスト型MCPサーバーとして利用できる。"
+    },
+    {
+      "rawArticleId": "650",
+      "titleJa": "Qwen-3のチャットテンプレートから学ぶ4つのこと",
+      "summary100Ja": "Qwen-3のJinjaチャットテンプレートを前バージョンと比較して分析し、推論のオプション化・動的コンテキスト管理・ツール引数シリアライゼーションの改善・デフォルトシステムプロンプトの廃止という4点の設計変更を解説する。",
+      "summary200Ja": "Qwen-3のチャットテンプレートをQwen-2.5・QwQと比較することで、モデル設計の特徴が明らかになる。enable_thinkingフラグで推論ステップをオプション化し、ロールバックポイントシステムでマルチターンツール呼び出し時の<think>ブロックを動的に保存・削除する。ツール引数の二重JSONエンコード問題も修正されており、デフォルトのシステムプロンプトは廃止されている。"
+    },
+    {
+      "rawArticleId": "652",
+      "titleJa": "Llama Guard 4がHugging Face Hubに公開",
+      "summary100Ja": "MetaがLlama 4 Scoutをベースに密なFFNモデルに変換した12Bマルチモーダル安全モデル「Llama Guard 4」と、プロンプトインジェクション検出に特化した「Llama Prompt Guard 2」（86Mと22M）を公開した。",
+      "summary200Ja": "MetaがLlama Guard 4（12B密モデル）とLlama Prompt Guard 2（86Mと22M）を公開した。Llama Guard 4はLlama 4 ScoutのMoEをプルーニングした密なモデルで、画像+テキスト入力のマルチモーダル安全チェックに対応し、MLCommonsの14カテゴリの有害コンテンツを分類できる。Llama Prompt Guard 2は前バージョンより高性能で、22Mの軽量版も追加されアドバーサリアル攻撃耐性も向上した。"
+    },
+    {
+      "rawArticleId": "654",
+      "titleJa": "AutoRound：IntelによるLLM・VLM向け高度量子化ツール",
+      "summary100Ja": "IntelのAutoRoundは符号付き確率的勾配降下法で重みの丸め範囲を最適化する重みのみ量子化PTQ手法で、INT2〜INT8の精度でほぼすべての主要LLM・VLMアーキテクチャに対応する。",
+      "summary200Ja": "IntelのAutoRoundは符号付き確率的勾配降下法で重みの丸め・クリッピング範囲を最適化する後学習量子化（PTQ）ツールだ。INT2精度で他のベースラインより最大2.1倍高い相対精度を示し、A100 GPUでの72Bモデル量子化が最速37分で完了する。GPTQ・AWQ・GGUF形式でのエクスポート、混合ビット量子化、CPU/Intel GPU/CUDAへのデプロイをサポートし、Hugging Face Transformersと統合して利用できる。"
+    },
+    {
+      "rawArticleId": "656",
+      "titleJa": "PipelineRL：推論中の重み更新で高効率なRL学習を実現",
+      "summary100Ja": "ServiceNowがPipelineRLをオープンソース化した。推論を止めずに重みを更新するインフライト重み更新技術により、GRPOトレーニングの推論スループットを常時高く保ちながらオンポリシー性を維持する。",
+      "summary200Ja": "ServiceNowがオープンソースRL実装「PipelineRL」を公開した。従来のRL実装では高スループット推論とオンポリシーデータ収集がトレードオフになるが、PipelineRLはオプティマイザーステップ後に推論を一時停止して重みを更新する「インフライト重み更新」でこれを解消する。7Bと32BモデルのトレーニングでOpen-Reasoner-Zeroと同等以上の性能を達成しており、モジュラーアーキテクチャでSGLang・vLLM等の推論エンジンや各種学習フレームワークとの組み合わせが容易。"
+    },
+    {
+      "rawArticleId": "658",
+      "titleJa": "Tiny Agents：50行のコードで実装するMCPエージェント（JavaScript版）",
+      "summary100Ja": "Hugging Faceが@huggingface/mcp-clientパッケージを公開した。MCPクライアントとLLM推論クライアントを組み合わせることで、エージェントはwhileループで書けると示している。",
+      "summary200Ja": "Hugging FaceのJulien ChaumondがMCPの仕組みを探る中で、MCPクライアント上のwhileループがエージェントの本質であることを発見した。TypeScriptで実装した@huggingface/mcp-clientは公式MCPのSDKとHugging FaceのInferenceClientを組み合わせ、Playwright MCPサーバー（Webブラウジング）やファイルシステムサーバーなどを自由に接続できる。npxコマンド1行でデモを試せるほどシンプルな設計になっている。"
+    },
+    {
+      "rawArticleId": "660",
+      "titleJa": "olmOCRのファインチューニングで忠実なOCRエンジンを構築する",
+      "summary100Ja": "TNG社がolmOCR-7B-0225-previewをファインチューニングし、請求書のヘッダー・フッターなど元モデルが省略する情報も含めてすべてのテキストを抽出できる忠実なOCRエンジンを構築した。",
+      "summary200Ja": "TNGがolmOCR-7B-0225-previewをQwen2.5-VL-72B-Instructで生成した8,000件のデータセットでファインチューニングし、LLM学習データ向けに省略されていたヘッダー・フッター情報も含む忠実なOCRモデルを構築した。8xH100ノードで2.5エポックの学習を実施し、請求書・多段組レイアウトの文書でも全情報を漏れなく抽出できることを定性評価で確認。オープンソースとして公開されている。"
+    },
+    {
+      "rawArticleId": "662",
+      "titleJa": "LLM推論におけるプリフィルとデコードの並行処理を理解する",
+      "summary100Ja": "TNG社がvLLMの並行リクエスト処理においてプリフィルとデコードフェーズがスループット・レイテンシ・GPU利用率に与える影響を解析した連載記事の第2回。静的バッチングと継続的バッチングの違いを実測データで示す。",
+      "summary200Ja": "TNG社がH100 GPUクラスターでLLMサービングを運用する中から得た知見をまとめた連載の第2回。プリフィル（並列処理・コンピュートバウンド）とデコード（逐次処理・メモリバウンドウンド）の特性の違い、静的バッチングと継続的バッチング（プリフィル優先・デコード優先）のトレードオフを実測データで解説し、並行リクエスト増加に伴うスループットの飽和曲線も示している。"
+    },
+    {
+      "rawArticleId": "664",
+      "titleJa": "GradioはただのUIライブラリではない17の理由",
+      "summary100Ja": "GradioがUI生成ツールにとどまらず、ユニバーサルAPIアクセス・キュー管理・ストリーミング・マルチページ対応・MCPサーバー・テーマシステムなどを備えたMLアプリケーションフレームワークである点を17の機能で解説する。",
+      "summary200Ja": "GradioはPython関数をWebUI兼APIとして公開するフレームワークであり、APIレコーダーによるコード自動生成、SSRによる高速初期表示、MLタスク向けキュー管理、HLS対応のリアルタイムストリーミング、マルチページ対応、MCP サーバー機能、Groovyによるクライアントサイド実行など、他のPythonフレームワークにない機能を多数備える。Hugging Face Spacesとの統合により無料でホスト型MCPサーバーとしての利用も可能。"
+    },
+    {
+      "rawArticleId": "666",
+      "titleJa": "CohereがHugging Face Inference Providersに対応",
+      "summary100Ja": "CohereがHugging Face Hubの推論プロバイダーに追加された。Command AやAya Visionなどのエンタープライズ向けモデルをHFクライアントSDKから利用でき、モデル作者として自社モデルを直接提供する初のプロバイダーでもある。",
+      "summary200Ja": "CohereがHugging Face Hubの推論プロバイダーエコシステムに参加し、モデル作者が自社モデルをHubで直接提供する初のケースとなった。256Kコンテキスト長のCommand A・多言語対応のAya Expanse・マルチモーダルのAya Visionなどが利用可能で、huggingface_hub SDKやOpenAIクライアントを通じてアクセスできる。ツール呼び出し（Function Calling）のサンプルコードも公開されている。"
+    },
+    {
+      "rawArticleId": "668",
+      "titleJa": "HELMET：長文脈言語モデルを包括的に評価するベンチマーク",
+      "summary100Ja": "Princeton NLPとIntelが開発した長文脈LLM評価ベンチマーク「HELMET」をICLR 2025で発表。RAG・引用生成・要約・ICLなど多様なタスクで59モデルを評価し、単純な合成タスクとの乖離を明らかにした。",
+      "summary200Ja": "Princeton NLPとIntelが開発した「HELMET」は、8K〜128Kトークンの文脈長で長文脈言語モデルを実用タスクで包括的に評価するベンチマークだ。Needle-in-a-Haystack等の単純合成タスクが実際のダウンストリーム性能と相関しないことを示し、モデルベース評価（ROUGE不使用）で59モデルを比較した。異なるタスクカテゴリ間で性能相関が低く、特定タスクに特化した評価では全体像が把握できないことを指摘している。"
+    },
+    {
+      "rawArticleId": "670",
+      "titleJa": "Hugging FaceがPollen Roboticsを買収しオープンソースロボットを販売へ",
+      "summary100Ja": "Hugging FaceがオープンソースロボットメーカーPollen Roboticsを買収し、ヒューマノイドロボット「Reachy 2」の販売を開始した。LeRobotライブラリのエコシステムと連携して進化する予定。",
+      "summary200Ja": "Hugging Faceが9年間オープンソースロボットを開発してきたPollen Roboticsを買収した。同社の最新ヒューマノイドロボット「Reachy 2」（7自由度アーム・LiDARモバイルベース・VRテレオペレーション対応）を70,000ドルで販売開始。LeRobotライブラリと組み合わせることでオープンソースの物理AI基盤の民主化を目指す。コーネル大学やカーネギーメロン大学など多くの研究機関が既に採用している。"
+    },
+    {
+      "rawArticleId": "672",
+      "titleJa": "400万モデルをスキャン：Protect AIとHugging Faceのパートナーシップ6ヶ月の成果",
+      "summary100Ja": "Protect AIとHugging Faceのセキュリティパートナーシップ6ヶ月間の成果を報告。400万以上のモデルバージョンをスキャンし、51,700モデルで352,000件の安全・疑わしい問題を検出した。",
+      "summary200Ja": "Protect AIとHugging Face間のセキュリティパートナーシップ開始から6ヶ月で、Guardian は441万件のモデルバージョンをスキャンし51,700モデルで352,000件の問題を検出した。アーカイブファイルシステム書き込み・TensorFlowアーキテクチャバックドア・llamafile悪意コード実行などの新検出モジュールを追加。ライブラリ依存型攻撃・ペイロード難読化・フレームワーク拡張機能悪用・攻撃ベクター連鎖という主要な攻撃パターンも解説している。"
+    },
+    {
+      "rawArticleId": "674",
+      "titleJa": "Visual Salamandra：マルチモーダル理解の限界を押し広げるVLM",
+      "summary100Ja": "スペインBSCのLanguage Technologies LabがSalamandra 7BをベースにSigLIPビジョンエンコーダを統合したマルチモーダルVLM「Visual Salamandra」を公開した。欧州言語の多言語サポートを重視した設計。",
+      "summary200Ja": "Barcelona Supercomputing CenterのLanguage Technologies Labが、Salamandra Instructed 7BにSigLIP（SigLIP-So400m）ビジョンエンコーダと2層MLPプロジェクタを統合したVLM「Visual Salamandra」を公開した。4段階のトレーニングで610万件のインストラクションチューニングデータを使用し、VQA・OCR・文書理解・数学推論・単一/複数画像・動画対応を実現する。欧州言語の多言語対応を重視している点が特徴。"
+    },
+    {
+      "rawArticleId": "676",
+      "titleJa": "Hugging FaceとCloudflareがFastRTCのリアルタイム通信を強化するパートナーシップを発表",
+      "summary100Ja": "Hugging FaceとCloudflareが提携し、FastRTC開発者がHFトークンだけでCloudflareのグローバルTURNサーバーネットワークに月10GBまで無料でアクセスできるようになった。",
+      "summary200Ja": "Hugging FaceとCloudflareが提携し、FastRTCのWebRTCアプリケーション開発者がHugging Faceアクセストークンのみで世界335拠点のCloudflare TURNサーバーを月10GBまで無料で利用できるようになった。WebRTCはリアルタイムAIアプリに不可欠だがTURNサーバーの維持が課題だったため、この統合により音声アシスタント・映像解析などのAIアプリケーション開発の障壁が下がる。FastRTC 0.0.20以上でget_cloudflare_turn_credentials関数を呼び出すだけで使用できる。"
+    },
+    {
+      "rawArticleId": "678",
+      "titleJa": "アラビア語リーダーボード：アラビア語Instruction Followingと更新版AraGen",
+      "summary100Ja": "InceptionとMBZUAIがアラビア語AI評価を集約する「Arabic-Leaderboards」スペースを立ち上げ、AraGen-03-25のリリースとアラビア語IFEvalベンチマークに基づく初のInstruction Followingリーダーボードを公開した。",
+      "summary200Ja": "InceptionとMBZUAIが共同でアラビア語AI評価の統合プラットフォーム「Arabic-Leaderboards」を公開した。AraGen-03-25は質問応答・推論・安全性・文法分析を含む340ペアに拡張され、ジャッジシステムプロンプトも改善された。新設のArabic Instruction Followingリーダーボードはアラビア語版IFEvalに基づく初の公開ベンチマークで、指示追従能力を評価する。動的評価サイクルを維持しつつ上位モデルのランキング安定性を確認している。"
+    }
+  ]
+}

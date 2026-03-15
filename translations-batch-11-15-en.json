@@ -1,0 +1,1012 @@
+Exporting batches 11-15...
+
+Batch 11: 50 rows
+Batch 12: 50 rows
+Batch 13: 50 rows
+Batch 14: 50 rows
+Batch 15: 50 rows
+
+Total: 250 titles
+
+[
+  {
+    "id": "501",
+    "en": "One in a million: celebrating the customers shaping AI’s future"
+  },
+  {
+    "id": "502",
+    "en": "NVIDIA Releases 6 Million Multi-Lingual Reasoning Dataset"
+  },
+  {
+    "id": "503",
+    "en": "Optimizing Inference for Long Context and Large Batch Sizes with NVFP4 KV Cache"
+  },
+  {
+    "id": "504",
+    "en": "Continuously hardening ChatGPT Atlas against prompt injection"
+  },
+  {
+    "id": "505",
+    "en": "NVIDIA Kaggle Grandmasters Win Artificial General Intelligence Competition"
+  },
+  {
+    "id": "506",
+    "en": "Evaluating chain-of-thought monitorability"
+  },
+  {
+    "id": "507",
+    "en": "Generate Images with Claude and Hugging Face"
+  },
+  {
+    "id": "508",
+    "en": "NVIDIA Grace CPU Delivers High Bandwidth and Efficiency for Modern Data Centers"
+  },
+  {
+    "id": "509",
+    "en": "Deepening our collaboration with the U.S. Department of Energy"
+  },
+  {
+    "id": "510",
+    "en": "From Zero to GPU: A Guide to Building and Scaling Production-Ready CUDA Kernels"
+  },
+  {
+    "id": "511",
+    "en": "Updating our Model Spec with teen protections"
+  },
+  {
+    "id": "512",
+    "en": "MCP for Research: How to Connect AI to Research Tools"
+  },
+  {
+    "id": "513",
+    "en": "AI literacy resources for teens and parents"
+  },
+  {
+    "id": "514",
+    "en": "Kimina-Prover-RL"
+  },
+  {
+    "id": "515",
+    "en": "Addendum to GPT-5.2 System Card: GPT-5.2-Codex"
+  },
+  {
+    "id": "516",
+    "en": "Arm & ExecuTorch 0.7: Bringing Generative AI to the masses"
+  },
+  {
+    "id": "517",
+    "en": "Introducing GPT-5.2-Codex"
+  },
+  {
+    "id": "518",
+    "en": "Neural Super Sampling is here!"
+  },
+  {
+    "id": "519",
+    "en": "Introducing GPT-5.2-Codex"
+  },
+  {
+    "id": "520",
+    "en": "TextQuests: How Good are LLMs at Text-Based Video Games?"
+  },
+  {
+    "id": "521",
+    "en": "Introducing OpenAI Academy for News Organizations"
+  },
+  {
+    "id": "522",
+    "en": "🇵🇭 FilBench - Can LLMs Understand and Generate Filipino?"
+  },
+  {
+    "id": "523",
+    "en": "The state of enterprise AI"
+  },
+  {
+    "id": "524",
+    "en": "Introducing AI Sheets: a tool to work with datasets using open AI models!"
+  },
+  {
+    "id": "525",
+    "en": "Developers can now submit apps to ChatGPT"
+  },
+  {
+    "id": "526",
+    "en": "Accelerate ND-Parallel: A guide to Efficient Multi-GPU Training"
+  },
+  {
+    "id": "527",
+    "en": "Evaluating AI’s ability to perform scientific research tasks"
+  },
+  {
+    "id": "528",
+    "en": "Vision Language Model Alignment in TRL ⚡️"
+  },
+  {
+    "id": "529",
+    "en": "Measuring AI’s capability to accelerate biological research"
+  },
+  {
+    "id": "530",
+    "en": "Welcome GPT OSS, the new open-source model family from OpenAI!"
+  },
+  {
+    "id": "531",
+    "en": "The new ChatGPT Images is here"
+  },
+  {
+    "id": "532",
+    "en": "Measuring Open-Source Llama Nemotron Models on DeepResearch Bench"
+  },
+  {
+    "id": "533",
+    "en": "How We Used Codex to Ship Sora for Android in 28 Days"
+  },
+  {
+    "id": "534",
+    "en": "📚 3LM: A Benchmark for Arabic LLMs in STEM and Code"
+  },
+  {
+    "id": "535",
+    "en": "BBVA and OpenAI collaborate to transform global banking"
+  },
+  {
+    "id": "536",
+    "en": "Implementing MCP Servers in Python: An AI Shopping Assistant with Gradio"
+  },
+  {
+    "id": "537",
+    "en": "BNY builds “AI for everyone, everywhere” with OpenAI"
+  },
+  {
+    "id": "538",
+    "en": "Introducing Trackio: A Lightweight Experiment Tracking Library from Hugging Face"
+  },
+  {
+    "id": "539",
+    "en": "Advancing science and math with GPT-5.2"
+  },
+  {
+    "id": "540",
+    "en": "Say hello to `hf`: a faster, friendlier Hugging Face CLI ✨"
+  },
+  {
+    "id": "541",
+    "en": "Increasing revenue 300% by bringing AI to SMBs"
+  },
+  {
+    "id": "542",
+    "en": "Parquet Content-Defined Chunking"
+  },
+  {
+    "id": "543",
+    "en": "Update to GPT-5 System Card: GPT-5.2"
+  },
+  {
+    "id": "544",
+    "en": "TimeScope: How Long Can Your Video Large Multimodal Model Go?"
+  },
+  {
+    "id": "545",
+    "en": "Ten years"
+  },
+  {
+    "id": "546",
+    "en": "Fast LoRA inference for Flux with Diffusers and PEFT"
+  },
+  {
+    "id": "547",
+    "en": "The Walt Disney Company and OpenAI reach landmark agreement to bring beloved characters to Sora"
+  },
+  {
+    "id": "548",
+    "en": "Accelerate a World of LLMs on Hugging Face with NVIDIA NIM"
+  },
+  {
+    "id": "549",
+    "en": "Introducing GPT-5.2"
+  },
+  {
+    "id": "550",
+    "en": "Arc Virtual Cell Challenge: A Primer"
+  },
+  {
+    "id": "551",
+    "en": "Strengthening cyber resilience as AI capabilities advance"
+  },
+  {
+    "id": "552",
+    "en": "Consilium: When Multiple LLMs Collaborate"
+  },
+  {
+    "id": "553",
+    "en": "How Scout24 is building the next generation of real-estate search with AI"
+  },
+  {
+    "id": "554",
+    "en": "Back to The Future: Evaluating AI Agents on Predicting Future Events"
+  },
+  {
+    "id": "555",
+    "en": "OpenAI co-founds Agentic AI Foundation, donates AGENTS.md"
+  },
+  {
+    "id": "556",
+    "en": "Five Big Improvements to Gradio MCP Servers"
+  },
+  {
+    "id": "557",
+    "en": "Launching our first OpenAI Certifications courses"
+  },
+  {
+    "id": "558",
+    "en": "Ettin Suite: SoTA Paired Encoders and Decoders"
+  },
+  {
+    "id": "559",
+    "en": "Building AI fluency at scale with ChatGPT Enterprise"
+  },
+  {
+    "id": "560",
+    "en": "Migrating the Hub from Git LFS to Xet"
+  },
+  {
+    "id": "561",
+    "en": "OpenAI appoints Denise Dresser as Chief Revenue Officer"
+  },
+  {
+    "id": "562",
+    "en": "Kimina-Prover: Applying Test-time RL Search on Large Formal Reasoning Models"
+  },
+  {
+    "id": "563",
+    "en": "Bringing powerful AI to millions across Europe with Deutsche Telekom"
+  },
+  {
+    "id": "564",
+    "en": "Asynchronous Robot Inference: Decoupling Action Prediction and Execution"
+  },
+  {
+    "id": "565",
+    "en": "Instacart and OpenAI partner on AI shopping experiences"
+  },
+  {
+    "id": "566",
+    "en": "ScreenEnv: Deploy your full stack Desktop Agent"
+  },
+  {
+    "id": "567",
+    "en": "The state of enterprise AI"
+  },
+  {
+    "id": "568",
+    "en": "Building the Hugging Face MCP Server"
+  },
+  {
+    "id": "569",
+    "en": "How Virgin Atlantic uses AI to enhance every step of travel"
+  },
+  {
+    "id": "570",
+    "en": "Reachy Mini - The Open-Source Robot for Today's and Tomorrow's AI Builders"
+  },
+  {
+    "id": "571",
+    "en": "Introducing OpenAI for Australia"
+  },
+  {
+    "id": "572",
+    "en": "Creating custom kernels for the AMD MI300"
+  },
+  {
+    "id": "573",
+    "en": "How confessions can keep language models honest"
+  },
+  {
+    "id": "574",
+    "en": "Upskill your LLMs With Gradio MCP Servers"
+  },
+  {
+    "id": "575",
+    "en": "OpenAI to acquire Neptune"
+  },
+  {
+    "id": "576",
+    "en": "SmolLM3: smol, multilingual, long-context reasoner"
+  },
+  {
+    "id": "577",
+    "en": "Announcing the initial People-First AI Fund grantees"
+  },
+  {
+    "id": "578",
+    "en": "Three Mighty Alerts Supporting Hugging Face’s Production Infrastructure"
+  },
+  {
+    "id": "579",
+    "en": "Inside Mirakl's agentic commerce vision"
+  },
+  {
+    "id": "580",
+    "en": "Efficient MultiModal Data Pipeline"
+  },
+  {
+    "id": "581",
+    "en": "Funding grants for new research into AI and mental health"
+  },
+  {
+    "id": "582",
+    "en": "Announcing NeurIPS 2025 E2LM Competition: Early Training Evaluation of Language Models"
+  },
+  {
+    "id": "583",
+    "en": "OpenAI and NORAD team up to bring new magic to “NORAD Tracks Santa”"
+  },
+  {
+    "id": "584",
+    "en": "Training and Finetuning Sparse Embedding Models with Sentence Transformers v5"
+  },
+  {
+    "id": "585",
+    "en": "Accenture and OpenAI accelerate enterprise AI success"
+  },
+  {
+    "id": "586",
+    "en": "Welcome the NVIDIA Llama Nemotron Nano VLM to Hugging Face Hub"
+  },
+  {
+    "id": "587",
+    "en": "OpenAI takes an ownership stake in Thrive Holdings to accelerate enterprise AI adoption"
+  },
+  {
+    "id": "588",
+    "en": "Gemma 3n fully available in the open-source ecosystem!"
+  },
+  {
+    "id": "589",
+    "en": "Mixpanel security incident: what OpenAI users need to know"
+  },
+  {
+    "id": "590",
+    "en": "Transformers backend integration in SGLang"
+  },
+  {
+    "id": "591",
+    "en": "Expanding data residency access to business customers worldwide"
+  },
+  {
+    "id": "592",
+    "en": "(LoRA) Fine-Tuning FLUX.1-dev on Consumer Hardware"
+  },
+  {
+    "id": "593",
+    "en": "Our approach to mental health-related litigation"
+  },
+  {
+    "id": "594",
+    "en": "Groq on Hugging Face Inference Providers 🔥"
+  },
+  {
+    "id": "595",
+    "en": "Inside JetBrains—the company reshaping how the world writes code"
+  },
+  {
+    "id": "596",
+    "en": "How Long Prompts Block Other Requests - Optimizing LLM Performance"
+  },
+  {
+    "id": "597",
+    "en": "Introducing shopping research in ChatGPT"
+  },
+  {
+    "id": "598",
+    "en": "Learn the Hugging Face Kernel Hub in 5 Minutes"
+  },
+  {
+    "id": "599",
+    "en": "GPT-5 and the future of mathematical discovery"
+  },
+  {
+    "id": "600",
+    "en": "Featherless AI on Hugging Face Inference Providers 🔥"
+  },
+  {
+    "id": "601",
+    "en": "OpenAI and Foxconn collaborate to strengthen U.S. manufacturing across the AI supply chain"
+  },
+  {
+    "id": "602",
+    "en": "Post-Training Isaac GR00T N1.5 for LeRobot SO-101 Arm"
+  },
+  {
+    "id": "603",
+    "en": "Helping 1,000 small businesses build with AI"
+  },
+  {
+    "id": "604",
+    "en": "Introducing Training Cluster as a Service - a new collaboration with NVIDIA"
+  },
+  {
+    "id": "605",
+    "en": "Early experiments in accelerating science with GPT-5"
+  },
+  {
+    "id": "606",
+    "en": "ScreenSuite - The most comprehensive evaluation suite for GUI Agents!"
+  },
+  {
+    "id": "607",
+    "en": "Strengthening our safety ecosystem with external testing"
+  },
+  {
+    "id": "608",
+    "en": "KV Cache from scratch in nanoVLM"
+  },
+  {
+    "id": "609",
+    "en": "How evals drive the next chapter in AI for businesses"
+  },
+  {
+    "id": "610",
+    "en": "Real-Time AI Sound Generation on Arm: A Personal Tool for Creative Freedom"
+  },
+  {
+    "id": "611",
+    "en": "OpenAI and Target team up on new AI-powered experiences"
+  },
+  {
+    "id": "612",
+    "en": "Holo1: New family of GUI automation VLMs powering GUI agent Surfer-H"
+  },
+  {
+    "id": "613",
+    "en": "A free version of ChatGPT built for teachers"
+  },
+  {
+    "id": "614",
+    "en": "SmolVLA: Efficient Vision-Language-Action Model trained on Lerobot Community Data"
+  },
+  {
+    "id": "615",
+    "en": "GPT-5.1-Codex-Max System Card"
+  },
+  {
+    "id": "616",
+    "en": "No GPU left behind: Unlocking Efficiency with Co-located vLLM in TRL"
+  },
+  {
+    "id": "617",
+    "en": "Building more with GPT-5.1-Codex-Max"
+  },
+  {
+    "id": "618",
+    "en": "CodeAgents + Structure: A Better Way to Execute Actions"
+  },
+  {
+    "id": "619",
+    "en": "How Scania is accelerating work with AI across its global workforce"
+  },
+  {
+    "id": "620",
+    "en": "🐯 Liger GRPO meets TRL"
+  },
+  {
+    "id": "621",
+    "en": "Intuit and OpenAI join forces on new AI-powered experiences"
+  },
+  {
+    "id": "622",
+    "en": "Dell Enterprise Hub is all you need to build AI on premises"
+  },
+  {
+    "id": "623",
+    "en": "OpenAI named Emerging Leader in Generative AI"
+  },
+  {
+    "id": "624",
+    "en": "Tiny Agents in Python: a MCP-powered agent in ~70 lines of code"
+  },
+  {
+    "id": "625",
+    "en": "Introducing OpenAI for Ireland"
+  },
+  {
+    "id": "626",
+    "en": "Falcon-H1: A Family of Hybrid-Head Language Models Redefining Efficiency and Performance"
+  },
+  {
+    "id": "627",
+    "en": "Understanding neural networks through sparse circuits"
+  },
+  {
+    "id": "628",
+    "en": "Falcon-Arabic: A Breakthrough in Arabic Language Models"
+  },
+  {
+    "id": "629",
+    "en": "Introducing group chats in ChatGPT"
+  },
+  {
+    "id": "630",
+    "en": "Exploring Quantization Backends in Diffusers"
+  },
+  {
+    "id": "631",
+    "en": "Introducing GPT-5.1 for developers"
+  },
+  {
+    "id": "632",
+    "en": "nanoVLM: The simplest repository to train your VLM in pure PyTorch"
+  },
+  {
+    "id": "633",
+    "en": "How Philips is scaling AI literacy across 70,000 employees"
+  },
+  {
+    "id": "634",
+    "en": "Microsoft and Hugging Face expand collaboration"
+  },
+  {
+    "id": "635",
+    "en": "Neuro drives national retail wins with ChatGPT Business"
+  },
+  {
+    "id": "636",
+    "en": "Falcon-Edge: A series of powerful, universal, fine-tunable 1.58bit language models."
+  },
+  {
+    "id": "637",
+    "en": "Fighting the New York Times’ invasion of user privacy"
+  },
+  {
+    "id": "638",
+    "en": "The Transformers Library: standardizing model definitions"
+  },
+  {
+    "id": "639",
+    "en": "GPT-5.1 Instant and GPT-5.1 Thinking System Card Addendum"
+  },
+  {
+    "id": "640",
+    "en": "Improving Hugging Face Model Access for Kaggle Users"
+  },
+  {
+    "id": "641",
+    "en": "GPT-5.1: A smarter, more conversational ChatGPT"
+  },
+  {
+    "id": "642",
+    "en": "Blazingly fast whisper transcriptions with Inference Endpoints"
+  },
+  {
+    "id": "643",
+    "en": "Free ChatGPT for transitioning U.S. servicemembers and veterans"
+  },
+  {
+    "id": "644",
+    "en": "Vision Language Models (Better, faster, stronger)"
+  },
+  {
+    "id": "645",
+    "en": "Understanding prompt injections: a frontier security challenge"
+  },
+  {
+    "id": "646",
+    "en": "LeRobot Community Datasets: The “ImageNet” of Robotics — When and How?"
+  },
+  {
+    "id": "647",
+    "en": "Notion’s rebuild for agentic AI: How GPT‑5 helped unlock autonomous workflows"
+  },
+  {
+    "id": "648",
+    "en": "How to Build an MCP Server with Gradio"
+  },
+  {
+    "id": "649",
+    "en": "From Pilot to Practice: How BBVA Is Scaling AI Across the Organization"
+  },
+  {
+    "id": "650",
+    "en": "The 4 Things Qwen-3’s Chat Template Teaches Us"
+  },
+  {
+    "id": "651",
+    "en": "AI progress and recommendations"
+  },
+  {
+    "id": "652",
+    "en": "Welcoming Llama Guard 4 on Hugging Face Hub"
+  },
+  {
+    "id": "653",
+    "en": "Introducing the Teen Safety Blueprint"
+  },
+  {
+    "id": "654",
+    "en": "Introducing AutoRound: Intel’s Advanced Quantization for LLMs and VLMs"
+  },
+  {
+    "id": "655",
+    "en": "How CRED is tapping AI to deliver premium customer experiences"
+  },
+  {
+    "id": "656",
+    "en": "PipelineRL"
+  },
+  {
+    "id": "657",
+    "en": "How Chime is redefining marketing through AI"
+  },
+  {
+    "id": "658",
+    "en": "Tiny Agents: an MCP-powered agent in 50 lines of code"
+  },
+  {
+    "id": "659",
+    "en": "1 million business customers putting AI to work"
+  },
+  {
+    "id": "660",
+    "en": "Finetuning olmOCR to be a faithful OCR-Engine"
+  },
+  {
+    "id": "661",
+    "en": "Brazil’s AI moment is here"
+  },
+  {
+    "id": "662",
+    "en": "Prefill and Decode for Concurrent Requests - Optimizing LLM Performance"
+  },
+  {
+    "id": "663",
+    "en": "Introducing IndQA"
+  },
+  {
+    "id": "664",
+    "en": "17 Reasons Why Gradio Isn't Just Another UI Library"
+  },
+  {
+    "id": "665",
+    "en": "AWS and OpenAI announce multi-year strategic partnership"
+  },
+  {
+    "id": "666",
+    "en": "Cohere on Hugging Face Inference Providers 🔥"
+  },
+  {
+    "id": "667",
+    "en": "Expanding Stargate to Michigan"
+  },
+  {
+    "id": "668",
+    "en": "Introducing HELMET: Holistically Evaluating Long-context Language Models"
+  },
+  {
+    "id": "669",
+    "en": "Introducing Aardvark: OpenAI’s agentic security researcher"
+  },
+  {
+    "id": "670",
+    "en": "Hugging Face to sell open-source robots thanks to Pollen Robotics acquisition 🤖"
+  },
+  {
+    "id": "671",
+    "en": "How we built OWL, the new architecture behind our ChatGPT-based browser, Atlas"
+  },
+  {
+    "id": "672",
+    "en": "4M Models Scanned: Protect AI + Hugging Face 6 Months In"
+  },
+  {
+    "id": "673",
+    "en": "Introducing gpt-oss-safeguard"
+  },
+  {
+    "id": "674",
+    "en": "Visual Salamandra: Pushing the Boundaries of Multimodal Understanding"
+  },
+  {
+    "id": "675",
+    "en": "gpt-oss-safeguard technical report"
+  },
+  {
+    "id": "676",
+    "en": "Hugging Face and Cloudflare Partner to Make Real-Time Speech and Video Seamless with FastRTC"
+  },
+  {
+    "id": "677",
+    "en": "Knowledge preservation powered by ChatGPT"
+  },
+  {
+    "id": "678",
+    "en": "Arabic Leaderboards: Introducing Arabic Instruction Following, Updating AraGen, and More"
+  },
+  {
+    "id": "679",
+    "en": "Doppel’s AI defense system stops attacks before they spread"
+  },
+  {
+    "id": "680",
+    "en": "Welcome Llama 4 Maverick & Scout on Hugging Face"
+  },
+  {
+    "id": "681",
+    "en": "The next chapter of the Microsoft–OpenAI partnership"
+  },
+  {
+    "id": "682",
+    "en": "Journey to 1 Million Gradio Users!"
+  },
+  {
+    "id": "683",
+    "en": "Built to benefit everyone"
+  },
+  {
+    "id": "684",
+    "en": "The NLP Course is becoming the LLM Course"
+  },
+  {
+    "id": "685",
+    "en": "Seizing the AI opportunity"
+  },
+  {
+    "id": "686",
+    "en": "Efficient Request Queueing – Optimizing LLM Performance"
+  },
+  {
+    "id": "687",
+    "en": "Strengthening ChatGPT’s responses in sensitive conversations"
+  },
+  {
+    "id": "688",
+    "en": "How Hugging Face Scaled Secrets Management for AI Infrastructure"
+  },
+  {
+    "id": "689",
+    "en": "Addendum to GPT-5 System Card: Sensitive conversations"
+  },
+  {
+    "id": "690",
+    "en": "🚀 Accelerating LLM Inference with TGI on Intel Gaudi"
+  },
+  {
+    "id": "691",
+    "en": "A law and tax firm redefines efficiency with ChatGPT Business"
+  },
+  {
+    "id": "692",
+    "en": "Open R1: Update #4"
+  },
+  {
+    "id": "693",
+    "en": "OpenAI acquires Software Applications Incorporated, maker of Sky"
+  },
+  {
+    "id": "694",
+    "en": "Training and Finetuning Reranker Models with Sentence Transformers v4"
+  },
+  {
+    "id": "695",
+    "en": "Consensus accelerates research with GPT-5 and Responses API"
+  },
+  {
+    "id": "696",
+    "en": "Introducing Gradio's new Dataframe!"
+  },
+  {
+    "id": "697",
+    "en": "AI in South Korea—OpenAI’s Economic Blueprint"
+  },
+  {
+    "id": "698",
+    "en": "The New and Fresh analytics in Inference Endpoints"
+  },
+  {
+    "id": "699",
+    "en": "Work smarter with your company knowledge in ChatGPT"
+  },
+  {
+    "id": "700",
+    "en": "Open R1: How to use OlympicCoder locally for coding"
+  },
+  {
+    "id": "701",
+    "en": "The next chapter for UK sovereign AI"
+  },
+  {
+    "id": "702",
+    "en": "AI Policy @🤗: Response to the White House AI Action Plan RFI"
+  },
+  {
+    "id": "703",
+    "en": "AI in Japan—OpenAI’s Japan Economic Blueprint"
+  },
+  {
+    "id": "704",
+    "en": "NVIDIA's GTC 2025 Announcement for Physical AI Developers: New Open Models and Datasets"
+  },
+  {
+    "id": "705",
+    "en": "Continue your ChatGPT experience beyond WhatsApp"
+  },
+  {
+    "id": "706",
+    "en": "Xet is on the Hub"
+  },
+  {
+    "id": "707",
+    "en": "Introducing ChatGPT Atlas, the browser with ChatGPT built in"
+  },
+  {
+    "id": "708",
+    "en": "Welcome Gemma 3: Google's all new multimodal, multilingual, long context open LLM"
+  },
+  {
+    "id": "709",
+    "en": "Plex Coffee delivers fast service and personal connections with ChatGPT Business"
+  },
+  {
+    "id": "710",
+    "en": "Open R1: Update #3"
+  },
+  {
+    "id": "711",
+    "en": "Expert Council on Well-Being and AI"
+  },
+  {
+    "id": "712",
+    "en": "LeRobot goes to driving school: World’s largest open-source self-driving dataset"
+  },
+  {
+    "id": "713",
+    "en": "Argentina’s AI opportunity"
+  },
+  {
+    "id": "714",
+    "en": "LLM Inference on Edge: A Fun and Easy Guide to run LLMs via React Native on your Phone!"
+  },
+  {
+    "id": "715",
+    "en": "OpenAI and Broadcom announce strategic collaboration to deploy 10 gigawatts of OpenAI-designed AI accelerators"
+  },
+  {
+    "id": "716",
+    "en": "Hugging Face and JFrog partner to make AI Security more transparent"
+  },
+  {
+    "id": "717",
+    "en": "HYGH powers next-gen digital ads with ChatGPT Business"
+  },
+  {
+    "id": "718",
+    "en": "A Deepdive into Aya Vision: Advancing the Frontier of Multilingual Multimodality"
+  },
+  {
+    "id": "719",
+    "en": "Defining and evaluating political bias in LLMs"
+  },
+  {
+    "id": "720",
+    "en": "Trace & Evaluate your Agent with Arize Phoenix"
+  },
+  {
+    "id": "721",
+    "en": "Growing impact and scale with ChatGPT"
+  },
+  {
+    "id": "722",
+    "en": "HuggingFace, IISc partner to supercharge model building on India's diverse languages"
+  },
+  {
+    "id": "723",
+    "en": "Disrupting malicious uses of AI: October 2025"
+  },
+  {
+    "id": "724",
+    "en": "FastRTC: The Real-Time Communication Library for Python"
+  },
+  {
+    "id": "725",
+    "en": "Codex is now generally available"
+  },
+  {
+    "id": "726",
+    "en": "Remote VAEs for decoding with Inference Endpoints 🤗"
+  },
+  {
+    "id": "727",
+    "en": "Introducing apps in ChatGPT and the new Apps SDK"
+  },
+  {
+    "id": "728",
+    "en": "SigLIP 2: A better multilingual vision language encoder"
+  },
+  {
+    "id": "729",
+    "en": "AMD and OpenAI announce strategic partnership to deploy 6 gigawatts of AMD GPUs"
+  },
+  {
+    "id": "730",
+    "en": "SmolVLM2: Bringing Video Understanding to Every Device"
+  },
+  {
+    "id": "731",
+    "en": "Accelerating AI adoption in Europe"
+  },
+  {
+    "id": "732",
+    "en": "PaliGemma 2 Mix - New Instruction Vision Language Models by Google"
+  },
+  {
+    "id": "733",
+    "en": "Introducing AgentKit, new Evals, and RFT for agents"
+  },
+  {
+    "id": "734",
+    "en": "Introducing Three New Serverless Inference Providers: Hyperbolic, Nebius AI Studio, and Novita 🔥"
+  },
+  {
+    "id": "735",
+    "en": "With GPT-5, Wrtn builds lifestyle AI for millions in Korea"
+  },
+  {
+    "id": "736",
+    "en": "Welcome Fireworks.ai on the Hub 🎆"
+  },
+  {
+    "id": "737",
+    "en": "OpenAI announces strategic collaboration with Japan’s Digital Agency"
+  },
+  {
+    "id": "738",
+    "en": "Fixing Open LLM Leaderboard with Math-Verify"
+  },
+  {
+    "id": "739",
+    "en": "Samsung and SK join OpenAI’s Stargate initiative to advance global AI infrastructure"
+  },
+  {
+    "id": "740",
+    "en": "1 Billion Classifications"
+  },
+  {
+    "id": "741",
+    "en": "Sora 2 System Card"
+  },
+  {
+    "id": "742",
+    "en": "From Chunks to Blocks: Accelerating Uploads and Downloads on the Hub"
+  },
+  {
+    "id": "743",
+    "en": "Launching Sora responsibly"
+  },
+  {
+    "id": "744",
+    "en": "Build awesome datasets for video generation"
+  },
+  {
+    "id": "745",
+    "en": "Sora 2 is here"
+  },
+  {
+    "id": "746",
+    "en": "Open R1: Update #2"
+  },
+  {
+    "id": "747",
+    "en": "Building OpenAI with OpenAI"
+  },
+  {
+    "id": "748",
+    "en": "The Open Arabic LLM Leaderboard 2"
+  },
+  {
+    "id": "749",
+    "en": "Driving sales productivity and customer success at OpenAI"
+  },
+  {
+    "id": "750",
+    "en": "Open-source DeepResearch – Freeing our search agents"
+  }
+]

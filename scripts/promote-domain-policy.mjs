@@ -69,9 +69,9 @@ async function run() {
     const requeue = await client.query(
       `
         WITH target_rows AS (
-          SELECT ar.id
+          SELECT ar.raw_article_id
           FROM articles_raw ar
-          ${provisionalOnly ? 'JOIN articles_enriched ae ON ae.raw_article_id = ar.id' : ''}
+          ${provisionalOnly ? 'JOIN articles_enriched ae ON ae.raw_article_id = ar.raw_article_id' : ''}
           WHERE lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) = $1
             ${provisionalOnly ? 'AND ae.is_provisional = true' : ''}
           ORDER BY ar.created_at DESC
@@ -85,8 +85,8 @@ async function run() {
           last_error = null,
           updated_at = now()
         FROM target_rows tr
-        WHERE ar.id = tr.id
-        RETURNING ar.id
+        WHERE ar.raw_article_id = tr.raw_article_id
+        RETURNING ar.raw_article_id
       `,
       [domain, limit],
     )

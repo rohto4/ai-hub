@@ -1,0 +1,286 @@
+{
+  "items": [
+    {
+      "rawArticleId": "481",
+      "titleJa": "OpenAI gpt-ossの技術をTransformersで活用する方法",
+      "summary100Ja": "OpenAIのGPT-OSSリリースに対応してTransformersライブラリを大幅強化。MXFP4量子化、ゼロビルドカーネル、テンソル並列などの新機能が追加された。",
+      "summary200Ja": "OpenAIのGPT-OSSシリーズに対応するため、Hugging FaceはTransformersライブラリをアップグレードし、MXFP4量子化・ゼロビルドカーネル・テンソル並列・エキスパート並列・動的スライディングウィンドウなど複数の新機能を導入した。これらの改善は他のモデルでも活用可能で、MLX・llama.cpp・vLLMなどのフレームワークが実装参照として利用できる点でコミュニティ全体に恩恵をもたらす。"
+    },
+    {
+      "rawArticleId": "484",
+      "titleJa": "Together AIを使ってHugging Face Hub上のLLMをファインチューニングする",
+      "summary100Ja": "Together AIとHugging Faceが連携し、Hub上の100Bパラメータ以下の互換LLMをTogether AIのインフラでファインチューニングできる新機能を発表した。",
+      "summary200Ja": "Together AIとHugging Faceの統合により、Hub上で公開されているLlamaやQwenなど任意の互換LLMを、Together AIのインフラ上でファインチューニングできるようになった。ベースモデルをテンプレートとして指定し、HFモデルをカスタムモデルとして渡すだけで訓練・推論・Hubへのアップロードが可能になり、複雑なインフラ構築なしに短期間でモデルを本番環境に展開できる点が利点となっている。"
+    },
+    {
+      "rawArticleId": "487",
+      "titleJa": "Jupyter Agents：LLMにノートブックで推論を学習させる",
+      "summary100Ja": "Jupyter Notebookを使ってデータ分析タスクを解くエージェントを構築するパイプラインを公開。Kaggleノートブックから訓練データを生成し、小規模モデルのファインチューニングを実施した。",
+      "summary200Ja": "DABStepベンチマーク上でデータ分析エージェントを評価・改善するため、KaggleノートブックをベースにQwen3-4Bをファインチューニングする多段階パイプラインを構築した。スキャフォールディングの最適化でベースラインから精度を大幅に向上させ、高品質データ生成・QAペア作成・実行トレース生成のプロセスを詳細に解説している。コード実行環境内で推論と行動を統合するJupyterエージェントの構築手法を示した点が重要である。"
+    },
+    {
+      "rawArticleId": "490",
+      "titleJa": "mmBERT：ModernBERTが多言語化—1800言語超対応のエンコーダモデル",
+      "summary100Ja": "3兆トークン以上・1800言語超で訓練した大規模多言語エンコーダmmBERTを発表。XLM-Rを超える初のモデルで、処理速度も2〜4倍向上している。",
+      "summary200Ja": "mmBERTはModernBERTアーキテクチャを継承しつつ、Gemma 2トークナイザーを採用した3段階訓練（事前学習2.3Tトークン・中間学習600B・減衰フェーズ100B）により1800言語超に対応する多言語エンコーダモデルである。GLUEやXTREMEなどの英語・多言語ベンチマーク、さらにコード検索でも高性能を示し、特に減衰フェーズで初めて学習した低資源言語でもGemini 2.5 ProやOpenAI o3を上回る結果を達成した。"
+    },
+    {
+      "rawArticleId": "493",
+      "titleJa": "EmbeddingGemma：Googleが公開した軽量多言語エンベディングモデル",
+      "summary100Ja": "GoogleがEmbeddingGemmaをリリース。3億パラメータ・100言語以上対応で、500M以下のモデルではMTEBランキング最高位を達成した多言語エンベディングモデル。",
+      "summary200Ja": "GoogleのEmbeddingGemmaは308Mパラメータ・2Kコンテキスト・100言語超対応の多言語テキストエンベディングモデルで、Gemma3アーキテクチャを双方向アテンション付きエンコーダとして改修したものである。量子化時にRAM 200MB以下で動作し、MMTEB多言語ベンチマークで500M以下モデルの中でトップに位置する。Sentence Transformers・LangChain・LlamaIndex・ONNX等各種フレームワークとの統合が提供され、医療分野でのファインチューニング例も示されている。"
+    },
+    {
+      "rawArticleId": "496",
+      "titleJa": "SAIR：薬剤設計向けの520万件タンパク質-リガンド3D構造データセット",
+      "summary100Ja": "SandboxAQがSAIR（Structurally Augmented IC50 Repository）を公開。520万件のAI生成タンパク質-リガンド3D構造とIC50結合活性データを紐付けたオープンデータセット。",
+      "summary200Ja": "SandboxAQがCC BY 4.0ライセンスで公開したSAIRは、100万件以上のタンパク質-リガンドペアを5種の立体構造でコフォールドした520万件のデータセットであり、各構造にChEMBLまたはBindingDBから取得した実験的IC50値を対応付けている。760台のNVIDIA H100を使い13万GPU時間で当初予定の3ヶ月を3週間に短縮して作成。タンパク質データバンクに構造が存在しない「ダーク標的」を含む創薬AIの訓練・スクリーニング基盤として活用可能である。"
+    },
+    {
+      "rawArticleId": "499",
+      "titleJa": "ZeroGPU Spacesを事前コンパイルで高速化する方法",
+      "summary100Ja": "PyTorchのAhead-of-Time（AoT）コンパイルをZeroGPU Spacesに適用する方法を解説。Flux・Wan・LTXなどのモデルで1.3〜1.8倍の速度向上を確認した。",
+      "summary200Ja": "ZeroGPUはリクエストのたびにGPUプロセスをforkする仕組みのため、torch.compileによる実行時コンパイルが毎回発生する問題があった。AoTコンパイルはモデルを事前にコンパイル・保存して即座に再読み込みできるため、この問題を解決しデモの応答速度を向上させる。FP8量子化・動的シェイプ・FlashAttention-3との組み合わせ手法を示しており、開発者が既存のZeroGPU SpaceにAoT最適化を追加するための具体的なコード例が提供されている。"
+    },
+    {
+      "rawArticleId": "502",
+      "titleJa": "NVIDIAが600万件の多言語推論データセットを公開",
+      "summary100Ja": "NVIDIAがNemotron Post-Training Dataset V2を公開。英語の推論データをフランス語・スペイン語・ドイツ語・イタリア語・日本語に翻訳した600万件の多言語データセット。",
+      "summary200Ja": "NVIDIAはNemotron Post-Training Dataset V2として、既存の英語推論データを5言語（仏・西・独・伊・日）に翻訳した600万件のデータセットを公開した。翻訳時のハルシネーション抑制のため行単位翻訳・特殊ブラケット形式・fastText言語IDフィルタリングなどの対策を講じている。合わせて発表したNemotron Nano 2 9Bはハイブリッドトランスフォーマー-マンバアーキテクチャを採用し、同クラス最高水準のスループットと推論コスト削減を実現したエッジ向けモデルである。"
+    },
+    {
+      "rawArticleId": "507",
+      "titleJa": "ClaudeとHugging Faceを連携させた画像生成の方法",
+      "summary100Ja": "ClaudeをHugging Face MCPサーバーに接続し、FLUX.1 Krea devやQwen-Imageなどの最新画像生成モデルをチャットから直接利用する方法を解説した記事。",
+      "summary200Ja": "ClaudeをHugging FaceのMCPサーバーと接続することで、ZeroGPUで動作するSpaces上の画像生成モデルをチャットUIから直接呼び出せるようになる。FLUX.1 Krea devはリアルな写真風画像の生成に優れ、Qwen-Imageはテキスト描画精度が高く、両モデルの結果を並べて比較する使い方も可能である。2025年10月のAnthropicポリシー変更後はカスタムコネクター経由での接続が必要になった点も記録されている。"
+    },
+    {
+      "rawArticleId": "510",
+      "titleJa": "CUDAカーネルをゼロからGPUプロダクション対応に仕上げるガイド",
+      "summary100Ja": "kernel-builderライブラリを使ったCUDAカーネルの開発・ビルド・Hubへの公開方法を解説した実践的チュートリアル。RGB-グレースケール変換カーネルを例として用いる。",
+      "summary200Ja": "kernel-builderはCUDAカーネルをローカルで開発しHugging Face Hub経由で配布するためのライブラリである。Nix環境を使って再現性の高いビルドを実現し、PyTorchのネイティブオペレーターとして登録することでtorch.compileとの互換性やハードウェア固有実装のディスパッチが可能になる。本ガイドではプロジェクト構成・CUDAカーネル記述・PyTorchバインディング・ビルド・Hubへの公開まで一連の手順を丁寧に解説している。"
+    },
+    {
+      "rawArticleId": "512",
+      "titleJa": "研究ツールとAIを連携させるMCPの活用法",
+      "summary100Ja": "MCPを使ってarXiv・GitHub・Hugging Faceなどの研究ツールをAIに接続し、論文探索・コード検索・データセット調査を自然言語で自動化する方法を解説。",
+      "summary200Ja": "MCP（Model Context Protocol）は手動の研究ディスカバリー作業をスクリプト自動化からさらに抽象化し、AIによる自然言語指示での横断的な情報収集を可能にする。Research Tracker MCPをHugging Face経由で追加するだけでClaude DesktopやVS CodeなどのMCPクライアントから利用でき、arXiv・GitHub・Hugging Faceへの横断検索をAIが自律的に実行できるようになる点で、研究者の作業効率向上に貢献する。"
+    },
+    {
+      "rawArticleId": "514",
+      "titleJa": "Kimina-Prover-RL：Lean 4定理証明のための強化学習パイプライン",
+      "summary100Ja": "Lean 4形式定理証明向けのオープンソース強化学習パイプラインkimina-prover-rlを公開。1.7BモデルでMiniF2FベンチマークPass@32が76.63%を達成した。",
+      "summary200Ja": "kimina-prover-rlはDeepSeek-R1にインスパイアされた「推論→Lean 4コード生成」の2段階出力パラダイムに基づく定理証明訓練パイプラインで、Verlフレームワークと完全互換である。フォーマット報酬と誤り訂正ターンを組み合わせたGRPO訓練により、1.7BモデルでMiniF2F Pass@32を76.23%に向上させた。訓練データ・コード・モデル重みを全てオープンソースとして公開しており、再現実験や独自モデルへの適用が可能になっている。"
+    },
+    {
+      "rawArticleId": "516",
+      "titleJa": "Arm & ExecuTorch 0.7：数十億台のデバイスへ生成AIを届ける",
+      "summary100Ja": "ExecuTorch 0.7でArm KleidiAIがデフォルト有効化され、SDOT命令（2015年以降の約30億台のArmデバイスに搭載）を活用したLLM推論の高速化が実現する。",
+      "summary200Ja": "Arm KleidiAIがExecuTorch 0.7でデフォルト有効化されることで、最新フラッグシップに限らず3〜5年前のAndroidデバイスやRaspberry Pi 5でもLlama 3.2を実行できる。SDOT命令はArmv8.2以降の全デバイスで利用可能で現在全デバイスの72%が対応しており、Int4量子化行列積の最適化によりオンデバイスでのプライベートAIアシスタントやリアルタイムテキスト補完などの用途が現実的な選択肢となる。"
+    },
+    {
+      "rawArticleId": "518",
+      "titleJa": "Armがモバイル向けAI超解像技術Neural Super Samplingを公開",
+      "summary100Ja": "ArmがNSS（Neural Super Sampling）をリリース。モバイルGPUのNeural Accelerator上で動作し、540pから1080pへのアップスケールをGPU負荷50%削減で実現する超解像モデル。",
+      "summary200Ja": "NSSはArmが開発したリアルタイム時間的超解像モデルで、モバイルGPU内のNeural Accelerator（NX）上での実行に最適化されている。540pで描画した映像を1080pに4msで高品質アップスケールすることを示しており、モバイルゲームやXRなど電力制約の大きい用途を対象としている。Unreal EngineへのプラグインおよびVulkan向けML拡張との統合が提供されており、開発者は今日から実験を開始できる。"
+    },
+    {
+      "rawArticleId": "520",
+      "titleJa": "TextQuests：LLMはテキストベースビデオゲームをどこまでクリアできるか",
+      "summary100Ja": "Infocomの古典テキストアドベンチャーゲーム25本を使ったLLMエージェントベンチマークTextQuestsを公開。長文脈推論と探索的推論の限界を測定する。",
+      "summary200Ja": "TextQuestsは25本のクラシックテキストアドベンチャーゲーム（人間なら30時間以上かかるもの）を使い、長文脈推論・探索学習・連続的な自律行動を必要とするエージェント評価ベンチマークである。コンテキストが10万トークンを超えると現行モデルは過去のやり取りを幻覚したり行動を繰り返すようになるという知見が得られており、評価指標としてゲーム進捗とゲーム内有害行動の2種類を使用している。静的な知識ベンチマークが飽和しつつある中でエージェント能力の動的評価手法として位置づけられる。"
+    },
+    {
+      "rawArticleId": "522",
+      "titleJa": "FilBench：LLMはフィリピン語（タガログ語・セブアノ語）をどれだけ理解できるか",
+      "summary100Ja": "フィリピン語（タガログ語・フィリピン語標準形・セブアノ語）向けの包括的なLLM評価スイートFilBenchを公開。20以上のLLMを12タスクで評価した。",
+      "summary200Ja": "FilBenchは文化的知識・古典的NLP・読解・生成の4カテゴリ12タスクでLLMのフィリピン語能力を体系的に評価するベンチマークスイートである。SEA特化LLMはパラメータ効率が高いものの最良のオープンモデルでもGPT-4oには及ばず、翻訳タスクで特に苦手な傾向が確認された。コスト・インフラ面の制約が大きいフィリピンの実情を考慮し、オープンウェイトモデルが商用モデルに匹敵する費用対効果を持つことも示されている。"
+    },
+    {
+      "rawArticleId": "524",
+      "titleJa": "AI Sheets：コード不要でオープンAIモデルを使ってデータセットを構築・変換するツール",
+      "summary100Ja": "Hugging FaceがAI Sheetsを公開。スプレッドシートUIでプロンプトを書くだけでデータセットの生成・変換・エンリッチメントができるノーコードツール。",
+      "summary200Ja": "AI SheetsはHugging Face Hub上のオープンモデルをInference Providers経由で利用し、プロンプトベースの列定義でデータセットを構築・変換・分類・要約するノーコードツールである。セルを手動編集したり「いいね」をつけることでfew-shotサンプルが自動追加される仕組みを持ち、局所的なフィードバックで生成品質を改善できる。エクスポート時に再利用可能なconfigを生成し、HF Jobsとの連携で大規模データ生成も可能になる。"
+    },
+    {
+      "rawArticleId": "526",
+      "titleJa": "Accelerate ND-Parallel：複数GPUでの効率的な訓練のための並列化ガイド",
+      "summary100Ja": "AccelerateとAxolotlが連携し、データ並列・FSDP・テンソル並列・コンテキスト並列の任意の組み合わせを数行のコードで設定できるND並列機能を統合した。",
+      "summary200Ja": "AccelerateのParallelismConfigクラスを使い、DP・FSDP・テンソル並列・コンテキスト並列の組み合わせ（N次元並列）を単一の設定オブジェクトで表現できる。HSDP（ノード内でFSDP、ノード間でDPを組み合わせる）など実用的な構成について通信オーバーヘッドとメモリ効率のトレードオフを解説しており、大規模モデル訓練における並列戦略の体系的な理解と選択に役立つガイドになっている。"
+    },
+    {
+      "rawArticleId": "528",
+      "titleJa": "TRLにおけるVision Language ModelのアライメントとGRPO・MPOサポート",
+      "summary100Ja": "TRLにVLMのアライメント手法MPO・GRPO・GSPOを新たに追加。加えてRLOO・Online DPOのVLM対応拡張と、ネイティブなSFTサポートも提供された。",
+      "summary200Ja": "TRLライブラリにVision Language Model（VLM）向けの新しいアライメント手法が追加された。MPO（混合損失によるDPO拡張）・GRPO（グループ相対ポリシー最適化）・GSPO（シーケンスレベルの重要度サンプリングによるGRPO変種）のVLM対応に加え、既存のRLOOとOnline DPOもVLMに拡張されている。vLLMインテグレーションも提供されており、スケーラブルなマルチモーダルアライメント訓練が可能になる。"
+    },
+    {
+      "rawArticleId": "530",
+      "titleJa": "GPT OSSへようこそ：OpenAIが公開した初のオープンソースモデルファミリー",
+      "summary100Ja": "OpenAIがGPT OSSシリーズ（gpt-oss-20bとgpt-oss-120b）をApache 2.0ライセンスで公開。MoEアーキテクチャとMXFP4量子化により、120BモデルをH100単一GPUで実行できる。",
+      "summary200Ja": "GPT OSSは21Bと117Bパラメータ（アクティブは各3.6Bと5.1B）の2つのMixture of Expertsモデルで、MXFP4量子化によりgpt-oss-20bは16GBのGPUでも動作する。128Kコンテキスト・RoPE・スライディングウィンドウ注意・アテンションシンクなどの技術を採用し、推論はTransformers・vLLM・llama.cpp・ollama経由で可能。Hugging FaceのInference ProvidersからAPIアクセスも提供されており、Apache 2.0ライセンスで商用利用可能である。"
+    },
+    {
+      "rawArticleId": "532",
+      "titleJa": "DeepResearch BenchでオープンソースのLlama Nemotronモデルを評価する",
+      "summary100Ja": "NVIDIAのAI-Qブループリントを使ったリサーチエージェントがDeepResearch BenchのLLM with Searchカテゴリで40.52点を記録し、完全オープンライセンスのスタック中で首位を獲得した。",
+      "summary200Ja": "NVIDIAのAI-QブループリントはLlama 3.3-70B InstructとLlama-3.3-Nemotron-Super-49Bを組み合わせた完全オープンの深層リサーチエージェントで、DeepResearch Bench（100件以上の実世界長文脈研究タスク）でトップスコアを達成した。Nemotron Superは強化学習とNASで最適化され、reasoning ON/OFFをシステムプロンプトで切り替えられる。オープンソースエコシステムが商用クローズドモデルに匹敵する能動的な推論能力を持てることを示した事例として重要である。"
+    },
+    {
+      "rawArticleId": "534",
+      "titleJa": "3LM：アラビア語LLMのSTEM・コード評価ベンチマーク",
+      "summary100Ja": "アラビア語LLMのSTEM（理科・数学等）とコード生成能力を評価するベンチマーク3LMを公開。865件のネイティブSTEM問題・1744件の合成問題・アラビア語コードデータセットで構成される。",
+      "summary200Ja": "3LMはアラビア語のSTEMと自然言語プログラミング能力を評価する初の総合ベンチマークで、実教材由来のMCQ・合成MCQ・HumanEval+/MBPP+のアラビア語翻訳版の3データセットから構成される。40以上のLLMを評価した結果、STEM多肢選択でQwen2.5-72B-Instructが最高成績を収め、コード生成ではGPT-4oが最良であった。アラビア語と英語のpass@1スコアには約0.97の相関があり、言語固有のプロンプト品質がモデル性能に大きく影響することが示された。"
+    },
+    {
+      "rawArticleId": "536",
+      "titleJa": "GradioでMCPサーバーを実装するAIショッピングアシスタントの構築例",
+      "summary100Ja": "GradioのMCP統合を使い、IDM-VTONによる仮想試着機能を備えたAIショッピングアシスタントをVS Codeと連携させる構築例を紹介した記事。",
+      "summary200Ja": "GradioのmcpサポートとPythonの関数をMCPツールに自動変換する機能を活用し、仮想試着AI（IDM-VTON）をMCPサーバーとして公開する方法を示している。VS CodeのAIチャット機能と組み合わせることで、衣類画像をURLで指定するだけでLLMが自律的に仮想試着を実行できる。Gradio 5.28.0以降でHugging Face SpacesがMCPアプリストアとして機能する仕組みを実践的なコード例で解説した点が特徴である。"
+    },
+    {
+      "rawArticleId": "538",
+      "titleJa": "Trackio：Hugging Faceが公開した軽量実験トラッキングライブラリ",
+      "summary100Ja": "Hugging FaceがTrackioを公開。ローカルダッシュボードとHugging Face Spacesへのシームレスな共有機能を持つ、wandbドロップイン代替の無料オープンソース実験トラッキングライブラリ。",
+      "summary200Ja": "Trackioはwandbと互換性のあるAPIを持つ軽量な実験トラッキングライブラリで、ローカルダッシュボードと無料のHugging Face Spaces連携によるチーム共有機能を提供する。既存のwandb呼び出しをほぼそのまま流用できる設計で、Hugging FaceがWandBから移行した際に実際に使用したツールとして公開されたものである。Spacesを通じた実験結果の公開・共有が容易になる点でオープンな研究コミュニティに貢献する。"
+    },
+    {
+      "rawArticleId": "540",
+      "titleJa": "Hugging Face CLIが`hf`に改名—より速く使いやすいコマンド体系へ",
+      "summary100Ja": "Hugging Face CLIがhuggingface-cliからhfに改名され、`hf <resource> <action>`形式の整理されたコマンド体系を採用。hf jobsコマンドも新たに追加された。",
+      "summary200Ja": "Hugging Face CLIがhfにリブランドされ、認証・キャッシュ・リポジトリ管理などのコマンドをリソース種別でグループ化した直感的な構造に再編された。旧来のhuggingface-cliは引き続き動作し非推奨警告で移行を誘導する設計である。新たに追加されたhf jobsは従量課金制でGPUインフラ上の任意のスクリプトやDockerイメージを実行できるジョブ管理コマンドで、Pro・チーム・Enterpriseユーザー向けに提供されている。"
+    },
+    {
+      "rawArticleId": "542",
+      "titleJa": "ParquetのContent-Defined Chunking：HubのXetストレージで差分転送を実現",
+      "summary100Ja": "PyArrowとPandasにParquet CDC（コンテンツ定義チャンキング）が追加された。Hugging FaceのXetストレージと組み合わせることで、変更部分のみを転送しアップロード・ダウンロードを大幅に削減できる。",
+      "summary200Ja": "Apache Parquetのcontent-defined chunking（CDC）機能がPyArrow（v21.0.0以降）とPandasに実装され、Hugging FaceのXetストレージとの組み合わせによりParquetファイルの差分転送が可能になった。列の追加・削除・行の追加など一般的なユースケースでアップロード量を劇的に削減でき、同一データのコピーではゼロバイト転送も実現する。Hugging FaceがホストするParquetデータが4PB以上に達する中でのストレージ最適化として重要な意義を持つ。"
+    },
+    {
+      "rawArticleId": "544",
+      "titleJa": "TimeScope：長時間動画の視覚言語モデル理解能力を測るベンチマーク",
+      "summary100Ja": "1分〜8時間の動画に短い「ニードルクリップ」を挿入して位置特定・情報統合・細粒度動作認識の3能力を測るベンチマークTimeScopeを公開。現行モデルは1時間超で急落する。",
+      "summary200Ja": "TimeScopeは長時間動画理解における真の時間的理解能力を評価するオープンソースベンチマークで、静止画ではなく短い動画クリップをニードルとして長い映像に埋め込む設計が特徴である。評価の結果、Gemini 2.5 Proを除くほぼ全モデルが1時間超で性能が急落し、動作カウントなど細粒度の時間知覚タスクではモデルサイズに関わらず性能が低迷することが判明した。長時間動画AIの誇張された能力主張に対し客観的な評価軸を提供する点で意義深い。"
+    },
+    {
+      "rawArticleId": "546",
+      "titleJa": "DiffusersとPEFTを使ったFluxのLoRA推論を高速化する方法",
+      "summary100Ja": "LoRAのホットスワップ・torch.compile・FP8量子化・Flash Attention 3を組み合わせてFlux.1-DevのLoRA推論を約2.3倍高速化する最適化レシピを解説。",
+      "summary200Ja": "LoRAを動的に交換しながら再コンパイルなしにtorch.compileの速度メリットを維持するhotswap機能と、FP8量子化・Flash Attention 3を組み合わせることで、H100ではベースラインの2.23倍の推論速度を達成した。RTX 4090（24GB）などのコンシューマGPUでも、T5テキストエンコーダのNF4量子化を追加することで全パイプラインを実行可能になり約3.3倍の速度向上を確認している。本レシピはFlux以外のモデルにも応用できる汎用的な手法として提示されている。"
+    },
+    {
+      "rawArticleId": "548",
+      "titleJa": "NVIDIA NIMでHugging Face上の10万以上のLLMを高速デプロイする",
+      "summary100Ja": "NVIDIAのNIM推論マイクロサービスが単一のDockerコンテナでHugging Face上の多様なLLMを自動検出・バックエンド選択・最適化してデプロイできるようになった。",
+      "summary200Ja": "NIM（NVIDIA Inference Microservice）が単一コンテナ内でTensorRT-LLM・vLLM・SGLangを統括し、Hugging Faceリポジトリのモデルを渡すだけでアーキテクチャ検出・量子化形式識別・バックエンド選択・パフォーマンス設定を自動実行するようになった。Transformersチェックポイント・GGUF・TensorRT-LLMエンジンなど主要形式に対応しており、手動チューニングなしにNVIDIAアクセラレーテッドインフラ上での本番デプロイを簡素化する。"
+    },
+    {
+      "rawArticleId": "550",
+      "titleJa": "Arc仮想細胞チャレンジ入門：ML技術者向けの生物学的背景解説",
+      "summary100Ja": "Arc Instituteの仮想細胞チャレンジを生物学の知識が少ないML技術者向けに解説。CRISPRによる遺伝子サイレンシングの細胞への影響予測タスクの背景・データ・評価指標を網羅的に説明。",
+      "summary200Ja": "Arc仮想細胞チャレンジは、CRISPRで遺伝子をサイレンシングした際の細胞トランスクリプトームへの影響を、未知の細胞タイプにも汎化して予測するモデルを訓練するコンペティションである。訓練データは22万細胞のRNA-seqプロファイルで構成され、ArcのベースラインモデルSTATEはLlamaバックボーンの状態遷移モデルとBERT風細胞埋め込みモデルの組み合わせである。評価指標（Perturbation Discrimination・Differential Expression・MAE）の意味と計算方法をML視点から丁寧に解説している。"
+    },
+    {
+      "rawArticleId": "552",
+      "titleJa": "Consilium：複数のLLMが議論してコンセンサスに達するマルチエージェントプラットフォーム",
+      "summary100Ja": "複数のLLMがラウンドテーブル形式で議論し、多数決・ランク集計・コンセンサス等の決定モードで最終回答を導くGradioベースのMCPサーバーConsuliumを紹介。",
+      "summary200Ja": "ConsuliumはGradio Agents & MCP Hackathonで開発されたマルチLLMプラットフォームで、MistralやDeepSeek-R1などのモデルが役割分担（提唱者・批評者・戦略顧問等）をもって最大5ラウンドの構造的議論を行い合意形成する仕組みを持つ。MCPサーバーとしてClineやVS Codeと統合でき、Webリサーチ機能も内蔵している。マイクロソフトのMAI-DxOなどの先行研究と同様に、複数AIの協調が単独AIを大幅に上回れることを示す実装例として位置づけられる。"
+    },
+    {
+      "rawArticleId": "554",
+      "titleJa": "FutureBench：AIエージェントの未来予測能力を評価する新ベンチマーク",
+      "summary100Ja": "ニュースや予測市場Polymarketから取得した実際の未来イベントの予測タスクでLLMエージェントを評価するFutureBenchを提案。データ汚染が構造上不可能な点が特徴。",
+      "summary200Ja": "FutureBenchはニュース記事や予測市場（Polymarket）から生成した時限付き予測タスクでエージェントを評価するベンチマークで、まだ起きていない出来事を訓練データに含めることが不可能なためデータ汚染問題を回避できる。フレームワーク・ツール・モデル性能をそれぞれ独立して比較できる3層評価構造を持ち、ツールを持つエージェントがベースLLMを上回ることを初期結果で確認している。未来予測能力が真の知性を測る指標として重要であるという問題意識に基づいている。"
+    },
+    {
+      "rawArticleId": "556",
+      "titleJa": "Gradio MCPサーバーの5つの主要改善点—v5.38.0",
+      "summary100Ja": "Gradio v5.38.0でMCPサーバーに5機能を追加。ローカルファイル自動アップロード・リアルタイム進捗通知・OpenAPIからMCPへの1行変換・認証ヘッダー対応・ツール説明カスタマイズ。",
+      "summary200Ja": "Gradio 5.38.0でMCPサーバーの実用性を高める5機能が追加された。ファイルアップロードMCPサーバーによるローカルファイルの自動処理、進捗通知のリアルタイムストリーミング、gr.load_openapi関数による既存バックエンドAPIの自動MCP化、gr.Headerによる認証情報の明示的な受け渡し、そしてapi_descriptionによるツール説明のカスタマイズである。Gradio/Spacesをエンタープライズ向けMCPサーバー基盤として位置づける取り組みの一環として提供された。"
+    },
+    {
+      "rawArticleId": "558",
+      "titleJa": "Ettin Suite：同一レシピで訓練したエンコーダ・デコーダのペアモデル群",
+      "summary100Ja": "同一データ・アーキテクチャ・訓練レシピでエンコーダのみ・デコーダのみのモデル（17M〜1B）を訓練したEttinスイートを発表。ModernBERT超えと、Llama 3.2超えのデコーダを実現。",
+      "summary200Ja": "Ettinは2Tトークン・同一データ・同一訓練レシピでエンコーダとデコーダを並行訓練した初のモデルスイートで、両アーキテクチャの公平な比較を可能にする。エンコーダはModernBERT（全データオープン版）を上回り、デコーダはLlama 3.2やSmolLM2を超える性能を示した。実験から、分類・検索にはエンコーダが、生成にはデコーダが構造的に優位であり、逆目標での追加訓練では性能が大きく損なわれることが確認された。"
+    },
+    {
+      "rawArticleId": "560",
+      "titleJa": "HubのストレージをGit LFSからXetへ移行する技術詳解",
+      "summary100Ja": "Hugging Face HubのストレージバックエンドをGit LFSからXetへ移行した半年間の取り組みを解説。現在100万人超が利用し、20PBを超えるリポジトリが移行済み。",
+      "summary200Ja": "Hugging FaceはGit LFS Bridgeとバックグラウンド移行処理という2つの仕組みにより、Hubユーザーのワークフローを中断することなく20PBを超えるストレージをXetへ段階的に移行した。Git LFS Bridgeは旧クライアント向けに署名付きURLを生成してXetストレージからファイルを再構築して返す機能で、バックグラウンド移行はwebhookを起点に並行処理される設計になっている。mradermacherの6.1PBなど大規模ユーザーの移行で得られたスケーリングの知見も詳述されている。"
+    },
+    {
+      "rawArticleId": "562",
+      "titleJa": "Kimina-Prover：テスト時強化学習探索で形式定理証明の最高精度を達成",
+      "summary100Ja": "Kimina-Prover-72BをリリースしてMiniF2FベンチマークでPass@1024が87.7%・TTRLサーチで92.2%を達成。補題活用パターンと誤り訂正機能が主要な革新点。",
+      "summary200Ja": "Kimina-Prover-72BはQwen2.5-72BベースにKimi k1.5 RLパイプラインで訓練された定理証明モデルで、Test-Time Reinforcement Learning（TTRL）サーチフレームワークにより中間補題を再帰的に発見・組み合わせて複雑な証明を構築する。Lean 4のエラーメッセージを解釈して証明を修正する能力も持ち、MiniF2FでPASS@1024が87.7%、TTRLサーチで92.2%という最高精度を達成した。補題利用率向上のための報酬シェーピング手法も詳述されている。"
+    },
+    {
+      "rawArticleId": "564",
+      "titleJa": "ロボット推論の非同期化：行動予測と実行を分離して応答性を高める",
+      "summary100Ja": "ロボットポリシーの行動予測と実行を別プロセスに分離する非同期推論アーキテクチャを提案。SmolVLAでのタスク完了時間を約2倍高速化した。",
+      "summary200Ja": "ロボットポリシーが行動チャンクを予測している間にロボットが待機するという逐次推論の問題を解決するため、PolicyServer（GPU推論）とRobotClient（行動実行）を分離しgRPC通信で接続する非同期推論アーキテクチャを提案した。クライアントはキュー長が閾値を下回ると自動的に新しい観測を送信し、受信した新しいチャンクを既存キューに統合することで推論待機ゼロを実現し、SmolVLAでタスク完了時間を約2倍短縮した。"
+    },
+    {
+      "rawArticleId": "566",
+      "titleJa": "ScreenEnv：Dockerコンテナ内のUbuntuデスクトップでGUIエージェントを構築・デプロイ",
+      "summary100Ja": "DockerコンテナでUbuntuデスクトップ環境を起動し、MCPまたは直接API経由でLLMエージェントがGUI操作を実行できるPythonライブラリScreenEnvを公開。",
+      "summary200Ja": "ScreenEnvは孤立したUbuntuデスクトップ環境をDockerで提供し、マウス・キーボード操作・画面録画・ターミナルアクセスを含むフルGUI制御を直接APIまたはMCPサーバー経由で利用できるPythonライブラリである。smolagentsとのネイティブ統合により、任意のVLMをバックエンドとしたカスタムデスクトップエージェントを数十行のコードで構築でき、AMD64とARM64の両アーキテクチャをサポートしている。"
+    },
+    {
+      "rawArticleId": "568",
+      "titleJa": "Hugging Face MCPサーバーの構築：設計判断とStreamable HTTP採用の経緯",
+      "summary100Ja": "hf.co/mcpの公式MCPサーバー開発の経緯を公開。Streamable HTTPのステートレス・ダイレクトレスポンス構成を採用した理由と、MCP仕様の急速な進化への対応方法を詳述。",
+      "summary200Ja": "Hugging Faceの公式MCPサーバーはユーザーごとのツール設定をリクエスト時に動的に解決するステートレス設計を採用し、本番環境ではStreamable HTTPのダイレクトレスポンスモードを使用している。SSE→Streamable HTTPへの仕様移行への対応、164種類ものMCPクライアントへの対応、ブラウザからのアクセスに対するフレンドリーなUIの実装など、実際の運用から得た知見が詳細に共有されている。"
+    },
+    {
+      "rawArticleId": "570",
+      "titleJa": "Reachy Mini：AI実験と人間-ロボットインタラクション向けのオープンソース卓上ロボット",
+      "summary100Ja": "Pollen RoboticsとHugging Faceが299ドルからのオープンソース卓上ロボットReachy Miniを発表。Python SDKで完全プログラム可能で、Hugging Faceのモデルとシームレスに統合できる。",
+      "summary200Ja": "Reachy MiniはPollen RoboticsとHugging Faceが共同で開発した高さ28cmのオープンソース卓上ロボットで、Liteバージョン（299ドル）とRaspberry Pi 4搭載のCompute版（449ドル）の2種類がある。カメラ・4マイク・スピーカーを搭載しPython SDKで制御可能で、Hub上のモデルを活用した音声・視覚インタラクションアプリの開発・共有・利用ができる。10Mユーザーのコミュニティと連携したロボット行動の共有エコシステムの構築を目指している。"
+    },
+    {
+      "rawArticleId": "572",
+      "titleJa": "AMD MI300向けカスタムCUDAカーネルの最適化プロセス",
+      "summary100Ja": "AMD MI300X上でLlama 3.1 405BのFP8推論を高速化するため、残差接続・RMSNorm・SwiGLU・スキニーGEMMの3種類のカスタムカーネルを開発・公開した。",
+      "summary200Ja": "Hugging FaceとAMDが協力し、MI300X（8台）上でvLLMを使ったLlama 3.1 405B FP8推論を高速化するカスタムROCmカーネルを開発した。MI300Xのアーキテクチャ（スレッド→ワープ→コンピュートユニット→XCDs→全体）を丁寧に解説した上で、残差接続+RMSNorm+FP8変換融合カーネル・SwiGLU+FP8変換融合カーネル・スキニーGEMMカーネルの3つを最適化しhf-rocm-kernelsとして公開した。"
+    },
+    {
+      "rawArticleId": "574",
+      "titleJa": "Gradio MCPサーバーでLLMに新しいスキルを付与する方法",
+      "summary100Ja": "MCPとGradioを使えば、Hugging Face Spacesにある数千のAIモデルをLLMのツールとして追加できる仕組みを解説。Flux.1 Krea devによる画像編集を例として示す。",
+      "summary200Ja": "Gradio 5.28.0以降、Hugging Face SpacesはMCPプロトコルに対応しており、数千のAIアプリをLLMのツールセットに追加する「MCPアプリストア」として機能する。設定ページからSpaceを選ぶだけでCursorなどのMCPクライアントに接続でき、Flux.1 Kontext devを例に画像編集をLLMに委任する方法を具体的に示している。ZeroGPU搭載Spaceの複製にはProアカウントが必要な点も触れられている。"
+    },
+    {
+      "rawArticleId": "576",
+      "titleJa": "SmolLM3：3Bパラメータで多言語・長文脈・デュアルモード推論を実現する小規模モデル",
+      "summary100Ja": "Hugging FaceがSmolLM3-3Bを公開。11Tトークン訓練・6言語対応・128Kコンテキスト・think/no_thinkモード切替対応で、同規模Llama 3.2やQwen2.5-3Bを上回る性能を持つ。",
+      "summary200Ja": "SmolLM3-3Bは3段階事前学習（安定フェーズ8T・コンテキスト拡張250B・減衰フェーズ1T）とGQA・NoPE・イントラドキュメントマスキングを採用した3Bモデルで、英・仏・西・独・伊・ポルトガル語の6言語に対応し128Kコンテキストを処理できる。SFTとAnchoredアライメントによるポストトレーニングによりthink/no_thinkのデュアルモード推論が可能になった。完全オープンな訓練レシピ（データ混合比・アーキテクチャ詳細・中間チェックポイント）とともに公開されている。"
+    },
+    {
+      "rawArticleId": "578",
+      "titleJa": "Hugging Faceの本番インフラを支える3つの重要アラートシステム",
+      "summary100Ja": "Hugging Faceのインフラチームが、NATゲートウェイスループット監視・ログアーカイブ成功率・APIエラーレートという3種の本番アラートの設計思想と実際の事例を解説。",
+      "summary200Ja": "Hugging FaceのインフラチームがNATゲートウェイのスループット異常検知・ログアーカイブパイプラインの成功率監視・APIエラーレートの3つのアラートの仕組みを公開した。NATアラートはインフラ変更時のコスト増や経路設定ミスの早期発見に、ログアーカイブアラートはFilebeat-Logstash-Elasticsearch-S3パイプラインの障害検知に機能する。実際のインシデント事例とともに各アラートが本番安定性に果たす役割が具体的に述べられている。"
+    },
+    {
+      "rawArticleId": "580",
+      "titleJa": "マルチモーダルデータパイプラインの効率化：ナップサックパッキングでパディングを削減",
+      "summary100Ja": "ナップサックパッキング戦略でマルチモーダル訓練データのバッチを構成することで、パディングを60%削減しGPU稼働率を大幅に改善した方法を解説。",
+      "summary200Ja": "nanoVLMプロジェクトでのGPUアイドル問題の調査から、訓練バッチの約60%がパディングトークンで埋められていることが判明した。その解決策として、bin-packingアルゴリズムを応用したナップサックパッキング戦略でシーケンスをバッチに詰め込む手法を採用し、PythonのIterableDatasetとプロデューサー・コンシューマーパターンで効率的なマルチモーダルバッチングを実現した。各段階のコード実装と可視化を含む体系的なチュートリアルとして公開されている。"
+    },
+    {
+      "rawArticleId": "582",
+      "titleJa": "NeurIPS 2025 E2LMコンペ：LLMの早期訓練評価ベンチマークを構築するコンペティション",
+      "summary100Ja": "NeurIPS 2025で開催されるE2LMコンペを発表。訓練初期（〜200Bトークン）のLLMに意味のある評価信号を与えられるSTEM科学知識ベンチマークを参加者が競って構築する。",
+      "summary200Ja": "E2LM（Early Training Evaluation of Language Models）コンペは、LLMの初期訓練段階（〜200Bトークン）で識別力の高い評価シグナルを提供するベンチマーク構築を競うNeurIPS 2025コンペティションである。信号品質・ランキング一貫性・科学的知識整合性の3指標で評価し、公開モデルチェックポイント（0.5B・1B・3B）でローカル採点が可能な一方、最終2指標の計算に使うチェックポイントは非公開のため過学習を防ぐ設計になっている。"
+    },
+    {
+      "rawArticleId": "584",
+      "titleJa": "Sentence Transformers v5でスパースエンベディングモデルを訓練・ファインチューニングする",
+      "summary100Ja": "Sentence Transformers v5でSPLADE等のスパースエンベディングモデルのファインチューニングに対応。Trainer・損失関数・評価器など全コンポーネントを詳細に解説。",
+      "summary200Ja": "Sentence Transformers v5.0が、密ベクトルの埋め込みモデルに加えてSPLADEなどのスパースエンベディングモデルの訓練をサポートした。スパースモデルは30,000次元以上の高次元ベクトルで各次元が語彙の単語に対応するため解釈性が高く、ハイブリッド検索で密モデルと組み合わせると特に効果的である。本記事ではモデル・データセット・損失関数・Trainer・評価器の各コンポーネントの設定方法を、医療ドメインへのファインチューニング例を通じて詳解している。"
+    }
+  ]
+}

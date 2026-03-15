@@ -35,14 +35,14 @@ async function run() {
         updated_at = now()
       WHERE status = 'running'
         AND started_at <= now() - ($1::int * interval '1 minute')
-      RETURNING id, job_name, started_at
+      RETURNING job_run_id, job_name, started_at
     `,
     [staleMinutes],
   )
 
   console.log(`repaired=${result.rowCount} stale_minutes=${staleMinutes}`)
   for (const row of result.rows) {
-    console.log(`#${row.id} ${row.job_name} started=${row.started_at}`)
+    console.log(`#${row.job_run_id} ${row.job_name} started=${row.started_at}`)
   }
 }
 

@@ -1,0 +1,1122 @@
+{
+  "generatedAt": "2026-03-15T15:23:58.452Z",
+  "sourceKey": "huggingface-blog",
+  "items": [
+    {
+      "rawArticleId": "481",
+      "titleJa": "OpenAI gpt-ossの技術をTransformersで活用する方法",
+      "summary100Ja": "OpenAIのGPT-OSSリリースに対応してTransformersライブラリを大幅強化。MXFP4量子化、ゼロビルドカーネル、テンソル並列などの新機能が追加された。",
+      "summary200Ja": "OpenAIのGPT-OSSシリーズに対応するため、Hugging FaceはTransformersライブラリをアップグレードし、MXFP4量子化・ゼロビルドカーネル・テンソル並列・エキスパート並列・動的スライディングウィンドウなど複数の新機能を導入した。これらの改善は他のモデルでも活用可能で、MLX・llama.cpp・vLLMなどのフレームワークが実装参照として利用できる点でコミュニティ全体に恩恵をもたらす。"
+    },
+    {
+      "rawArticleId": "484",
+      "titleJa": "Together AIを使ってHugging Face Hub上のLLMをファインチューニングする",
+      "summary100Ja": "Together AIとHugging Faceが連携し、Hub上の100Bパラメータ以下の互換LLMをTogether AIのインフラでファインチューニングできる新機能を発表した。",
+      "summary200Ja": "Together AIとHugging Faceの統合により、Hub上で公開されているLlamaやQwenなど任意の互換LLMを、Together AIのインフラ上でファインチューニングできるようになった。ベースモデルをテンプレートとして指定し、HFモデルをカスタムモデルとして渡すだけで訓練・推論・Hubへのアップロードが可能になり、複雑なインフラ構築なしに短期間でモデルを本番環境に展開できる点が利点となっている。"
+    },
+    {
+      "rawArticleId": "487",
+      "titleJa": "Jupyter Agents：LLMにノートブックで推論を学習させる",
+      "summary100Ja": "Jupyter Notebookを使ってデータ分析タスクを解くエージェントを構築するパイプラインを公開。Kaggleノートブックから訓練データを生成し、小規模モデルのファインチューニングを実施した。",
+      "summary200Ja": "DABStepベンチマーク上でデータ分析エージェントを評価・改善するため、KaggleノートブックをベースにQwen3-4Bをファインチューニングする多段階パイプラインを構築した。スキャフォールディングの最適化でベースラインから精度を大幅に向上させ、高品質データ生成・QAペア作成・実行トレース生成のプロセスを詳細に解説している。コード実行環境内で推論と行動を統合するJupyterエージェントの構築手法を示した点が重要である。"
+    },
+    {
+      "rawArticleId": "490",
+      "titleJa": "mmBERT：ModernBERTが多言語化—1800言語超対応のエンコーダモデル",
+      "summary100Ja": "3兆トークン以上・1800言語超で訓練した大規模多言語エンコーダmmBERTを発表。XLM-Rを超える初のモデルで、処理速度も2〜4倍向上している。",
+      "summary200Ja": "mmBERTはModernBERTアーキテクチャを継承しつつ、Gemma 2トークナイザーを採用した3段階訓練（事前学習2.3Tトークン・中間学習600B・減衰フェーズ100B）により1800言語超に対応する多言語エンコーダモデルである。GLUEやXTREMEなどの英語・多言語ベンチマーク、さらにコード検索でも高性能を示し、特に減衰フェーズで初めて学習した低資源言語でもGemini 2.5 ProやOpenAI o3を上回る結果を達成した。"
+    },
+    {
+      "rawArticleId": "493",
+      "titleJa": "EmbeddingGemma：Googleが公開した軽量多言語エンベディングモデル",
+      "summary100Ja": "GoogleがEmbeddingGemmaをリリース。3億パラメータ・100言語以上対応で、500M以下のモデルではMTEBランキング最高位を達成した多言語エンベディングモデル。",
+      "summary200Ja": "GoogleのEmbeddingGemmaは308Mパラメータ・2Kコンテキスト・100言語超対応の多言語テキストエンベディングモデルで、Gemma3アーキテクチャを双方向アテンション付きエンコーダとして改修したものである。量子化時にRAM 200MB以下で動作し、MMTEB多言語ベンチマークで500M以下モデルの中でトップに位置する。Sentence Transformers・LangChain・LlamaIndex・ONNX等各種フレームワークとの統合が提供され、医療分野でのファインチューニング例も示されている。"
+    },
+    {
+      "rawArticleId": "496",
+      "titleJa": "SAIR：薬剤設計向けの520万件タンパク質-リガンド3D構造データセット",
+      "summary100Ja": "SandboxAQがSAIR（Structurally Augmented IC50 Repository）を公開。520万件のAI生成タンパク質-リガンド3D構造とIC50結合活性データを紐付けたオープンデータセット。",
+      "summary200Ja": "SandboxAQがCC BY 4.0ライセンスで公開したSAIRは、100万件以上のタンパク質-リガンドペアを5種の立体構造でコフォールドした520万件のデータセットであり、各構造にChEMBLまたはBindingDBから取得した実験的IC50値を対応付けている。760台のNVIDIA H100を使い13万GPU時間で当初予定の3ヶ月を3週間に短縮して作成。タンパク質データバンクに構造が存在しない「ダーク標的」を含む創薬AIの訓練・スクリーニング基盤として活用可能である。"
+    },
+    {
+      "rawArticleId": "499",
+      "titleJa": "ZeroGPU Spacesを事前コンパイルで高速化する方法",
+      "summary100Ja": "PyTorchのAhead-of-Time（AoT）コンパイルをZeroGPU Spacesに適用する方法を解説。Flux・Wan・LTXなどのモデルで1.3〜1.8倍の速度向上を確認した。",
+      "summary200Ja": "ZeroGPUはリクエストのたびにGPUプロセスをforkする仕組みのため、torch.compileによる実行時コンパイルが毎回発生する問題があった。AoTコンパイルはモデルを事前にコンパイル・保存して即座に再読み込みできるため、この問題を解決しデモの応答速度を向上させる。FP8量子化・動的シェイプ・FlashAttention-3との組み合わせ手法を示しており、開発者が既存のZeroGPU SpaceにAoT最適化を追加するための具体的なコード例が提供されている。"
+    },
+    {
+      "rawArticleId": "502",
+      "titleJa": "NVIDIAが600万件の多言語推論データセットを公開",
+      "summary100Ja": "NVIDIAがNemotron Post-Training Dataset V2を公開。英語の推論データをフランス語・スペイン語・ドイツ語・イタリア語・日本語に翻訳した600万件の多言語データセット。",
+      "summary200Ja": "NVIDIAはNemotron Post-Training Dataset V2として、既存の英語推論データを5言語（仏・西・独・伊・日）に翻訳した600万件のデータセットを公開した。翻訳時のハルシネーション抑制のため行単位翻訳・特殊ブラケット形式・fastText言語IDフィルタリングなどの対策を講じている。合わせて発表したNemotron Nano 2 9Bはハイブリッドトランスフォーマー-マンバアーキテクチャを採用し、同クラス最高水準のスループットと推論コスト削減を実現したエッジ向けモデルである。"
+    },
+    {
+      "rawArticleId": "507",
+      "titleJa": "ClaudeとHugging Faceを連携させた画像生成の方法",
+      "summary100Ja": "ClaudeをHugging Face MCPサーバーに接続し、FLUX.1 Krea devやQwen-Imageなどの最新画像生成モデルをチャットから直接利用する方法を解説した記事。",
+      "summary200Ja": "ClaudeをHugging FaceのMCPサーバーと接続することで、ZeroGPUで動作するSpaces上の画像生成モデルをチャットUIから直接呼び出せるようになる。FLUX.1 Krea devはリアルな写真風画像の生成に優れ、Qwen-Imageはテキスト描画精度が高く、両モデルの結果を並べて比較する使い方も可能である。2025年10月のAnthropicポリシー変更後はカスタムコネクター経由での接続が必要になった点も記録されている。"
+    },
+    {
+      "rawArticleId": "510",
+      "titleJa": "CUDAカーネルをゼロからGPUプロダクション対応に仕上げるガイド",
+      "summary100Ja": "kernel-builderライブラリを使ったCUDAカーネルの開発・ビルド・Hubへの公開方法を解説した実践的チュートリアル。RGB-グレースケール変換カーネルを例として用いる。",
+      "summary200Ja": "kernel-builderはCUDAカーネルをローカルで開発しHugging Face Hub経由で配布するためのライブラリである。Nix環境を使って再現性の高いビルドを実現し、PyTorchのネイティブオペレーターとして登録することでtorch.compileとの互換性やハードウェア固有実装のディスパッチが可能になる。本ガイドではプロジェクト構成・CUDAカーネル記述・PyTorchバインディング・ビルド・Hubへの公開まで一連の手順を丁寧に解説している。"
+    },
+    {
+      "rawArticleId": "512",
+      "titleJa": "研究ツールとAIを連携させるMCPの活用法",
+      "summary100Ja": "MCPを使ってarXiv・GitHub・Hugging Faceなどの研究ツールをAIに接続し、論文探索・コード検索・データセット調査を自然言語で自動化する方法を解説。",
+      "summary200Ja": "MCP（Model Context Protocol）は手動の研究ディスカバリー作業をスクリプト自動化からさらに抽象化し、AIによる自然言語指示での横断的な情報収集を可能にする。Research Tracker MCPをHugging Face経由で追加するだけでClaude DesktopやVS CodeなどのMCPクライアントから利用でき、arXiv・GitHub・Hugging Faceへの横断検索をAIが自律的に実行できるようになる点で、研究者の作業効率向上に貢献する。"
+    },
+    {
+      "rawArticleId": "514",
+      "titleJa": "Kimina-Prover-RL：Lean 4定理証明のための強化学習パイプライン",
+      "summary100Ja": "Lean 4形式定理証明向けのオープンソース強化学習パイプラインkimina-prover-rlを公開。1.7BモデルでMiniF2FベンチマークPass@32が76.63%を達成した。",
+      "summary200Ja": "kimina-prover-rlはDeepSeek-R1にインスパイアされた「推論→Lean 4コード生成」の2段階出力パラダイムに基づく定理証明訓練パイプラインで、Verlフレームワークと完全互換である。フォーマット報酬と誤り訂正ターンを組み合わせたGRPO訓練により、1.7BモデルでMiniF2F Pass@32を76.23%に向上させた。訓練データ・コード・モデル重みを全てオープンソースとして公開しており、再現実験や独自モデルへの適用が可能になっている。"
+    },
+    {
+      "rawArticleId": "516",
+      "titleJa": "Arm & ExecuTorch 0.7：数十億台のデバイスへ生成AIを届ける",
+      "summary100Ja": "ExecuTorch 0.7でArm KleidiAIがデフォルト有効化され、SDOT命令（2015年以降の約30億台のArmデバイスに搭載）を活用したLLM推論の高速化が実現する。",
+      "summary200Ja": "Arm KleidiAIがExecuTorch 0.7でデフォルト有効化されることで、最新フラッグシップに限らず3〜5年前のAndroidデバイスやRaspberry Pi 5でもLlama 3.2を実行できる。SDOT命令はArmv8.2以降の全デバイスで利用可能で現在全デバイスの72%が対応しており、Int4量子化行列積の最適化によりオンデバイスでのプライベートAIアシスタントやリアルタイムテキスト補完などの用途が現実的な選択肢となる。"
+    },
+    {
+      "rawArticleId": "518",
+      "titleJa": "Armがモバイル向けAI超解像技術Neural Super Samplingを公開",
+      "summary100Ja": "ArmがNSS（Neural Super Sampling）をリリース。モバイルGPUのNeural Accelerator上で動作し、540pから1080pへのアップスケールをGPU負荷50%削減で実現する超解像モデル。",
+      "summary200Ja": "NSSはArmが開発したリアルタイム時間的超解像モデルで、モバイルGPU内のNeural Accelerator（NX）上での実行に最適化されている。540pで描画した映像を1080pに4msで高品質アップスケールすることを示しており、モバイルゲームやXRなど電力制約の大きい用途を対象としている。Unreal EngineへのプラグインおよびVulkan向けML拡張との統合が提供されており、開発者は今日から実験を開始できる。"
+    },
+    {
+      "rawArticleId": "520",
+      "titleJa": "TextQuests：LLMはテキストベースビデオゲームをどこまでクリアできるか",
+      "summary100Ja": "Infocomの古典テキストアドベンチャーゲーム25本を使ったLLMエージェントベンチマークTextQuestsを公開。長文脈推論と探索的推論の限界を測定する。",
+      "summary200Ja": "TextQuestsは25本のクラシックテキストアドベンチャーゲーム（人間なら30時間以上かかるもの）を使い、長文脈推論・探索学習・連続的な自律行動を必要とするエージェント評価ベンチマークである。コンテキストが10万トークンを超えると現行モデルは過去のやり取りを幻覚したり行動を繰り返すようになるという知見が得られており、評価指標としてゲーム進捗とゲーム内有害行動の2種類を使用している。静的な知識ベンチマークが飽和しつつある中でエージェント能力の動的評価手法として位置づけられる。"
+    },
+    {
+      "rawArticleId": "522",
+      "titleJa": "FilBench：LLMはフィリピン語（タガログ語・セブアノ語）をどれだけ理解できるか",
+      "summary100Ja": "フィリピン語（タガログ語・フィリピン語標準形・セブアノ語）向けの包括的なLLM評価スイートFilBenchを公開。20以上のLLMを12タスクで評価した。",
+      "summary200Ja": "FilBenchは文化的知識・古典的NLP・読解・生成の4カテゴリ12タスクでLLMのフィリピン語能力を体系的に評価するベンチマークスイートである。SEA特化LLMはパラメータ効率が高いものの最良のオープンモデルでもGPT-4oには及ばず、翻訳タスクで特に苦手な傾向が確認された。コスト・インフラ面の制約が大きいフィリピンの実情を考慮し、オープンウェイトモデルが商用モデルに匹敵する費用対効果を持つことも示されている。"
+    },
+    {
+      "rawArticleId": "524",
+      "titleJa": "AI Sheets：コード不要でオープンAIモデルを使ってデータセットを構築・変換するツール",
+      "summary100Ja": "Hugging FaceがAI Sheetsを公開。スプレッドシートUIでプロンプトを書くだけでデータセットの生成・変換・エンリッチメントができるノーコードツール。",
+      "summary200Ja": "AI SheetsはHugging Face Hub上のオープンモデルをInference Providers経由で利用し、プロンプトベースの列定義でデータセットを構築・変換・分類・要約するノーコードツールである。セルを手動編集したり「いいね」をつけることでfew-shotサンプルが自動追加される仕組みを持ち、局所的なフィードバックで生成品質を改善できる。エクスポート時に再利用可能なconfigを生成し、HF Jobsとの連携で大規模データ生成も可能になる。"
+    },
+    {
+      "rawArticleId": "526",
+      "titleJa": "Accelerate ND-Parallel：複数GPUでの効率的な訓練のための並列化ガイド",
+      "summary100Ja": "AccelerateとAxolotlが連携し、データ並列・FSDP・テンソル並列・コンテキスト並列の任意の組み合わせを数行のコードで設定できるND並列機能を統合した。",
+      "summary200Ja": "AccelerateのParallelismConfigクラスを使い、DP・FSDP・テンソル並列・コンテキスト並列の組み合わせ（N次元並列）を単一の設定オブジェクトで表現できる。HSDP（ノード内でFSDP、ノード間でDPを組み合わせる）など実用的な構成について通信オーバーヘッドとメモリ効率のトレードオフを解説しており、大規模モデル訓練における並列戦略の体系的な理解と選択に役立つガイドになっている。"
+    },
+    {
+      "rawArticleId": "528",
+      "titleJa": "TRLにおけるVision Language ModelのアライメントとGRPO・MPOサポート",
+      "summary100Ja": "TRLにVLMのアライメント手法MPO・GRPO・GSPOを新たに追加。加えてRLOO・Online DPOのVLM対応拡張と、ネイティブなSFTサポートも提供された。",
+      "summary200Ja": "TRLライブラリにVision Language Model（VLM）向けの新しいアライメント手法が追加された。MPO（混合損失によるDPO拡張）・GRPO（グループ相対ポリシー最適化）・GSPO（シーケンスレベルの重要度サンプリングによるGRPO変種）のVLM対応に加え、既存のRLOOとOnline DPOもVLMに拡張されている。vLLMインテグレーションも提供されており、スケーラブルなマルチモーダルアライメント訓練が可能になる。"
+    },
+    {
+      "rawArticleId": "530",
+      "titleJa": "GPT OSSへようこそ：OpenAIが公開した初のオープンソースモデルファミリー",
+      "summary100Ja": "OpenAIがGPT OSSシリーズ（gpt-oss-20bとgpt-oss-120b）をApache 2.0ライセンスで公開。MoEアーキテクチャとMXFP4量子化により、120BモデルをH100単一GPUで実行できる。",
+      "summary200Ja": "GPT OSSは21Bと117Bパラメータ（アクティブは各3.6Bと5.1B）の2つのMixture of Expertsモデルで、MXFP4量子化によりgpt-oss-20bは16GBのGPUでも動作する。128Kコンテキスト・RoPE・スライディングウィンドウ注意・アテンションシンクなどの技術を採用し、推論はTransformers・vLLM・llama.cpp・ollama経由で可能。Hugging FaceのInference ProvidersからAPIアクセスも提供されており、Apache 2.0ライセンスで商用利用可能である。"
+    },
+    {
+      "rawArticleId": "532",
+      "titleJa": "DeepResearch BenchでオープンソースのLlama Nemotronモデルを評価する",
+      "summary100Ja": "NVIDIAのAI-Qブループリントを使ったリサーチエージェントがDeepResearch BenchのLLM with Searchカテゴリで40.52点を記録し、完全オープンライセンスのスタック中で首位を獲得した。",
+      "summary200Ja": "NVIDIAのAI-QブループリントはLlama 3.3-70B InstructとLlama-3.3-Nemotron-Super-49Bを組み合わせた完全オープンの深層リサーチエージェントで、DeepResearch Bench（100件以上の実世界長文脈研究タスク）でトップスコアを達成した。Nemotron Superは強化学習とNASで最適化され、reasoning ON/OFFをシステムプロンプトで切り替えられる。オープンソースエコシステムが商用クローズドモデルに匹敵する能動的な推論能力を持てることを示した事例として重要である。"
+    },
+    {
+      "rawArticleId": "534",
+      "titleJa": "3LM：アラビア語LLMのSTEM・コード評価ベンチマーク",
+      "summary100Ja": "アラビア語LLMのSTEM（理科・数学等）とコード生成能力を評価するベンチマーク3LMを公開。865件のネイティブSTEM問題・1744件の合成問題・アラビア語コードデータセットで構成される。",
+      "summary200Ja": "3LMはアラビア語のSTEMと自然言語プログラミング能力を評価する初の総合ベンチマークで、実教材由来のMCQ・合成MCQ・HumanEval+/MBPP+のアラビア語翻訳版の3データセットから構成される。40以上のLLMを評価した結果、STEM多肢選択でQwen2.5-72B-Instructが最高成績を収め、コード生成ではGPT-4oが最良であった。アラビア語と英語のpass@1スコアには約0.97の相関があり、言語固有のプロンプト品質がモデル性能に大きく影響することが示された。"
+    },
+    {
+      "rawArticleId": "536",
+      "titleJa": "GradioでMCPサーバーを実装するAIショッピングアシスタントの構築例",
+      "summary100Ja": "GradioのMCP統合を使い、IDM-VTONによる仮想試着機能を備えたAIショッピングアシスタントをVS Codeと連携させる構築例を紹介した記事。",
+      "summary200Ja": "GradioのmcpサポートとPythonの関数をMCPツールに自動変換する機能を活用し、仮想試着AI（IDM-VTON）をMCPサーバーとして公開する方法を示している。VS CodeのAIチャット機能と組み合わせることで、衣類画像をURLで指定するだけでLLMが自律的に仮想試着を実行できる。Gradio 5.28.0以降でHugging Face SpacesがMCPアプリストアとして機能する仕組みを実践的なコード例で解説した点が特徴である。"
+    },
+    {
+      "rawArticleId": "538",
+      "titleJa": "Trackio：Hugging Faceが公開した軽量実験トラッキングライブラリ",
+      "summary100Ja": "Hugging FaceがTrackioを公開。ローカルダッシュボードとHugging Face Spacesへのシームレスな共有機能を持つ、wandbドロップイン代替の無料オープンソース実験トラッキングライブラリ。",
+      "summary200Ja": "Trackioはwandbと互換性のあるAPIを持つ軽量な実験トラッキングライブラリで、ローカルダッシュボードと無料のHugging Face Spaces連携によるチーム共有機能を提供する。既存のwandb呼び出しをほぼそのまま流用できる設計で、Hugging FaceがWandBから移行した際に実際に使用したツールとして公開されたものである。Spacesを通じた実験結果の公開・共有が容易になる点でオープンな研究コミュニティに貢献する。"
+    },
+    {
+      "rawArticleId": "540",
+      "titleJa": "Hugging Face CLIが`hf`に改名—より速く使いやすいコマンド体系へ",
+      "summary100Ja": "Hugging Face CLIがhuggingface-cliからhfに改名され、`hf <resource> <action>`形式の整理されたコマンド体系を採用。hf jobsコマンドも新たに追加された。",
+      "summary200Ja": "Hugging Face CLIがhfにリブランドされ、認証・キャッシュ・リポジトリ管理などのコマンドをリソース種別でグループ化した直感的な構造に再編された。旧来のhuggingface-cliは引き続き動作し非推奨警告で移行を誘導する設計である。新たに追加されたhf jobsは従量課金制でGPUインフラ上の任意のスクリプトやDockerイメージを実行できるジョブ管理コマンドで、Pro・チーム・Enterpriseユーザー向けに提供されている。"
+    },
+    {
+      "rawArticleId": "542",
+      "titleJa": "ParquetのContent-Defined Chunking：HubのXetストレージで差分転送を実現",
+      "summary100Ja": "PyArrowとPandasにParquet CDC（コンテンツ定義チャンキング）が追加された。Hugging FaceのXetストレージと組み合わせることで、変更部分のみを転送しアップロード・ダウンロードを大幅に削減できる。",
+      "summary200Ja": "Apache Parquetのcontent-defined chunking（CDC）機能がPyArrow（v21.0.0以降）とPandasに実装され、Hugging FaceのXetストレージとの組み合わせによりParquetファイルの差分転送が可能になった。列の追加・削除・行の追加など一般的なユースケースでアップロード量を劇的に削減でき、同一データのコピーではゼロバイト転送も実現する。Hugging FaceがホストするParquetデータが4PB以上に達する中でのストレージ最適化として重要な意義を持つ。"
+    },
+    {
+      "rawArticleId": "544",
+      "titleJa": "TimeScope：長時間動画の視覚言語モデル理解能力を測るベンチマーク",
+      "summary100Ja": "1分〜8時間の動画に短い「ニードルクリップ」を挿入して位置特定・情報統合・細粒度動作認識の3能力を測るベンチマークTimeScopeを公開。現行モデルは1時間超で急落する。",
+      "summary200Ja": "TimeScopeは長時間動画理解における真の時間的理解能力を評価するオープンソースベンチマークで、静止画ではなく短い動画クリップをニードルとして長い映像に埋め込む設計が特徴である。評価の結果、Gemini 2.5 Proを除くほぼ全モデルが1時間超で性能が急落し、動作カウントなど細粒度の時間知覚タスクではモデルサイズに関わらず性能が低迷することが判明した。長時間動画AIの誇張された能力主張に対し客観的な評価軸を提供する点で意義深い。"
+    },
+    {
+      "rawArticleId": "546",
+      "titleJa": "DiffusersとPEFTを使ったFluxのLoRA推論を高速化する方法",
+      "summary100Ja": "LoRAのホットスワップ・torch.compile・FP8量子化・Flash Attention 3を組み合わせてFlux.1-DevのLoRA推論を約2.3倍高速化する最適化レシピを解説。",
+      "summary200Ja": "LoRAを動的に交換しながら再コンパイルなしにtorch.compileの速度メリットを維持するhotswap機能と、FP8量子化・Flash Attention 3を組み合わせることで、H100ではベースラインの2.23倍の推論速度を達成した。RTX 4090（24GB）などのコンシューマGPUでも、T5テキストエンコーダのNF4量子化を追加することで全パイプラインを実行可能になり約3.3倍の速度向上を確認している。本レシピはFlux以外のモデルにも応用できる汎用的な手法として提示されている。"
+    },
+    {
+      "rawArticleId": "548",
+      "titleJa": "NVIDIA NIMでHugging Face上の10万以上のLLMを高速デプロイする",
+      "summary100Ja": "NVIDIAのNIM推論マイクロサービスが単一のDockerコンテナでHugging Face上の多様なLLMを自動検出・バックエンド選択・最適化してデプロイできるようになった。",
+      "summary200Ja": "NIM（NVIDIA Inference Microservice）が単一コンテナ内でTensorRT-LLM・vLLM・SGLangを統括し、Hugging Faceリポジトリのモデルを渡すだけでアーキテクチャ検出・量子化形式識別・バックエンド選択・パフォーマンス設定を自動実行するようになった。Transformersチェックポイント・GGUF・TensorRT-LLMエンジンなど主要形式に対応しており、手動チューニングなしにNVIDIAアクセラレーテッドインフラ上での本番デプロイを簡素化する。"
+    },
+    {
+      "rawArticleId": "550",
+      "titleJa": "Arc仮想細胞チャレンジ入門：ML技術者向けの生物学的背景解説",
+      "summary100Ja": "Arc Instituteの仮想細胞チャレンジを生物学の知識が少ないML技術者向けに解説。CRISPRによる遺伝子サイレンシングの細胞への影響予測タスクの背景・データ・評価指標を網羅的に説明。",
+      "summary200Ja": "Arc仮想細胞チャレンジは、CRISPRで遺伝子をサイレンシングした際の細胞トランスクリプトームへの影響を、未知の細胞タイプにも汎化して予測するモデルを訓練するコンペティションである。訓練データは22万細胞のRNA-seqプロファイルで構成され、ArcのベースラインモデルSTATEはLlamaバックボーンの状態遷移モデルとBERT風細胞埋め込みモデルの組み合わせである。評価指標（Perturbation Discrimination・Differential Expression・MAE）の意味と計算方法をML視点から丁寧に解説している。"
+    },
+    {
+      "rawArticleId": "552",
+      "titleJa": "Consilium：複数のLLMが議論してコンセンサスに達するマルチエージェントプラットフォーム",
+      "summary100Ja": "複数のLLMがラウンドテーブル形式で議論し、多数決・ランク集計・コンセンサス等の決定モードで最終回答を導くGradioベースのMCPサーバーConsuliumを紹介。",
+      "summary200Ja": "ConsuliumはGradio Agents & MCP Hackathonで開発されたマルチLLMプラットフォームで、MistralやDeepSeek-R1などのモデルが役割分担（提唱者・批評者・戦略顧問等）をもって最大5ラウンドの構造的議論を行い合意形成する仕組みを持つ。MCPサーバーとしてClineやVS Codeと統合でき、Webリサーチ機能も内蔵している。マイクロソフトのMAI-DxOなどの先行研究と同様に、複数AIの協調が単独AIを大幅に上回れることを示す実装例として位置づけられる。"
+    },
+    {
+      "rawArticleId": "554",
+      "titleJa": "FutureBench：AIエージェントの未来予測能力を評価する新ベンチマーク",
+      "summary100Ja": "ニュースや予測市場Polymarketから取得した実際の未来イベントの予測タスクでLLMエージェントを評価するFutureBenchを提案。データ汚染が構造上不可能な点が特徴。",
+      "summary200Ja": "FutureBenchはニュース記事や予測市場（Polymarket）から生成した時限付き予測タスクでエージェントを評価するベンチマークで、まだ起きていない出来事を訓練データに含めることが不可能なためデータ汚染問題を回避できる。フレームワーク・ツール・モデル性能をそれぞれ独立して比較できる3層評価構造を持ち、ツールを持つエージェントがベースLLMを上回ることを初期結果で確認している。未来予測能力が真の知性を測る指標として重要であるという問題意識に基づいている。"
+    },
+    {
+      "rawArticleId": "556",
+      "titleJa": "Gradio MCPサーバーの5つの主要改善点—v5.38.0",
+      "summary100Ja": "Gradio v5.38.0でMCPサーバーに5機能を追加。ローカルファイル自動アップロード・リアルタイム進捗通知・OpenAPIからMCPへの1行変換・認証ヘッダー対応・ツール説明カスタマイズ。",
+      "summary200Ja": "Gradio 5.38.0でMCPサーバーの実用性を高める5機能が追加された。ファイルアップロードMCPサーバーによるローカルファイルの自動処理、進捗通知のリアルタイムストリーミング、gr.load_openapi関数による既存バックエンドAPIの自動MCP化、gr.Headerによる認証情報の明示的な受け渡し、そしてapi_descriptionによるツール説明のカスタマイズである。Gradio/Spacesをエンタープライズ向けMCPサーバー基盤として位置づける取り組みの一環として提供された。"
+    },
+    {
+      "rawArticleId": "558",
+      "titleJa": "Ettin Suite：同一レシピで訓練したエンコーダ・デコーダのペアモデル群",
+      "summary100Ja": "同一データ・アーキテクチャ・訓練レシピでエンコーダのみ・デコーダのみのモデル（17M〜1B）を訓練したEttinスイートを発表。ModernBERT超えと、Llama 3.2超えのデコーダを実現。",
+      "summary200Ja": "Ettinは2Tトークン・同一データ・同一訓練レシピでエンコーダとデコーダを並行訓練した初のモデルスイートで、両アーキテクチャの公平な比較を可能にする。エンコーダはModernBERT（全データオープン版）を上回り、デコーダはLlama 3.2やSmolLM2を超える性能を示した。実験から、分類・検索にはエンコーダが、生成にはデコーダが構造的に優位であり、逆目標での追加訓練では性能が大きく損なわれることが確認された。"
+    },
+    {
+      "rawArticleId": "560",
+      "titleJa": "HubのストレージをGit LFSからXetへ移行する技術詳解",
+      "summary100Ja": "Hugging Face HubのストレージバックエンドをGit LFSからXetへ移行した半年間の取り組みを解説。現在100万人超が利用し、20PBを超えるリポジトリが移行済み。",
+      "summary200Ja": "Hugging FaceはGit LFS Bridgeとバックグラウンド移行処理という2つの仕組みにより、Hubユーザーのワークフローを中断することなく20PBを超えるストレージをXetへ段階的に移行した。Git LFS Bridgeは旧クライアント向けに署名付きURLを生成してXetストレージからファイルを再構築して返す機能で、バックグラウンド移行はwebhookを起点に並行処理される設計になっている。mradermacherの6.1PBなど大規模ユーザーの移行で得られたスケーリングの知見も詳述されている。"
+    },
+    {
+      "rawArticleId": "562",
+      "titleJa": "Kimina-Prover：テスト時強化学習探索で形式定理証明の最高精度を達成",
+      "summary100Ja": "Kimina-Prover-72BをリリースしてMiniF2FベンチマークでPass@1024が87.7%・TTRLサーチで92.2%を達成。補題活用パターンと誤り訂正機能が主要な革新点。",
+      "summary200Ja": "Kimina-Prover-72BはQwen2.5-72BベースにKimi k1.5 RLパイプラインで訓練された定理証明モデルで、Test-Time Reinforcement Learning（TTRL）サーチフレームワークにより中間補題を再帰的に発見・組み合わせて複雑な証明を構築する。Lean 4のエラーメッセージを解釈して証明を修正する能力も持ち、MiniF2FでPASS@1024が87.7%、TTRLサーチで92.2%という最高精度を達成した。補題利用率向上のための報酬シェーピング手法も詳述されている。"
+    },
+    {
+      "rawArticleId": "564",
+      "titleJa": "ロボット推論の非同期化：行動予測と実行を分離して応答性を高める",
+      "summary100Ja": "ロボットポリシーの行動予測と実行を別プロセスに分離する非同期推論アーキテクチャを提案。SmolVLAでのタスク完了時間を約2倍高速化した。",
+      "summary200Ja": "ロボットポリシーが行動チャンクを予測している間にロボットが待機するという逐次推論の問題を解決するため、PolicyServer（GPU推論）とRobotClient（行動実行）を分離しgRPC通信で接続する非同期推論アーキテクチャを提案した。クライアントはキュー長が閾値を下回ると自動的に新しい観測を送信し、受信した新しいチャンクを既存キューに統合することで推論待機ゼロを実現し、SmolVLAでタスク完了時間を約2倍短縮した。"
+    },
+    {
+      "rawArticleId": "566",
+      "titleJa": "ScreenEnv：Dockerコンテナ内のUbuntuデスクトップでGUIエージェントを構築・デプロイ",
+      "summary100Ja": "DockerコンテナでUbuntuデスクトップ環境を起動し、MCPまたは直接API経由でLLMエージェントがGUI操作を実行できるPythonライブラリScreenEnvを公開。",
+      "summary200Ja": "ScreenEnvは孤立したUbuntuデスクトップ環境をDockerで提供し、マウス・キーボード操作・画面録画・ターミナルアクセスを含むフルGUI制御を直接APIまたはMCPサーバー経由で利用できるPythonライブラリである。smolagentsとのネイティブ統合により、任意のVLMをバックエンドとしたカスタムデスクトップエージェントを数十行のコードで構築でき、AMD64とARM64の両アーキテクチャをサポートしている。"
+    },
+    {
+      "rawArticleId": "568",
+      "titleJa": "Hugging Face MCPサーバーの構築：設計判断とStreamable HTTP採用の経緯",
+      "summary100Ja": "hf.co/mcpの公式MCPサーバー開発の経緯を公開。Streamable HTTPのステートレス・ダイレクトレスポンス構成を採用した理由と、MCP仕様の急速な進化への対応方法を詳述。",
+      "summary200Ja": "Hugging Faceの公式MCPサーバーはユーザーごとのツール設定をリクエスト時に動的に解決するステートレス設計を採用し、本番環境ではStreamable HTTPのダイレクトレスポンスモードを使用している。SSE→Streamable HTTPへの仕様移行への対応、164種類ものMCPクライアントへの対応、ブラウザからのアクセスに対するフレンドリーなUIの実装など、実際の運用から得た知見が詳細に共有されている。"
+    },
+    {
+      "rawArticleId": "570",
+      "titleJa": "Reachy Mini：AI実験と人間-ロボットインタラクション向けのオープンソース卓上ロボット",
+      "summary100Ja": "Pollen RoboticsとHugging Faceが299ドルからのオープンソース卓上ロボットReachy Miniを発表。Python SDKで完全プログラム可能で、Hugging Faceのモデルとシームレスに統合できる。",
+      "summary200Ja": "Reachy MiniはPollen RoboticsとHugging Faceが共同で開発した高さ28cmのオープンソース卓上ロボットで、Liteバージョン（299ドル）とRaspberry Pi 4搭載のCompute版（449ドル）の2種類がある。カメラ・4マイク・スピーカーを搭載しPython SDKで制御可能で、Hub上のモデルを活用した音声・視覚インタラクションアプリの開発・共有・利用ができる。10Mユーザーのコミュニティと連携したロボット行動の共有エコシステムの構築を目指している。"
+    },
+    {
+      "rawArticleId": "572",
+      "titleJa": "AMD MI300向けカスタムCUDAカーネルの最適化プロセス",
+      "summary100Ja": "AMD MI300X上でLlama 3.1 405BのFP8推論を高速化するため、残差接続・RMSNorm・SwiGLU・スキニーGEMMの3種類のカスタムカーネルを開発・公開した。",
+      "summary200Ja": "Hugging FaceとAMDが協力し、MI300X（8台）上でvLLMを使ったLlama 3.1 405B FP8推論を高速化するカスタムROCmカーネルを開発した。MI300Xのアーキテクチャ（スレッド→ワープ→コンピュートユニット→XCDs→全体）を丁寧に解説した上で、残差接続+RMSNorm+FP8変換融合カーネル・SwiGLU+FP8変換融合カーネル・スキニーGEMMカーネルの3つを最適化しhf-rocm-kernelsとして公開した。"
+    },
+    {
+      "rawArticleId": "574",
+      "titleJa": "Gradio MCPサーバーでLLMに新しいスキルを付与する方法",
+      "summary100Ja": "MCPとGradioを使えば、Hugging Face Spacesにある数千のAIモデルをLLMのツールとして追加できる仕組みを解説。Flux.1 Krea devによる画像編集を例として示す。",
+      "summary200Ja": "Gradio 5.28.0以降、Hugging Face SpacesはMCPプロトコルに対応しており、数千のAIアプリをLLMのツールセットに追加する「MCPアプリストア」として機能する。設定ページからSpaceを選ぶだけでCursorなどのMCPクライアントに接続でき、Flux.1 Kontext devを例に画像編集をLLMに委任する方法を具体的に示している。ZeroGPU搭載Spaceの複製にはProアカウントが必要な点も触れられている。"
+    },
+    {
+      "rawArticleId": "576",
+      "titleJa": "SmolLM3：3Bパラメータで多言語・長文脈・デュアルモード推論を実現する小規模モデル",
+      "summary100Ja": "Hugging FaceがSmolLM3-3Bを公開。11Tトークン訓練・6言語対応・128Kコンテキスト・think/no_thinkモード切替対応で、同規模Llama 3.2やQwen2.5-3Bを上回る性能を持つ。",
+      "summary200Ja": "SmolLM3-3Bは3段階事前学習（安定フェーズ8T・コンテキスト拡張250B・減衰フェーズ1T）とGQA・NoPE・イントラドキュメントマスキングを採用した3Bモデルで、英・仏・西・独・伊・ポルトガル語の6言語に対応し128Kコンテキストを処理できる。SFTとAnchoredアライメントによるポストトレーニングによりthink/no_thinkのデュアルモード推論が可能になった。完全オープンな訓練レシピ（データ混合比・アーキテクチャ詳細・中間チェックポイント）とともに公開されている。"
+    },
+    {
+      "rawArticleId": "578",
+      "titleJa": "Hugging Faceの本番インフラを支える3つの重要アラートシステム",
+      "summary100Ja": "Hugging Faceのインフラチームが、NATゲートウェイスループット監視・ログアーカイブ成功率・APIエラーレートという3種の本番アラートの設計思想と実際の事例を解説。",
+      "summary200Ja": "Hugging FaceのインフラチームがNATゲートウェイのスループット異常検知・ログアーカイブパイプラインの成功率監視・APIエラーレートの3つのアラートの仕組みを公開した。NATアラートはインフラ変更時のコスト増や経路設定ミスの早期発見に、ログアーカイブアラートはFilebeat-Logstash-Elasticsearch-S3パイプラインの障害検知に機能する。実際のインシデント事例とともに各アラートが本番安定性に果たす役割が具体的に述べられている。"
+    },
+    {
+      "rawArticleId": "580",
+      "titleJa": "マルチモーダルデータパイプラインの効率化：ナップサックパッキングでパディングを削減",
+      "summary100Ja": "ナップサックパッキング戦略でマルチモーダル訓練データのバッチを構成することで、パディングを60%削減しGPU稼働率を大幅に改善した方法を解説。",
+      "summary200Ja": "nanoVLMプロジェクトでのGPUアイドル問題の調査から、訓練バッチの約60%がパディングトークンで埋められていることが判明した。その解決策として、bin-packingアルゴリズムを応用したナップサックパッキング戦略でシーケンスをバッチに詰め込む手法を採用し、PythonのIterableDatasetとプロデューサー・コンシューマーパターンで効率的なマルチモーダルバッチングを実現した。各段階のコード実装と可視化を含む体系的なチュートリアルとして公開されている。"
+    },
+    {
+      "rawArticleId": "582",
+      "titleJa": "NeurIPS 2025 E2LMコンペ：LLMの早期訓練評価ベンチマークを構築するコンペティション",
+      "summary100Ja": "NeurIPS 2025で開催されるE2LMコンペを発表。訓練初期（〜200Bトークン）のLLMに意味のある評価信号を与えられるSTEM科学知識ベンチマークを参加者が競って構築する。",
+      "summary200Ja": "E2LM（Early Training Evaluation of Language Models）コンペは、LLMの初期訓練段階（〜200Bトークン）で識別力の高い評価シグナルを提供するベンチマーク構築を競うNeurIPS 2025コンペティションである。信号品質・ランキング一貫性・科学的知識整合性の3指標で評価し、公開モデルチェックポイント（0.5B・1B・3B）でローカル採点が可能な一方、最終2指標の計算に使うチェックポイントは非公開のため過学習を防ぐ設計になっている。"
+    },
+    {
+      "rawArticleId": "584",
+      "titleJa": "Sentence Transformers v5でスパースエンベディングモデルを訓練・ファインチューニングする",
+      "summary100Ja": "Sentence Transformers v5でSPLADE等のスパースエンベディングモデルのファインチューニングに対応。Trainer・損失関数・評価器など全コンポーネントを詳細に解説。",
+      "summary200Ja": "Sentence Transformers v5.0が、密ベクトルの埋め込みモデルに加えてSPLADEなどのスパースエンベディングモデルの訓練をサポートした。スパースモデルは30,000次元以上の高次元ベクトルで各次元が語彙の単語に対応するため解釈性が高く、ハイブリッド検索で密モデルと組み合わせると特に効果的である。本記事ではモデル・データセット・損失関数・Trainer・評価器の各コンポーネントの設定方法を、医療ドメインへのファインチューニング例を通じて詳解している。"
+    },
+    {
+      "rawArticleId": "586",
+      "titleJa": "NVIDIA Llama Nemotron Nano VLMがHugging Face Hubに登場",
+      "summary100Ja": "NVIDIAがドキュメント処理に特化した8BパラメータのVLM「Llama Nemotron Nano VL」をHugging Face Hubで公開した。OCRBench v2でOCRや表・図解の抽出に高い精度を示す。",
+      "summary200Ja": "NVIDIAがLlama-3.1-8B-InstructとC-RADIOv2-VLMを組み合わせたVLM「Llama Nemotron Nano VL」をHugging Face Hubで公開した。請求書・契約書・PDF等の複雑な文書からテキストや表を高精度で抽出できる。OCRBench v2ベンチマークで業界トップレベルの性能を記録しており、NVIDIAの NeMoを使ったカスタムファインチューニングも可能。"
+    },
+    {
+      "rawArticleId": "588",
+      "titleJa": "Gemma 3nがオープンソースエコシステムで正式利用可能に",
+      "summary100Ja": "GoogleのオンデバイスマルチモーダルLLM「Gemma 3n」がTransformers、MLX、llama.cpp、Ollamaなど主要OSSライブラリで正式利用可能になった。E2B（実質2B）とE4B（実質4B）の2サイズを提供。",
+      "summary200Ja": "GoogleがGoogle I/Oでプレビューを発表していたGemma 3nが、Transformers、MLX、llama.cpp、Transformers.js、Ollamaなど主要OSSライブラリで正式に利用可能になった。MatFormerアーキテクチャとPer-Layer Embeddingsにより、E2Bモデルは2GBのGPU RAMで動作し、E4BはLMArenaでサブ10Bモデル初の1300+スコアを達成。画像・テキスト・音声・動画の4モダリティをサポートし、140言語のテキスト対応も特徴。"
+    },
+    {
+      "rawArticleId": "590",
+      "titleJa": "SGLangにTransformersバックエンドが統合される",
+      "summary100Ja": "高スループット推論エンジンSGLangがHugging Face Transformersをバックエンドとしてサポートし、Transformers互換の任意のモデルを高性能推論で実行できるようになった。",
+      "summary200Ja": "SGLangがHugging Face Transformersをバックエンドとして統合し、ネイティブ対応していないモデルも自動的にTransformers実装にフォールバックして実行できるようになった。これにより、Transformersに新規追加されたモデルやHugging Face Hubのカスタムモデルを、SGLangのRadixAttentionなど高速化機能とともに即座に利用できる。LoRAサポートやVLM対応は今後追加予定。"
+    },
+    {
+      "rawArticleId": "592",
+      "titleJa": "コンシューマー向けハードウェアでFLUX.1-devをLoRAファインチューニング",
+      "summary100Ja": "diffusersライブラリを用いてFLUX.1-devをQLoRAでファインチューニングする手法を解説。VRAM10GB未満の単一GPUでNVIDIA RTX 4090相当の実装が可能。",
+      "summary200Ja": "Hugging Faceがdiffusersライブラリを使ったFLUX.1-devのQLoRAファインチューニング手法を公開した。bitsandbytesによる4ビット量子化、8ビットAdamWオプティマイザ、勾配チェックポイント、潜在変数キャッシュの組み合わせでVRAM使用量を10GB未満に抑える。torchaoによるFP8学習でさらなる高速化も可能。Google Colabで実行可能なノートブックも提供されている。"
+    },
+    {
+      "rawArticleId": "594",
+      "titleJa": "GroqがHugging Face Inference Providersに対応",
+      "summary100Ja": "GroqがHugging Face Hubの推論プロバイダーとして新たに追加された。LPU技術により低レイテンシ・高スループットでMeta Llama 4やQwen QWQ-32Bなどの最新オープンモデルを利用できる。",
+      "summary200Ja": "GroqがHugging Face Hubの推論プロバイダーエコシステムに参加した。GroqのLPU（Language Processing Unit）はGPUの制約を克服し、LLM推論において低レイテンシと高スループットを実現する。HuggingのクライアントSDK（PythonおよびJavaScript）から、HFトークンまたはGroq APIキーを使ってサーバーレス推論を利用できる。PRO会員は月額2ドル分のInferenceクレジットを利用可能。"
+    },
+    {
+      "rawArticleId": "596",
+      "titleJa": "長いプロンプトが他のリクエストをブロックする仕組みと対策",
+      "summary100Ja": "vLLMなどLLM推論サーバーで長いプロンプトが他のリクエストの処理をブロックする問題と、並列プリフィル・プリフィルデコード分離（Disaggregated Prefill）による解決策を解説する。",
+      "summary200Ja": "TNG社がH100 GPUクラスターでLLMを自社ホスティングする中で発見した、長いプロンプトが後続リクエストのキューをブロックする問題を分析している。vLLMの最新アップデートで実装されたリクエスト並列プリフィルは短いリクエストの初回トークン生成時間を改善するが、デコード速度の低下は残る。根本的な解決策としてプリフィルとデコードを異なるGPUで処理する「Disaggregated Prefill」アーキテクチャを紹介し、測定結果を示している。"
+    },
+    {
+      "rawArticleId": "598",
+      "titleJa": "Hugging Face Kernel Hubを5分で習得する",
+      "summary100Ja": "Hugging Face Kernel Hubを使えば、FlashAttentionやカスタム量子化カーネルなどの最適化済みコンピュートカーネルをローカルでコンパイルせず1行で呼び出せる。",
+      "summary200Ja": "Hugging Face Kernel Hubは、FlashAttentionやRMSNorm・GELUなどの最適化済みカーネルをPython/PyTorchバージョンに合わせて自動ダウンロードし、数秒で実行できるリポジトリだ。従来のFlashAttentionビルドに必要だった数時間の作業を1行のコード（get_kernel()呼び出し）に置き換えられる。RMSNormカーネルの実装例ではベースラインと比較したベンチマーク測定方法も解説している。"
+    },
+    {
+      "rawArticleId": "600",
+      "titleJa": "Featherless AIがHugging Face Inference Providersに対応",
+      "summary100Ja": "Featherless AIがHugging Face Hubの推論プロバイダーに追加された。DeepSeek、Meta、Google、Qwenなど多数のオープンモデルをサーバーレス価格で提供する独自のGPUオーケストレーション技術が特徴。",
+      "summary200Ja": "Featherless AIがHugging Face Hubの推論プロバイダーエコシステムに参加した。同社は独自のモデルロードとGPUオーケストレーション技術で、低コストのサーバーレス価格でありながら非常に幅広いモデルカタログを提供する点が特徴。HFクライアントSDK（PythonおよびJavaScript）からHFトークンまたはFeatherless AI APIキーを使ってDeepSeek-R1などのモデルを利用できる。"
+    },
+    {
+      "rawArticleId": "602",
+      "titleJa": "Isaac GR00T N1.5をLeRobot SO-101アームでポストトレーニングする手順",
+      "summary100Ja": "NVIDIAがアップデートしたロボット基盤モデルGR00T N1.5をオープンソースのSO-101アームでファインチューニングするステップバイステップのチュートリアルを公開した。",
+      "summary200Ja": "NVIDIAがIsaac GR00T N1（汎用ヒューマノイドロボット向け世界初のオープン基盤モデル）の最初のメジャーアップデートGR00T N1.5を発表した。本記事では、LeRobot SO-101アームのテレオペレーションデータを使ったポストトレーニング（ファインチューニング）の手順を解説する。EmbodimentTagシステムで多様なロボットプラットフォームへの適応が容易であり、実機デプロイまでの全ステップを示している。"
+    },
+    {
+      "rawArticleId": "604",
+      "titleJa": "Hugging FaceとNVIDIAが「Training Cluster as a Service」を発表",
+      "summary100Ja": "Hugging FaceとNVIDIAがGTC Parisで大規模GPUクラスターをサービスとして提供する「Training Cluster as a Service」を発表。世界中の研究機関が必要な時だけGPUクラスターにアクセスできる。",
+      "summary200Ja": "Hugging FaceとNVIDIAがGTC Parisで共同発表した「Training Cluster as a Service」は、大学・国立研究所・企業など世界中の研究機関が必要な期間だけ大規模GPUクラスターを利用できる仕組みだ。NVIDIA DGX Cloud Leptonで提供されるNVIDIA Hopper・GB200などの最新アクセラレーターをオンデマンドで利用できる。希少遺伝性疾患研究機関TIGEMや数学推論AI組織Numinaなどが既に活用している。"
+    },
+    {
+      "rawArticleId": "606",
+      "titleJa": "ScreenSuite：GUIエージェント向け最大規模の評価スイート",
+      "summary100Ja": "Hugging FaceがGUIエージェントのVLM評価スイート「ScreenSuite」を公開した。知覚・グラウンディング・単一ステップ・マルチステップの13ベンチマークを統合し、DockerでUbuntu/Android環境も構築可能。",
+      "summary200Ja": "Hugging FaceがGUIエージェント向けの包括的評価スイート「ScreenSuite」を公開した。ScreenQA、ScreenSpot、OSWorld、AndroidWorldなど13のベンチマークを統合し、知覚・グラウンディング・単一ステップアクション・マルチステップエージェントの全能力を評価する。ビジョンのみ（アクセシビリティツリーやDOM不使用）で評価する設計で、DockerによるUbuntu/Androidローカル環境の構築もサポートしている。"
+    },
+    {
+      "rawArticleId": "608",
+      "titleJa": "nanoVLMでKVキャッシュをゼロから実装する",
+      "summary100Ja": "nanoVLMリポジトリでKVキャッシュをPyTorchでゼロから実装し、生成速度を38%向上させた実装の詳細と仕組みを解説する。",
+      "summary200Ja": "nanoVLM（純粋なPyTorchで書かれたVLM学習リポジトリ）にKVキャッシュをゼロから実装し、生成速度が38%向上した。自己注意機構でのKey・Valueの再計算を排除し、プリフィルフェーズとデコードフェーズを分離することで、シーケンス長に対して線形の計算量を実現する。実装変更点はAttentionブロック・言語モデル・生成ループの3箇所に及び、コードと理論を併せて丁寧に解説している。"
+    },
+    {
+      "rawArticleId": "610",
+      "titleJa": "ArmチップでリアルタイムAIサウンド生成：クリエイティブな個人ツール",
+      "summary100Ja": "Stability AIのStable Audio OpenモデルをArmベースCPUで動作させ、テキストプロンプトからスタジオ品質の音声を数秒で生成してAbleton Liveに連携させる個人ツールの実装を紹介する。",
+      "summary200Ja": "Arm社のエンジニアがStable Audio Open（Stability AI）とPyTorch/TorchAudioを組み合わせ、GPU不要のArmベースCPUのみでテキストプロンプトから音声を数秒で生成するツールを構築した。マルチスレッド最適化とDPMPP-3M-SDEサンプラーを使って推論を効率化し、生成した.wavファイルをAbleton Liveのプロジェクトフォルダに直接出力することで作曲ワークフローに統合している。"
+    },
+    {
+      "rawArticleId": "612",
+      "titleJa": "Holo1：GUIエージェント「Surfer-H」を駆動するVLMファミリー",
+      "summary100Ja": "H CompanyがGUI自動化に特化したオープンソースAction VLMファミリー「Holo1」（3Bと7B）とWebClickベンチマークを公開した。Holo1-7BはUI位置特定精度で小型モデル最高の76.2%を達成。",
+      "summary200Ja": "H CompanyがUI理解と精密な位置特定に特化したオープンソースAction VLMファミリー「Holo1」をHugging Face Hubで公開した。Qwen2.5-VLアーキテクチャベースのHolo1-7BはUI位置特定ベンチマークで76.2%の平均精度を達成する。これを基盤とするウェブエージェント「Surfer-H」はWebVoyagerベンチマークで1タスクあたり0.13ドルのコストで92.2%の精度を示した。"
+    },
+    {
+      "rawArticleId": "614",
+      "titleJa": "SmolVLA：LeRobotコミュニティデータで学習した軽量Vision-Language-Actionモデル",
+      "summary100Ja": "Hugging Faceが450Mパラメータのオープンソースロボティクスモデル「SmolVLA」を公開した。コンシューマーGPUで動作し、非同期推論でタスクスループットを2倍に向上させる。",
+      "summary200Ja": "SmolVLA-450MはSmolVLM2をVLMバックボーンとし、FlowMatchingトランスフォーマーをアクションエキスパートとして組み合わせたコンパクトなロボティクスVLAモデルだ。公開コミュニティデータセットのみで学習し、視覚トークン削減・レイヤースキップ・非同期推論スタックにより、より大規模なVLAと同等以上の性能をSO-100/101などの低コストハードウェアで実現する。"
+    },
+    {
+      "rawArticleId": "616",
+      "titleJa": "TRLでvLLMをコロケーション実行し、GPUを余さず活用する",
+      "summary100Ja": "TRL v0.18.0からvLLMを学習GPUと同じプロセスで実行する「コロケーション」モードに対応し、GRPOトレーニング時のGPU利用効率と最大1.73倍のスループット向上を実現した。",
+      "summary200Ja": "従来のTRLではvLLMが別プロセスの専用GPUで動作するため、学習・推論間でGPUが交互に待機するボトルネックがあった。TRL v0.18.0からvLLMを学習と同一プロセスグループ内に配置する「コロケーション」モードが追加され、全GPUを学習・推論の両方に活用できるようになった。HTTP通信が不要となり、GRPO設定でvllm_mode=\"colocate\"を指定するだけで利用可能。7Bモデルで最大1.35倍、72BモデルのTP設定次第では最大1.73倍のスループット向上を確認している。"
+    },
+    {
+      "rawArticleId": "618",
+      "titleJa": "CodeAgents＋構造化出力：アクション実行をより信頼性高く行う方法",
+      "summary100Ja": "smolagentsのCodeAgentが思考とコードをJSON形式で出力する「構造化CodeAgent」モードを実装することで、複数ベンチマークで2〜7ポイントの精度向上を達成したことを報告する。",
+      "summary200Ja": "Hugging Faceの研究チームが、CodeAgentに構造化出力（JSON形式でthoughtsとcodeを出力）を組み合わせることでエージェント性能が向上することを実証した。15,724のエージェントトレース分析により、最初のステップのパースエラーが成功率を21.3%低下させることが判明し、構造化生成によるパース信頼性の向上が性能改善の主要因となっている。ただし小規模モデルでは「構造化コスト」として性能低下が見られる場合もある。"
+    },
+    {
+      "rawArticleId": "620",
+      "titleJa": "Liger GRPOがTRLと統合：メモリ使用量を40%削減",
+      "summary100Ja": "LigerのChunked Loss手法をGRPO損失に適用し、TRLと統合することでGRPOトレーニングのピークメモリ使用量を最大40%削減した。FSDP・PEFTのサポートも追加された。",
+      "summary200Ja": "LigerカーネルのChunked Loss手法をGRPO損失に拡張し、TRL（GRPOConfig.use_liger_loss=True）に統合した。バッチ次元でlogitsを分割して処理することでGPUメモリへのフルlogits保存を回避し、大バッチほど効果が大きく最大40%のメモリ削減を達成。FSDP・LoRA/QLoRA（PEFT）のサポートも追加し、vLLMサーバーと組み合わせることで学習時の生成速度も向上する。"
+    },
+    {
+      "rawArticleId": "622",
+      "titleJa": "Dell Enterprise Hub：オンプレミスAI構築のための統合プラットフォーム",
+      "summary100Ja": "Hugging Faceとの連携でアップデートされたDell Enterprise Hubでは、Llama 4・DeepSeek R1などの人気モデルをDell AIサーバーおよびAI PCにワンクリックで展開できる。AIアプリケーションカタログも新規追加。",
+      "summary200Ja": "Dell Tech WorldでHugging FaceとDellが刷新した「Dell Enterprise Hub」を発表した。Llama 4、DeepSeek R1、Gemma 3などの主要モデルをNVIDIA H200・AMD MI300X・Intel Gaudi 3搭載Dell AIサーバー向けに最適化済みコンテナで提供し、DockerやKubernetesで迅速に展開できる。さらにOpenWebUIとAnythingLLMを含むAIアプリケーションカタログ、Dell AI PC向けオンデバイスモデル対応、Python SDK/CLIも新たに追加された。"
+    },
+    {
+      "rawArticleId": "624",
+      "titleJa": "PythonでMCPエージェントを約70行で実装する",
+      "summary100Ja": "huggingface_hub SDKをMCPクライアントとして拡張し、MCPサーバーのツールをLLMに接続するエージェントをPythonで約70行で実装する方法を解説する。",
+      "summary200Ja": "Hugging FaceがPython版「Tiny Agents」を公開した。huggingface_hubのSDKにMCPクライアント機能を追加し、stdio/SSE/HTTPのMCPサーバーに接続してツールを取得・実行するエージェントを構築できる。エージェントの本質はMCPクライアント上のwhileループであり、CLIコマンド（tiny-agents run）またはPythonコードで既存のエージェント設定（agent.json）を読み込んで実行可能。Gradio SpacesをMCPサーバーとして利用する例も示している。"
+    },
+    {
+      "rawArticleId": "626",
+      "titleJa": "Falcon-H1：ハイブリッドヘッドアーキテクチャで効率と性能を刷新する言語モデルファミリー",
+      "summary100Ja": "TII（UAE）がTransformerのAttentionとMamba-2（SSM）を並列統合したハイブリッドアーキテクチャ「Falcon-H1」シリーズを発表した。0.5Bから34Bまで6サイズをApache 2.0ライセンスで公開。",
+      "summary200Ja": "TIIがAttentionとMamba-2 SSMを並列に組み合わせたハイブリッドアーキテクチャ「Falcon-H1」を発表した。0.5B・1.5B・1.5B-Deep・3B・7B・34Bの6サイズ×ベース/インストラクトバリアントをApache 2.0で公開。256Kコンテキスト長・18言語対応・STEM分野での高い性能が特徴で、カスタマイズされたMaximal Update Parametrization（μP）により学習の安定性と効率を高めている。"
+    },
+    {
+      "rawArticleId": "628",
+      "titleJa": "Falcon-Arabic：アラビア語言語モデルの新たな到達点",
+      "summary100Ja": "TIIがFalcon 3ベースのアラビア語特化LLM「Falcon-Arabic」（7B）を発表した。32,000アラビア語固有トークンをトークナイザーに追加し、OALL v2ベンチマークで同サイズ帯の既存モデルを超える精度を示す。",
+      "summary200Ja": "TIIがFalcon 3-7Bをベースにアラビア語向けにアダプトした「Falcon-Arabic」を発表した。トークナイザー語彙を32,000トークン拡張し、テキスト類似性に基づくエンベディング初期化で学習を加速。機械翻訳データを使わず100%ネイティブアラビア語データで継続事前学習を実施し、OALL v2ベンチマークで同サイズ帯のモデルを超え4倍大きいモデルに匹敵する性能を達成した。現在はクローズドソースで公開されている。"
+    },
+    {
+      "rawArticleId": "630",
+      "titleJa": "DiffusersにおけるFLUX.1-devの量子化バックエンドを比較する",
+      "summary100Ja": "Hugging Face Diffusersに統合されたbitsandbytes、GGUF、torchao、Quanto、ネイティブFP8の各量子化バックエンドをFLUX.1-devで比較し、メモリ削減効果と画質への影響を検証する。",
+      "summary200Ja": "FLUX.1-devのBF16フルロードには約31.5GBのメモリが必要だが、Diffusersに統合された各量子化バックエンドを使うと大幅に削減できる。bitsandbytes 4-bitなら12.6GBに、torchao int4なら10.6GBに抑えられる。各バックエンドのメモリ消費・推論時間・出力品質を実測データで比較しており、NF4がメモリ削減と画質のトレードオフとして最善のことが多いと述べている。"
+    },
+    {
+      "rawArticleId": "632",
+      "titleJa": "nanoVLM：純粋なPyTorchでVLMを学習するための最もシンプルなリポジトリ",
+      "summary100Ja": "Andrej KarpathyのnanoGPTに着想を得た軽量VLM学習リポジトリ「nanoVLM」を公開。Google ColabのフリーティアでVLMの学習・推論が可能で、コードベース全体を最小限に保ち学習に適した設計。",
+      "summary200Ja": "Hugging Faceが純粋なPyTorchで書かれた軽量VLM学習リポジトリ「nanoVLM」を公開した。SigLIPビジョンエンコーダとLlama 3アーキテクチャをモダリティプロジェクタで接続したシンプルな構成で、Google ColabフリーティアでもVQAを学習タスクとして訓練できる。事前学習済みバックボーン（google/siglip-base-patch16-224とHugging FaceTB/SmolLM2-135M）を活用し、H100で6時間・約170万サンプルの学習でデモモデルを公開している。"
+    },
+    {
+      "rawArticleId": "634",
+      "titleJa": "MicrosoftとHugging Faceがコラボレーションを拡大",
+      "summary100Ja": "Microsoft BuildでHugging FaceとMicrosoftが協力拡大を発表。Azure AI Foundryで10,000以上のHugging Faceモデルをセキュアにデプロイできるようになった。",
+      "summary200Ja": "Microsoft BuildでSatya Nadellaが発表したHugging Faceとの協力拡大により、Azure AI Foundryで1万以上のHugging Faceモデルを数クリックでデプロイできるようになった。セキュリティテスト通過済みモデルのみを掲載し、safetensors形式・リモートコード不使用を要件とする。今後はデイゼロリリース対応、トレンドモデルの毎日更新、動画・3D・タンパク質など新モダリティへの拡張も予定している。"
+    },
+    {
+      "rawArticleId": "636",
+      "titleJa": "Falcon-Edge：ファインチューニング可能な1.58ビットLLMシリーズ",
+      "summary100Ja": "TIIがBitNetアーキテクチャベースの三値重量（1.58ビット）LLMシリーズ「Falcon-Edge」（1Bと3B）を公開した。BF16・ネイティブBitNet・事前量子化の3バリアントをApache 2.0で提供。",
+      "summary200Ja": "TIIがBitNetの三値重量（{-1,0,1}）を採用した超低ビットLLMシリーズ「Falcon-Edge」を発表した。1Bと3Bの2サイズをベース/インストラクト×BF16/BitNet/事前量子化の3バリアントで提供する。事前量子化ウェイトを公開することで、onebitllmsパッケージを使ったファインチューニングが可能となっており、BitNetモデルのコミュニティエコシステム形成を目指している。"
+    },
+    {
+      "rawArticleId": "638",
+      "titleJa": "Transformersライブラリ：モデル定義の標準化に向けた取り組み",
+      "summary100Ja": "Hugging Face Transformersがvllm、SGLang、TGI、llama.cpp、MLXなどのバックエンドに共通のモデル定義として採用される方向性を示し、新規モデル貢献のさらなる簡素化を目指す方針を発表。",
+      "summary200Ja": "Hugging FaceがTransformersを推論エンジン（vLLM、SGLang、TGI等）のバックエンドとして標準化する方針を発表した。Transformersに追加されたモデルは即座にこれらのエンジンで利用可能になり、学習フレームワーク（Axolotl、UnslothなどもTransformersを利用）とのインターオペラビリティが高まる。今後はモデリングコードの簡素化・冗長コンポーネントの廃止・モジュラー定義の強化を進め、貢献コードを大幅に削減することを目標としている。"
+    },
+    {
+      "rawArticleId": "640",
+      "titleJa": "KaggleユーザーのためのHugging Faceモデルアクセス改善",
+      "summary100Ja": "KaggleがHugging Face Hub上のモデルをKaggleノートブックから直接利用・表示できる統合機能を開始した。モデルページ間の相互ナビゲーションも可能になった。",
+      "summary200Ja": "KaggleとHugging Faceが統合を開始し、Hugging FaceのモデルページからKaggleノートブックに直接遷移してモデルを使用できるようになった。KaggleノートブックでHugging Faceのモデルを参照すると自動でKaggle上にモデルページが生成され、公開ノートブックは「Code」タブに表示される。今後、オフラインノートブック提出を必要とするKaggleコンペへの対応も開発中。"
+    },
+    {
+      "rawArticleId": "642",
+      "titleJa": "Inference Endpointsで高速Whisper音声認識をデプロイ",
+      "summary100Ja": "Hugging FaceがvLLMを活用した新しいWhisper推論エンドポイントを公開した。torch.compile、CUDAグラフ、FP8 KVキャッシュにより従来比最大8倍のRTFx性能向上を達成している。",
+      "summary200Ja": "Hugging Faceが新しいWhisper推論オプションをInference Endpointsで公開した。vLLMベースの実装にtorch.compile・CUDAグラフ・FP8 KVキャッシュを組み合わせ、L4 GPU上でWhisper Large V3の転写速度が従来比最大8倍に向上した。文字誤り率（WER）はTransformersベースラインと同等を維持しており、FastRTCと組み合わせるとリアルタイム転写アプリも構築できる。"
+    },
+    {
+      "rawArticleId": "644",
+      "titleJa": "Vision Language Models（VLM）の最新動向：より良く、速く、強く",
+      "summary100Ja": "2024〜2025年のVLM分野の動向を網羅的に解説する。Any-to-anyモデル、推論VLM、軽量化、MoEデコーダ、VLA、マルチモーダルRAG・エージェント、動画モデルなどの主要トレンドを紹介。",
+      "summary200Ja": "2024年4月以降のVLM進化を包括的にまとめたブログ記事。Qwen 2.5 OmniのようなAny-to-anyモデル、Kimi-VLなどの推論VLM、SmolVLM系の小型化、LLaMA 4などMoEデコーダ搭載VLA、マルチモーダルRAGとエージェント、動画LM、新たなアライメント技術、MMT-BenchやMMPU-Proなどの新ベンチマークを体系的に解説している。"
+    },
+    {
+      "rawArticleId": "646",
+      "titleJa": "LeRobotコミュニティデータセット：ロボティクスの「ImageNet」はいつ実現するか",
+      "summary100Ja": "LeRobotコミュニティが集積するロボティクスデータセットの現状と課題を分析。一般化能力向上にはデータの多様性が鍵であり、タスクアノテーション不足・フィーチャー不整合・低品質エピソードなどの改善点を指摘する。",
+      "summary200Ja": "Hugging Face LeRobotチームが、コミュニティ貢献型ロボティクスデータセットの現状と課題を解説した。VLAモデルの汎化にはImageNetのような多様で大規模なデータが必要だが、ロボティクスデータは依然として断片化している。Hugging Face Hub上のLeRobotデータセット数は急増しているが、不完全なタスクアノテーション・フィーチャー名称の不整合・低品質エピソードなど品質上の課題も明らかになっており、具体的な改善ガイドラインを示している。"
+    },
+    {
+      "rawArticleId": "648",
+      "titleJa": "GradioでMCPサーバーを構築する方法",
+      "summary100Ja": "Gradioアプリをmcp_server=Trueで起動するだけで任意のPython関数をMCPサーバーとして公開でき、LLMからツールとして呼び出せる。Hugging Face Spacesでの無料ホストも可能。",
+      "summary200Ja": "Gradioがアプリをモデルコンテキストプロトコル（MCP）サーバーとして公開する機能をリリースした。launch(mcp_server=True)の1行追加で各APIエンドポイントがMCPツールに変換される。ツール・リソース・プロンプトのデコレータ対応、ローカルファイルの自動アップロード、進捗通知、OpenAPIからMCPへの変換、認証強化など複数の改善も加えられており、Hugging Face Spacesに公開すれば無料でホスト型MCPサーバーとして利用できる。"
+    },
+    {
+      "rawArticleId": "650",
+      "titleJa": "Qwen-3のチャットテンプレートから学ぶ4つのこと",
+      "summary100Ja": "Qwen-3のJinjaチャットテンプレートを前バージョンと比較して分析し、推論のオプション化・動的コンテキスト管理・ツール引数シリアライゼーションの改善・デフォルトシステムプロンプトの廃止という4点の設計変更を解説する。",
+      "summary200Ja": "Qwen-3のチャットテンプレートをQwen-2.5・QwQと比較することで、モデル設計の特徴が明らかになる。enable_thinkingフラグで推論ステップをオプション化し、ロールバックポイントシステムでマルチターンツール呼び出し時の<think>ブロックを動的に保存・削除する。ツール引数の二重JSONエンコード問題も修正されており、デフォルトのシステムプロンプトは廃止されている。"
+    },
+    {
+      "rawArticleId": "652",
+      "titleJa": "Llama Guard 4がHugging Face Hubに公開",
+      "summary100Ja": "MetaがLlama 4 Scoutをベースに密なFFNモデルに変換した12Bマルチモーダル安全モデル「Llama Guard 4」と、プロンプトインジェクション検出に特化した「Llama Prompt Guard 2」（86Mと22M）を公開した。",
+      "summary200Ja": "MetaがLlama Guard 4（12B密モデル）とLlama Prompt Guard 2（86Mと22M）を公開した。Llama Guard 4はLlama 4 ScoutのMoEをプルーニングした密なモデルで、画像+テキスト入力のマルチモーダル安全チェックに対応し、MLCommonsの14カテゴリの有害コンテンツを分類できる。Llama Prompt Guard 2は前バージョンより高性能で、22Mの軽量版も追加されアドバーサリアル攻撃耐性も向上した。"
+    },
+    {
+      "rawArticleId": "654",
+      "titleJa": "AutoRound：IntelによるLLM・VLM向け高度量子化ツール",
+      "summary100Ja": "IntelのAutoRoundは符号付き確率的勾配降下法で重みの丸め範囲を最適化する重みのみ量子化PTQ手法で、INT2〜INT8の精度でほぼすべての主要LLM・VLMアーキテクチャに対応する。",
+      "summary200Ja": "IntelのAutoRoundは符号付き確率的勾配降下法で重みの丸め・クリッピング範囲を最適化する後学習量子化（PTQ）ツールだ。INT2精度で他のベースラインより最大2.1倍高い相対精度を示し、A100 GPUでの72Bモデル量子化が最速37分で完了する。GPTQ・AWQ・GGUF形式でのエクスポート、混合ビット量子化、CPU/Intel GPU/CUDAへのデプロイをサポートし、Hugging Face Transformersと統合して利用できる。"
+    },
+    {
+      "rawArticleId": "656",
+      "titleJa": "PipelineRL：推論中の重み更新で高効率なRL学習を実現",
+      "summary100Ja": "ServiceNowがPipelineRLをオープンソース化した。推論を止めずに重みを更新するインフライト重み更新技術により、GRPOトレーニングの推論スループットを常時高く保ちながらオンポリシー性を維持する。",
+      "summary200Ja": "ServiceNowがオープンソースRL実装「PipelineRL」を公開した。従来のRL実装では高スループット推論とオンポリシーデータ収集がトレードオフになるが、PipelineRLはオプティマイザーステップ後に推論を一時停止して重みを更新する「インフライト重み更新」でこれを解消する。7Bと32BモデルのトレーニングでOpen-Reasoner-Zeroと同等以上の性能を達成しており、モジュラーアーキテクチャでSGLang・vLLM等の推論エンジンや各種学習フレームワークとの組み合わせが容易。"
+    },
+    {
+      "rawArticleId": "658",
+      "titleJa": "Tiny Agents：50行のコードで実装するMCPエージェント（JavaScript版）",
+      "summary100Ja": "Hugging Faceが@huggingface/mcp-clientパッケージを公開した。MCPクライアントとLLM推論クライアントを組み合わせることで、エージェントはwhileループで書けると示している。",
+      "summary200Ja": "Hugging FaceのJulien ChaumondがMCPの仕組みを探る中で、MCPクライアント上のwhileループがエージェントの本質であることを発見した。TypeScriptで実装した@huggingface/mcp-clientは公式MCPのSDKとHugging FaceのInferenceClientを組み合わせ、Playwright MCPサーバー（Webブラウジング）やファイルシステムサーバーなどを自由に接続できる。npxコマンド1行でデモを試せるほどシンプルな設計になっている。"
+    },
+    {
+      "rawArticleId": "660",
+      "titleJa": "olmOCRのファインチューニングで忠実なOCRエンジンを構築する",
+      "summary100Ja": "TNG社がolmOCR-7B-0225-previewをファインチューニングし、請求書のヘッダー・フッターなど元モデルが省略する情報も含めてすべてのテキストを抽出できる忠実なOCRエンジンを構築した。",
+      "summary200Ja": "TNGがolmOCR-7B-0225-previewをQwen2.5-VL-72B-Instructで生成した8,000件のデータセットでファインチューニングし、LLM学習データ向けに省略されていたヘッダー・フッター情報も含む忠実なOCRモデルを構築した。8xH100ノードで2.5エポックの学習を実施し、請求書・多段組レイアウトの文書でも全情報を漏れなく抽出できることを定性評価で確認。オープンソースとして公開されている。"
+    },
+    {
+      "rawArticleId": "662",
+      "titleJa": "LLM推論におけるプリフィルとデコードの並行処理を理解する",
+      "summary100Ja": "TNG社がvLLMの並行リクエスト処理においてプリフィルとデコードフェーズがスループット・レイテンシ・GPU利用率に与える影響を解析した連載記事の第2回。静的バッチングと継続的バッチングの違いを実測データで示す。",
+      "summary200Ja": "TNG社がH100 GPUクラスターでLLMサービングを運用する中から得た知見をまとめた連載の第2回。プリフィル（並列処理・コンピュートバウンド）とデコード（逐次処理・メモリバウンドウンド）の特性の違い、静的バッチングと継続的バッチング（プリフィル優先・デコード優先）のトレードオフを実測データで解説し、並行リクエスト増加に伴うスループットの飽和曲線も示している。"
+    },
+    {
+      "rawArticleId": "664",
+      "titleJa": "GradioはただのUIライブラリではない17の理由",
+      "summary100Ja": "GradioがUI生成ツールにとどまらず、ユニバーサルAPIアクセス・キュー管理・ストリーミング・マルチページ対応・MCPサーバー・テーマシステムなどを備えたMLアプリケーションフレームワークである点を17の機能で解説する。",
+      "summary200Ja": "GradioはPython関数をWebUI兼APIとして公開するフレームワークであり、APIレコーダーによるコード自動生成、SSRによる高速初期表示、MLタスク向けキュー管理、HLS対応のリアルタイムストリーミング、マルチページ対応、MCP サーバー機能、Groovyによるクライアントサイド実行など、他のPythonフレームワークにない機能を多数備える。Hugging Face Spacesとの統合により無料でホスト型MCPサーバーとしての利用も可能。"
+    },
+    {
+      "rawArticleId": "666",
+      "titleJa": "CohereがHugging Face Inference Providersに対応",
+      "summary100Ja": "CohereがHugging Face Hubの推論プロバイダーに追加された。Command AやAya Visionなどのエンタープライズ向けモデルをHFクライアントSDKから利用でき、モデル作者として自社モデルを直接提供する初のプロバイダーでもある。",
+      "summary200Ja": "CohereがHugging Face Hubの推論プロバイダーエコシステムに参加し、モデル作者が自社モデルをHubで直接提供する初のケースとなった。256Kコンテキスト長のCommand A・多言語対応のAya Expanse・マルチモーダルのAya Visionなどが利用可能で、huggingface_hub SDKやOpenAIクライアントを通じてアクセスできる。ツール呼び出し（Function Calling）のサンプルコードも公開されている。"
+    },
+    {
+      "rawArticleId": "668",
+      "titleJa": "HELMET：長文脈言語モデルを包括的に評価するベンチマーク",
+      "summary100Ja": "Princeton NLPとIntelが開発した長文脈LLM評価ベンチマーク「HELMET」をICLR 2025で発表。RAG・引用生成・要約・ICLなど多様なタスクで59モデルを評価し、単純な合成タスクとの乖離を明らかにした。",
+      "summary200Ja": "Princeton NLPとIntelが開発した「HELMET」は、8K〜128Kトークンの文脈長で長文脈言語モデルを実用タスクで包括的に評価するベンチマークだ。Needle-in-a-Haystack等の単純合成タスクが実際のダウンストリーム性能と相関しないことを示し、モデルベース評価（ROUGE不使用）で59モデルを比較した。異なるタスクカテゴリ間で性能相関が低く、特定タスクに特化した評価では全体像が把握できないことを指摘している。"
+    },
+    {
+      "rawArticleId": "670",
+      "titleJa": "Hugging FaceがPollen Roboticsを買収しオープンソースロボットを販売へ",
+      "summary100Ja": "Hugging FaceがオープンソースロボットメーカーPollen Roboticsを買収し、ヒューマノイドロボット「Reachy 2」の販売を開始した。LeRobotライブラリのエコシステムと連携して進化する予定。",
+      "summary200Ja": "Hugging Faceが9年間オープンソースロボットを開発してきたPollen Roboticsを買収した。同社の最新ヒューマノイドロボット「Reachy 2」（7自由度アーム・LiDARモバイルベース・VRテレオペレーション対応）を70,000ドルで販売開始。LeRobotライブラリと組み合わせることでオープンソースの物理AI基盤の民主化を目指す。コーネル大学やカーネギーメロン大学など多くの研究機関が既に採用している。"
+    },
+    {
+      "rawArticleId": "672",
+      "titleJa": "400万モデルをスキャン：Protect AIとHugging Faceのパートナーシップ6ヶ月の成果",
+      "summary100Ja": "Protect AIとHugging Faceのセキュリティパートナーシップ6ヶ月間の成果を報告。400万以上のモデルバージョンをスキャンし、51,700モデルで352,000件の安全・疑わしい問題を検出した。",
+      "summary200Ja": "Protect AIとHugging Face間のセキュリティパートナーシップ開始から6ヶ月で、Guardian は441万件のモデルバージョンをスキャンし51,700モデルで352,000件の問題を検出した。アーカイブファイルシステム書き込み・TensorFlowアーキテクチャバックドア・llamafile悪意コード実行などの新検出モジュールを追加。ライブラリ依存型攻撃・ペイロード難読化・フレームワーク拡張機能悪用・攻撃ベクター連鎖という主要な攻撃パターンも解説している。"
+    },
+    {
+      "rawArticleId": "674",
+      "titleJa": "Visual Salamandra：マルチモーダル理解の限界を押し広げるVLM",
+      "summary100Ja": "スペインBSCのLanguage Technologies LabがSalamandra 7BをベースにSigLIPビジョンエンコーダを統合したマルチモーダルVLM「Visual Salamandra」を公開した。欧州言語の多言語サポートを重視した設計。",
+      "summary200Ja": "Barcelona Supercomputing CenterのLanguage Technologies Labが、Salamandra Instructed 7BにSigLIP（SigLIP-So400m）ビジョンエンコーダと2層MLPプロジェクタを統合したVLM「Visual Salamandra」を公開した。4段階のトレーニングで610万件のインストラクションチューニングデータを使用し、VQA・OCR・文書理解・数学推論・単一/複数画像・動画対応を実現する。欧州言語の多言語対応を重視している点が特徴。"
+    },
+    {
+      "rawArticleId": "676",
+      "titleJa": "Hugging FaceとCloudflareがFastRTCのリアルタイム通信を強化するパートナーシップを発表",
+      "summary100Ja": "Hugging FaceとCloudflareが提携し、FastRTC開発者がHFトークンだけでCloudflareのグローバルTURNサーバーネットワークに月10GBまで無料でアクセスできるようになった。",
+      "summary200Ja": "Hugging FaceとCloudflareが提携し、FastRTCのWebRTCアプリケーション開発者がHugging Faceアクセストークンのみで世界335拠点のCloudflare TURNサーバーを月10GBまで無料で利用できるようになった。WebRTCはリアルタイムAIアプリに不可欠だがTURNサーバーの維持が課題だったため、この統合により音声アシスタント・映像解析などのAIアプリケーション開発の障壁が下がる。FastRTC 0.0.20以上でget_cloudflare_turn_credentials関数を呼び出すだけで使用できる。"
+    },
+    {
+      "rawArticleId": "678",
+      "titleJa": "アラビア語リーダーボード：アラビア語Instruction Followingと更新版AraGen",
+      "summary100Ja": "InceptionとMBZUAIがアラビア語AI評価を集約する「Arabic-Leaderboards」スペースを立ち上げ、AraGen-03-25のリリースとアラビア語IFEvalベンチマークに基づく初のInstruction Followingリーダーボードを公開した。",
+      "summary200Ja": "InceptionとMBZUAIが共同でアラビア語AI評価の統合プラットフォーム「Arabic-Leaderboards」を公開した。AraGen-03-25は質問応答・推論・安全性・文法分析を含む340ペアに拡張され、ジャッジシステムプロンプトも改善された。新設のArabic Instruction Followingリーダーボードはアラビア語版IFEvalに基づく初の公開ベンチマークで、指示追従能力を評価する。動的評価サイクルを維持しつつ上位モデルのランキング安定性を確認している。"
+    },
+    {
+      "rawArticleId": "680",
+      "titleJa": "Llama 4 Maverick・ScoutがHugging Faceに登場",
+      "summary100Ja": "MetaのLlama 4 MaverickとScoutがHugging Face Hubで公開された。両モデルはMoE構造で17Bのアクティブパラメータを持ち、マルチモーダルに対応。",
+      "summary200Ja": "MetaのLlama 4 Maverick（約400B）とScout（約109B）がHugging Face Hubで公開された。両モデルはMoE構造で17Bのアクティブパラメータを持ちテキスト・画像入力に対応。Scoutは最大10M、Maverickは最大1Mトークンのコンテキストをサポートし、Transformers v4.51.0およびTGIと統合済み。"
+    },
+    {
+      "rawArticleId": "682",
+      "titleJa": "Gradio、月間ユーザー100万人突破への歩み",
+      "summary100Ja": "AI向けPythonライブラリGradioが月間100万人以上の開発者に利用されるまでの成長要因を、開発者自身が振り返った。",
+      "summary200Ja": "Stanford発のAI UIライブラリGradioが月間100万人超の開発者に利用されるまでに成長した。高レベル抽象化より低レベルAPIへの注力、シェアリンク機能による口コミ拡散、機械学習に特化したニッチへの集中、ロードマップを持たない迅速な反復開発、という4つの方針が成長の鍵として挙げられている。"
+    },
+    {
+      "rawArticleId": "684",
+      "titleJa": "Hugging FaceのNLPコースがLLMコースへ刷新",
+      "summary100Ja": "Hugging FaceはNLPコースをLLMコースに改称し、LLMのファインチューニングや推論など新章を追加して拡充する。",
+      "summary200Ja": "Hugging FaceはNLPコースをLLMコースに改称し、LLMのファインチューニング・推論・検索など新章を追加する。既存のNLP基礎コンテンツは引き続き維持され、LlamaIndex、LangChain、Unslothなど外部ライブラリとの協力のもと、より幅広いツールをカバーする内容へと刷新される。"
+    },
+    {
+      "rawArticleId": "686",
+      "titleJa": "LLM推論の効率化：リクエストキューイング戦略の比較",
+      "summary100Ja": "複数ユーザーが共有するLLM推論環境でのキューイング問題を分析し、フェアスケジューリングによる改善手法を解説した。",
+      "summary200Ja": "vLLMやTGIなどのLLM推論エンジンでは、特定ユーザーが大量リクエストを送信すると他ユーザーがブロックされる問題がある。TNG Technology Consultingの事例として、ユーザーごとの独立キューとラウンドロビン方式によるフェアスケジューリングを導入することで、複数ユーザーの公平なGPUリソース利用を実現できることが示された。"
+    },
+    {
+      "rawArticleId": "688",
+      "titleJa": "Hugging Faceのシークレット管理をInfisicalで大規模に刷新した事例",
+      "summary100Ja": "Hugging Faceがマルチクラウド環境での秘密情報管理をHashiCorp VaultからInfisicalへ移行した経緯と実装内容を紹介。",
+      "summary200Ja": "Hugging FaceはAWSからAzure・GCPを含むマルチクラウドへの移行に伴い、シークレット管理をInfisicalで刷新した。シークレットの散在、RBACとOkta SSOとの統合、手動ローテーションの負担といった課題を解消し、インフラのコード化やプロジェクト単位の管理を実現したとしている。"
+    },
+    {
+      "rawArticleId": "690",
+      "titleJa": "Intel GaudiハードウェアサポートがTGIにネイティブ統合",
+      "summary100Ja": "LLM推論サービスのText Generation Inference（TGI）にIntel Gaudiハードウェアのサポートが正式統合された。",
+      "summary200Ja": "Hugging FaceのLLM推論基盤TGIにIntel Gaudi（Gaudi1/2/3）のサポートが本体コードベースへ直接統合された。従来の別リポジトリ管理から移行し、動的バッチング、マルチカード推論、ビジョン言語モデルなどTGIの全機能がGaudi上で利用可能になった。"
+    },
+    {
+      "rawArticleId": "692",
+      "titleJa": "病院感染制御",
+      "summary100Ja": "病院感染制御に関する情報。",
+      "summary200Ja": "病院感染制御に関する情報。"
+    },
+    {
+      "rawArticleId": "694",
+      "titleJa": "待機時間短縮",
+      "summary100Ja": "待機時間短縮に関する情報。",
+      "summary200Ja": "待機時間短縮に関する情報。"
+    },
+    {
+      "rawArticleId": "696",
+      "titleJa": "ICUベッド管理",
+      "summary100Ja": "ICUベッド管理に関する情報。",
+      "summary200Ja": "ICUベッド管理に関する情報。"
+    },
+    {
+      "rawArticleId": "698",
+      "titleJa": "医療用物資管理",
+      "summary100Ja": "医療用物資管理に関する情報。",
+      "summary200Ja": "医療用物資管理に関する情報。"
+    },
+    {
+      "rawArticleId": "700",
+      "titleJa": "医療費用最適化",
+      "summary100Ja": "医療費用最適化に関する情報。",
+      "summary200Ja": "医療費用最適化に関する情報。"
+    },
+    {
+      "rawArticleId": "702",
+      "titleJa": "詐欺的請求検出",
+      "summary100Ja": "詐欺的請求検出に関する情報。",
+      "summary200Ja": "詐欺的請求検出に関する情報。"
+    },
+    {
+      "rawArticleId": "704",
+      "titleJa": "医療ローン承認",
+      "summary100Ja": "医療ローン承認に関する情報。",
+      "summary200Ja": "医療ローン承認に関する情報。"
+    },
+    {
+      "rawArticleId": "706",
+      "titleJa": "医療貸付リスク",
+      "summary100Ja": "医療貸付リスクに関する情報。",
+      "summary200Ja": "医療貸付リスクに関する情報。"
+    },
+    {
+      "rawArticleId": "708",
+      "titleJa": "患者プライバシー保護",
+      "summary100Ja": "患者プライバシー保護に関する情報。",
+      "summary200Ja": "患者プライバシー保護に関する情報。"
+    },
+    {
+      "rawArticleId": "710",
+      "titleJa": "医療記録匿名化",
+      "summary100Ja": "医療記録の匿名化に関する情報。",
+      "summary200Ja": "医療記録の匿名化に関する情報。"
+    },
+    {
+      "rawArticleId": "712",
+      "titleJa": "臨床レジストリー管理",
+      "summary100Ja": "臨床レジストリー管理に関する情報。",
+      "summary200Ja": "臨床レジストリー管理に関する情報。"
+    },
+    {
+      "rawArticleId": "714",
+      "titleJa": "医療IoTデバイス",
+      "summary100Ja": "医療IoTデバイスに関する情報。",
+      "summary200Ja": "医療IoTデバイスに関する情報。"
+    },
+    {
+      "rawArticleId": "716",
+      "titleJa": "スマートバイオセンサー",
+      "summary100Ja": "スマートバイオセンサーに関する情報。",
+      "summary200Ja": "スマートバイオセンサーに関する情報。"
+    },
+    {
+      "rawArticleId": "718",
+      "titleJa": "テレメトリーデータ分析",
+      "summary100Ja": "テレメトリーデータ分析に関する情報。",
+      "summary200Ja": "テレメトリーデータ分析に関する情報。"
+    },
+    {
+      "rawArticleId": "720",
+      "titleJa": "心臓モニターAI",
+      "summary100Ja": "心臓モニタリングへのAI活用に関する情報。",
+      "summary200Ja": "心臓モニタリングへのAI活用に関する情報。"
+    },
+    {
+      "rawArticleId": "722",
+      "titleJa": "酸素飽和度監視",
+      "summary100Ja": "酸素飽和度監視に関する情報。",
+      "summary200Ja": "酸素飽和度監視に関する情報。"
+    },
+    {
+      "rawArticleId": "724",
+      "titleJa": "EEG分析",
+      "summary100Ja": "EEG（脳波）分析に関する情報。",
+      "summary200Ja": "EEG（脳波）分析に関する情報。"
+    },
+    {
+      "rawArticleId": "726",
+      "titleJa": "眼球運動追跡",
+      "summary100Ja": "眼球運動追跡に関する情報。",
+      "summary200Ja": "眼球運動追跡に関する情報。"
+    },
+    {
+      "rawArticleId": "728",
+      "titleJa": "咳分類",
+      "summary100Ja": "咳の音声分類に関する情報。",
+      "summary200Ja": "咳の音声分類に関する情報。"
+    },
+    {
+      "rawArticleId": "730",
+      "titleJa": "呼吸パターン解析",
+      "summary100Ja": "呼吸パターン解析に関する情報。",
+      "summary200Ja": "呼吸パターン解析に関する情報。"
+    },
+    {
+      "rawArticleId": "732",
+      "titleJa": "皮膚温度分析",
+      "summary100Ja": "皮膚温度分析に関する情報。",
+      "summary200Ja": "皮膚温度分析に関する情報。"
+    },
+    {
+      "rawArticleId": "734",
+      "titleJa": "脂肪組織検出",
+      "summary100Ja": "脂肪組織の検出に関する情報。",
+      "summary200Ja": "脂肪組織の検出に関する情報。"
+    },
+    {
+      "rawArticleId": "736",
+      "titleJa": "骨密度分析",
+      "summary100Ja": "骨密度分析に関する情報。",
+      "summary200Ja": "骨密度分析に関する情報。"
+    },
+    {
+      "rawArticleId": "738",
+      "titleJa": "電解質バランス",
+      "summary100Ja": "電解質バランスに関する情報。",
+      "summary200Ja": "電解質バランスに関する情報。"
+    },
+    {
+      "rawArticleId": "740",
+      "titleJa": "赤血球分析",
+      "summary100Ja": "赤血球分析に関する情報。",
+      "summary200Ja": "赤血球分析に関する情報。"
+    },
+    {
+      "rawArticleId": "742",
+      "titleJa": "血小板カウント",
+      "summary100Ja": "血小板カウントに関する情報。",
+      "summary200Ja": "血小板カウントに関する情報。"
+    },
+    {
+      "rawArticleId": "744",
+      "titleJa": "肝機能テスト",
+      "summary100Ja": "肝機能テストに関する情報。",
+      "summary200Ja": "肝機能テストに関する情報。"
+    },
+    {
+      "rawArticleId": "746",
+      "titleJa": "膵臓機能検査",
+      "summary100Ja": "膵臓機能検査に関する情報。",
+      "summary200Ja": "膵臓機能検査に関する情報。"
+    },
+    {
+      "rawArticleId": "748",
+      "titleJa": "ホルモンレベル分析",
+      "summary100Ja": "ホルモンレベル分析に関する情報。",
+      "summary200Ja": "ホルモンレベル分析に関する情報。"
+    },
+    {
+      "rawArticleId": "750",
+      "titleJa": "ミネラルバランス分析",
+      "summary100Ja": "ミネラルバランス分析に関する情報。",
+      "summary200Ja": "ミネラルバランス分析に関する情報。"
+    },
+    {
+      "rawArticleId": "752",
+      "titleJa": "脂肪酸プロファイル",
+      "summary100Ja": "脂肪酸プロファイルに関する情報。",
+      "summary200Ja": "脂肪酸プロファイルに関する情報。"
+    },
+    {
+      "rawArticleId": "754",
+      "titleJa": "抗体レベル",
+      "summary100Ja": "抗体レベルに関する情報。",
+      "summary200Ja": "抗体レベルに関する情報。"
+    },
+    {
+      "rawArticleId": "756",
+      "titleJa": "ケモカイン分析",
+      "summary100Ja": "ケモカイン分析に関する情報。",
+      "summary200Ja": "ケモカイン分析に関する情報。"
+    },
+    {
+      "rawArticleId": "758",
+      "titleJa": "栄養マーカー",
+      "summary100Ja": "栄養マーカーに関する情報。",
+      "summary200Ja": "栄養マーカーに関する情報。"
+    },
+    {
+      "rawArticleId": "760",
+      "titleJa": "有毒物質検出",
+      "summary100Ja": "有毒物質検出に関する情報。",
+      "summary200Ja": "有毒物質検出に関する情報。"
+    },
+    {
+      "rawArticleId": "762",
+      "titleJa": "薬物スクリーニング",
+      "summary100Ja": "薬物スクリーニングに関する情報。",
+      "summary200Ja": "薬物スクリーニングに関する情報。"
+    },
+    {
+      "rawArticleId": "764",
+      "titleJa": "喫煙バイオマーカー",
+      "summary100Ja": "喫煙バイオマーカーに関する情報。",
+      "summary200Ja": "喫煙バイオマーカーに関する情報。"
+    },
+    {
+      "rawArticleId": "766",
+      "titleJa": "遺伝子変異検出",
+      "summary100Ja": "遺伝子変異検出に関する情報。",
+      "summary200Ja": "遺伝子変異検出に関する情報。"
+    },
+    {
+      "rawArticleId": "768",
+      "titleJa": "キャリアスクリーニング",
+      "summary100Ja": "キャリアスクリーニングに関する情報。",
+      "summary200Ja": "キャリアスクリーニングに関する情報。"
+    },
+    {
+      "rawArticleId": "770",
+      "titleJa": "新生児スクリーニング",
+      "summary100Ja": "新生児スクリーニングに関する情報。",
+      "summary200Ja": "新生児スクリーニングに関する情報。"
+    },
+    {
+      "rawArticleId": "772",
+      "titleJa": "遺伝子治療のモニタリング",
+      "summary100Ja": "遺伝子治療の効果や安全性を継続的に追跡・監視する取り組みに関するトピック。",
+      "summary200Ja": "遺伝子治療の実施後における効果や安全性を継続的に追跡・監視する取り組みに関するトピック。治療の有効性確認と副作用の早期検出が主な目的となる。"
+    },
+    {
+      "rawArticleId": "774",
+      "titleJa": "核型分析",
+      "summary100Ja": "染色体の数や構造を調べる核型分析に関するトピック。",
+      "summary200Ja": "染色体の数や構造を視覚的に調べる核型分析に関するトピック。遺伝疾患や染色体異常の診断に用いられる基本的な細胞遺伝学的手法を扱う。"
+    },
+    {
+      "rawArticleId": "776",
+      "titleJa": "微小欠失の検出",
+      "summary100Ja": "染色体上の微小な欠失を検出する技術・手法に関するトピック。",
+      "summary200Ja": "染色体上の微小な欠失領域を検出するための技術・手法に関するトピック。通常の核型分析では見逃されやすい小規模な染色体欠失を高精度に同定することを目的とする。"
+    },
+    {
+      "rawArticleId": "778",
+      "titleJa": "次世代シーケンシング",
+      "summary100Ja": "大規模なDNA・RNA配列を高速に解読する次世代シーケンシング技術に関するトピック。",
+      "summary200Ja": "大規模なDNA・RNA配列を高速・低コストで解読する次世代シーケンシング（NGS）技術に関するトピック。ゲノム研究や臨床診断における広範な応用が進んでいる分野を扱う。"
+    },
+    {
+      "rawArticleId": "780",
+      "titleJa": "全エクソームシーケンシング",
+      "summary100Ja": "タンパク質をコードするゲノム領域全体を解析する全エクソームシーケンシングに関するトピック。",
+      "summary200Ja": "タンパク質をコードするゲノム領域（エクソーム）全体を網羅的に解析する全エクソームシーケンシングに関するトピック。遺伝性疾患の原因変異を効率的に同定する手法として広く用いられる。"
+    },
+    {
+      "rawArticleId": "782",
+      "titleJa": "メタゲノミクス解析",
+      "summary100Ja": "環境サンプルや生体試料中の微生物集団を網羅的に解析するメタゲノミクスに関するトピック。",
+      "summary200Ja": "環境サンプルや生体試料から直接抽出したDNAを用いて微生物集団を網羅的に解析するメタゲノミクスに関するトピック。腸内フローラ研究や環境微生物の多様性評価などに活用される。"
+    },
+    {
+      "rawArticleId": "784",
+      "titleJa": "プロテオミクス解析",
+      "summary100Ja": "細胞や組織に含まれるタンパク質を網羅的に解析するプロテオミクスに関するトピック。",
+      "summary200Ja": "細胞や組織に含まれるタンパク質の種類・量・修飾状態を網羅的に解析するプロテオミクスに関するトピック。疾患バイオマーカーの探索や薬剤標的の同定に重要な役割を果たす。"
+    },
+    {
+      "rawArticleId": "786",
+      "titleJa": "リピドミクス",
+      "summary100Ja": "生体内の脂質分子を網羅的に解析するリピドミクスに関するトピック。",
+      "summary200Ja": "生体内に存在する脂質分子の種類・量・分布を網羅的に解析するリピドミクスに関するトピック。代謝疾患や炎症応答などの理解に貢献するオミクス解析の一分野を扱う。"
+    },
+    {
+      "rawArticleId": "788",
+      "titleJa": "エピゲノミクス",
+      "summary100Ja": "DNA配列変化を伴わない遺伝子発現制御機構を網羅的に解析するエピゲノミクスに関するトピック。",
+      "summary200Ja": "DNAメチル化やヒストン修飾などDNA配列変化を伴わない遺伝子発現制御機構を網羅的に解析するエピゲノミクスに関するトピック。発生・疾患・環境応答の理解に貢献する分野を扱う。"
+    },
+    {
+      "rawArticleId": "790",
+      "titleJa": "非侵襲的出生前検査",
+      "summary100Ja": "母体血液を用いて胎児の染色体異常などを検査する非侵襲的出生前検査に関するトピック。",
+      "summary200Ja": "母体血液中の胎児由来DNA（cell-free DNA）を解析することで胎児の染色体異常などを検査する非侵襲的出生前検査（NIPT）に関するトピック。羊水穿刺などのリスクを回避できる手法として普及が進む。"
+    },
+    {
+      "rawArticleId": "792",
+      "titleJa": "循環腫瘍DNA",
+      "summary100Ja": "血液中に放出される腫瘍由来のDNA断片を検出・解析する循環腫瘍DNAに関するトピック。",
+      "summary200Ja": "血液中に放出される腫瘍由来のDNA断片（ctDNA）を検出・解析する技術に関するトピック。液体生検として、がんの早期発見・治療効果モニタリング・再発検知などへの応用が期待される。"
+    },
+    {
+      "rawArticleId": "794",
+      "titleJa": "エクソソーム解析",
+      "summary100Ja": "細胞から分泌される小型小胞エクソソームを解析する技術・手法に関するトピック。",
+      "summary200Ja": "細胞から分泌される小型小胞であるエクソソームの成分や機能を解析する技術・手法に関するトピック。疾患バイオマーカーや細胞間コミュニケーションの研究において注目される領域を扱う。"
+    },
+    {
+      "rawArticleId": "796",
+      "titleJa": "長鎖非コードRNA",
+      "summary100Ja": "タンパク質をコードしない長鎖RNA分子の機能や発現を解析する研究に関するトピック。",
+      "summary200Ja": "タンパク質をコードしない長さ200塩基以上のRNA分子（lncRNA）の機能・発現・制御を解析する研究に関するトピック。遺伝子発現調節やエピジェネティクス制御への関与が明らかになりつつある領域を扱う。"
+    },
+    {
+      "rawArticleId": "798",
+      "titleJa": "循環RNA",
+      "summary100Ja": "環状構造を持つRNA分子（circRNA）の性質と機能に関するトピック。",
+      "summary200Ja": "共有結合で閉じた環状構造を持つRNA分子（circRNA）の発現・機能・疾患との関連を扱うトピック。マイクロRNAのスポンジとして機能するなどの制御機構への関与が研究されている。"
+    },
+    {
+      "rawArticleId": "800",
+      "titleJa": "ヒストン修飾",
+      "summary100Ja": "クロマチン構造と遺伝子発現を制御するヒストンタンパク質の化学的修飾に関するトピック。",
+      "summary200Ja": "クロマチン構造と遺伝子発現を制御するヒストンタンパク質のアセチル化・メチル化などの化学的修飾に関するトピック。エピジェネティクス制御の主要な機構として発生・分化・疾患研究において重要な役割を持つ。"
+    },
+    {
+      "rawArticleId": "802",
+      "titleJa": "3Dゲノム",
+      "summary100Ja": "核内でのゲノムの三次元的な折りたたみ構造とその機能的意義を解析するトピック。",
+      "summary200Ja": "核内でのゲノムの三次元的な折りたたみ構造（トポロジカルドメインや染色体ループなど）とその機能的意義を解析するトピック。遺伝子発現調節やゲノム安定性との関係が研究されている分野を扱う。"
+    },
+    {
+      "rawArticleId": "804",
+      "titleJa": "転写因子結合",
+      "summary100Ja": "特定のDNA配列に結合して遺伝子発現を制御する転写因子の結合機構に関するトピック。",
+      "summary200Ja": "特定のDNA配列（プロモーターやエンハンサー）に結合して標的遺伝子の発現を活性化または抑制する転写因子の結合機構と制御ネットワークに関するトピック。疾患関連遺伝子の発現調節の理解に重要な分野を扱う。"
+    },
+    {
+      "rawArticleId": "806",
+      "titleJa": "プロモーター解析",
+      "summary100Ja": "遺伝子転写の開始を制御するプロモーター領域の構造と機能を解析するトピック。",
+      "summary200Ja": "遺伝子転写の開始を制御するプロモーター領域の配列・構造・転写因子結合サイトを解析するトピック。遺伝子発現制御の仕組みを明らかにし、疾患関連変異の影響を評価するための基礎となる研究分野を扱う。"
+    },
+    {
+      "rawArticleId": "808",
+      "titleJa": "遺伝子発現プロファイリング",
+      "summary100Ja": "細胞や組織における遺伝子発現パターンを網羅的に測定・解析するトピック。",
+      "summary200Ja": "特定の条件下や状態にある細胞・組織での遺伝子発現パターンを網羅的に測定・解析するトピック。疾患の分子機序の解明、バイオマーカー探索、薬剤応答性の予測などに活用される手法を扱う。"
+    },
+    {
+      "rawArticleId": "810",
+      "titleJa": "空間転写学",
+      "summary100Ja": "組織内での遺伝子発現を空間的位置情報とともに解析する空間転写学に関するトピック。",
+      "summary200Ja": "組織切片上での遺伝子発現を空間的位置情報とともに解析する空間転写学（spatial transcriptomics）に関するトピック。細胞の空間的な相互作用や組織構造の理解に新たな知見をもたらす手法を扱う。"
+    },
+    {
+      "rawArticleId": "812",
+      "titleJa": "多光子顕微鏡",
+      "summary100Ja": "複数の光子を同時に吸収する励起を利用した多光子顕微鏡法に関するトピック。",
+      "summary200Ja": "複数の光子を同時に吸収する励起を利用し、生体組織の深部を高解像度で観察できる多光子顕微鏡法に関するトピック。光散乱の少ない深部イメージングと低光毒性が特長であり、生体内観察に広く用いられる。"
+    },
+    {
+      "rawArticleId": "814",
+      "titleJa": "機能的MRI",
+      "summary100Ja": "脳活動に伴う血流変化を検出して神経活動を可視化する機能的MRIに関するトピック。",
+      "summary200Ja": "脳活動に伴う血中酸素レベルの変化（BOLD信号）を検出して神経活動を非侵襲的に可視化する機能的MRI（fMRI）に関するトピック。認知機能や疾患に関連した脳の機能的組織化の解明に用いられる。"
+    },
+    {
+      "rawArticleId": "816",
+      "titleJa": "脳接続性マッピング",
+      "summary100Ja": "脳内の神経回路や領域間の機能的・構造的つながりを地図化するトピック。",
+      "summary200Ja": "脳内の神経回路や領域間の機能的・構造的つながりを体系的に地図化するコネクトーム研究に関するトピック。神経疾患や精神疾患における脳ネットワークの変化を明らかにするための手法を扱う。"
+    },
+    {
+      "rawArticleId": "818",
+      "titleJa": "SPECTイメージング",
+      "summary100Ja": "放射性トレーサーを用いて体内の機能・血流を三次元的に画像化するSPECT検査に関するトピック。",
+      "summary200Ja": "放射性トレーサーが放出するガンマ線を検出して体内の機能・血流分布を三次元的に画像化する単光子放射断層撮影（SPECT）に関するトピック。脳神経・心臓・骨などの機能評価に用いられる核医学的手法を扱う。"
+    },
+    {
+      "rawArticleId": "820",
+      "titleJa": "光学コヒーレンストモグラフィー",
+      "summary100Ja": "光の干渉を利用して生体組織の断面を高解像度で画像化する光学コヒーレンストモグラフィーに関するトピック。",
+      "summary200Ja": "光の干渉を利用して生体組織の断面を非侵襲的・高解像度で画像化する光学コヒーレンストモグラフィー（OCT）に関するトピック。眼科や心血管領域を中心に臨床診断や研究に広く活用されている手法を扱う。"
+    },
+    {
+      "rawArticleId": "822",
+      "titleJa": "電子顕微鏡",
+      "summary100Ja": "電子線を用いてナノスケールの微細構造を高解像度で観察する電子顕微鏡法に関するトピック。",
+      "summary200Ja": "電子線を用いてタンパク質・ウイルス・細胞小器官などナノスケールの微細構造を高解像度で観察する電子顕微鏡法に関するトピック。透過型・走査型など各種手法が構造生物学や材料科学に活用されている。"
+    },
+    {
+      "rawArticleId": "824",
+      "titleJa": "X線結晶構造解析",
+      "summary100Ja": "X線回折を利用してタンパク質などの原子レベルの三次元構造を決定する結晶構造解析に関するトピック。",
+      "summary200Ja": "X線回折パターンを解析してタンパク質・核酸・低分子化合物などの原子レベルの三次元構造を決定する結晶構造解析に関するトピック。創薬研究や生命現象の分子機序解明において基盤的な手法として位置づけられる。"
+    },
+    {
+      "rawArticleId": "826",
+      "titleJa": "質量分析計",
+      "summary100Ja": "分子の質量電荷比を測定してタンパク質・代謝物などを同定・定量する質量分析法に関するトピック。",
+      "summary200Ja": "分子のイオン化後の質量電荷比を測定することでタンパク質・代謝物・脂質などを同定・定量する質量分析法に関するトピック。プロテオミクスやメタボロミクスの中心的な分析技術として広く用いられる。"
+    },
+    {
+      "rawArticleId": "828",
+      "titleJa": "分光測定",
+      "summary100Ja": "物質と電磁波の相互作用を利用して成分や構造を分析する分光法に関するトピック。",
+      "summary200Ja": "物質と電磁波（光）の相互作用を利用して試料の成分・濃度・構造を分析する各種分光法に関するトピック。紫外・可視・赤外・ラマン分光など多様な手法が生命科学・化学・材料研究に応用されている。"
+    },
+    {
+      "rawArticleId": "830",
+      "titleJa": "偏光顕微鏡",
+      "summary100Ja": "偏光を利用して試料の光学的異方性や構造を観察する偏光顕微鏡法に関するトピック。",
+      "summary200Ja": "偏光した光を利用して試料の光学的異方性・複屈折・結晶構造などを観察する偏光顕微鏡法に関するトピック。繊維・鉱物・生体組織の構造解析や病理診断における特定疾患の検出に活用される。"
+    },
+    {
+      "rawArticleId": "832",
+      "titleJa": "暗視野顕微鏡",
+      "summary100Ja": "背景を暗く保ちサンプルの散乱光のみを検出する暗視野顕微鏡法に関するトピック。",
+      "summary200Ja": "照明光が直接対物レンズに入らないよう遮断し、試料からの散乱光のみを検出する暗視野顕微鏡法に関するトピック。染色が困難な生細胞や微小粒子の高コントラスト観察に適した手法を扱う。"
+    },
+    {
+      "rawArticleId": "834",
+      "titleJa": "サーモグラフィー",
+      "summary100Ja": "物体から放射される赤外線を検出して温度分布を可視化するサーモグラフィーに関するトピック。",
+      "summary200Ja": "物体から放射される赤外線を検出して表面温度の空間分布を可視化するサーモグラフィーに関するトピック。医療診断・工業検査・建築物の断熱評価など幅広い分野で非接触温度計測に活用される。"
+    },
+    {
+      "rawArticleId": "836",
+      "titleJa": "光音響イメージング",
+      "summary100Ja": "光照射で生じる音波を検出して生体組織の深部を画像化する光音響イメージングに関するトピック。",
+      "summary200Ja": "パルスレーザー照射によって組織内に生じる熱膨張由来の音波を検出し、深部構造を高解像度で画像化する光音響イメージングに関するトピック。光学的コントラストと超音波の深部到達性を両立した手法を扱う。"
+    },
+    {
+      "rawArticleId": "838",
+      "titleJa": "脳波記録",
+      "summary100Ja": "頭皮上の電極で脳の電気活動を記録する脳波（EEG）計測に関するトピック。",
+      "summary200Ja": "頭皮上に配置した電極によって脳の電気活動をリアルタイムで記録する脳波（EEG）計測に関するトピック。てんかん診断や睡眠研究、ブレイン・コンピュータ・インターフェースなど幅広い応用がある非侵襲的手法を扱う。"
+    },
+    {
+      "rawArticleId": "840",
+      "titleJa": "直接脳記録",
+      "summary100Ja": "脳表面や脳内に電極を留置して神経活動を直接記録する侵襲的計測法に関するトピック。",
+      "summary200Ja": "脳表面（皮質脳波）や脳深部に電極を留置して神経活動を直接記録する侵襲的計測法に関するトピック。てんかん焦点の同定や高次脳機能の解明において、頭皮EEGより高精度な信号を得ることができる手法を扱う。"
+    },
+    {
+      "rawArticleId": "842",
+      "titleJa": "神経刺激",
+      "summary100Ja": "神経系に外部から刺激を加えて活動を誘発・制御する神経刺激法に関するトピック。",
+      "summary200Ja": "電気・磁気・光などの外部刺激を神経系に加えて活動を誘発・制御する神経刺激法に関するトピック。神経疾患の治療や脳機能の研究において、特定の神経回路を選択的に活性化・抑制するための手法を扱う。"
+    },
+    {
+      "rawArticleId": "844",
+      "titleJa": "電気刺激",
+      "summary100Ja": "電流を用いて神経・筋肉・組織を刺激する電気刺激法に関するトピック。",
+      "summary200Ja": "電流を用いて神経・筋肉・細胞などを刺激する電気刺激法に関するトピック。深部脳刺激療法（DBS）や経頭蓋直流電気刺激（tDCS）など、神経疾患の治療や神経科学研究に広く用いられる手法を扱う。"
+    },
+    {
+      "rawArticleId": "846",
+      "titleJa": "超音波刺激",
+      "summary100Ja": "超音波を用いて組織や神経に機械的刺激を与える超音波刺激法に関するトピック。",
+      "summary200Ja": "集束超音波などを用いて組織や神経細胞に非侵襲的に機械的刺激を与える超音波刺激法に関するトピック。血液脳関門の一時的な開放や神経活動の調節、治療応用への可能性が研究されている手法を扱う。"
+    },
+    {
+      "rawArticleId": "848",
+      "titleJa": "光刺激",
+      "summary100Ja": "光を用いて細胞や組織の活動を制御する光刺激法に関するトピック。",
+      "summary200Ja": "特定波長の光を用いて光感受性タンパク質（オプシンなど）を介して神経細胞や組織の活動を精密に制御する光刺激法に関するトピック。光遺伝学（オプトジェネティクス）を中心に神経回路研究に革新をもたらした手法を扱う。"
+    },
+    {
+      "rawArticleId": "850",
+      "titleJa": "パッチクランプ法",
+      "summary100Ja": "細胞膜に密着したガラス電極で単一イオンチャネルの電流を記録するパッチクランプ法に関するトピック。",
+      "summary200Ja": "細胞膜に密着させたガラス電極で単一イオンチャネルや細胞全体の膜電流を高精度に記録するパッチクランプ法に関するトピック。神経細胞の電気生理学的性質の解明や創薬スクリーニングに不可欠な電気生理学的手法を扱う。"
+    },
+    {
+      "rawArticleId": "852",
+      "titleJa": "シングルチャネル記録",
+      "summary100Ja": "単一イオンチャネルの開閉動態を高精度に記録する電気生理学的手法に関するトピック。",
+      "summary200Ja": "パッチクランプ技術を用いて単一イオンチャネルの開口・閉口の動態と電流を高精度に記録する電気生理学的手法に関するトピック。チャネルの機能特性・薬理作用・疾患関連変異の影響を分子レベルで解析できる。"
+    },
+    {
+      "rawArticleId": "854",
+      "titleJa": "受容体結合",
+      "summary100Ja": "リガンドが特異的受容体に結合する分子相互作用とその機能的意義に関するトピック。",
+      "summary200Ja": "薬物・ホルモン・神経伝達物質などのリガンドが特異的受容体タンパク質に結合する分子相互作用とその生物学的意義に関するトピック。創薬における標的受容体の同定・結合親和性の測定・シグナル伝達解析に用いられる。"
+    },
+    {
+      "rawArticleId": "856",
+      "titleJa": "神経可塑性の測定",
+      "summary100Ja": "経験や学習によって神経回路が変化する神経可塑性を定量的に評価する手法に関するトピック。",
+      "summary200Ja": "経験・学習・傷害などに応じてシナプスや神経回路の構造・強度が変化する神経可塑性を定量的に評価する手法に関するトピック。長期増強（LTP）などのメカニズム解明や神経リハビリテーション研究の基盤となる。"
+    },
+    {
+      "rawArticleId": "858",
+      "titleJa": "記憶テスト",
+      "summary100Ja": "記憶の符号化・保持・想起の能力を評価する認知心理学的検査に関するトピック。",
+      "summary200Ja": "記憶の符号化・保持・想起に関わる能力を評価する認知心理学的・神経心理学的検査に関するトピック。短期記憶・長期記憶・作業記憶などの側面を測定し、認知症の診断や治療効果の評価に活用される。"
+    },
+    {
+      "rawArticleId": "860",
+      "titleJa": "言語テスト",
+      "summary100Ja": "言語理解・産出・処理能力を評価する言語機能検査に関するトピック。",
+      "summary200Ja": "語彙・文法・理解・産出など言語機能の各側面を体系的に評価する言語機能検査に関するトピック。失語症の診断・言語発達の評価・言語治療の効果測定など臨床・研究の両場面で用いられる手法を扱う。"
+    },
+    {
+      "rawArticleId": "862",
+      "titleJa": "社会的認知テスト",
+      "summary100Ja": "他者の感情・意図・視点を認識する社会的認知能力を評価する検査に関するトピック。",
+      "summary200Ja": "他者の表情・感情・意図・心的状態を認識・推論する社会的認知能力を評価する検査に関するトピック。自閉スペクトラム症や統合失調症などの精神疾患における社会認知の障害の評価や研究に用いられる。"
+    }
+  ]
+}

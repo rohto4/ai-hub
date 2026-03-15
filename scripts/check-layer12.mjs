@@ -109,7 +109,7 @@ async function run() {
         COUNT(*) FILTER (WHERE ar.is_processed = true)::int AS raw_processed,
         COUNT(*) FILTER (WHERE ar.is_processed = false)::int AS raw_unprocessed
       FROM source_targets st
-      LEFT JOIN articles_raw ar ON ar.source_target_id = st.id
+      LEFT JOIN articles_raw ar ON ar.source_target_id = st.source_target_id
       WHERE st.is_active = true
       GROUP BY st.source_key
       ORDER BY raw_unprocessed DESC, raw_total DESC, st.source_key ASC
@@ -166,7 +166,7 @@ async function run() {
       LIMIT 10
     `),
     queryMany(`
-      SELECT id, title, last_error, updated_at
+      SELECT raw_article_id AS id, title, last_error, updated_at
       FROM articles_raw
       WHERE last_error IS NOT NULL
       ORDER BY updated_at DESC
@@ -179,7 +179,7 @@ async function run() {
       LIMIT 15
     `),
     queryMany(`
-      SELECT id, title, summary_basis, summary_input_basis, content_path, is_provisional, provisional_reason, dedupe_status, publish_candidate, score, processed_at
+      SELECT enriched_article_id AS id, title, summary_basis, summary_input_basis, content_path, is_provisional, provisional_reason, dedupe_status, publish_candidate, score, processed_at
       , publication_basis
       FROM articles_enriched
       ORDER BY processed_at DESC
@@ -200,7 +200,7 @@ async function run() {
         COUNT(*) FILTER (WHERE detail->>'extractionError' IS NOT NULL)::int AS error_count
       FROM job_run_items
       WHERE job_run_id = (
-        SELECT id
+        SELECT job_run_id
         FROM job_runs
         WHERE job_name = 'daily-enrich'
           AND status = 'completed'
@@ -218,7 +218,7 @@ async function run() {
         detail->>'extractionError' AS extraction_error
       FROM job_run_items
       WHERE job_run_id = (
-        SELECT id
+        SELECT job_run_id
         FROM job_runs
         WHERE job_name = 'daily-enrich'
           AND status = 'completed'

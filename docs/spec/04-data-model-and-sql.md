@@ -9,6 +9,44 @@
 3. `layer3` は手動承認層ではなく、運用データ層として扱う
 4. サイトは `layer4` だけを読む
 5. 確定重複と類似重複を分けて扱う
+6. 主キー列に汎用名 `id` は使わず、テーブル固有名へ統一する
+
+## 1.1 主キー列命名
+
+1. `source_targets.source_target_id`
+2. `source_priority_rules.source_priority_rule_id`
+3. `articles_raw.raw_article_id`
+4. `articles_raw_history.raw_article_history_id`
+5. `tags_master.tag_id`
+6. `tag_aliases.tag_alias_id`
+7. `tag_candidate_pool.tag_candidate_id`
+8. `articles_enriched.enriched_article_id`
+9. `articles_enriched_history.enriched_article_history_id`
+10. `public_articles.public_article_id`
+11. `public_article_sources.public_article_source_id`
+12. `activity_logs.activity_log_id`
+13. `admin_operation_logs.admin_operation_log_id`
+14. `priority_processing_queue.priority_processing_queue_id`
+15. `push_subscriptions.push_subscription_id`
+16. `digest_logs.digest_log_id`
+17. `job_runs.job_run_id`
+18. `job_run_items.job_run_item_id`
+
+## 1.2 安定文字列 ID
+
+1. 数値主キーの可読性を補うため、主要な運用テーブルには文字列 ID を追加する
+2. 文字列 ID は主キーとは別列で保持し、既存データを消さず後付けできる形にする
+3. 現在の導入対象:
+   - `articles_raw.raw_id`
+   - `articles_raw_history.raw_history_id`
+   - `articles_enriched.enriched_id`
+   - `articles_enriched_history.enriched_history_id`
+   - `job_runs.job_id`
+   - `job_run_items.job_item_id`
+4. 命名形式:
+   - `raw-00000001`
+   - `enriched-00000001`
+   - `job-00000001`
 
 ## 2. レイヤーと主テーブル
 

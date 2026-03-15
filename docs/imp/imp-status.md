@@ -265,6 +265,106 @@
   - not visibly truncated
 - Finalized snippet rows are no longer treated as provisional and can become publish candidates.
 
+## 2026-03-15 Summary Provider + Localization Update
+
+- Added summary fallback order in practice and runtime as:
+  - `GEMINI_API_KEY`
+  - `GEMINI_API_KEY2`
+  - `OPENAI_API_KEY`
+  - `template`
+- Verified `OPENAI_API_KEY` is usable and `gpt-5-mini` returns valid summaries when called with:
+  - `reasoning.effort=minimal`
+  - sufficient `max_output_tokens`
+- Changed the fallback behavior so `template` output is not treated as a publishable summary and rows that fall to `template` are forced to `publication_basis=hold`.
+- Ran a Layer2 remediation pass for non-Japanese summaries and cleared the remaining non-Japanese summary rows from `articles_enriched`.
+
+## 2026-03-16 Hugging Face 手動 import 更新
+
+- DB import 前に、手動 AI 出力ファイルの固有名詞・製品名表記を校正した。
+  - `Transformers` の大文字表記
+  - `Hugging Face` のスペース
+  - `AraGen` の表記
+- 4 分割の手動 AI 出力を `artifacts/ai-enrich-outputs-official-remaining.json` に結合した。
+- 残っていた `huggingface-blog` backlog を `scripts/import-ai-enrich-outputs.ts` で import した。
+- import 結果:
+  - `processed_count = 186`
+  - `success_count = 186`
+  - `failed_count = 0`
+- import 後の DB 状態:
+  - `articles_enriched = 873`
+  - `huggingface-blog = 277/277 enriched`
+  - `huggingface-blog raw_unprocessed = 0`
+- 補足:
+  - 手動要約 JSON には `100 / 200` 文字制限超過が多く含まれていた
+  - 現行 import 経路では DB 書き込み時に truncate されるため、投入自体は正常終了した
+
+## 2026-03-16 要約 batch + prompt template 更新
+
+- Layer2 要約用の専用 prompt template ファイルを追加した:
+  - `src/lib/ai/prompts/enrich-batch-ja.ts`
+- 要約経路を `1記事 / 1項目ごとの呼び出し` から `10記事単位の batch 呼び出し` へ変更した。
+- `src/lib/ai/enrich.ts` の現在仕様:
+  - batch ごとに固定の日本語 prompt template を組み立てる
+  - `summary100Ja` と `summary200Ja` を 1 回の応答で要求する
+  - 構造化 JSON を parse する
+  - provider 順は `Gemini(primary) -> Gemini(secondary) -> OpenAI`
+- `daily-enrich` は `summaryBatchSize` を受け取り、DB upsert 前に batch 要約する。
+- `hourly-layer12` と cron route も `summaryBatchSize` を渡せるようにした。
+- 確認:
+  - `npm run type-check`
+
+## 2026-03-16 Manual Pending fallback 更新
+
+- Layer2 enrich の最終 fallback を `template` から `manual_pending` へ切り替えた。
+- migration `023_add_ai_processing_state.sql` を追加した。
+  - `articles_enriched.ai_processing_state`
+  - `articles_enriched_history.ai_processing_state`
+- `ai_processing_state` の現在値:
+  - `completed`
+  - `manual_pending`
+- Gemini と OpenAI が両方失敗した batch では:
+  - deterministic な Layer2 項目は DB に保存する
+  - `publication_basis` は `hold` に固定する
+  - 行は `ai_processing_state=manual_pending` にする
+  - 一時的な placeholder summary を DB 充足用に入れる
+  - 手動 import 互換の JSON を `artifacts/manual-pending/` に出力する
+- `scripts/import-ai-enrich-outputs.ts` は manual import 完了時に `ai_processing_state=completed` を書き戻す。
+- 確認:
+  - `npm run type-check`
+  - `npm run db:migrate`
+- `articles_enriched.title` も Claude ベースの運用で日本語化済みとし、enriched 側の英語 title は今後は品質不良として扱う。
+
+## 2026-03-16 現在の統合スナップショット
+
+- 現在の解釈:
+  - initial official-source backlog rescue は完了
+  - Layer2 蓄積は `873` 件を基盤に回る状態
+  - 自動要約経路は `10` 件 batch + 固定 prompt template に移行済み
+  - Gemini / OpenAI が両方失敗した場合は deterministic な Layer2 を保存したうえで `manual_pending` へ回す
+- 現在の DB 状態:
+  - `articles_enriched = 873`
+  - `ai_processing_state=completed = 873`
+  - `ai_processing_state=manual_pending = 0`
+- 現在フェイズ:
+  - 実装追加よりも、ジョブ経路の cycle test と hardening が主課題
+
+## 2026-03-15 Primary Key Naming + Stable Text ID Update
+
+- Renamed generic primary key columns away from bare `id` so table-local and joined SQL can use unambiguous names such as:
+  - `raw_article_id`
+  - `enriched_article_id`
+  - `job_run_id`
+  - `source_target_id`
+  - `tag_id`
+- Added stable readable text IDs alongside numeric keys for operator use:
+  - `articles_raw.raw_id`
+  - `articles_enriched.enriched_id`
+  - `job_runs.job_id`
+  - `job_run_items.job_item_id`
+- Current ID strategy is:
+  - numeric table-specific primary key columns remain the relational key
+  - readable text IDs are available for inspection, exports, and future API exposure
+
 ## 2026-03-15 Latest Snapshot Refresh
 
 - Latest Layer2 snapshot:
@@ -299,3 +399,154 @@
 - New env knobs:
   - `OPENAI_API_KEY`
   - `OPENAI_SUMMARY_MODEL` (default: `gpt-5-mini`)
+
+## 2026-03-15 OpenAI Fallback Verification Update
+
+- Confirmed `OPENAI_API_KEY` is loaded from local env and `gpt-5-mini` is accepted by the API.
+- Initial verification showed the current OpenAI call shape was not sufficient:
+  - `responses.create()` returned `status=incomplete`
+  - `incomplete_details.reason = max_output_tokens`
+  - `output_text = ""`
+- Fixed `src/lib/ai/enrich.ts` so OpenAI fallback now uses:
+  - `reasoning.effort = minimal`
+  - larger `max_output_tokens`
+  - explicit empty-output detection
+- Re-verified after the patch:
+  - direct `responses.create()` with `gpt-5-mini` returned `output_text = "OK"`
+  - `generateEnrichedSummary()` returned actual Japanese summaries with `summarySource = openai`
+  - confirmed both paths:
+    - Gemini present but failing with `429 spending cap` -> OpenAI fallback succeeds
+    - Gemini disabled -> OpenAI primary succeeds
+- Tightened Layer2 publication routing:
+  - when `summarySource = template`, `publication_basis` is forced to `hold`
+  - template-generated fallback text is no longer used as publishable summary text
+- Validation executed:
+  - `npm run type-check`
+  - `npm run db:check-layer12`
+
+## 2026-03-15 Primary Key Naming Cleanup
+
+- Added migration `021_rename_primary_key_columns.sql`.
+- Renamed generic primary key columns from `id` to table-specific names across the current schema.
+- Examples:
+  - `articles_raw.id -> raw_article_id`
+  - `articles_enriched.id -> enriched_article_id`
+  - `source_targets.id -> source_target_id`
+  - `job_runs.id -> job_run_id`
+  - `tags_master.id -> tag_id`
+- Updated current runtime SQL and ops scripts to follow the renamed columns while keeping app-level object shapes stable where practical.
+- Verified after migration:
+  - `npm run db:migrate`
+  - `npm run type-check`
+  - `npm run db:check-layer12`
+  - `npm run db:check-source-policies`
+  - `npm run db:check-domain-policies -- --needs-review`
+
+## 2026-03-15 Stable Text ID Addition
+
+- Added migration `022_add_stable_text_ids.sql`.
+- Introduced readable generated text IDs without removing existing primary keys.
+- Current added columns:
+  - `articles_raw.raw_id`
+  - `articles_raw_history.raw_history_id`
+  - `articles_enriched.enriched_id`
+  - `articles_enriched_history.enriched_history_id`
+  - `job_runs.job_id`
+  - `job_run_items.job_item_id`
+- Format examples:
+  - `raw-00000001`
+  - `enriched-00000001`
+  - `job-00000001`
+- Existing data was preserved; values are generated from the current numeric primary keys.
+- Validation executed:
+  - `npm run db:migrate`
+  - `npm run type-check`
+
+## 2026-03-15 Provider Tier + Title Localization Ops Update
+
+- `generateEnrichedSummary()` の provider 順を実コードベースで次に統一した:
+  - `GEMINI_API_KEY`
+  - `GEMINI_API_KEY2`
+  - `OPENAI_API_KEY`
+  - `template fallback`
+- `summarySource` は `gemini / gemini2 / openai / template` を返す。
+- OpenAI 呼び出しは `reasoning.effort=minimal` と `max_output_tokens=320` を固定し、空応答は失敗として次の fallback に回す。
+- `daily-enrich` 側では `summarySource=template` のとき `publication_basis=hold` を優先し、snippet publish 条件より強く抑止する形に整理した。
+- 運用補助として `npm run db:translate-raw-titles -- <batch>` を追加し、`articles_raw.title` の日本語化をバッチ単位で進められるようにした。
+- 既存の Layer2/公開文 remediation は引き続き:
+  - `scripts/translate-layer2-english-summaries.mjs`
+  - `scripts/update-enriched-titles.mjs`
+  - `scripts/update-enriched-titles-from-file.mjs`
+  を使う前提。
+
+## 2026-03-15 Raw Title Rollback Direction
+
+- `articles_raw.title` の日本語化運用は誤りだったものとして扱う方針に切り替えた。
+- 今後の日本語化対象は `articles_enriched.title` / `summary_100` / `summary_200` / `publication_text` に限定する。
+- `articles_raw.title` は source から取った生タイトルを保持する ingestion 用フィールドとみなし、公開品質 remediation の対象から外す。
+- 既存の未処理 backlog を今後の enrich 対象から外すため、`npm run db:skip-raw-backlog -- --through-raw-id <raw_article_id>` を追加した。
+- このコマンドは該当 raw を削除せず `is_processed=true` と `last_error=skip理由` に更新して、サービス開始後の新規蓄積を優先できるようにする。
+
+## 2026-03-15 Official Source Raw Title Rescue
+
+- 方針を `google-alerts 系は backlog 切り離し`, `official source backlog は可能な限り救済` に整理した。
+- `scripts/repair-raw-titles-from-url.mjs` と `npm run db:repair-raw-titles-from-url` を追加した。
+- この repair は `fulltext_allowed` source の未処理 raw に限定し、記事 URL から:
+  - `og:title`
+  - `twitter:title`
+  - `h1`
+  - `<title>`
+  を順に見て `articles_raw.title` を原題へ戻す。
+- 実行結果:
+  - `openai-news`: `187/187` 件 repair 成功
+  - `nvidia-developer-blog`: `10/10` 件 repair 成功
+  - `huggingface-blog`: `97/186` 件 repair 成功
+- `huggingface-blog` の残りは title 抽出ロジック不足ではなく、取得元の `429` rate limit による未回収。
+- repair 後、official source backlog に残っていた古い SQL 失敗 (`could not determine data type of parameter $7`) は stale と判断して `253` 件分クリアした。
+- 現在の official source backlog 状態:
+  - `openai-news unprocessed=187 / latin-title=187 / with-error=0`
+  - `huggingface-blog unprocessed=186 / latin-title=98 / with-error=0`
+  - `nvidia-developer-blog unprocessed=10 / latin-title=10 / with-error=0`
+- 次の実運用は:
+  - `official source` backlog を enrich で消化
+  - `google-alerts` backlog は必要なら skip
+  - 以後の raw title は source 原題のまま保持
+
+## 2026-03-15 OpenAI-Only Enrich Continuation + AI Input Export
+
+- 中断前の実行結果を確認し、`openai-news` と `nvidia-developer-blog` は backlog をすべて消化済みに到達した。
+- 現在の official source 状態:
+  - `openai-news = 278/278 enriched`
+  - `nvidia-developer-blog = 100/100 enriched`
+  - `huggingface-blog = 91/277 enriched`
+- 全体 snapshot:
+  - `articles_enriched = 687`
+  - `enriched_ready_total = 645`
+  - `enriched_provisional_total = 37`
+- Gemini は `GEMINI_API_KEY` / `GEMINI_API_KEY2` ともに `429 spending cap` で実運用不能のため、追加 enrich は実質 `OpenAI fallback` で進んでいる。
+- 処理速度と従量課金を考慮し、残 official backlog は「AI が必要な入力だけファイルへ export -> 手作業 CLI 要約 -> 後で import/register」の方式へ切り替える判断にした。
+- `scripts/export-ai-enrich-inputs.ts` と `npm run db:export-ai-enrich-inputs` を追加した。
+- `scripts/import-ai-enrich-outputs.ts` と `npm run db:import-ai-enrich-outputs` を追加した。
+- 現在の export 済みファイル:
+  - `artifacts/ai-enrich-inputs-official-remaining.json`
+- 現在の output template:
+  - `artifacts/ai-enrich-output-template-official-remaining.json`
+- export 対象は現在 `huggingface-blog` の未処理 `186` 件。
+- export ファイルには、後段で AI 以外を再計算しなくて済むように次を含める:
+  - `title`
+  - `content`
+  - `summaryInputBasis`
+  - `summaryInputText`
+  - `summaryBasis`
+  - `provisionalBase`
+  - `dedupeStatus`
+  - `dedupeGroupKey`
+  - `matchedTagIds`
+  - `candidateTags`
+  - `publicationBasisIfSummaryExists`
+- export 内訳:
+  - `contentPath full = 100`
+  - `contentPath snippet = 86`
+  - `summaryInputBasis full_content = 100`
+  - `summaryInputBasis title_only = 86`
+- この方式は実現可能。ただし最終登録は生 SQL 生成より、既存の `upsertEnrichedArticle` / `markRawProcessed` を呼ぶ import スクリプトに寄せた方が安全。

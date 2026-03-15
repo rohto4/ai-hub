@@ -5,7 +5,7 @@ import { normalizeUrl } from '@/lib/rss/normalize'
 import type { CollectedItem, SourceTarget } from '@/lib/collectors/types'
 
 type ExistingRawRow = {
-  id: number
+  raw_article_id: number
   source_updated_at: string | null
   snippet_hash: string | null
 }
@@ -43,11 +43,11 @@ export async function persistCollectedItem({
   const snippetHash = buildSnippetHash(item)
 
   const existingRows = (await sql`
-    SELECT id, source_updated_at, snippet_hash
+    SELECT raw_article_id, source_updated_at, snippet_hash
     FROM articles_raw
     WHERE source_target_id = ${sourceTarget.id}
       AND normalized_url = ${normalizedUrl}
-    ORDER BY fetch_run_at DESC, id DESC
+    ORDER BY fetch_run_at DESC, raw_article_id DESC
     LIMIT 1
   `) as ExistingRawRow[]
 
@@ -117,12 +117,12 @@ export async function markLatestRawError(
   await sql`
     UPDATE articles_raw
     SET last_error = ${errorMessage}
-    WHERE id = (
-      SELECT id
+    WHERE raw_article_id = (
+      SELECT raw_article_id
       FROM articles_raw
       WHERE source_target_id = ${sourceTargetId}
         AND normalized_url = ${normalizedUrl}
-      ORDER BY fetch_run_at DESC, id DESC
+      ORDER BY fetch_run_at DESC, raw_article_id DESC
       LIMIT 1
     )
   `

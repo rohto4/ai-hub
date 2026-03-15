@@ -39,7 +39,7 @@ async function run() {
   const limit = Math.max(1, Number(readArg('--limit', '20')))
   const candidates = await pool.query(
     `
-      SELECT id, candidate_key, display_name, seen_count, review_status
+      SELECT tag_candidate_id AS id, candidate_key, display_name, seen_count, review_status
       FROM tag_candidate_pool
       WHERE seen_count >= $1
         AND review_status IN ('candidate', 'trend_matched', 'manual_review')
@@ -71,12 +71,12 @@ async function run() {
           ON CONFLICT (tag_key) DO UPDATE
             SET display_name = EXCLUDED.display_name,
                 updated_at = now()
-          RETURNING id
+          RETURNING tag_id
         `,
         [tagKey, row.display_name, 'Promoted from tag_candidate_pool'],
       )
 
-      const tagId = inserted.rows[0].id
+      const tagId = inserted.rows[0].tag_id
       await client.query(
         `
           UPDATE tag_candidate_pool
@@ -84,7 +84,7 @@ async function run() {
             review_status = 'promoted',
             promoted_tag_id = $2,
             updated_at = now()
-          WHERE id = $1
+          WHERE tag_candidate_id = $1
         `,
         [row.id, tagId],
       )

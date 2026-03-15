@@ -12,6 +12,8 @@
 1. P0 ではジョブを責務単位で分割する
 2. 時間粒度と責務粒度は一致させない
 3. enrich は現行実装名が `daily-enrich` でも、運用上は毎時実行前提で扱う
+4. 要約 API 呼び出しは 1 記事ずつではなく、`summaryBatchSize=10` を基本とする
+5. Gemini / OpenAI へ渡す要約指示は固定テンプレートファイルを使い、毎回同じルールを明示する
 4. 毎時運用は `fetch -> enrich` を直列にし、enrich は小分けで回す
 5. 即時反映は定期バッチに混ぜず、優先キュー経由で処理する
 6. 記事単位失敗でスキップし、ジョブ全体は止めない
@@ -85,6 +87,9 @@
   - 要約を生成する
     - `summary_100`
     - `summary_200`
+    - provider 順は `Gemini(primary) -> Gemini(secondary) -> OpenAI gpt-5-mini`
+    - 両 provider が落ちた場合は `template fallback` へは落とさず `manual_pending` に回す
+    - `manual_pending` 行は `hold` のまま保持し、手動 import 用 JSON を `artifacts/manual-pending/` へ出力する
   - タグ候補を抽出する
   - `tags_master` / `tag_aliases` に照合する
     - 一致タグを `articles_enriched_tags` へ保存する

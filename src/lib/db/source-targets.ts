@@ -18,7 +18,7 @@ export async function listDueSourceTargets(limit = 20): Promise<SourceTarget[]> 
   const sql = getSql()
   const rows = (await sql`
     SELECT
-      st.id,
+      st.source_target_id AS id,
       st.source_key,
       st.display_name,
       st.fetch_kind,
@@ -32,7 +32,7 @@ export async function listDueSourceTargets(limit = 20): Promise<SourceTarget[]> 
     LEFT JOIN LATERAL (
       SELECT MAX(ar.fetch_run_at) AS last_fetch_run_at
       FROM articles_raw ar
-      WHERE ar.source_target_id = st.id
+      WHERE ar.source_target_id = st.source_target_id
     ) latest_fetch ON true
     WHERE st.is_active = true
       AND st.fetch_kind IN ('rss', 'alerts')

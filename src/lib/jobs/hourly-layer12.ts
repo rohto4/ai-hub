@@ -5,6 +5,7 @@ export interface HourlyLayer12Options {
   fetchLimit?: number
   enrichBatchSize?: number
   maxEnrichBatches?: number
+  summaryBatchSize?: number
 }
 
 export interface HourlyLayer12Result {
@@ -15,6 +16,7 @@ export interface HourlyLayer12Result {
     processed: number
     failed: number
     provisional: number
+    manualPending: number
     completedBatches: number
   }
 }
@@ -22,6 +24,7 @@ export interface HourlyLayer12Result {
 const DEFAULT_FETCH_LIMIT = 20
 const DEFAULT_ENRICH_BATCH_SIZE = 25
 const DEFAULT_MAX_ENRICH_BATCHES = 4
+const DEFAULT_SUMMARY_BATCH_SIZE = 10
 
 export async function runHourlyLayer12(
   options: HourlyLayer12Options = {},
@@ -29,12 +32,19 @@ export async function runHourlyLayer12(
   const fetchLimit = Math.max(1, Math.min(100, options.fetchLimit ?? DEFAULT_FETCH_LIMIT))
   const enrichBatchSize = Math.max(1, Math.min(100, options.enrichBatchSize ?? DEFAULT_ENRICH_BATCH_SIZE))
   const maxEnrichBatches = Math.max(1, Math.min(12, options.maxEnrichBatches ?? DEFAULT_MAX_ENRICH_BATCHES))
+  const summaryBatchSize = Math.max(
+    1,
+    Math.min(10, options.summaryBatchSize ?? DEFAULT_SUMMARY_BATCH_SIZE),
+  )
 
   const fetch = await runHourlyFetch(fetchLimit)
   const enrichRuns: DailyEnrichResult[] = []
 
   for (let batchIndex = 0; batchIndex < maxEnrichBatches; batchIndex += 1) {
-    const enrichResult = await runDailyEnrich(enrichBatchSize)
+    const enrichResult = await runDailyEnrich({
+      limit: enrichBatchSize,
+      summaryBatchSize,
+    })
     enrichRuns.push(enrichResult)
 
     if (enrichResult.attempted < enrichBatchSize) {
@@ -53,6 +63,7 @@ export async function runHourlyLayer12(
         (sum, run) => sum + run.items.filter((item) => item.isProvisional).length,
         0,
       ),
+      manualPending: enrichRuns.reduce((sum, run) => sum + run.manualPendingCount, 0),
       completedBatches: enrichRuns.length,
     },
   }

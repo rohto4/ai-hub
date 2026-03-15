@@ -6,7 +6,13 @@
       "Bash(npx create-next-app@latest:*)",
       "Bash(npm install:*)",
       "Bash(npm run:*)",
-      "Bash(xargs wc:*)"
+      "Bash(xargs wc:*)",
+      "mcp__Neon__run_sql",
+      "Bash(cd:*)",
+      "mcp__ide__executeCode",
+      "Bash(ls:*)",
+      "mcp__Neon__describe_project",
+      "mcp__Neon__describe_table_schema"
     ]
   }
 }

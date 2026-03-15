@@ -1,56 +1,56 @@
-# GEMINI.md - Optimization for Uni-Verse-Canvas
+# GEMINI.md - Gemini 運用方針
 
-## 🌌 Core Philosophy: DDD (Document-Driven Development)
+## 1. 基本姿勢
 
-あなたは、このプロジェクトの**SSOT（信頼できる唯一の情報源）である `docs/` 配下の設計書を最優先**するAIエージェントです。
+1. 設計判断、実装判断、検証結果を `docs/` に残し、ソースと乖離させない。
+2. Document-Driven Development を徹底し、実装変更に追随して `docs/` を更新する。
+3. 進捗、判断、未解決事項、引き継ぎ事項は `docs/imp/` に集約する。
+4. `docs/guide`、`docs/spec`、`docs/imp` の役割を崩さない。
 
-### 🚨 共通ルール
-- **型安全性の徹底**: `any` 禁止、`unknown` と型ガードを推奨。
-- **ドキュメント先行**: 実装前に必ず `docs/imp/implementation-plan.md` または関連ドキュメントを更新すること。
-- **自動同期**: 実装完了後、必ず設計書（`docs/`）を最新の状態に更新し、`docs/implementation-status.md`に更新結果を追記すること。
+## 2. 文字コードと読解ルール
 
----
+1. 日本語を含むファイルは毎回 UTF-8 前提で読むこと。文字化けした表示のまま解釈して進めない。
+2. 読み取り内容に違和感がある場合は、まず文字コード起因を疑う。
+3. UTF-8 で再読込せずに guide や spec を書き換えない。
 
-## 🛠️ シチュエーション別プロンプト
+## 3. docs 更新方針
 
-### 📂 Situation A: 調査・設計 (Research & Design)
-> アーキテクチャやデータスキーマの変更、新規機能の設計を行う場合。
+1. `docs/` 配下へ追記・更新する内容は、原則として日本語で読める形で残す。
+2. 一時メモ、進捗整理、判断待ち、運用メモも日本語で読み返せることを優先する。
+3. 英語の識別子、API 名、外部サービス名、テーブル名、カラム名はそのままでよい。
+4. ただし、説明本文まで英語に逃がさず、日本語で意味が追えるように書く。
+5. 方針変更や運用変更は `implementation-plan.md`、`imp-status.md`、必要に応じて `implementation-wait.md` や `docs/spec` に反映する。
 
-- `gemini-3-ultra-thinking` を優先使用。
-- `docs/specs/data-schema.md` を常に参照。
-- Google Searchを使用して、最新のライブラリ（Next.js 15+, Tailwind 4+等）の仕様を確認。
+## 4. ソースコードのコメント方針
 
-### 💻 Situation B: 機能実装 (Implementation)
-> 具体的なコード生成を行う場合。
+1. コメントは最小限でよい。
+2. コメントが必要な箇所では、日本語で簡潔に意図を書く。
+3. 自明な処理説明は書かない。
+4. 複雑な分岐、制約、後続で誤解されやすい箇所だけにコメントを残す。
 
-- `implementation-plan.md` の手順に従い、1ステップずつ実装。
-- `npm run type-check` を実行し、型エラーがゼロであることを確認。
-- 不要なコメントは省き、ドキュメントへのリンクを優先。
+## 5. 実行ルール
 
-### 🐞 Situation C: デバッグ・修正 (Debugging)
-> エラーレポートの分析と修正を行う場合。
+1. 実装前に関連する `docs/guide`、`docs/spec`、`docs/imp` を確認する。
+2. 実装中に方針が変わったら、そのターンで docs も更新する。
+3. 未解決事項や判断待ちは `implementation-wait.md` に残す。
+4. 後で検証すべき項目や引き継ぎ事項は `imp-hangover.md` に残す。
 
-- `temp-error-report.md` を作成して現状を整理。
-- 修正前に「なぜそのエラーが起きたか」の根本原因を設計レベルで分析。
-- 修正後は影響範囲を `grep_search` で全検索し、デグレを防止。
+## 6. タスク完了時の更新ルール
 
----
+1. コードや挙動を変更したら、タスクを離れる前に `docs/imp/implementation-plan.md` の現況を更新する。
+2. 実際に終わったこと、確認できたこと、残件は `docs/imp/imp-status.md` に追記する。
+3. 判断が未了のまま終える場合は、必ず `docs/imp/implementation-wait.md` に論点と必要な判断を書く。
+4. 今回やり切らない確認、障害試験、運用宿題は `docs/imp/imp-hangover.md` に残す。
+5. 恒久仕様が変わった場合は `docs/spec/` か `docs/guide/PROJECT.md` を更新し、進捗メモだけで済ませない。
+6. docs 更新なしでタスクを閉じてよいのは、コード・挙動・判断が何も変わっていない場合に限る。
 
-## 🧠 Skills
-- `DDD_Architect`: 複雑なビジネスロジックを設計書に落とし込むスキル。
-- `Tech_Scout`: 2026年3月時点の最新技術スタックを最適に適用するスキル。
+## 7. タスク中断時の更新ルール
 
-## 🌐 Global Agent Skills & Workflows
-必ずワークスペースのルートにある `.agent/` ディレクトリを確認してください。
-ここには16のSkillsと、16のSlash Commands (Workflows) が格納されており、すべてのエージェントで共有されるべき強力なツールキットです。
-各コマンドの詳細は `README.md` を参照してください。
+1. 中断時点での到達点、未実施、次の一手を `imp-status.md` または `imp-hangover.md` に残す。
+2. 途中変更がある場合は、どこまで反映済みかを明確に書く。
+3. 失敗した試行や却下した案も、再試行コストが高いものは簡潔に残す。
 
----
+## 8. 補助資料
 
-## ⚡ Proactive Workflow & Strict DDD Enforcement (絶対遵守)
-
-1. **Auto-Trigger Commands (ワークフローの自発的起動)**:
-   ユーザーの指示が `.agent/workflows/` 内のSOP（例: UI修正なら `/design-component`）の意図に合致する場合、ユーザーが明示的にスラッシュコマンドを入力しなくても、**エージェント自らが該当SOPをロードして実行に移ること**。
-2. **Forward-Moving DDD (実装と設計の双方向同期)**:
-   - **設計先行（デフォルト）**: ユーザーと実装方針を合意したら、直ちにコードは書かず、必ず `docs/imp/implementation-plan.md` にタスクを蓄積し、その計画に沿って着実にコーディングを進めること。
-   - **実装先行（アジャイル対応）**: スピード優先でユーザーから直接ソース編集の指示を受け、先行してコードを書き換えた場合は、**事後速やかにその変更内容を `docs/` 配下の仕様書や実装計画へ逆同期（反映）させること**。決してソースとドキュメントを乖離させたままタスクを終えないこと。
+1. `docs/guide/README.md` と `docs/guide/PROJECT.md` を guide の基準点として扱う。
+2. `.agent/` 配下の skills と workflows は必要時に参照するが、プロジェクト固有の判断はこの guide と `docs/spec` を優先する。
