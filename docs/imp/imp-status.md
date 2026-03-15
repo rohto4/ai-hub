@@ -201,3 +201,38 @@
   - `enriched_ready_total = 19`
   - `content_path full = 19`
 - Also fixed `observed_article_domains` upsert typing so new official-source fetches no longer fail on nullable policy parameters.
+
+## 2026-03-15 Bulk Source Acceleration Update
+
+- Switched the execution mode in practice from `slow domain-by-domain review` to `bulk official source seeding + bulk fetch/enrich + post-hoc triage`.
+- Added `meta-ai-news` and preseeded `about.fb.com` as an official domain.
+- Ran a bulk cycle:
+  - `hourly-fetch?limit=10`
+  - `daily-enrich?limit=12` x 5
+- Bulk fetch result:
+  - `processedTargets = 9`
+  - `inserted = 103`
+  - successful new official source: `meta-ai-news inserted=10`
+- Bulk enrich result:
+  - processed `60` additional raw rows
+  - most rows from official sources resolved to `full_content`
+- Current latest observation after the bulk cycle:
+  - `source_targets = 17`
+  - `fulltext_allowed sources = 8`
+  - `raw_total = 966`
+  - `enriched_total = 242`
+  - `enriched_ready_total = 69`
+  - `content_path full = 69`
+- Official source adoption now looks like this:
+  - `huggingface-blog ready=14 / full=14`
+  - `nvidia-developer-blog ready=14 / full=14`
+  - `openai-news ready=13 / full=13`
+  - `aws-machine-learning-blog ready=13 / full=13`
+  - `microsoft-foundry-blog ready=10 / full=10`
+  - `meta-ai-news raw=10 / enriched=0` (fetched, not consumed yet)
+- Current `needs-fix` sources discovered from the latest hourly fetch:
+  - `anthropic-news` -> `Status code 404`
+  - `google-ai-blog` -> `Cannot convert object to primitive value`
+- Interpretation:
+  - bulk official source expansion is now clearly producing publish-ready `full_content`
+  - the main path to service start is to keep consuming official-source raw backlog and maintain a separate fix list for the few broken sources

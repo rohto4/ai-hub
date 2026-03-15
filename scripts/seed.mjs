@@ -97,6 +97,15 @@ const sourceTargets = [
     contentAccessPolicy: 'fulltext_allowed',
   },
   {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000111',
+    sourceKey: 'meta-ai-news',
+    displayName: 'Meta AI News',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    baseUrl: 'https://about.fb.com/news/tag/ai/feed/',
+    contentAccessPolicy: 'fulltext_allowed',
+  },
+  {
     id: '7d4c0b20-1a1b-41d1-a111-000000000101',
     sourceKey: 'google-alerts-voice-ai-voice-agent',
     displayName: 'Google Alerts: Voice AI / Voice Agent',
@@ -199,6 +208,7 @@ const officialDomains = [
   { domain: 'aws.amazon.com', sourceKey: 'aws-machine-learning-blog' },
   { domain: 'huggingface.co', sourceKey: 'huggingface-blog' },
   { domain: 'developer.nvidia.com', sourceKey: 'nvidia-developer-blog' },
+  { domain: 'about.fb.com', sourceKey: 'meta-ai-news' },
 ]
 
 const tags = [
