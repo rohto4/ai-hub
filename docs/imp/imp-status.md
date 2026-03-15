@@ -257,6 +257,7 @@
   - `full_summary`
   - `source_snippet`
 - Layer2 now stores both `publication_basis` and `publication_text`.
+- Layer2 also stores `summary_input_basis` so the web tier can distinguish full-content summaries from snippet-based summaries.
 - `feed_snippet` / `blocked_snippet` rows can be finalized at Layer2 when they are:
   - relevant
   - unique

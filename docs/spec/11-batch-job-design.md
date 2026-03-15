@@ -80,6 +80,7 @@
   - 本文未取得時は `snippet` ベースで仮蓄積する
   - `is_provisional` / `provisional_reason` を更新する
   - `publication_basis` / `publication_text` を更新する
+  - `summary_input_basis` を更新する
   - blocked domain は `domain_snippet_only` として区別する
   - 要約を生成する
     - `summary_100`

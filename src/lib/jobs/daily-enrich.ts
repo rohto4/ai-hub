@@ -137,6 +137,35 @@ function determineSummaryBasis(
   return 'fallback_snippet'
 }
 
+function determineSummaryInput(
+  contentPath: 'full' | 'snippet',
+  extractedContent: string,
+  normalizedSnippet: string,
+  title: string,
+): {
+  summaryInputBasis: 'full_content' | 'source_snippet' | 'title_only'
+  summaryInputText: string
+} {
+  if (contentPath === 'full' && extractedContent.trim().length > 0) {
+    return {
+      summaryInputBasis: 'full_content',
+      summaryInputText: extractedContent,
+    }
+  }
+
+  if (normalizedSnippet.trim().length >= 80) {
+    return {
+      summaryInputBasis: 'source_snippet',
+      summaryInputText: normalizedSnippet,
+    }
+  }
+
+  return {
+    summaryInputBasis: 'title_only',
+    summaryInputText: title,
+  }
+}
+
 function isSnippetPublicationEligible(
   summaryBasis: 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet',
   contentPath: 'full' | 'snippet',
@@ -213,7 +242,13 @@ export async function runDailyEnrich(
         rawArticle.contentAccessPolicy,
         rawArticle.observedDomainFetchPolicy,
       )
-      const summaries = await generateEnrichedSummary(title, contentResult.content || title)
+      const summaryInput = determineSummaryInput(
+        contentResult.contentPath,
+        contentResult.content,
+        normalizedSnippet,
+        title,
+      )
+      const summaries = await generateEnrichedSummary(title, summaryInput.summaryInputText)
       const relevance = assessSourceTargetRelevance(rawArticle.sourceKey, title, normalizedSnippet)
       const tagResult = matchTags(
         tagReferences,
@@ -257,7 +292,7 @@ export async function runDailyEnrich(
         publicationBasis === 'full_summary'
           ? summaries.summary200 || summaries.summary100
           : publicationBasis === 'source_snippet'
-            ? normalizedSnippet
+            ? summaries.summary200 || summaries.summary100
             : null
       const finalIsProvisional = publicationBasis === 'source_snippet'
         ? false
@@ -296,6 +331,7 @@ export async function runDailyEnrich(
         publishCandidate,
         publicationBasis,
         publicationText,
+        summaryInputBasis: summaryInput.summaryInputBasis,
         score: adjustedScore,
         scoreReason: adjustedScoreReason,
         sourceUpdatedAt: rawArticle.sourceUpdatedAt,
@@ -316,6 +352,7 @@ export async function runDailyEnrich(
           provisionalReason: finalProvisionalReason,
           summaryBasis,
           publicationBasis,
+          summaryInputBasis: summaryInput.summaryInputBasis,
           publishCandidate,
           dedupeStatus,
           relevanceMatchedKeyword: relevance.matchedKeyword,

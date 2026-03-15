@@ -55,6 +55,7 @@ type ExistingEnrichedRow = {
   publish_candidate: boolean
   publication_basis: 'hold' | 'full_summary' | 'source_snippet'
   publication_text: string | null
+  summary_input_basis: 'full_content' | 'source_snippet' | 'title_only'
   score: string | number
   score_reason: string | null
   source_updated_at: string | null
@@ -95,6 +96,7 @@ export interface UpsertEnrichedInput {
   publishCandidate: boolean
   publicationBasis: 'hold' | 'full_summary' | 'source_snippet'
   publicationText: string | null
+  summaryInputBasis: 'full_content' | 'source_snippet' | 'title_only'
   score: number
   scoreReason: string
   sourceUpdatedAt: string | null
@@ -313,6 +315,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         publish_candidate,
         publication_basis,
         publication_text,
+        summary_input_basis,
         score,
         score_reason,
         source_updated_at,
@@ -340,6 +343,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         ${existing.publish_candidate},
         ${existing.publication_basis},
         ${existing.publication_text},
+        ${existing.summary_input_basis},
         ${existing.score},
         ${existing.score_reason},
         ${existing.source_updated_at},
@@ -368,6 +372,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         publish_candidate = ${input.publishCandidate},
         publication_basis = ${input.publicationBasis},
         publication_text = ${input.publicationText},
+        summary_input_basis = ${input.summaryInputBasis},
         score = ${input.score},
         score_reason = ${input.scoreReason},
         source_updated_at = ${input.sourceUpdatedAt},
@@ -402,6 +407,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       publish_candidate,
       publication_basis,
       publication_text,
+      summary_input_basis,
       score,
       score_reason,
       source_updated_at
@@ -424,6 +430,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       ${input.publishCandidate},
       ${input.publicationBasis},
       ${input.publicationText},
+      ${input.summaryInputBasis},
       ${input.score},
       ${input.scoreReason},
       ${input.sourceUpdatedAt}

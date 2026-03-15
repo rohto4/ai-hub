@@ -132,13 +132,15 @@
 7. `summary_basis` を `full_content / feed_snippet / blocked_snippet / fallback_snippet` で付ける
 8. `publication_basis` を `hold / full_summary / source_snippet` で付ける
 9. `publication_text` に公開面で使う本文を保存する
+10. `summary_input_basis` に「本文要約 / snippet要約 / title fallback」の別を保存する
    - `feed_only` source は `provisional_reason=feed_only_policy`
    - 未判定 domain は `provisional_reason=domain_needs_review`
-10. 要約 100 / 200 を生成する
+11. 要約 100 / 200 を生成する
 10. タグ候補抽出とタグ照合を行う
 11. 確定重複判定を行う
 10. `articles_enriched` と `articles_enriched_tags` に保存する
-11. `hold` 行だけ `publish_candidate=false` にする
+12. `source_snippet` 行は snippet を要約した結果を公開面に使う
+13. `hold` 行だけ `publish_candidate=false` にする
 12. `tag_candidate_pool` を更新する
 13. `articles_raw.is_processed = true` を更新する
 
