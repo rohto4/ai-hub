@@ -1,80 +1,75 @@
-# AI Trend Hub 実装ハングオーバー
+# AI Trend Hub Implementation Hangover
 
 最終更新: 2026-03-15
 
 ## 1. このファイルの役割
 
-セッションが切れても、次に戻った人が `Layer1 -> Layer2` の実装と運用をすぐ再開できるようにするための再開ガイド。
+セッションが切れても、ここから再開できるように現状を短く固定する。
+今の主戦場は `Layer1 -> Layer2`。`Layer3 / Layer4` はまだ本格着手していない。
 
-今は「広く本文取得する」段階ではない。  
-まず `source policy` と `domain review` を前提に、安全に `full_content` を増やす段階である。
+## 2. 現在の基本方針
 
-## 2. 現在の正しい前提
+1. Google Alerts は discovery 用。原則 `feed_only`。
+2. 公式 source は `fulltext_allowed` を基本にする。
+3. ただし本文取得は source だけでなく domain review も通す。
+4. snippet は捨てない。Layer2 で
+   - `full_summary`
+   - `source_snippet`
+   - `hold`
+   に分ける。
+5. `source_snippet` は「生 snippet を出す」のではなく、「snippet を入力に 100/200 要約したもの」を公開文に使う。
+6. web 側は `summary_input_basis` を見て
+   - 本文要約
+   - snippet 要約
+   を表示上で区別できるようにする。
 
-- 主対象は `Layer1 -> Layer2` の品質改善と毎時運用
-- `Layer3 / Layer4` はまだ保留
-- スケジューラは GitHub Actions
-- enrich の実装名は `daily-enrich` だが、運用上は毎時 enrich として扱う
-- 毎時実行は `fetch -> enrich` を直列にする
-- enrich は小分け batch で回す
-- 本文未取得でも `snippet` ベースで Layer2 に仮蓄積する
-- blocked domain は障害ではなく `domain_snippet_only / snippet-only` として扱う
-- tag candidate は高閾値の保守運用
+## 3. 現在の重要カラム
 
-## 3. いま壊してはいけない設計判断
+### 3.1 source_targets
 
-### 3.1 Source policy first
+- `content_access_policy`
+  - `feed_only`
+  - `fulltext_allowed`
+  - `blocked_snippet_only`
 
-`source_targets.content_access_policy` を先に見る。
+### 3.2 observed_article_domains
 
-- `feed_only`
-- `fulltext_allowed`
-- `blocked_snippet_only`
+- `fetch_policy`
+  - `needs_review`
+  - `fulltext_allowed`
+  - `snippet_only`
+  - `blocked`
 
-原則:
+### 3.3 articles_enriched
 
-- Google Alerts 系 source は `feed_only`
-- 公式 source / 公式 blog / 明示的に本文取得を許容してよい source だけ `fulltext_allowed`
-- 既知 blocked source は `blocked_snippet_only`
-- ただし `feed_only` source でも、review 済み official domain が `fulltext_allowed` なら本文取得に進めてよい
+- `summary_basis`
+  - `full_content`
+  - `feed_snippet`
+  - `blocked_snippet`
+  - `fallback_snippet`
+- `publication_basis`
+  - `hold`
+  - `full_summary`
+  - `source_snippet`
+- `summary_input_basis`
+  - `full_content`
+  - `source_snippet`
+  - `title_only`
+- `publication_text`
+  - 公開面で使う本文
+- `is_provisional`
+- `provisional_reason`
+- `publish_candidate`
 
-### 3.2 Domain review first
+## 4. 現在の source 状態
 
-`observed_article_domains.fetch_policy` を見て、未確認ドメインには本文取得しない。
-
-- `needs_review`
-- `fulltext_allowed`
-- `snippet_only`
-- `blocked`
-
-原則:
-
-- `needs_review` は保留状態であり、恒久停止ではない
-- `fulltext_allowed` に昇格した domain だけ本文取得へ進める
-- `snippet_only` / `blocked` は snippet 仮蓄積に落とす
-
-### 3.3 Summary basis を残す
-
-Layer2 には要約の根拠を残す。
-
-- `full_content`
-- `feed_snippet`
-- `blocked_snippet`
-- `fallback_snippet`
-
-この区別を消さないこと。  
-後で本実装へ移行するときに、「何を根拠に要約したか」が追えなくなる。
-
-## 4. 現在の DB / 実装状態
-
-### 4.1 Source 状態
+### 4.1 active source 数
 
 - active source: `17`
-- `feed_only = 9`
-- `fulltext_allowed = 8`
-- `blocked_snippet_only` は source 単位では必要時のみ設定
+- `feed_only`: `9`
+- `fulltext_allowed`: `8`
 
-現在の `fulltext_allowed` source:
+### 4.2 fulltext_allowed source
 
 - `anthropic-news`
 - `google-ai-blog`
@@ -85,117 +80,117 @@ Layer2 には要約の根拠を残す。
 - `nvidia-developer-blog`
 - `meta-ai-news`
 
-`ai-news-roundup` は placeholder source だったため `is_active=false` にしてある。
+### 4.3 active だが discovery 用の source
 
-### 4.2 Layer2 状態
+- Google Alerts 系 9本
 
-直近確認値:
+## 5. 現在の Layer2 スナップショット
 
-- `articles_raw = 162`
-- `articles_enriched = 162`
-- `raw_unprocessed = 0`
-- `enriched_ready_total = 2`
-- `enriched_provisional_total = 160`
-- `content_path full = 2`
-- `content_path snippet = 160`
+`npm run db:check-layer12` の最新観測:
 
-いま `ready` が少ないのは不具合ではなく、source policy を安全側に倒した結果である。  
-`ready` を無理に増やすのではなく、「許可済み source / domain からだけ `full_content` を増やす」方針で進める。
+- `raw_total = 966`
+- `raw_processed = 490`
+- `raw_unprocessed = 476`
+- `raw_with_error = 253`
+- `enriched_total = 490`
+- `enriched_ready_total = 459`
+- `enriched_provisional_total = 31`
 
-### 4.3 Summary basis 状態
+### 5.1 content path
 
-直近確認値:
+- `full = 317`
+- `snippet = 173`
 
-- `full_content = 2`
-- `feed_snippet = 160`
+### 5.2 publication basis
+
+- `full_summary = 317`
+- `source_snippet = 142`
+- `hold = 31`
+
+### 5.3 summary input basis
+
+- `full_content = 317`
+- `source_snippet = 168`
+- `title_only = 5`
 
 意味:
 
-- `feed_snippet` は監視・仮蓄積としては使える
-- ただし公開候補母集団は `full_content` 中心で考える
+- 317件は本文を取って要約済み
+- 142件は snippet を入力に要約し、公開候補まで進めた
+- 31件はまだ保留
 
-### 4.4 Domain inventory 状態
+## 6. official source の進み具合
 
-`observed_article_domains` を導入済み。  
-取得済み記事の行き先ドメインを DB に保持し、domain ごとに review できる。
+- `openai-news ready=91 / unprocessed=187`
+- `huggingface-blog ready=91 / unprocessed=186`
+- `nvidia-developer-blog ready=90 / unprocessed=10`
+- `aws-machine-learning-blog ready=20 / unprocessed=0`
+- `microsoft-foundry-blog ready=10 / unprocessed=0`
+- `meta-ai-news ready=10 / unprocessed=0`
+- `anthropic-news ready=1 / unprocessed=0`
+- `google-ai-blog ready=1 / unprocessed=0`
 
-直近確認値:
+ここでいう `ready` は、現状ほぼ「Layer2 で公開候補に進める状態」の数。
 
-- observed domains: `138`
+## 7. 最近入れた大きい変更
 
-既知 blocked / snippet-only として初期投入済み:
+### 7.1 summary_300 廃止
 
-- `axios.com`
-- `bloomberg.com`
-- `youtube.com`
-- `cdt.org`
+- 300文字要約は削除済み
+- 要約は `100 / 200` のみ
+- Gemini 呼び出しは 1記事あたり 3回から 2回へ削減
 
-明示的に `fulltext_allowed` にした domain:
+### 7.2 source-targeted daily enrich
 
-- `anthropic.com`
-- `blog.google`
-- `research.google`
-- `safe.ai`
-- `databricks.com`
-- `blogs.cisco.com`
-- `openai.com`
-- `devblogs.microsoft.com`
-- `aws.amazon.com`
-- `huggingface.co`
-- `developer.nvidia.com`
-- `about.fb.com`
+- `daily-enrich` に `sourceKey` 指定を追加
+- 公式 source を狙い撃ちで消化可能
 
-## 5. 主要テーブルと意味
+API:
 
-### 5.1 `source_targets`
+```bash
+POST /api/cron/daily-enrich?limit=20&sourceKey=openai-news
+```
 
-- source 定義
-- `content_access_policy` を持つ
+### 7.3 snippet publication path
 
-### 5.2 `articles_raw`
+- Layer2 で `hold / full_summary / source_snippet` を確定
+- `source_snippet` は snippet をそのまま出すのではなく、snippet を入力に作った 100/200 要約を `publication_text` に保存
+- `summary_input_basis` で web 側が表示ラベルを切り替えられる
 
-- Layer1 の取り込み結果
-- raw 再処理対象
+## 8. まだ残っている主な課題
 
-### 5.3 `articles_enriched`
+1. web 側にまだ公開面がない
+2. web 側で `summary_input_basis` を見て
+   - 本文要約
+   - snippet 要約
+   を表示分岐する必要がある
+3. official source backlog がまだ大きい
+   - OpenAI
+   - Hugging Face
+   - NVIDIA の残り
+4. raw の古い `could not determine data type of parameter $7` 系エラー残骸がまだ残っている
+5. dedupe はまだ全件一律寄り
+   - 再配信サイト向けの重み付けに整理余地あり
+6. tag candidate はまだ運用調整余地あり
 
-- Layer2 の enrich 結果
-- `is_provisional`
-- `provisional_reason`
-- `summary_basis`
+## 9. 次にやると自然なタスク
 
-### 5.4 `observed_article_domains`
+優先順:
 
-- 記事 URL の行き先ドメイン inventory
-- `fetch_policy`
-- `summary_policy`
-- `observed_article_count`
-- `latest_article_url`
+1. web 公開面の暫定実装
+   - `publish_candidate = true`
+   - `publication_text`
+   - `publication_basis`
+   - `summary_input_basis`
+   を使って一覧化
+2. `source_snippet` に「配信元スニペットを要約」と表示ラベルを出す
+3. official source backlog を source 指定 enrich で継続消化
+4. raw error 残骸の再キュー整理
+5. dedupe を「再配信サイト寄り」に寄せて再設計
 
-## 6. いまの enrich 判定ルール
+## 10. すぐ使うコマンド
 
-大筋は次の順。
-
-1. `source_targets.content_access_policy` を確認
-2. `observed_article_domains.fetch_policy` を確認
-3. どちらも本文取得可能な場合だけ本文 fetch を試みる
-4. それ以外は `snippet` 仮蓄積に落とす
-
-現在の実装上の振る舞い:
-
-- source が `feed_only` のとき
-  - 原則本文 fetch しない
-  - ただし domain が `fulltext_allowed` なら本文 fetch に進める
-  - snippet fallback 時は `provisional_reason = feed_only_policy`
-  - snippet fallback 時は `summary_basis = feed_snippet`
-- source が `fulltext_allowed` でも domain が `needs_review` のとき
-  - 本文 fetch しない
-  - `provisional_reason = domain_needs_review`
-- domain が `snippet_only` または `blocked` のとき
-  - 本文 fetch しない
-  - `provisional_reason = domain_snippet_only`
-
-## 7. 再開時にまず打つコマンド
+### 状態確認
 
 ```bash
 npm run type-check
@@ -204,128 +199,51 @@ npm run db:check-source-policies
 npm run db:check-domain-policies -- --needs-review
 ```
 
-見るポイント:
-
-- `ready / provisional` の比率
-- `summary_basis`
-- `provisional_reason`
-- 未判定 domain の上位
-- source policy の崩れがないか
-
-## 8. domain review の標準フロー
-
-未確認 domain を review して本文取得へ進める標準手順はこれ。
-
-1. `npm run db:check-domain-policies -- --needs-review`
-2. サンプル URL と source を確認
-3. domain policy を決める
-4. policy 更新と provisional 再キューを行う
-5. 次の enrich で `full_content` 化を確認する
-
-コマンド:
+### source / domain 操作
 
 ```bash
-npm run db:promote-domain-policy -- <domain> fulltext_allowed summarize_full
-```
-
-あるいは個別更新:
-
-```bash
-npm run db:set-domain-policy -- <domain> fulltext_allowed summarize_full
-npm run db:requeue-raw -- --domain <domain> --provisional-only
-```
-
-重要:
-
-- `needs_review` は止めるための状態ではなく、unlock 前の保留状態
-- `fulltext_allowed` にした domain は通常どおり本文取得へ進む
-
-## 9. source review の標準フロー
-
-source 単位で本文取得を許可するときの標準手順。
-
-```bash
-npm run db:check-source-policies
-npm run db:set-source-policy -- <source-key> fulltext_allowed --requeue
-```
-
-ただし、Google Alerts を広く `fulltext_allowed` に戻さないこと。  
-Alerts は discovery 用、公開候補生成は公式 source 中心、という役割分離を維持する。
-
-## 10. いま使う主要コマンド
-
-```bash
-npm run db:check-layer12
-npm run db:check-source-policies
 npm run db:set-source-policy -- <source-key> <policy> --requeue
-npm run db:sync-observed-domains
-npm run db:check-domain-policies
-npm run db:check-domain-policies -- --needs-review
 npm run db:set-domain-policy -- <domain> <policy> <summary-policy>
 npm run db:promote-domain-policy -- <domain> <policy> <summary-policy>
-npm run db:requeue-raw -- --domain <domain> --provisional-only
 ```
 
-補助:
+### raw 再処理
 
 ```bash
-npm run db:check-snippet-domains
-npm run db:promote-tag-candidates
-npm run db:repair-stale-job-runs
+node scripts/requeue-raw.mjs --source-key openai-news --limit 20
+node scripts/requeue-raw.mjs --domain example.com --provisional-only --limit 20
 ```
 
-## 11. 次に潰すべき実務
+### source 指定 enrich
 
-優先順はこれ。
+```bash
+POST /api/cron/daily-enrich?limit=20&sourceKey=openai-news
+POST /api/cron/daily-enrich?limit=20&sourceKey=huggingface-blog
+POST /api/cron/daily-enrich?limit=20&sourceKey=nvidia-developer-blog
+```
 
-1. `needs_review` 上位 domain の review
-2. 公式 source / 公式 domain の追加
-3. `full_content` を増やした上で publish 候補母集団を育てる
-4. tag candidate の prune / promote を保守運用で続ける
+## 11. 参照すべきファイル
 
-現時点で review 候補になりやすい domain 例:
+優先:
 
-- `theverge.com`
-- `cnbc.com`
-- `theguardian.com`
-- `wired.com`
-- `techbuzz.ai`
-
-## 12. まだ残るリスク
-
-- `ready` はまだ少ない
-- source を増やさない限り公開候補母集団は伸びにくい
-- `feed_snippet` は監視用途には有効だが、そのまま公開要約にするには質のムラがある
-- tag candidate はまだ運用判断が残る
-
-## 13. 直近コミット
-
-- `9517d6c` hourly orchestration と provisional state
-- `eac7d3c` layer2 再処理と tag hygiene
-- `b50a9b1` blocked domain 分類と `nvidia` 昇格
-- `83acf19` source content access policy
-- `82e6bda` source policy ops scripts
-- `516ec0d` summary basis
-- `1dae083` observed article domains
-- `23979fd` domain review enforcement
-- `9e8258f` domain review promotion flow
-
-## 14. 次に必ず読むファイル
-
-1. `docs/guide` 配下
+1. `docs/guide/*`
 2. `docs/imp/implementation-plan.md`
 3. `docs/imp/imp-status.md`
 4. `docs/imp/implementation-wait.md`
-5. `docs/memo/20260312_dataflow.md`
-6. `docs/spec/11-batch-job-design.md`
+5. `docs/spec/04-data-model-and-sql.md`
+6. `docs/spec/05-ingestion-and-ai-pipeline.md`
+7. `docs/spec/11-batch-job-design.md`
 
-必要に応じて:
+実装本体:
 
-1. `docs/spec/04-data-model-and-sql.md`
-2. `docs/spec/05-ingestion-and-ai-pipeline.md`
-3. `src/lib/jobs/daily-enrich.ts`
-4. `src/lib/extractors/content.ts`
-5. `src/lib/db/enrichment.ts`
-6. `scripts/check-layer12.mjs`
-7. `scripts/check-domain-policies.mjs`
-8. `scripts/promote-domain-policy.mjs`
+1. `src/lib/jobs/daily-enrich.ts`
+2. `src/lib/db/enrichment.ts`
+3. `src/lib/extractors/content.ts`
+4. `scripts/check-layer12.mjs`
+
+## 12. 直近コミット
+
+- `d545ee9` feat: remove summary 300 pipeline
+- `d756700` feat: support source-targeted daily enrich
+- `34592e3` feat: finalize snippet publication path in layer2
+- `84bf669` feat: summarize publishable snippets in layer2

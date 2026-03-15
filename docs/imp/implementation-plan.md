@@ -171,3 +171,17 @@ npm run db:promote-tag-candidates
 4. `docs/imp/implementation-wait.md`
 5. `docs/spec/05-ingestion-and-ai-pipeline.md`
 6. `docs/spec/11-batch-job-design.md`
+
+## 9. Post-Launch Maintenance Kit
+
+This is intentionally a late-phase task. Do not prioritize it while the specification is still moving.
+
+1. Create the maintenance kit only after the current implementation is broadly complete and the web publishing flow is stable.
+2. The kit should include:
+   - operator runbook
+   - incident and failure triage checklist
+   - standard SQL snippets for inspection
+   - requeue / repair / backfill command catalog
+   - source review / domain review templates
+   - publish verification checklist
+3. This is a hardening task for after the current implementation phase, not a current blocking deliverable.

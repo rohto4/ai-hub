@@ -264,3 +264,25 @@
   - long enough
   - not visibly truncated
 - Finalized snippet rows are no longer treated as provisional and can become publish candidates.
+
+## 2026-03-15 Latest Snapshot Refresh
+
+- Latest Layer2 snapshot:
+  - `raw_total = 966`
+  - `raw_processed = 490`
+  - `raw_unprocessed = 476`
+  - `enriched_total = 490`
+  - `enriched_ready_total = 459`
+  - `enriched_provisional_total = 31`
+- Publication routing snapshot:
+  - `full_summary = 317`
+  - `source_snippet = 142`
+  - `hold = 31`
+- Summary input basis snapshot:
+  - `full_content = 317`
+  - `source_snippet = 168`
+  - `title_only = 5`
+- Current operational interpretation:
+  - full-content publication flow is working
+  - snippet-summary publication flow is now also working inside Layer2
+  - the next natural task is the web-side publishing view that distinguishes full summaries from snippet-based summaries
