@@ -37,6 +37,11 @@ export interface DailyEnrichResult {
   items: DailyEnrichItemResult[]
 }
 
+export interface DailyEnrichOptions {
+  limit?: number
+  sourceKey?: string | null
+}
+
 function determineProvisionalState(
   contentPath: 'full' | 'snippet',
   extractionStage:
@@ -147,12 +152,16 @@ function scoreArticle(
   return { score, scoreReason }
 }
 
-export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
+export async function runDailyEnrich(
+  options: number | DailyEnrichOptions = 50,
+): Promise<DailyEnrichResult> {
+  const limit = typeof options === 'number' ? options : options.limit ?? 50
+  const sourceKey = typeof options === 'number' ? null : options.sourceKey ?? null
   const jobRunId = await startJobRun({
     jobName: 'daily-enrich',
-    metadata: { limit },
+    metadata: { limit, sourceKey },
   })
-  const rawArticles = await listRawArticlesForEnrichment(limit)
+  const rawArticles = await listRawArticlesForEnrichment(limit, sourceKey)
   const tagReferences = await listActiveTagReferences()
   const items: DailyEnrichItemResult[] = []
 

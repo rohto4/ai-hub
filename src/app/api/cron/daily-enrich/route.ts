@@ -17,9 +17,10 @@ export async function POST(request: NextRequest) {
   }
 
   const limitParam = request.nextUrl.searchParams.get('limit')
+  const sourceKey = request.nextUrl.searchParams.get('sourceKey')
   const parsedLimit = limitParam ? Number(limitParam) : 50
   const limit = Number.isFinite(parsedLimit) ? Math.max(1, Math.min(100, parsedLimit)) : 50
 
-  const result = await runDailyEnrich(limit)
+  const result = await runDailyEnrich({ limit, sourceKey })
   return NextResponse.json(result)
 }
