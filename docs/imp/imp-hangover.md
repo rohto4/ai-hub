@@ -69,15 +69,20 @@ Layer2 には要約の根拠を残す。
 
 ### 4.1 Source 状態
 
-- active source: `11`
+- active source: `16`
 - `feed_only = 9`
-- `fulltext_allowed = 2`
+- `fulltext_allowed = 7`
 - `blocked_snippet_only` は source 単位では必要時のみ設定
 
 現在の `fulltext_allowed` source:
 
 - `anthropic-news`
 - `google-ai-blog`
+- `openai-news`
+- `microsoft-foundry-blog`
+- `aws-machine-learning-blog`
+- `huggingface-blog`
+- `nvidia-developer-blog`
 
 `ai-news-roundup` は placeholder source だったため `is_active=false` にしてある。
 
@@ -132,6 +137,11 @@ Layer2 には要約の根拠を残す。
 - `safe.ai`
 - `databricks.com`
 - `blogs.cisco.com`
+- `openai.com`
+- `devblogs.microsoft.com`
+- `aws.amazon.com`
+- `huggingface.co`
+- `developer.nvidia.com`
 
 ## 5. 主要テーブルと意味
 

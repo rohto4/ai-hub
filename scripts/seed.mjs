@@ -52,6 +52,51 @@ const sourceTargets = [
     isActive: false,
   },
   {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000106',
+    sourceKey: 'openai-news',
+    displayName: 'OpenAI News',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    baseUrl: 'https://openai.com/news/rss.xml',
+    contentAccessPolicy: 'fulltext_allowed',
+  },
+  {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000107',
+    sourceKey: 'microsoft-foundry-blog',
+    displayName: 'Microsoft Foundry Blog',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    baseUrl: 'https://devblogs.microsoft.com/foundry/feed/',
+    contentAccessPolicy: 'fulltext_allowed',
+  },
+  {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000108',
+    sourceKey: 'aws-machine-learning-blog',
+    displayName: 'AWS Machine Learning Blog',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    baseUrl: 'https://aws.amazon.com/blogs/machine-learning/feed/',
+    contentAccessPolicy: 'fulltext_allowed',
+  },
+  {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000109',
+    sourceKey: 'huggingface-blog',
+    displayName: 'Hugging Face Blog',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    baseUrl: 'https://huggingface.co/blog/feed.xml',
+    contentAccessPolicy: 'fulltext_allowed',
+  },
+  {
+    id: '6d6f7c02-1a1b-41d1-a111-000000000110',
+    sourceKey: 'nvidia-developer-blog',
+    displayName: 'NVIDIA Developer Blog',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    baseUrl: 'https://developer.nvidia.com/blog/feed/',
+    contentAccessPolicy: 'fulltext_allowed',
+  },
+  {
     id: '7d4c0b20-1a1b-41d1-a111-000000000101',
     sourceKey: 'google-alerts-voice-ai-voice-agent',
     displayName: 'Google Alerts: Voice AI / Voice Agent',
@@ -145,6 +190,17 @@ const sourceTargets = [
 
 const usageTypes = ['public_primary', 'public_secondary']
 
+const officialDomains = [
+  { domain: 'anthropic.com', sourceKey: 'anthropic-news' },
+  { domain: 'blog.google', sourceKey: 'google-ai-blog' },
+  { domain: 'research.google', sourceKey: 'google-ai-blog' },
+  { domain: 'openai.com', sourceKey: 'openai-news' },
+  { domain: 'devblogs.microsoft.com', sourceKey: 'microsoft-foundry-blog' },
+  { domain: 'aws.amazon.com', sourceKey: 'aws-machine-learning-blog' },
+  { domain: 'huggingface.co', sourceKey: 'huggingface-blog' },
+  { domain: 'developer.nvidia.com', sourceKey: 'nvidia-developer-blog' },
+]
+
 const tags = [
   { key: 'llm', displayName: 'LLM', trendKeyword: 'large language model' },
   { key: 'agent', displayName: 'Agent', trendKeyword: 'AI agent' },
@@ -161,9 +217,10 @@ async function run() {
 
   try {
     await client.query('BEGIN')
+    const effectiveSourceTargetIds = new Map()
 
     for (const sourceTarget of sourceTargets) {
-      await client.query(
+      const upsertedSourceTarget = await client.query(
         `
           INSERT INTO source_targets (
             id, source_key, display_name, fetch_kind, source_category, base_url,
@@ -180,6 +237,7 @@ async function run() {
             fetch_interval_minutes = EXCLUDED.fetch_interval_minutes,
             supports_update_detection = EXCLUDED.supports_update_detection,
             requires_auth = EXCLUDED.requires_auth
+          RETURNING id, source_key
         `,
         [
           sourceTarget.id,
@@ -192,9 +250,16 @@ async function run() {
           sourceTarget.isActive ?? true,
         ],
       )
+
+      effectiveSourceTargetIds.set(
+        sourceTarget.sourceKey,
+        upsertedSourceTarget.rows[0].id,
+      )
     }
 
     for (const sourceTarget of sourceTargets) {
+      const effectiveSourceTargetId = effectiveSourceTargetIds.get(sourceTarget.sourceKey)
+
       for (const usageType of usageTypes) {
         await client.query(
           `
@@ -204,11 +269,11 @@ async function run() {
             VALUES ($1, $2, 100, true, $3)
             ON CONFLICT (source_target_id, usage_type) DO UPDATE SET
               priority_score = EXCLUDED.priority_score,
-              is_active = EXCLUDED.is_active,
-              notes = EXCLUDED.notes
+            is_active = EXCLUDED.is_active,
+            notes = EXCLUDED.notes
           `,
           [
-            sourceTarget.id,
+            effectiveSourceTargetId,
             usageType,
             'Initial P0 seed. No source-specific priority difference yet.',
           ],
@@ -232,9 +297,42 @@ async function run() {
       )
     }
 
+    for (const officialDomain of officialDomains) {
+      await client.query(
+        `
+          INSERT INTO observed_article_domains (
+            domain,
+            fetch_policy,
+            summary_policy,
+            observed_article_count,
+            latest_article_url,
+            first_seen_at,
+            last_seen_at,
+            notes
+          )
+          VALUES (
+            $1,
+            'fulltext_allowed',
+            'summarize_full',
+            0,
+            null,
+            now(),
+            now(),
+            $2
+          )
+          ON CONFLICT (domain) DO UPDATE SET
+            fetch_policy = 'fulltext_allowed',
+            summary_policy = 'summarize_full',
+            notes = EXCLUDED.notes,
+            updated_at = now()
+        `,
+        [officialDomain.domain, `Seeded official domain for ${officialDomain.sourceKey}`],
+      )
+    }
+
     await client.query('COMMIT')
     console.log(
-      `Seeded ${sourceTargets.length} source targets, ${sourceTargets.length * usageTypes.length} source priority rules, and ${tags.length} tags.`,
+      `Seeded ${sourceTargets.length} source targets, ${sourceTargets.length * usageTypes.length} source priority rules, ${tags.length} tags, and ${officialDomains.length} official domains.`,
     )
   } catch (error) {
     await client.query('ROLLBACK')
