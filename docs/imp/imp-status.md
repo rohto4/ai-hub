@@ -236,3 +236,16 @@
 - Interpretation:
   - bulk official source expansion is now clearly producing publish-ready `full_content`
   - the main path to service start is to keep consuming official-source raw backlog and maintain a separate fix list for the few broken sources
+
+## 2026-03-15 Summary Cost Reduction Update
+
+- Removed `summary_300` from the active runtime/data path.
+- `generateEnrichedSummary()` now produces only:
+  - `summary100`
+  - `summary200`
+- This reduces Gemini summary calls per article from `3` to `2`.
+- Added migration `018_remove_summary_300.sql` to drop:
+  - `articles_enriched.summary_300`
+  - `articles_enriched_history.summary_300`
+  - `public_articles.display_summary_300`
+- Updated current specs so the live requirement is now `100 / 200` only.

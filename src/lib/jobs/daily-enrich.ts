@@ -215,7 +215,6 @@ export async function runDailyEnrich(limit = 50): Promise<DailyEnrichResult> {
         title,
         summary100: summaries.summary100,
         summary200: summaries.summary200,
-        summary300: summaries.summary300,
         summaryBasis,
         contentPath: contentResult.contentPath,
         isProvisional: provisionalState.isProvisional,

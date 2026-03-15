@@ -61,7 +61,6 @@
 
 1. `summary_100`
 2. `summary_200`
-3. `summary_300`
 
 要件:
 
@@ -134,7 +133,7 @@
 8. `snippet` 行には `is_provisional=true` と `provisional_reason` を付ける
    - `feed_only` source は `provisional_reason=feed_only_policy`
    - 未判定 domain は `provisional_reason=domain_needs_review`
-9. 要約 100 / 200 / 300 を生成する
+9. 要約 100 / 200 を生成する
 10. タグ候補抽出とタグ照合を行う
 11. 確定重複判定を行う
 10. `articles_enriched` と `articles_enriched_tags` に保存する

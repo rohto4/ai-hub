@@ -94,7 +94,6 @@
    - `thumbnail_url`
    - `summary_100`
    - `summary_200`
-   - `summary_300`
 4. 判定列
    - `content_path`
    - `dedupe_status`

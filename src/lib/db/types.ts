@@ -19,7 +19,6 @@ export type ActionSource = 'direct' | 'digest' | 'search' | 'topic_group'
 export type ActionType =
   | 'view'
   | 'expand_200'
-  | 'expand_300'
   | 'article_open'
   | 'return_focus'
   | 'share_open'
@@ -85,7 +84,6 @@ export interface Article {
   published_at: Date
   summary_100: string | null
   summary_200: string | null
-  summary_300: string | null
   critique: string | null
   ai_model: string | null
   topic_group_id: string | null
@@ -108,7 +106,6 @@ export interface RankBreakdown {
   share: number
   save: number
   view: number
-  expand_300: number
   expand_200: number
   critique_expand: number
   article_open: number

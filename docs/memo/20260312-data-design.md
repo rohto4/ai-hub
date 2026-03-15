@@ -87,7 +87,7 @@
 #### この段階でやること
 
 1. `full` / `snippet` の判定
-2. `summary_100` / `summary_200` / `summary_300` の生成
+2. `summary_100` / `summary_200` の生成
 3. タグ候補抽出
 4. `tags_master` / `tag_aliases` との照合
 5. `tag_candidate_pool` への未採用タグ蓄積

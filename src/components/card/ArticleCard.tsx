@@ -1,11 +1,11 @@
-﻿'use client'
+'use client'
 
 import type { Article, ActionType } from '@/lib/db/types'
 
 interface Props {
   article: Article & { score?: number }
   rank?: number
-  summaryMode: 100 | 200 | 300
+  summaryMode: 100 | 200
   showCritique?: boolean
   isFocused?: boolean
   isSaved?: boolean
@@ -38,7 +38,7 @@ export function ArticleCard({
         : undefined
 
   const summary =
-    (summaryMode === 300 ? article.summary_300 : summaryMode === 200 ? article.summary_200 : article.summary_100) ??
+    (summaryMode === 200 ? article.summary_200 : article.summary_100) ??
     article.summary_100 ??
     '要約準備中'
 
@@ -55,7 +55,7 @@ export function ArticleCard({
     <article
       className="relative overflow-hidden rounded-xl border bg-card-second"
       style={{
-        minHeight: summaryMode === 300 || showCritique ? 320 : 272,
+        minHeight: showCritique ? 320 : 272,
         borderColor: isFocused || showCritique ? 'var(--color-orange)' : '#e5e5e5',
         boxShadow: '0 4px 4px rgba(0,0,0,0.25)',
       }}
@@ -99,7 +99,7 @@ export function ArticleCard({
       </div>
 
       <div className="absolute inset-x-0 bottom-2 grid grid-cols-3 gap-1.5 px-2 md:flex md:items-center md:justify-center md:gap-[7px]">
-        <ActButton label={summaryMode === 300 ? '折りたたむ' : '300字'} onClick={() => onAction('expand_300', article.id)} />
+        <ActButton label="200字" onClick={() => onAction('expand_200', article.id)} />
         <ActButton label="Topic Group" onClick={() => onAction('topic_group_open', article.id)} />
         <ActButton label="共有" variant="share" onClick={() => onAction('share_open', article.id)} />
         <ActButton label={isSaved ? '保存済み' : '保存'} onClick={() => onAction(isSaved ? 'unsave' : 'save', article.id)} />

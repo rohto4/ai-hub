@@ -179,8 +179,7 @@
 7. `thumbnail_url`
 8. `summary_100`
 9. `summary_200`
-10. `summary_300`
-11. `summary_basis`
+10. `summary_basis`
    - `full_content / feed_snippet / blocked_snippet / fallback_snippet`
 12. `content_path`
 13. `is_provisional`
@@ -319,7 +318,6 @@
 1. `display_title`
 2. `display_summary_100`
 3. `display_summary_200`
-4. `display_summary_300`
 5. `thumbnail_url`
 6. `primary_source_target_id`
 7. `public_refreshed_at`

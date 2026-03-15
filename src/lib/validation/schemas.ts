@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import type { Genre, RankPeriod, Platform, ActionType } from '@/lib/db/types'
 
-// ---- 共通 ----
 const GENRES: [Genre, ...Genre[]] = [
   'llm', 'agent', 'coding', 'image_gen', 'voice',
   'rag', 'fine_tuning', 'enterprise', 'safety',
@@ -11,7 +10,6 @@ const GENRES: [Genre, ...Genre[]] = [
 
 const RANK_PERIODS: [RankPeriod, ...RankPeriod[]] = ['24h', '7d', '30d']
 
-// ---- GET /api/trends ----
 export const TrendsQuerySchema = z.object({
   period: z.enum(RANK_PERIODS).default('24h'),
   genre: z.string().default('all'),
@@ -21,7 +19,6 @@ export const TrendsQuerySchema = z.object({
 
 export type TrendsQuery = z.infer<typeof TrendsQuerySchema>
 
-// ---- GET /api/search ----
 export const SearchQuerySchema = z.object({
   q: z.string().min(1).max(100).trim(),
   genre: z.string().optional(),
@@ -31,9 +28,8 @@ export const SearchQuerySchema = z.object({
 
 export type SearchQuery = z.infer<typeof SearchQuerySchema>
 
-// ---- POST /api/actions ----
 const ACTION_TYPES: [ActionType, ...ActionType[]] = [
-  'view', 'expand_200', 'expand_300', 'article_open', 'return_focus',
+  'view', 'expand_200', 'article_open', 'return_focus',
   'share_open', 'share_copy', 'share_x', 'share_threads', 'share_slack',
   'share_misskey', 'save', 'unsave', 'topic_group_open', 'critique_expand',
   'search', 'digest_click',
@@ -52,7 +48,6 @@ export const ActionLogSchema = z.object({
 
 export type ActionLogInput = z.infer<typeof ActionLogSchema>
 
-// ---- POST /api/push/subscribe ----
 export const PushSubscribeSchema = z.object({
   session_id: z.string().min(1).max(128),
   endpoint: z.string().url(),
@@ -65,22 +60,24 @@ export const PushSubscribeSchema = z.object({
 
 export type PushSubscribeInput = z.infer<typeof PushSubscribeSchema>
 
-// ---- 要約文字数バリデーション ----
 export const SummarySchema = z.object({
   summary_100: z.string()
     .min(1)
-    .max(120)  // 100字 + バッファ
-    .refine(s => !containsForbiddenWords(s), '禁止語を含んでいます'),
+    .max(120)
+    .refine((value) => !containsForbiddenWords(value), 'Forbidden word included'),
   summary_200: z.string().max(240).optional(),
-  summary_300: z.string().max(360).optional(),
   critique: z.string().max(500).optional(),
 })
 
-// 禁止語チェック（差別語・広告的表現など）
 const FORBIDDEN_WORDS = [
-  '最高', '最強', '絶対', '完璧', '必見', '衝撃',
+  '最新',
+  '最強',
+  '絶対',
+  '神機能',
+  '革命',
+  '必見',
 ]
 
 function containsForbiddenWords(text: string): boolean {
-  return FORBIDDEN_WORDS.some(word => text.includes(word))
+  return FORBIDDEN_WORDS.some((word) => text.includes(word))
 }

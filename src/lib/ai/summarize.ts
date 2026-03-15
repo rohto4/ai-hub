@@ -102,12 +102,12 @@ function validateSummaryResult(result: SummaryResult, fallback: SummaryResult): 
 }
 
 /**
- * 200 / 300字要約はオンデマンド生成（初回アクセス時にキャッシュ）
+ * 200字要約はオンデマンド生成（初回アクセス時にキャッシュ）
  */
 export async function generateSummaryExtended(
   title: string,
   content: string,
-  length: 200 | 300
+  length: 200
 ): Promise<string> {
   if (!process.env.GEMINI_API_KEY) return content.slice(0, length)
 
