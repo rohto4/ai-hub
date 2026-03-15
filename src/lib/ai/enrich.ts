@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import OpenAI from 'openai'
 
 const GEMINI_SUMMARY_MODEL = 'gemini-2.5-flash'
+const OPENAI_SUMMARY_MODEL = process.env.OPENAI_SUMMARY_MODEL || 'gpt-5-mini'
 
 const SUMMARY_TARGETS = [
   { key: 'summary100', length: 100 },
@@ -12,7 +14,7 @@ type SummaryKey = (typeof SUMMARY_TARGETS)[number]['key']
 export interface EnrichedSummary {
   summary100: string
   summary200: string
-  summarySource: 'gemini' | 'template'
+  summarySource: 'gemini' | 'openai' | 'template'
 }
 
 function normalizeWhitespace(value: string): string {
@@ -119,6 +121,22 @@ ${content.slice(0, 5000)}
   `.trim()
 }
 
+function openAiPromptForLength(title: string, content: string, maxLength: number): string {
+  return `
+Summarize the article below in Japanese.
+- Keep it factual and concise.
+- Do not add information not present in the source.
+- Output plain text only.
+- Keep the result within ${maxLength} characters.
+
+Title:
+${title}
+
+Content:
+${content.slice(0, 5000)}
+  `.trim()
+}
+
 async function generateWithGemini(title: string, content: string): Promise<EnrichedSummary> {
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
   const model = genAI.getGenerativeModel({ model: GEMINI_SUMMARY_MODEL })
@@ -138,6 +156,28 @@ async function generateWithGemini(title: string, content: string): Promise<Enric
   }
 }
 
+async function generateWithOpenAI(title: string, content: string): Promise<EnrichedSummary> {
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+  const entries = await Promise.all(
+    SUMMARY_TARGETS.map(async (target) => {
+      const response = await client.responses.create({
+        model: OPENAI_SUMMARY_MODEL,
+        input: openAiPromptForLength(title, content, target.length),
+        max_output_tokens: 220,
+      })
+      return [target.key, truncateAtWordBoundary(response.output_text, target.length)] as const
+    }),
+  )
+
+  const summaryMap = Object.fromEntries(entries) as Record<SummaryKey, string>
+  return {
+    summary100: summaryMap.summary100,
+    summary200: summaryMap.summary200,
+    summarySource: 'openai',
+  }
+}
+
 function generateTemplateSummaries(title: string, content: string): EnrichedSummary {
   return {
     summary100: buildTemplateSummary(title, content, 100),
@@ -152,14 +192,21 @@ export async function generateEnrichedSummary(
 ): Promise<EnrichedSummary> {
   const fallback = generateTemplateSummaries(title, content)
 
-  if (!process.env.GEMINI_API_KEY) {
-    return fallback
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      return await generateWithGemini(title, content)
+    } catch (error) {
+      console.error('[enrich] Gemini summary failed, falling back to next provider', error)
+    }
   }
 
-  try {
-    return await generateWithGemini(title, content)
-  } catch (error) {
-    console.error('[enrich] Gemini summary failed, falling back to template', error)
-    return fallback
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      return await generateWithOpenAI(title, content)
+    } catch (error) {
+      console.error('[enrich] OpenAI summary failed, falling back to template', error)
+    }
   }
+
+  return fallback
 }
