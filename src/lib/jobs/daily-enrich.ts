@@ -1,5 +1,8 @@
-import { generateEnrichedSummary } from '@/lib/ai/enrich'
+import fs from 'node:fs'
+import path from 'node:path'
+import { generateEnrichedSummaries } from '@/lib/ai/enrich'
 import {
+  type RawArticleForEnrichment,
   type DedupeStatus,
   findDuplicateMatch,
   findSimilarTitleDuplicate,
@@ -10,7 +13,7 @@ import {
 } from '@/lib/db/enrichment'
 import { finishJobRun, recordJobRunItem, startJobRun } from '@/lib/db/job-runs'
 import { listActiveTagReferences } from '@/lib/db/tags'
-import { resolveArticleContent } from '@/lib/extractors/content'
+import { type ExtractedContentResult, resolveArticleContent } from '@/lib/extractors/content'
 import { assessSourceTargetRelevance } from '@/lib/relevance/source-target'
 import { matchTags } from '@/lib/tags/match'
 import { decodeAndNormalizeText, normalizeHeadline } from '@/lib/text/normalize'
@@ -35,12 +38,67 @@ export interface DailyEnrichResult {
   attempted: number
   processed: number
   failed: number
+  manualPendingCount: number
+  manualPendingExportPath: string | null
   items: DailyEnrichItemResult[]
 }
 
 export interface DailyEnrichOptions {
   limit?: number
   sourceKey?: string | null
+  summaryBatchSize?: number
+}
+
+interface PreparedEnrichArticle {
+  rawArticle: RawArticleForEnrichment
+  title: string
+  normalizedSnippet: string
+  contentResult: ExtractedContentResult
+  summaryInput: {
+    summaryInputBasis: 'full_content' | 'source_snippet' | 'title_only'
+    summaryInputText: string
+  }
+  relevance: ReturnType<typeof assessSourceTargetRelevance>
+  tagResult: ReturnType<typeof matchTags>
+  dedupeStatus: DedupeStatus
+  dedupeGroupKey: string
+  provisionalState: ReturnType<typeof determineProvisionalState>
+  summaryBasis: ReturnType<typeof determineSummaryBasis>
+  snippetPublishable: boolean
+  shouldPersistCandidateTags: boolean
+}
+
+type ManualPendingExportItem = {
+  rawArticleId: number
+  sourceTargetId: string
+  sourceKey: string
+  normalizedUrl: string
+  citedUrl: string | null
+  canonicalUrl: string
+  sourceUpdatedAt: string | null
+  title: string
+  contentPath: 'full' | 'snippet'
+  summaryBasis: 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet'
+  provisionalBase: {
+    isProvisional: boolean
+    provisionalReason:
+      | 'snippet_only'
+      | 'domain_snippet_only'
+      | 'fetch_error'
+      | 'extracted_below_threshold'
+      | 'feed_only_policy'
+      | 'domain_needs_review'
+      | null
+  }
+  dedupeStatus: DedupeStatus
+  dedupeGroupKey: string | null
+  isRelevant: boolean
+  matchedTagIds: string[]
+  candidateTags: Array<{ candidateKey: string; displayName: string }>
+  publicationBasisIfSummaryExists: 'hold' | 'full_summary' | 'source_snippet'
+  summaryInputBasis: 'full_content' | 'source_snippet' | 'title_only'
+  summaryInputText: string
+  content: string
 }
 
 function determineProvisionalState(
@@ -203,13 +261,52 @@ function isSnippetPublicationEligible(
   return tokenCount >= 12
 }
 
+function chunkItems<T>(items: T[], size: number): T[][] {
+  const chunks: T[][] = []
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size))
+  }
+  return chunks
+}
+
+function writeManualPendingExport(
+  jobRunId: number,
+  sourceKey: string | null,
+  items: ManualPendingExportItem[],
+): string {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+  const outputDir = path.join(process.cwd(), 'artifacts', 'manual-pending')
+  const outputPath = path.join(
+    outputDir,
+    `ai-enrich-inputs-manual-pending-${sourceKey ?? 'mixed'}-job-${jobRunId}-${timestamp}.json`,
+  )
+
+  fs.mkdirSync(outputDir, { recursive: true })
+  fs.writeFileSync(
+    outputPath,
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        sourceKey,
+        totalExported: items.length,
+        items,
+      },
+      null,
+      2,
+    ),
+    'utf8',
+  )
+
+  return outputPath
+}
+
 function scoreArticle(
   contentPath: 'full' | 'snippet',
   matchedTagCount: number,
-  summarySource: 'gemini' | 'openai' | 'template',
+  summarySource: 'gemini' | 'gemini2' | 'openai' | 'manual_pending',
 ): { score: number; scoreReason: string } {
   const base = contentPath === 'full' ? 70 : 45
-  const summaryBonus = summarySource === 'template' ? 0 : 6
+  const summaryBonus = summarySource === 'manual_pending' ? 0 : 6
   const score = Math.min(100, base + matchedTagCount * 8 + summaryBonus)
   const scoreReason =
     contentPath === 'full'
@@ -224,13 +321,17 @@ export async function runDailyEnrich(
 ): Promise<DailyEnrichResult> {
   const limit = typeof options === 'number' ? options : options.limit ?? 50
   const sourceKey = typeof options === 'number' ? null : options.sourceKey ?? null
+  const summaryBatchSize =
+    typeof options === 'number' ? 10 : Math.max(1, Math.min(10, options.summaryBatchSize ?? 10))
   const jobRunId = await startJobRun({
     jobName: 'daily-enrich',
-    metadata: { limit, sourceKey },
+    metadata: { limit, sourceKey, summaryBatchSize },
   })
   const rawArticles = await listRawArticlesForEnrichment(limit, sourceKey)
   const tagReferences = await listActiveTagReferences()
   const items: DailyEnrichItemResult[] = []
+  const preparedArticles: PreparedEnrichArticle[] = []
+  const manualPendingExports: ManualPendingExportItem[] = []
 
   for (const rawArticle of rawArticles) {
     try {
@@ -248,7 +349,6 @@ export async function runDailyEnrich(
         normalizedSnippet,
         title,
       )
-      const summaries = await generateEnrichedSummary(title, summaryInput.summaryInputText)
       const relevance = assessSourceTargetRelevance(rawArticle.sourceKey, title, normalizedSnippet)
       const tagResult = matchTags(
         tagReferences,
@@ -282,95 +382,22 @@ export async function runDailyEnrich(
         dedupeStatus,
         relevance.isRelevant,
       )
-      const publicationBasis =
-        contentResult.contentPath === 'full'
-          ? 'full_summary'
-          : snippetPublishable
-            ? 'source_snippet'
-            : 'hold'
-      const publicationText =
-        publicationBasis === 'full_summary'
-          ? summaries.summary200 || summaries.summary100
-          : publicationBasis === 'source_snippet'
-            ? summaries.summary200 || summaries.summary100
-            : null
-      const finalIsProvisional = publicationBasis === 'source_snippet'
-        ? false
-        : provisionalState.isProvisional
-      const finalProvisionalReason = publicationBasis === 'source_snippet'
-        ? null
-        : provisionalState.provisionalReason
-      const publishCandidate =
-        publicationBasis !== 'hold' && dedupeStatus === 'unique' && relevance.isRelevant
       const shouldPersistCandidateTags = relevance.isRelevant && contentResult.contentPath === 'full'
-      const { score, scoreReason } = scoreArticle(
-        contentResult.contentPath,
-        tagResult.matchedTagIds.length,
-        summaries.summarySource,
-      )
-      const adjustedScore = relevance.isRelevant ? score : Math.max(0, score - 25)
-      const adjustedScoreReason = relevance.isRelevant
-        ? scoreReason
-        : `${scoreReason}; low source relevance`
 
-      await upsertEnrichedArticle({
-        rawArticleId: rawArticle.id,
-        sourceTargetId: rawArticle.sourceTargetId,
-        normalizedUrl: rawArticle.normalizedUrl,
-        citedUrl: rawArticle.citedUrl,
-        canonicalUrl: rawArticle.citedUrl ?? rawArticle.normalizedUrl,
+      preparedArticles.push({
+        rawArticle,
         title,
-        summary100: summaries.summary100,
-        summary200: summaries.summary200,
-        summaryBasis,
-        contentPath: contentResult.contentPath,
-        isProvisional: finalIsProvisional,
-        provisionalReason: finalProvisionalReason,
+        normalizedSnippet,
+        contentResult,
+        summaryInput,
+        relevance,
+        tagResult,
         dedupeStatus,
         dedupeGroupKey,
-        publishCandidate,
-        publicationBasis,
-        publicationText,
-        summaryInputBasis: summaryInput.summaryInputBasis,
-        score: adjustedScore,
-        scoreReason: adjustedScoreReason,
-        sourceUpdatedAt: rawArticle.sourceUpdatedAt,
-        matchedTagIds: tagResult.matchedTagIds,
-        candidateTags: shouldPersistCandidateTags ? tagResult.candidateTags : [],
-      })
-
-      await markRawProcessed(rawArticle.id)
-      await recordJobRunItem({
-        jobRunId,
-        itemKey: String(rawArticle.id),
-        itemStatus: 'processed',
-        detail: {
-          rawArticleId: rawArticle.id,
-          title,
-          contentPath: contentResult.contentPath,
-          isProvisional: finalIsProvisional,
-          provisionalReason: finalProvisionalReason,
-          summaryBasis,
-          publicationBasis,
-          summaryInputBasis: summaryInput.summaryInputBasis,
-          publishCandidate,
-          dedupeStatus,
-          relevanceMatchedKeyword: relevance.matchedKeyword,
-          isRelevant: relevance.isRelevant,
-          extractionStage: contentResult.extractionStage,
-          extractedLength: contentResult.extractedLength,
-          snippetLength: contentResult.snippetLength,
-          extractionError: contentResult.extractionError ?? null,
-          matchedTagCount: tagResult.matchedTagIds.length,
-          candidateTagCount: shouldPersistCandidateTags ? tagResult.candidateTags.length : 0,
-        },
-      })
-      items.push({
-        rawArticleId: rawArticle.id,
-        status: 'processed',
-        contentPath: contentResult.contentPath,
-        isProvisional: finalIsProvisional,
-        provisionalReason: finalProvisionalReason,
+        provisionalState,
+        summaryBasis,
+        snippetPublishable,
+        shouldPersistCandidateTags,
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown enrich error'
@@ -393,10 +420,177 @@ export async function runDailyEnrich(
     }
   }
 
+  for (const batch of chunkItems(preparedArticles, summaryBatchSize)) {
+    const summaries = await generateEnrichedSummaries(
+      batch.map((article) => ({
+        id: String(article.rawArticle.id),
+        title: article.title,
+        content: article.summaryInput.summaryInputText,
+      })),
+      summaryBatchSize,
+    )
+
+    for (const [index, article] of batch.entries()) {
+      const summariesForArticle = summaries[index]
+
+      try {
+        const publicationBasisIfSummaryExists =
+          article.contentResult.contentPath === 'full'
+            ? 'full_summary'
+            : article.snippetPublishable
+              ? 'source_snippet'
+              : 'hold'
+        const publicationBasis =
+          summariesForArticle.summarySource === 'manual_pending'
+            ? 'hold'
+            : article.contentResult.contentPath === 'full'
+              ? 'full_summary'
+              : article.snippetPublishable
+                ? 'source_snippet'
+                : 'hold'
+        const publicationText =
+          publicationBasis === 'hold'
+            ? null
+            : summariesForArticle.summary200 || summariesForArticle.summary100
+        const finalIsProvisional =
+          publicationBasis === 'source_snippet' ? false : article.provisionalState.isProvisional
+        const finalProvisionalReason =
+          publicationBasis === 'source_snippet' ? null : article.provisionalState.provisionalReason
+        const publishCandidate =
+          publicationBasis !== 'hold' &&
+          article.dedupeStatus === 'unique' &&
+          article.relevance.isRelevant
+        const aiProcessingState =
+          summariesForArticle.summarySource === 'manual_pending' ? 'manual_pending' : 'completed'
+        const { score, scoreReason } = scoreArticle(
+          article.contentResult.contentPath,
+          article.tagResult.matchedTagIds.length,
+          summariesForArticle.summarySource,
+        )
+        const adjustedScore = article.relevance.isRelevant ? score : Math.max(0, score - 25)
+        const adjustedScoreReason = article.relevance.isRelevant
+          ? scoreReason
+          : `${scoreReason}; low source relevance`
+
+        await upsertEnrichedArticle({
+          rawArticleId: article.rawArticle.id,
+          sourceTargetId: article.rawArticle.sourceTargetId,
+          normalizedUrl: article.rawArticle.normalizedUrl,
+          citedUrl: article.rawArticle.citedUrl,
+          canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
+          title: article.title,
+          summary100: summariesForArticle.summary100,
+          summary200: summariesForArticle.summary200,
+          summaryBasis: article.summaryBasis,
+          contentPath: article.contentResult.contentPath,
+          isProvisional: finalIsProvisional,
+          provisionalReason: finalProvisionalReason,
+          dedupeStatus: article.dedupeStatus,
+          dedupeGroupKey: article.dedupeGroupKey,
+          publishCandidate,
+          publicationBasis,
+          publicationText,
+          summaryInputBasis: article.summaryInput.summaryInputBasis,
+          score: adjustedScore,
+          scoreReason: adjustedScoreReason,
+          aiProcessingState,
+          sourceUpdatedAt: article.rawArticle.sourceUpdatedAt,
+          matchedTagIds: article.tagResult.matchedTagIds,
+          candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
+        })
+
+        await markRawProcessed(article.rawArticle.id)
+        await recordJobRunItem({
+          jobRunId,
+          itemKey: String(article.rawArticle.id),
+          itemStatus: 'processed',
+          detail: {
+            rawArticleId: article.rawArticle.id,
+            title: article.title,
+            contentPath: article.contentResult.contentPath,
+            isProvisional: finalIsProvisional,
+            provisionalReason: finalProvisionalReason,
+            summaryBasis: article.summaryBasis,
+            publicationBasis,
+            summaryInputBasis: article.summaryInput.summaryInputBasis,
+            publishCandidate,
+            dedupeStatus: article.dedupeStatus,
+            relevanceMatchedKeyword: article.relevance.matchedKeyword,
+            isRelevant: article.relevance.isRelevant,
+            extractionStage: article.contentResult.extractionStage,
+            extractedLength: article.contentResult.extractedLength,
+            snippetLength: article.contentResult.snippetLength,
+            extractionError: article.contentResult.extractionError ?? null,
+            matchedTagCount: article.tagResult.matchedTagIds.length,
+            candidateTagCount: article.shouldPersistCandidateTags
+              ? article.tagResult.candidateTags.length
+              : 0,
+            summarySource: summariesForArticle.summarySource,
+            aiProcessingState,
+          },
+        })
+        if (aiProcessingState === 'manual_pending') {
+          manualPendingExports.push({
+            rawArticleId: article.rawArticle.id,
+            sourceTargetId: article.rawArticle.sourceTargetId,
+            sourceKey: article.rawArticle.sourceKey,
+            normalizedUrl: article.rawArticle.normalizedUrl,
+            citedUrl: article.rawArticle.citedUrl,
+            canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
+            sourceUpdatedAt: article.rawArticle.sourceUpdatedAt,
+            title: article.title,
+            contentPath: article.contentResult.contentPath,
+            summaryBasis: article.summaryBasis,
+            provisionalBase: article.provisionalState,
+            dedupeStatus: article.dedupeStatus,
+            dedupeGroupKey: article.dedupeGroupKey,
+            isRelevant: article.relevance.isRelevant,
+            matchedTagIds: article.tagResult.matchedTagIds,
+            candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
+            publicationBasisIfSummaryExists,
+            summaryInputBasis: article.summaryInput.summaryInputBasis,
+            summaryInputText: article.summaryInput.summaryInputText,
+            content: article.contentResult.content,
+          })
+        }
+        items.push({
+          rawArticleId: article.rawArticle.id,
+          status: 'processed',
+          contentPath: article.contentResult.contentPath,
+          isProvisional: finalIsProvisional,
+          provisionalReason: finalProvisionalReason,
+        })
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown enrich error'
+        await markRawError(article.rawArticle.id, message)
+        await recordJobRunItem({
+          jobRunId,
+          itemKey: String(article.rawArticle.id),
+          itemStatus: 'failed',
+          detail: {
+            rawArticleId: article.rawArticle.id,
+            title: article.rawArticle.title,
+          },
+          errorMessage: message,
+        })
+        items.push({
+          rawArticleId: article.rawArticle.id,
+          status: 'failed',
+          error: message,
+        })
+      }
+    }
+  }
+
+  const manualPendingExportPath =
+    manualPendingExports.length > 0 ? writeManualPendingExport(jobRunId, sourceKey, manualPendingExports) : null
+
   const result = {
     attempted: items.length,
     processed: items.filter((item) => item.status === 'processed').length,
     failed: items.filter((item) => item.status === 'failed').length,
+    manualPendingCount: manualPendingExports.length,
+    manualPendingExportPath,
     items,
   }
 
@@ -408,6 +602,9 @@ export async function runDailyEnrich(
     failedCount: result.failed,
     metadata: {
       attempted: items.length,
+      summaryBatchSize,
+      manualPendingCount: manualPendingExports.length,
+      manualPendingExportPath,
       fullCount: items.filter((item) => item.contentPath === 'full').length,
       snippetCount: items.filter((item) => item.contentPath === 'snippet').length,
       provisionalCount: items.filter((item) => item.isProvisional).length,

@@ -19,7 +19,7 @@ export interface RawArticleForEnrichment {
 }
 
 type RawArticleRow = {
-  id: number
+  raw_article_id: number
   source_target_id: string
   source_key: string
   source_category: string
@@ -36,7 +36,7 @@ type RawArticleRow = {
 }
 
 type ExistingEnrichedRow = {
-  id: number
+  enriched_article_id: number
   raw_article_id: number
   source_target_id: string
   normalized_url: string
@@ -58,6 +58,7 @@ type ExistingEnrichedRow = {
   summary_input_basis: 'full_content' | 'source_snippet' | 'title_only'
   score: string | number
   score_reason: string | null
+  ai_processing_state: 'completed' | 'manual_pending'
   source_updated_at: string | null
   processed_at: string
   created_at: string
@@ -99,6 +100,7 @@ export interface UpsertEnrichedInput {
   summaryInputBasis: 'full_content' | 'source_snippet' | 'title_only'
   score: number
   scoreReason: string
+  aiProcessingState?: 'completed' | 'manual_pending'
   sourceUpdatedAt: string | null
   matchedTagIds: string[]
   candidateTags: Array<{ candidateKey: string; displayName: string }>
@@ -116,7 +118,7 @@ export async function listRawArticlesForEnrichment(
   const rows = (sourceKey
     ? await sql`
         SELECT
-          ar.id,
+          ar.raw_article_id,
           ar.source_target_id,
           st.source_key,
           st.source_category,
@@ -131,7 +133,7 @@ export async function listRawArticlesForEnrichment(
           ar.source_updated_at,
           ar.has_source_update
         FROM articles_raw ar
-        JOIN source_targets st ON st.id = ar.source_target_id
+        JOIN source_targets st ON st.source_target_id = ar.source_target_id
         LEFT JOIN observed_article_domains od
           ON od.domain = lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', ''))
         WHERE ar.is_processed = false
@@ -142,7 +144,7 @@ export async function listRawArticlesForEnrichment(
       `
     : await sql`
         SELECT
-          ar.id,
+          ar.raw_article_id,
           ar.source_target_id,
           st.source_key,
           st.source_category,
@@ -157,7 +159,7 @@ export async function listRawArticlesForEnrichment(
           ar.source_updated_at,
           ar.has_source_update
         FROM articles_raw ar
-        JOIN source_targets st ON st.id = ar.source_target_id
+        JOIN source_targets st ON st.source_target_id = ar.source_target_id
         LEFT JOIN observed_article_domains od
           ON od.domain = lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', ''))
         WHERE ar.is_processed = false
@@ -167,7 +169,7 @@ export async function listRawArticlesForEnrichment(
       `) as RawArticleRow[]
 
   return rows.map((row) => ({
-    id: row.id,
+    id: row.raw_article_id,
     sourceTargetId: row.source_target_id,
     sourceKey: row.source_key,
     sourceCategory: row.source_category,
@@ -194,7 +196,7 @@ export async function findDuplicateMatch(
   const baseQuery = citedUrl
     ? sql`
         SELECT
-          id,
+          enriched_article_id,
           normalized_url,
           cited_url,
           dedupe_group_key
@@ -204,24 +206,24 @@ export async function findDuplicateMatch(
             normalized_url = ${normalizedUrl}
             OR cited_url = ${citedUrl}
           )
-        ORDER BY processed_at DESC, id DESC
+        ORDER BY processed_at DESC, enriched_article_id DESC
         LIMIT 1
       `
     : sql`
         SELECT
-          id,
+          enriched_article_id,
           normalized_url,
           cited_url,
           dedupe_group_key
         FROM articles_enriched
         WHERE raw_article_id <> ${currentRawArticleId}
           AND normalized_url = ${normalizedUrl}
-        ORDER BY processed_at DESC, id DESC
+        ORDER BY processed_at DESC, enriched_article_id DESC
         LIMIT 1
       `
 
   const rows = (await baseQuery) as Array<{
-    id: number
+    enriched_article_id: number
     normalized_url: string
     cited_url: string | null
     dedupe_group_key: string | null
@@ -257,15 +259,15 @@ export async function findSimilarTitleDuplicate(
   const sql = getSql()
   const rows = (await sql`
     SELECT
-      id,
+      enriched_article_id,
       title,
       dedupe_group_key
     FROM articles_enriched
     WHERE raw_article_id <> ${currentRawArticleId}
-    ORDER BY processed_at DESC, id DESC
+    ORDER BY processed_at DESC, enriched_article_id DESC
     LIMIT 200
   `) as Array<{
-    id: number
+    enriched_article_id: number
     title: string
     dedupe_group_key: string | null
   }>
@@ -287,7 +289,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
     SELECT *
     FROM articles_enriched
     WHERE normalized_url = ${input.normalizedUrl}
-    ORDER BY processed_at DESC, id DESC
+    ORDER BY processed_at DESC, enriched_article_id DESC
     LIMIT 1
   `) as ExistingEnrichedRow[]
 
@@ -318,13 +320,14 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         summary_input_basis,
         score,
         score_reason,
+        ai_processing_state,
         source_updated_at,
         processed_at,
         created_at,
         updated_at
       )
       VALUES (
-        ${existing.id},
+        ${existing.enriched_article_id},
         ${existing.raw_article_id},
         ${existing.source_target_id},
         ${existing.normalized_url},
@@ -346,6 +349,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         ${existing.summary_input_basis},
         ${existing.score},
         ${existing.score_reason},
+        ${existing.ai_processing_state},
         ${existing.source_updated_at},
         ${existing.processed_at},
         ${existing.created_at},
@@ -375,17 +379,18 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
         summary_input_basis = ${input.summaryInputBasis},
         score = ${input.score},
         score_reason = ${input.scoreReason},
+        ai_processing_state = ${input.aiProcessingState ?? 'completed'},
         source_updated_at = ${input.sourceUpdatedAt},
         processed_at = now(),
         updated_at = now()
-      WHERE id = ${existing.id}
+      WHERE enriched_article_id = ${existing.enriched_article_id}
     `
 
-    await syncEnrichedTags(existing.id, input.matchedTagIds)
+    await syncEnrichedTags(existing.enriched_article_id, input.matchedTagIds)
     await upsertTagCandidates(input.candidateTags, input.rawArticleId)
     await refreshTagArticleCounts()
 
-    return { enrichedArticleId: existing.id }
+    return { enrichedArticleId: existing.enriched_article_id }
   }
 
   const inserted = (await sql`
@@ -410,6 +415,7 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       summary_input_basis,
       score,
       score_reason,
+      ai_processing_state,
       source_updated_at
     )
     VALUES (
@@ -433,12 +439,13 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       ${input.summaryInputBasis},
       ${input.score},
       ${input.scoreReason},
+      ${input.aiProcessingState ?? 'completed'},
       ${input.sourceUpdatedAt}
     )
-    RETURNING id
-  `) as Array<{ id: number }>
+    RETURNING enriched_article_id
+  `) as Array<{ enriched_article_id: number }>
 
-  const enrichedArticleId = inserted[0].id
+  const enrichedArticleId = inserted[0].enriched_article_id
   await syncEnrichedTags(enrichedArticleId, input.matchedTagIds)
   await upsertTagCandidates(input.candidateTags, input.rawArticleId)
   await refreshTagArticleCounts()
@@ -504,14 +511,14 @@ async function refreshTagArticleCounts(): Promise<void> {
       FROM articles_enriched_tags aet
       GROUP BY aet.tag_id
     ) counts
-    WHERE tm.id = counts.tag_id
+    WHERE tm.tag_id = counts.tag_id
   `
 
   await sql`
     UPDATE tags_master
     SET article_count = 0,
         updated_at = now()
-    WHERE id NOT IN (
+    WHERE tag_id NOT IN (
       SELECT DISTINCT tag_id
       FROM articles_enriched_tags
     )
@@ -529,7 +536,7 @@ export async function markRawProcessed(rawArticleId: number): Promise<void> {
       process_after = now(),
       last_error = null,
       updated_at = now()
-    WHERE id = ${rawArticleId}
+    WHERE raw_article_id = ${rawArticleId}
   `
 }
 
@@ -541,6 +548,6 @@ export async function markRawError(rawArticleId: number, errorMessage: string): 
       last_error = ${errorMessage},
       process_after = now() + interval '1 hour',
       updated_at = now()
-    WHERE id = ${rawArticleId}
+    WHERE raw_article_id = ${rawArticleId}
   `
 }

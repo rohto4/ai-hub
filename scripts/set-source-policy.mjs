@@ -43,7 +43,7 @@ async function run() {
           content_access_policy = $2,
           updated_at = now()
         WHERE source_key = $1
-        RETURNING id, source_key, content_access_policy, is_active
+        RETURNING source_target_id, source_key, content_access_policy, is_active
       `,
       [sourceKey, policy],
     )
@@ -64,9 +64,9 @@ async function run() {
             last_error = null,
             updated_at = now()
           WHERE source_target_id = $1
-          RETURNING id
+          RETURNING raw_article_id
         `,
-        [updated.rows[0].id],
+        [updated.rows[0].source_target_id],
       )
       requeuedCount = requeued.rowCount
     }

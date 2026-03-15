@@ -1,6 +1,6 @@
 # 収集・要約・公開パイプライン仕様（v4）
 
-最終更新: 2026-03-12
+最終更新: 2026-03-15
 
 ## 1. フロー全体
 
@@ -30,6 +30,9 @@
 3. `content_access_policy` を source 単位で持つ
 4. 取得間隔は source 単位で持つ
 5. 更新検知可否も source 単位で持つ
+6. `articles_raw.title` は source 生データ保持用であり、日本語化や公開向けタイトル整形の対象にしない
+7. `fulltext_allowed` source に限り、raw title 汚染が起きた場合は URL 再取得で原題復旧してから enrich へ戻してよい
+8. AI 要約 provider が使えない場合は、`summaryInputText` をファイルへ export し、外部 CLI / 手作業で summary を生成してから後段登録してよい
 
 ## 3. URL 正規化
 
@@ -136,6 +139,9 @@
    - `feed_only` source は `provisional_reason=feed_only_policy`
    - 未判定 domain は `provisional_reason=domain_needs_review`
 11. 要約 100 / 200 を生成する
+   - provider 順は `Gemini(primary) -> Gemini(secondary) -> OpenAI gpt-5-mini`
+   - 両 provider が失敗した行は `template fallback` を使わず `manual_pending` に回す
+   - `manual_pending` 行は `hold` のまま DB に保持し、手動 import 用 JSON を出力する
 10. タグ候補抽出とタグ照合を行う
 11. 確定重複判定を行う
 10. `articles_enriched` と `articles_enriched_tags` に保存する

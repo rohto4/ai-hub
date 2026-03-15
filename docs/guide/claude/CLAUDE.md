@@ -1,75 +1,55 @@
-# CLAUDE.md - Memory & Context Management
+# CLAUDE.md - Claude 運用方針
 
-## 🎯 Role & Objective
-あなたは、大規模なコンテキストを効率的に管理し、検証（Verification）を重視するClaude Codeエージェントです。
+## 1. 基本姿勢
 
----
+1. 大きなコンテキストを扱える前提で、状況整理と検証結果を丁寧に残す。
+2. Document-Driven Development を徹底し、実装変更に追随して `docs/` を更新する。
+3. 進捗、判断、未解決事項、引き継ぎ事項は `docs/imp/` に集約する。
+4. `docs/guide`、`docs/spec`、`docs/imp` の役割を混同しない。
 
-## 🧠 Context Management
+## 2. 文字コードと読解ルール
 
-### 1. The 3 Pillars of Persistence
-- `CLAUDE.md`: プロジェクト全体のルール、技術スタック、アーキテクチャ方針を記録。
-- `plan.md`: 現在進行中の実装計画、タスクリスト、未解決の課題を記録。
-- `notes.md`: 調査結果、APIレスポンスのサンプル、エラーログの分析結果を記録。
+1. 日本語を含むファイルは毎回 UTF-8 前提で読むこと。文字化けした表示のまま解釈して進めない。
+2. 読み取り結果が不自然な場合は、内容破損ではなく文字コード起因を先に疑う。
+3. 読み直し時は UTF-8 を明示し、誤読状態で docs を更新しない。
 
-### 2. Session Hygiene
-- 1つの大きなタスクが完了するたびに `/clear` を推奨。
-- セッション開始時に必ず `plan.md` を読み込み、前回までの進捗を同期すること。
+## 3. docs 更新方針
 
----
+1. `docs/` 配下へ追記・更新する内容は、原則として日本語で読める形で残す。
+2. 一時メモ、進捗整理、判断待ち、運用メモも日本語で読み返せることを優先する。
+3. 英語の識別子、API 名、外部サービス名、テーブル名、カラム名はそのままでよい。
+4. ただし、説明本文まで英語に逃がさず、日本語で意味が追えるように書く。
+5. 方針変更や運用変更は `implementation-plan.md`、`imp-status.md`、必要に応じて `implementation-wait.md` や `docs/spec` に反映する。
 
-## 🛠️ Verification-First Workflow
+## 4. ソースコードのコメント方針
 
-### Logic Verification
-コードを生成したら、必ず以下のXMLタグを使用して自己検証を行う。
+1. コメントは最小限でよい。
+2. コメントが必要な箇所では、日本語で簡潔に意図を書く。
+3. 自明な説明コメントは避ける。
+4. 複雑な分岐、運用制約、あとで誤読しやすい箇所だけにコメントを残す。
 
-<verification_checklist>
-- [ ] 型エラーがゼロであること (`npm run type-check`)
-- [ ] エッジケース（null/undefined処理）を考慮しているか
-- [ ] バグが発生した際の影響範囲が特定されているか
-</verification_checklist>
+## 5. 検証優先ルール
 
----
+1. 実装後は型、主要フロー、影響範囲の順で確認する。
+2. 失敗時はすぐ修正に飛ばず、原因と再現条件を切り分ける。
+3. 検証していない項目は、確認済みのように書かない。
 
-## 🔀 Strategy by Situation
+## 6. タスク完了時の更新ルール
 
-### [A] Research (notes.md)
-調査時は `@` を使用して関連ファイルを明示し、複雑な調査は専用の `subagent` に任せること。
+1. コードや挙動を変更したら、タスクを離れる前に `docs/imp/implementation-plan.md` の現況を更新する。
+2. 実際に終わったこと、確認できたこと、残件は `docs/imp/imp-status.md` に追記する。
+3. 判断が未了のまま終える場合は、必ず `docs/imp/implementation-wait.md` に論点と必要な判断を書く。
+4. 今回やり切らない確認、障害試験、運用宿題は `docs/imp/imp-hangover.md` に残す。
+5. 恒久仕様が変わった場合は `docs/spec/` か `docs/guide/PROJECT.md` を更新し、進捗メモだけで済ませない。
+6. docs 更新なしでタスクを閉じてよいのは、コード・挙動・判断が何も変わっていない場合に限る。
 
-### [B] Coding (plan.md)
-`plan.md` に基づいたステップバイステップの実行。1ステップごとに `git commit` を行う。
+## 7. タスク中断時の更新ルール
 
-### [C] Debugging (temp-error-report.md)
-エラー発生時は、直接修正せず、まず `temp-error-report.md` を作成して根本原因を分析すること。
+1. 中断時点での到達点、未実施、次の一手を `imp-status.md` または `imp-hangover.md` に残す。
+2. 途中変更がある場合は、どこまで反映済みかを明確に書く。
+3. 失敗した試行や却下した案も、再試行コストが高いものは簡潔に残す。
 
----
+## 8. 補助資料
 
-## 🚀 2026 Core Tech Directives (Deep Research Additions)
-最新のWeb検証に基づく、Claudeエージェントが順守すべき技術基準です。
-
-1. **Next.js 15 Server Actions**
-   - バリデーションエラーは `throw` せず、状態として `return { error: '...' }` を返す。
-   - クライアント側で `useActionState` を用いて、エラーをインラインで即座に表示させること。
-2. **Tailwind v4 & Spatial UI**
-   - v4 の 3D transform ユーティリティを利用し、ペタンコのUIを避けてZ軸の奥行き（Spatial UI）を表現する。
-   - `col-span-` や `row-span-` を駆使したBento Gridレイアウトを積極的に提案する。
-3. **Supabase RLS 究極の最適化**
-   - ポリシーの `USING` 句に含まれるカラム（`user_id` 等）には**必ずインデックスを付与**する（100倍のパフォーマンス向上）。
-   - ポリシー内で `auth.uid()` を呼ぶ際は `(SELECT auth.uid())` とラップし、PGキャッシュを効かせること。
-
----
-
-## 🌐 Global Agent Skills & Workflows
-必ずワークスペースのルートにある `.agent/` ディレクトリを確認してください。
-ここには16のSkillsと、16のSlash Commands (Workflows) が格納されており、すべてのエージェントで共有されるべき強力なツールキットです。
-各コマンドの詳細は `README.md` を参照してください。
-
----
-
-## ⚡ Proactive Workflow & Strict DDD Enforcement (絶対遵守)
-
-1. **Auto-Trigger Commands (ワークフローの自発的起動)**:
-   ユーザーの指示が `.agent/workflows/` 内のSOP（例: UI修正なら `/design-component`）の意図に合致する場合、ユーザーが明示的にスラッシュコマンドを入力しなくても、**エージェント自らが該当SOPをロードして実行に移ること**。
-2. **Forward-Moving DDD (実装と設計の双方向同期)**:
-   - **設計先行（デフォルト）**: ユーザーと実装方針を合意したら、直ちにコードは書かず、必ず `docs/imp/implementation-plan.md` にタスクを蓄積し、その計画に沿って着実にコーディングを進めること。
-   - **実装先行（アジャイル対応）**: スピード優先でユーザーから直接ソース編集の指示を受け、先行してコードを書き換えた場合は、**事後速やかにその変更内容を `docs/` 配下の仕様書や実装計画へ逆同期（反映）させること**。決してソースとドキュメントを乖離させたままタスクを終えないこと。
+1. `docs/guide/README.md` と `docs/guide/PROJECT.md` を guide の基準点として扱う。
+2. `.agent/` 配下の skills と workflows は必要時に参照するが、プロジェクト固有の判断はこの guide と `docs/spec` を優先する。

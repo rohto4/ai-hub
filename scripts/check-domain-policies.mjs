@@ -39,8 +39,8 @@ async function run() {
         COUNT(*) FILTER (WHERE ae.is_provisional = false) AS ready_count,
         string_agg(DISTINCT st.source_key, ',' ORDER BY st.source_key) AS source_keys
       FROM articles_raw ar
-      JOIN source_targets st ON st.id = ar.source_target_id
-      LEFT JOIN articles_enriched ae ON ae.raw_article_id = ar.id
+      JOIN source_targets st ON st.source_target_id = ar.source_target_id
+      LEFT JOIN articles_enriched ae ON ae.raw_article_id = ar.raw_article_id
       GROUP BY 1
     ) domain_stats
       ON domain_stats.domain = od.domain

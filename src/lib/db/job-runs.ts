@@ -31,10 +31,10 @@ export async function startJobRun(input: StartJobRunInput): Promise<number> {
   const rows = (await sql`
     INSERT INTO job_runs (job_name, status, metadata)
     VALUES (${input.jobName}, 'running', ${JSON.stringify(input.metadata ?? {})}::jsonb)
-    RETURNING id
-  `) as Array<{ id: number }>
+    RETURNING job_run_id
+  `) as Array<{ job_run_id: number }>
 
-  return rows[0].id
+  return rows[0].job_run_id
 }
 
 export async function recordJobRunItem(input: JobRunItemInput): Promise<void> {
@@ -64,6 +64,6 @@ export async function finishJobRun(input: FinishJobRunInput): Promise<void> {
       metadata = ${JSON.stringify(input.metadata ?? {})}::jsonb,
       last_error = ${input.lastError ?? null},
       updated_at = now()
-    WHERE id = ${input.jobRunId}
+    WHERE job_run_id = ${input.jobRunId}
   `
 }

@@ -247,3 +247,45 @@ POST /api/cron/daily-enrich?limit=20&sourceKey=nvidia-developer-blog
 - `d756700` feat: support source-targeted daily enrich
 - `34592e3` feat: finalize snippet publication path in layer2
 - `84bf669` feat: summarize publishable snippets in layer2
+
+## 13. 2026-03-16 追検証タスク
+
+1. 自動要約の障害系テスト
+   - `GEMINI_API_KEY` と `OPENAI_API_KEY` を無効化または外す
+   - 小さな `daily-enrich` を実行する
+   - `articles_enriched.ai_processing_state=manual_pending` を確認する
+   - `publication_basis=hold` を確認する
+   - `artifacts/manual-pending/` に JSON が出力されることを確認する
+2. manual recovery テスト
+   - 出力された manual-pending JSON を 1 本使う
+   - reviewed output JSON を作る
+   - `scripts/import-ai-enrich-outputs.ts` で import する
+   - `ai_processing_state=completed` と summary 更新を確認する
+3. batch provider テスト
+   - `summaryBatchSize=10` で要約生成を流す
+   - Gemini / OpenAI が parse 可能な JSON を安定返却するか確認する
+   - `job_runs` / `job_run_items` で latency と failure pattern を見る
+4. 毎時 orchestration テスト
+   - `hourly-fetch -> daily-enrich` を `hourly-layer12` 経由で直列実行する
+   - totals と batch count が整合するか確認する
+   - stale な `running` job が残らないことを確認する
+
+## 14. サイクルテスト移行メモ
+
+1. まずジョブを分離して試す
+   - `hourly-fetch`
+   - `daily-enrich`
+   - `hourly-layer12`
+2. テスト条件は小さく固定する
+   - `sourceKey` を固定
+   - `limit` を小さく
+   - `summaryBatchSize` を明示
+3. 毎回 3 面で確認する
+   - DB state
+   - `job_runs` / `job_run_items`
+   - 生成 artifact
+4. 現フェイズの主要回帰リスク
+   - requeue 後の重複処理
+   - batch provider JSON の parse 崩れ
+   - 低品質 fallback の混入
+   - `manual_pending` 行が export されないこと

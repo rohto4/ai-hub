@@ -32,11 +32,18 @@ export async function POST(request: NextRequest) {
   const fetchLimit = readBoundedNumber(request.nextUrl.searchParams.get('fetchLimit'), 20, 1, 100)
   const enrichBatchSize = readBoundedNumber(request.nextUrl.searchParams.get('enrichBatchSize'), 25, 1, 100)
   const maxEnrichBatches = readBoundedNumber(request.nextUrl.searchParams.get('maxEnrichBatches'), 4, 1, 12)
+  const summaryBatchSize = readBoundedNumber(
+    request.nextUrl.searchParams.get('summaryBatchSize'),
+    10,
+    1,
+    10,
+  )
 
   const result = await runHourlyLayer12({
     fetchLimit,
     enrichBatchSize,
     maxEnrichBatches,
+    summaryBatchSize,
   })
 
   return NextResponse.json(result)

@@ -233,7 +233,7 @@ async function run() {
       const upsertedSourceTarget = await client.query(
         `
           INSERT INTO source_targets (
-            id, source_key, display_name, fetch_kind, source_category, base_url,
+            source_target_id, source_key, display_name, fetch_kind, source_category, base_url,
             content_access_policy, is_active, fetch_interval_minutes, supports_update_detection, requires_auth
           )
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 60, true, false)
@@ -247,7 +247,7 @@ async function run() {
             fetch_interval_minutes = EXCLUDED.fetch_interval_minutes,
             supports_update_detection = EXCLUDED.supports_update_detection,
             requires_auth = EXCLUDED.requires_auth
-          RETURNING id, source_key
+          RETURNING source_target_id, source_key
         `,
         [
           sourceTarget.id,
@@ -263,7 +263,7 @@ async function run() {
 
       effectiveSourceTargetIds.set(
         sourceTarget.sourceKey,
-        upsertedSourceTarget.rows[0].id,
+        upsertedSourceTarget.rows[0].source_target_id,
       )
     }
 

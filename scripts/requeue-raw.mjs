@@ -51,16 +51,16 @@ async function run() {
         process_after = now(),
         last_error = null,
         updated_at = now()
-      WHERE id = $1
-      RETURNING id, normalized_url
+      WHERE raw_article_id = $1
+      RETURNING raw_article_id AS id, normalized_url
     `
     params = [Number(rawId)]
   } else if (sourceKey) {
     sql = `
       WITH target_rows AS (
-        SELECT ar.id
+        SELECT ar.raw_article_id
         FROM articles_raw ar
-        JOIN source_targets st ON st.id = ar.source_target_id
+        JOIN source_targets st ON st.source_target_id = ar.source_target_id
         WHERE st.source_key = $1
         ORDER BY ar.created_at DESC
         LIMIT $2
@@ -73,16 +73,16 @@ async function run() {
         last_error = null,
         updated_at = now()
       FROM target_rows tr
-      WHERE ar.id = tr.id
-      RETURNING ar.id, ar.normalized_url
+      WHERE ar.raw_article_id = tr.raw_article_id
+      RETURNING ar.raw_article_id AS id, ar.normalized_url
     `
     params = [sourceKey, Number.isFinite(limit) ? Math.max(1, limit) : 20]
   } else {
     sql = `
       WITH target_rows AS (
-        SELECT ar.id
+        SELECT ar.raw_article_id
         FROM articles_raw ar
-        ${provisionalOnly ? 'JOIN articles_enriched ae ON ae.raw_article_id = ar.id' : ''}
+        ${provisionalOnly ? 'JOIN articles_enriched ae ON ae.raw_article_id = ar.raw_article_id' : ''}
         WHERE lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) = $1
           ${provisionalOnly ? 'AND ae.is_provisional = true' : ''}
         ORDER BY ar.created_at DESC
@@ -96,8 +96,8 @@ async function run() {
         last_error = null,
         updated_at = now()
       FROM target_rows tr
-      WHERE ar.id = tr.id
-      RETURNING ar.id, ar.normalized_url
+      WHERE ar.raw_article_id = tr.raw_article_id
+      RETURNING ar.raw_article_id AS id, ar.normalized_url
     `
     params = [domain.toLowerCase().replace(/^www\./, ''), Number.isFinite(limit) ? Math.max(1, limit) : 20]
   }

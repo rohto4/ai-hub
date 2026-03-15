@@ -71,7 +71,7 @@ async function run() {
       SELECT DISTINCT
         lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS article_domain
       FROM articles_raw ar
-      JOIN source_targets st ON st.id = ar.source_target_id
+      JOIN source_targets st ON st.source_target_id = ar.source_target_id
       WHERE st.content_access_policy = 'fulltext_allowed'
         AND lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) IN (
           lower(regexp_replace(split_part(split_part(st.base_url, '://', 2), '/', 1), '^www\\.', '')),
