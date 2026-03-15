@@ -15,7 +15,6 @@ interface AggregatedRow {
   share: number | string
   save: number | string
   view: number | string
-  expand_300: number | string
   expand_200: number | string
   critique_expand: number | string
   article_open: number | string
@@ -44,7 +43,6 @@ export async function POST(request: NextRequest) {
         COUNT(*) FILTER (WHERE action_type IN ('share_x','share_threads','share_slack','share_misskey','share_copy')) AS share,
         COUNT(*) FILTER (WHERE action_type = 'save')            AS save,
         COUNT(*) FILTER (WHERE action_type = 'view')            AS view,
-        COUNT(*) FILTER (WHERE action_type = 'expand_300')      AS expand_300,
         COUNT(*) FILTER (WHERE action_type = 'expand_200')      AS expand_200,
         COUNT(*) FILTER (WHERE action_type = 'critique_expand') AS critique_expand,
         COUNT(*) FILTER (WHERE action_type = 'article_open')    AS article_open,
@@ -62,7 +60,6 @@ export async function POST(request: NextRequest) {
         share: Number(row.share),
         save: Number(row.save),
         view: Number(row.view),
-        expand_300: Number(row.expand_300),
         expand_200: Number(row.expand_200),
         critique_expand: Number(row.critique_expand),
         article_open: Number(row.article_open),

@@ -5,7 +5,6 @@ const GEMINI_SUMMARY_MODEL = 'gemini-2.5-flash'
 const SUMMARY_TARGETS = [
   { key: 'summary100', length: 100 },
   { key: 'summary200', length: 200 },
-  { key: 'summary300', length: 300 },
 ] as const
 
 type SummaryKey = (typeof SUMMARY_TARGETS)[number]['key']
@@ -13,7 +12,6 @@ type SummaryKey = (typeof SUMMARY_TARGETS)[number]['key']
 export interface EnrichedSummary {
   summary100: string
   summary200: string
-  summary300: string
   summarySource: 'gemini' | 'template'
 }
 
@@ -136,7 +134,6 @@ async function generateWithGemini(title: string, content: string): Promise<Enric
   return {
     summary100: summaryMap.summary100,
     summary200: summaryMap.summary200,
-    summary300: summaryMap.summary300,
     summarySource: 'gemini',
   }
 }
@@ -145,7 +142,6 @@ function generateTemplateSummaries(title: string, content: string): EnrichedSumm
   return {
     summary100: buildTemplateSummary(title, content, 100),
     summary200: buildTemplateSummary(title, content, 200),
-    summary300: buildTemplateSummary(title, content, 300),
     summarySource: 'template',
   }
 }

@@ -83,7 +83,6 @@
   - 要約を生成する
     - `summary_100`
     - `summary_200`
-    - `summary_300`
   - タグ候補を抽出する
   - `tags_master` / `tag_aliases` に照合する
     - 一致タグを `articles_enriched_tags` へ保存する

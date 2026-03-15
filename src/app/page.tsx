@@ -44,7 +44,6 @@ const mockArticles: ArticleWithScore[] = [
     published_at: new Date('2026-03-10T08:00:00+09:00'),
     summary_100: 'Google が Gemini 2.0 Flash を刷新。速度とコスト効率を前面に出し、社内業務や軽量推論の導入が現実味を帯びた。',
     summary_200: 'Google が Gemini 2.0 Flash を刷新。速度とコスト効率を前面に出し、社内業務や軽量推論の導入が現実味を帯びた。既存ワークフローへ埋め込みやすい価格設計が話題になっている。',
-    summary_300: 'Google が Gemini 2.0 Flash を刷新。速度とコスト効率を前面に出し、社内業務や軽量推論の導入が現実味を帯びた。既存ワークフローへ埋め込みやすい価格設計が話題になっており、サポート用途や検索拡張の PoC が増えそうだ。巨大モデル常時運用より、Flash 級を多点配置する設計が再評価されている。',
     critique: '差別化の本丸は性能より導入摩擦の低さ。運用負荷と単価が揃えば、比較対象は GPT 系より既存 FAQ システムになる。',
     ai_model: 'template',
     topic_group_id: 'tg1',
@@ -63,7 +62,6 @@ const mockArticles: ArticleWithScore[] = [
     published_at: new Date('2026-03-10T07:40:00+09:00'),
     summary_100: 'コーディング支援で Claude 3.7 Sonnet の評価が上昇。単発生成よりレビューと差分整理に強いという報告が目立つ。',
     summary_200: 'コーディング支援で Claude 3.7 Sonnet の評価が上昇。単発生成よりレビューと差分整理に強いという報告が目立つ。PR レビューや仕様との差分確認に強みが見えてきた。',
-    summary_300: 'コーディング支援で Claude 3.7 Sonnet の評価が上昇。単発生成よりレビューと差分整理に強いという報告が目立つ。PR レビューや仕様との差分確認に強みが見えてきた。一方で大規模置換は still human check 前提で、CI と型検査の重要度はさらに上がっている。',
     critique: '生成モデルを自動補完よりレビュアとして使う方が価値が安定している。評価指標は速度ではなく手戻り削減量で見るべき。',
     ai_model: 'template',
     topic_group_id: 'tg2',
@@ -82,7 +80,6 @@ const mockArticles: ArticleWithScore[] = [
     published_at: new Date('2026-03-10T06:50:00+09:00'),
     summary_100: 'Agent 実装では、モデル選定より先にタスク分解と権限制御を固める設計が主流になってきた。',
     summary_200: 'Agent 実装では、モデル選定より先にタスク分解と権限制御を固める設計が主流になってきた。運用系では、許可されたアクションの明確化とログ監査が品質を左右する。',
-    summary_300: 'Agent 実装では、モデル選定より先にタスク分解と権限制御を固める設計が主流になってきた。運用系では、許可されたアクションの明確化とログ監査が品質を左右する。万能 agent を目指すより、限定権限の小さな agent をつなぐ構成の方が失敗半径を管理しやすい。',
     critique: 'トレンドは賢い agent から、壊れても被害が限定される agent へ移っている。UI より先に監査と権限モデルを決める設計が増えるはずだ。',
     ai_model: 'template',
     topic_group_id: 'tg3',
@@ -101,7 +98,6 @@ const mockArticles: ArticleWithScore[] = [
     published_at: new Date('2026-03-10T06:10:00+09:00'),
     summary_100: 'RAG の比較軸が検索精度一本から変化。更新頻度や運用保守まで含めて選定すべきという見方が強まっている。',
     summary_200: 'RAG の比較軸が検索精度一本から変化。更新頻度や運用保守まで含めて選定すべきという見方が強まっている。再索引時間や品質監査の方法まで含めた設計が必要だ。',
-    summary_300: 'RAG の比較軸が検索精度一本から変化。更新頻度や運用保守まで含めて選定すべきという見方が強まっている。再索引時間や品質監査の方法まで含めた設計が必要だ。PoC では勝てても、本番で継続的に更新できない構成はすぐに陳腐化する。',
     critique: 'RAG はモデル比較よりデータ運用設計が差を作る段階に入っている。更新戦略が曖昧なまま検索精度だけを議論しても意味は薄い。',
     ai_model: 'template',
     topic_group_id: 'tg4',
@@ -168,7 +164,7 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabId>('ranking')
   const [period, setPeriod] = useState<RankPeriod>('24h')
   const [activeCategory, setActiveCategory] = useState<CategoryId>('all')
-  const [summaryMode, setSummaryMode] = useState<100 | 200 | 300>(100)
+  const [summaryMode, setSummaryMode] = useState<100 | 200>(100)
   const [showCritique, setShowCritique] = useState(false)
   const [notifTimes, setNotifTimes] = useState(initialNotifTimes)
   const [shareTarget, setShareTarget] = useState<UiArticle | null>(null)
@@ -461,12 +457,12 @@ export default function HomePage() {
       return
     }
 
-    if (type === 'expand_300') {
+    if (type === 'expand_200') {
       const nextExpanded = expandedArticleId === articleId ? null : articleId
       setExpandedArticleId(nextExpanded)
       setFocusedArticleId(articleId)
       void trackAction({
-        actionType: nextExpanded ? 'expand_300' : 'expand_200',
+        actionType: 'expand_200',
         articleId,
         source: 'direct',
       })
@@ -528,9 +524,6 @@ export default function HomePage() {
               <ModeButton active={summaryMode === 200} onClick={() => setSummaryMode(200)}>
                 200字
               </ModeButton>
-              <ModeButton active={summaryMode === 300} onClick={() => setSummaryMode(300)}>
-                300字
-              </ModeButton>
               <ModeButton active={showCritique} onClick={() => setShowCritique((current) => !current)}>
                 批評表示
               </ModeButton>
@@ -545,7 +538,7 @@ export default function HomePage() {
                     key={article.id}
                     article={article}
                     rank={index + 1}
-                    summaryMode={expandedArticleId === article.id ? 300 : summaryMode}
+                    summaryMode={expandedArticleId === article.id ? 200 : summaryMode}
                     showCritique={showCritique}
                     isFocused={focusedArticleId === article.id}
                     isSaved={savedArticleIds.includes(article.id)}
@@ -617,7 +610,7 @@ export default function HomePage() {
                       <ArticleCard
                         key={`search-${article.id}`}
                         article={article}
-                        summaryMode={expandedArticleId === article.id ? 300 : summaryMode}
+                        summaryMode={expandedArticleId === article.id ? 200 : summaryMode}
                         showCritique={showCritique}
                         isFocused={focusedArticleId === article.id}
                         isSaved={savedArticleIds.includes(article.id)}
