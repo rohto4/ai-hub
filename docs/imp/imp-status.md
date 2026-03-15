@@ -249,3 +249,17 @@
   - `articles_enriched_history.summary_300`
   - `public_articles.display_summary_300`
 - Updated current specs so the live requirement is now `100 / 200` only.
+
+## 2026-03-15 Snippet Publication Path Update
+
+- Added Layer2 publication routing with:
+  - `hold`
+  - `full_summary`
+  - `source_snippet`
+- Layer2 now stores both `publication_basis` and `publication_text`.
+- `feed_snippet` / `blocked_snippet` rows can be finalized at Layer2 when they are:
+  - relevant
+  - unique
+  - long enough
+  - not visibly truncated
+- Finalized snippet rows are no longer treated as provisional and can become publish candidates.

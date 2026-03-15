@@ -130,14 +130,15 @@
 5. `fulltext_allowed` source でも `domain=fulltext_allowed` 以外は本文 fetch しない
 6. `full` / `snippet` を判定する
 7. `summary_basis` を `full_content / feed_snippet / blocked_snippet / fallback_snippet` で付ける
-8. `snippet` 行には `is_provisional=true` と `provisional_reason` を付ける
+8. `publication_basis` を `hold / full_summary / source_snippet` で付ける
+9. `publication_text` に公開面で使う本文を保存する
    - `feed_only` source は `provisional_reason=feed_only_policy`
    - 未判定 domain は `provisional_reason=domain_needs_review`
-9. 要約 100 / 200 を生成する
+10. 要約 100 / 200 を生成する
 10. タグ候補抽出とタグ照合を行う
 11. 確定重複判定を行う
 10. `articles_enriched` と `articles_enriched_tags` に保存する
-11. provisional 行は `publish_candidate=false` にする
+11. `hold` 行だけ `publish_candidate=false` にする
 12. `tag_candidate_pool` を更新する
 13. `articles_raw.is_processed = true` を更新する
 
