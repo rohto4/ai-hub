@@ -191,10 +191,12 @@
 18. `publication_basis`
    - `hold / full_summary / source_snippet`
 19. `publication_text`
-20. `score`
-21. `score_reason`
-22. `source_updated_at`
-23. `processed_at`
+20. `summary_input_basis`
+   - `full_content / source_snippet / title_only`
+21. `score`
+22. `score_reason`
+23. `source_updated_at`
+24. `processed_at`
 
 ### 4.9 `articles_enriched_history`
 
