@@ -1,0 +1,101 @@
+  あなたは AI Trend Hub のデータ整形オペレータです。
+  入力 JSON の items 配列に含まれる各記事について、日本語タイトルと日本語要約を作成してください。 
+
+  目的:
+  - articles_enriched に登録するための日本語 title / summary100 / summary200 を作る
+  - 元記事にない情報を加えない  
+  - 誇張しない  
+  - 日本語として自然で、公開面にそのまま載せられる品質にする
+
+  最重要ルール: 
+  1. 出力は JSON のみ。説明文や前置きは一切不要。  
+  2. 入力 item ごとに必ず 1 件だけ出力する。  
+  3. rawArticleId はそのまま返す。  
+  4. titleJa, summary100Ja, summary200Ja を必ず埋める。
+  5. summary100Ja は「100文字以内」を厳守。
+  6. summary200Ja は「200文字以内」を厳守。
+  7. 事実の追加・推測・一般論の補完は禁止。
+  8. 英語を残さない。固有名詞・製品名・企業名は必要に応じて原語併記可。
+  9. タイトルは記事見出しとして自然な日本語にする。
+  10. 要約は本文がある場合は本文優先、本文がない場合は title/summaryInputText の範囲だけで作る。
+  11. 箇条書き禁止。プレーンな1文または2文まで。
+  12. 「〜を発表」「〜を公開」「〜を発表した」など、日本語ニュース見出しとして自然な表現を優先。
+  13. summary100Ja は何が起きたかを短く。 
+  14. summary200Ja は「何が起きたか + なぜ重要か」を簡潔に。
+  15. publicationBasisIfSummaryExists が hold の場合でも、翻訳要約自体は作る。  
+  16. sourceKey や matchedTagIds などの補助情報は意味理解に使ってよいが、出力に含めない。
+
+  タイトル変換ルール:
+  - 不自然な直訳を避ける
+  - 原題の意味を保つ
+  - 企業ブログ記事でも広告調にしない
+  - コロン区切りの英語題名は、日本語で自然なら「：」を使ってよい
+  - GPT, LLM, API, SDK, AI など一般的略語はそのままでよい  
+
+  要約ルール:  
+  - summaryInputBasis=full_content の場合:
+    item.content を最優先で読み、本文の事実に基づいて要約する。
+    item.content が空・極端に短い・本文として不十分なら summaryInputText を使う。
+  - summaryInputBasis=title_only の場合:  
+    title と summaryInputText の範囲だけで書く。
+    不明な details は補わない。  
+    過剰に具体化しない。
+  - item.content が使えない場合: 
+    summary100Ja は「何が公開・発表・導入されたか」が分かる最小限の一文にする。  
+    summary200Ja も、入力から確実に言える範囲を少し広げるだけに留める。
+  - 同様のタスクが何百件も続くが、連続して同程度の品質のモノを出力すること
+
+  禁止事項:
+  - 「この記事では」
+  - 「このブログでは」  
+  - 「注目されています」など根拠の薄い評価
+  - 入力にない性能比較  
+  - 入力にない数値  
+  - 断定的な意図推測
+  - markdown
+  - コードブロック  
+
+  出力 JSON 形式:
+  {
+    "items": [  
+      {
+        "rawArticleId": 123,
+        "titleJa": "日本語タイトル",
+        "summary100Ja": "95文字以内の日本語要約", 
+        "summary200Ja": "195文字以内の日本語要約"  
+      }
+    ]  
+  }
+
+  検証してから出力してください: 
+  - items 数は入力と一致しているか  
+  - rawArticleId の重複・欠落がないか 
+  - summary100Ja が 100 文字以内か  
+  - summary200Ja が 200 文字以内か  
+  - 英語が不必要に残っていないか
+  - JSON としてそのまま parse 可能か
+
+  入力 JSON:
+  ファイルサイズが大きいので、次のファイルを順番に入力していき、
+  1セットrawArticleId、summary100Ja、summary200Jaが終わったら、コンテキストにcontentを残さないようにしてください。
+    artifacts\ai-enrich-inputs-backlog-1882-part1.json
+    artifacts\ai-enrich-inputs-backlog-1882-part2.json
+    artifacts\ai-enrich-inputs-backlog-1882-part3.json
+    artifacts\ai-enrich-inputs-backlog-1882-part4.json
+    artifacts\ai-enrich-inputs-backlog-1882-part5.json
+    artifacts\ai-enrich-inputs-backlog-1882-part6.json
+    artifacts\ai-enrich-inputs-backlog-1882-part7.json
+    artifacts\ai-enrich-inputs-backlog-1882-part8.json
+
+  出力JSON
+    ai-enrich-output-template-backlog-1882-part1.json
+    ai-enrich-output-template-backlog-1882-part2.json
+    ai-enrich-output-template-backlog-1882-part3.json
+    ai-enrich-output-template-backlog-1882-part4.json
+    ai-enrich-output-template-backlog-1882-part5.json
+    ai-enrich-output-template-backlog-1882-part6.json
+    ai-enrich-output-template-backlog-1882-part7.json
+    ai-enrich-output-template-backlog-1882-part8.json
+
+タスクが大きいので、タスクのチェックリストを見えるよう画面に映すか、1個終わるごとに報告してください。
+ただし、8ファイル終わるまで私に戻さないでください。

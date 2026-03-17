@@ -1,16 +1,26 @@
 // ============================================================
-// DB 型定義 — テーブルスキーマに1:1対応
+// 公開面 / L3-L4 向けの型定義
 // ============================================================
 
 export type Genre =
-  | 'llm' | 'agent' | 'coding' | 'image_gen' | 'voice'
-  | 'rag' | 'fine_tuning' | 'enterprise' | 'safety'
-  | 'hardware' | 'robotics' | 'education' | 'medical'
-  | 'legal' | 'finance' | 'regulation'
+  | 'llm'
+  | 'agent'
+  | 'voice'
+  | 'policy'
+  | 'safety'
+  | 'search'
+  | 'news'
 
-export type SourceType = 'youtube' | 'blog' | 'official' | 'news'
+export type SourceType =
+  | 'official'
+  | 'blog'
+  | 'news'
+  | 'video'
+  | 'alerts'
+  | 'paper'
 
 export type RankPeriod = '24h' | '7d' | '30d'
+export type RankingWindow = 'hourly' | RankPeriod
 
 export type Platform = 'pc' | 'sp' | 'tb'
 
@@ -34,125 +44,34 @@ export type ActionType =
   | 'search'
   | 'digest_click'
 
-// ---- feeds ----
-export interface Feed {
-  id: string
-  name: string
-  url: string
-  genre: Genre
-  source_type: SourceType
-  active: boolean
-  fetch_interval_m: number
-  last_fetched_at: Date | null
-  error_count: number
-  created_at: Date
-}
-
-// ---- source_items ----
-export interface SourceItem {
-  id: string
-  feed_id: string
-  url: string
-  url_hash: string
-  title: string | null
-  published_at: Date | null
-  raw_content: string | null
-  content_expires_at: Date | null
-  processed: boolean
-  fetched_at: Date
-}
-
-// ---- topic_groups ----
-export interface TopicGroup {
-  id: string
-  genre: Genre
-  label: string
-  article_count: number
-  created_at: Date
-  updated_at: Date
-}
-
-// ---- articles ----
 export interface Article {
   id: string
   url: string
-  url_hash: string
   title: string
   genre: Genre
   source_type: SourceType
   thumbnail_url: string | null
+  thumbnail_emoji: string | null
   published_at: Date
   summary_100: string | null
   summary_200: string | null
   critique: string | null
-  ai_model: string | null
+  publication_basis: 'full_summary' | 'source_snippet' | null
+  summary_input_basis: 'full_content' | 'source_snippet' | 'title_only' | null
   topic_group_id: string | null
-  // embedding は API 層には露出しない（pgvector バッチ専用）
   created_at: Date
   updated_at: Date
 }
 
-// ---- rank_scores ----
-export interface RankScore {
-  article_id: string
-  period: RankPeriod
-  genre: string   // 'all' | Genre
-  score: number
-  breakdown: RankBreakdown | null
-  computed_at: Date
-}
-
 export interface RankBreakdown {
+  impression: number
+  open: number
   share: number
   save: number
-  view: number
-  expand_200: number
-  critique_expand: number
-  article_open: number
+  source_open: number
+  content_score: number
+  decay_factor: number
 }
-
-// ---- action_logs ----
-export interface ActionLog {
-  id: bigint
-  article_id: string | null
-  action_type: ActionType
-  session_id: string
-  user_id: string | null
-  platform: Platform | null
-  source: ActionSource | null
-  meta: Record<string, unknown> | null
-  created_at: Date
-}
-
-// ---- push_subscriptions ----
-export interface PushSubscription {
-  id: string
-  user_id: string | null
-  session_id: string
-  endpoint: string
-  keys: { auth: string; p256dh: string }
-  genres: Genre[]
-  active: boolean
-  created_at: Date
-}
-
-// ---- digest_logs ----
-export type DigestStatus = 'pending' | 'sent' | 'failed'
-
-export interface DigestLog {
-  id: string
-  subscription_id: string
-  scheduled_at: Date
-  sent_at: Date | null
-  status: DigestStatus
-  article_ids: string[]
-  error_msg: string | null
-  retry_count: number
-}
-
-// ============================================================
-// API レスポンス型（DB型をフロント向けに整形）
-// ============================================================
 
 export interface ArticleWithScore extends Article {
   score: number
@@ -172,6 +91,46 @@ export interface SearchResponse {
   total: number
 }
 
-export interface TopicGroupWithArticles extends TopicGroup {
-  articles: Article[]
+export interface HomeStats {
+  publishedToday: number
+  publishedTotal: number
+  officialCount: number
+  topRatedCount: number
+}
+
+export interface HomeActivity {
+  shareCountLastHour: number
+  activeArticlesLastHour: number
+}
+
+export interface HomeResponse {
+  articles: ArticleWithScore[]
+  period: RankPeriod
+  stats: HomeStats
+  activity: HomeActivity
+  total: number
+}
+
+export interface PushSubscription {
+  id: string
+  user_id: string | null
+  session_id: string
+  endpoint: string
+  keys: { auth: string; p256dh: string }
+  genres: Genre[]
+  active: boolean
+  created_at: Date
+}
+
+export type DigestStatus = 'pending' | 'sent' | 'failed'
+
+export interface DigestLog {
+  id: string
+  subscription_id: string
+  scheduled_at: Date
+  sent_at: Date | null
+  status: DigestStatus
+  article_ids: string[]
+  error_msg: string | null
+  retry_count: number
 }

@@ -1,8 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { loadEnvConfig } from '@next/env'
 import {
   markRawProcessed,
   type DedupeStatus,
+  refreshTagArticleCounts,
   upsertEnrichedArticle,
 } from '@/lib/db/enrichment'
 import { finishJobRun, recordJobRunItem, startJobRun } from '@/lib/db/job-runs'
@@ -10,6 +12,8 @@ import { finishJobRun, recordJobRunItem, startJobRun } from '@/lib/db/job-runs'
 type ExportedInputItem = {
   rawArticleId: number
   sourceTargetId: string
+  sourceCategory?: string
+  sourceType?: string
   sourceKey: string
   normalizedUrl: string
   citedUrl: string | null
@@ -57,6 +61,23 @@ type OutputFile = {
   items: OutputItem[]
 }
 
+loadEnvConfig(process.cwd())
+
+function normalizeRawArticleId(value: number | string, fieldName: string): number {
+  const normalized =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+        ? Number(value)
+        : Number.NaN
+
+  if (!Number.isInteger(normalized) || normalized <= 0) {
+    throw new Error(`${fieldName} must be a positive integer: ${String(value)}`)
+  }
+
+  return normalized
+}
+
 function readArg(flag: string, fallback: string | null = null): string | null {
   const index = process.argv.indexOf(flag)
   if (index === -1 || index + 1 >= process.argv.length) {
@@ -100,6 +121,7 @@ const outputPath =
   readArg('--output') ??
   path.join(process.cwd(), 'artifacts', 'ai-enrich-outputs-official-remaining.json')
 const dryRun = process.argv.includes('--dry-run')
+const skipExisting = process.argv.includes('--skip-existing')
 const writeTemplateOnly = process.argv.includes('--write-template-only')
 const templatePath =
   readArg('--template-output') ??
@@ -128,12 +150,15 @@ async function main(): Promise<void> {
 
   const outputFile = JSON.parse(fs.readFileSync(outputPath, 'utf8')) as OutputFile
   const outputMap = new Map<number, OutputItem>(
-    outputFile.items.map((item) => [item.rawArticleId, item]),
+    outputFile.items.map((item) => [
+      normalizeRawArticleId(item.rawArticleId, 'output.items[].rawArticleId'),
+      item,
+    ]),
   )
 
   const missing = inputFile.items
-    .filter((item) => !outputMap.has(item.rawArticleId))
-    .map((item) => item.rawArticleId)
+    .map((item) => normalizeRawArticleId(item.rawArticleId, 'input.items[].rawArticleId'))
+    .filter((rawArticleId) => !outputMap.has(rawArticleId))
 
   if (missing.length > 0) {
     throw new Error(`Missing output items for raw_article_id: ${missing.slice(0, 20).join(', ')}`)
@@ -150,10 +175,44 @@ async function main(): Promise<void> {
         },
       })
 
+  const existingRawIds = skipExisting && !dryRun
+    ? new Set(
+        (
+          await Promise.all(
+            inputFile.items.map(async (item) => normalizeRawArticleId(item.rawArticleId, 'input.items[].rawArticleId'))
+          )
+        ).filter(Boolean)
+      )
+    : null
+
+  const alreadyImportedRawIds =
+    skipExisting && !dryRun
+      ? new Set<number>(
+          (
+            await import('@/lib/db').then(async ({ getSql }) => {
+              const sql = getSql()
+              const rawIds = inputFile.items.map((item) =>
+                normalizeRawArticleId(item.rawArticleId, 'input.items[].rawArticleId'),
+              )
+              const rows = (await sql`
+                SELECT raw_article_id
+                FROM articles_enriched
+                WHERE raw_article_id = ANY(${rawIds})
+              `) as Array<{ raw_article_id: number }>
+              return rows
+            })
+          ).map((row) => row.raw_article_id),
+        )
+      : null
+
   let processed = 0
 
   for (const inputItem of inputFile.items) {
-    const outputItem = outputMap.get(inputItem.rawArticleId)
+    const rawArticleId = normalizeRawArticleId(inputItem.rawArticleId, 'input.items[].rawArticleId')
+    if (existingRawIds && alreadyImportedRawIds?.has(rawArticleId)) {
+      continue
+    }
+    const outputItem = outputMap.get(rawArticleId)
     if (!outputItem) {
       continue
     }
@@ -197,7 +256,7 @@ async function main(): Promise<void> {
       console.log(
         JSON.stringify(
           {
-            rawArticleId: inputItem.rawArticleId,
+            rawArticleId,
             title,
             publicationBasis,
             publishCandidate,
@@ -211,44 +270,51 @@ async function main(): Promise<void> {
       continue
     }
 
-    await upsertEnrichedArticle({
-      rawArticleId: inputItem.rawArticleId,
-      sourceTargetId: inputItem.sourceTargetId,
-      normalizedUrl: inputItem.normalizedUrl,
-      citedUrl: inputItem.citedUrl,
-      canonicalUrl: inputItem.canonicalUrl,
-      title,
-      summary100,
-      summary200,
-      summaryBasis: inputItem.summaryBasis,
-      contentPath: inputItem.contentPath,
-      isProvisional: finalIsProvisional,
-      provisionalReason: finalProvisionalReason,
-      dedupeStatus: inputItem.dedupeStatus,
-      dedupeGroupKey: inputItem.dedupeGroupKey,
-      publishCandidate,
-      publicationBasis,
-      publicationText,
-      summaryInputBasis:
-        inputItem.contentPath === 'full'
-          ? 'full_content'
-          : publicationBasis === 'source_snippet'
-            ? 'source_snippet'
-            : 'title_only',
-      score: adjustedScore,
-      scoreReason: adjustedScoreReason,
-      aiProcessingState: 'completed',
-      sourceUpdatedAt: inputItem.sourceUpdatedAt,
-      matchedTagIds: inputItem.matchedTagIds,
-      candidateTags: inputItem.candidateTags,
-    })
-    await markRawProcessed(inputItem.rawArticleId)
+    await upsertEnrichedArticle(
+      {
+        rawArticleId,
+        sourceTargetId: inputItem.sourceTargetId,
+        sourceCategory: inputItem.sourceCategory ?? 'unknown',
+        sourceType: inputItem.sourceType ?? 'news',
+        normalizedUrl: inputItem.normalizedUrl,
+        citedUrl: inputItem.citedUrl,
+        canonicalUrl: inputItem.canonicalUrl,
+        title,
+        summary100,
+        summary200,
+        summaryBasis: inputItem.summaryBasis,
+        contentPath: inputItem.contentPath,
+        isProvisional: finalIsProvisional,
+        provisionalReason: finalProvisionalReason,
+        dedupeStatus: inputItem.dedupeStatus,
+        dedupeGroupKey: inputItem.dedupeGroupKey,
+        publishCandidate,
+        publicationBasis,
+        publicationText,
+        summaryInputBasis:
+          inputItem.contentPath === 'full'
+            ? 'full_content'
+            : publicationBasis === 'source_snippet'
+              ? 'source_snippet'
+              : 'title_only',
+        score: adjustedScore,
+        scoreReason: adjustedScoreReason,
+        aiProcessingState: 'completed',
+        sourceUpdatedAt: inputItem.sourceUpdatedAt,
+        matchedTagIds: inputItem.matchedTagIds,
+        candidateTags: inputItem.candidateTags,
+      },
+      {
+        refreshTagCounts: false,
+      },
+    )
+    await markRawProcessed(rawArticleId)
     await recordJobRunItem({
       jobRunId: jobRunId!,
-      itemKey: String(inputItem.rawArticleId),
+      itemKey: String(rawArticleId),
       itemStatus: 'processed',
       detail: {
-        rawArticleId: inputItem.rawArticleId,
+        rawArticleId,
         sourceKey: inputItem.sourceKey,
         publicationBasis,
         publishCandidate,
@@ -258,6 +324,7 @@ async function main(): Promise<void> {
   }
 
   if (!dryRun) {
+    await refreshTagArticleCounts()
     await finishJobRun({
       jobRunId: jobRunId!,
       status: 'completed',

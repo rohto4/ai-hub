@@ -18,94 +18,26 @@ import {
   toggleSavedArticleId,
   trackAction,
 } from '@/lib/client/home'
-import type { ActionType, Article, ArticleWithScore, RankPeriod, SearchResponse, TrendsResponse } from '@/lib/db/types'
+import type {
+  ActionType,
+  Article,
+  HomeActivity,
+  HomeResponse,
+  HomeStats,
+  RankPeriod,
+  SearchResponse,
+} from '@/lib/db/types'
 
 type TabId = 'ranking' | 'latest' | 'unique'
-type CategoryId = 'all' | 'youtube' | 'official' | 'blog' | 'agent'
+type CategoryId = 'all' | 'video' | 'official' | 'blog' | 'agent'
 
 type UiArticle = Article & { score?: number }
 
 type LoadState = {
   articles: UiArticle[]
   loading: boolean
-  source: 'live' | 'mock'
   message: string | null
 }
-
-const mockArticles: ArticleWithScore[] = [
-  {
-    id: '11111111-1111-1111-1111-111111111111',
-    url: 'https://example.com/gemini-flash',
-    url_hash: 'a1',
-    title: 'Gemini 2.0 Flash が低コスト化。軽量推論を前提にした業務導入が加速',
-    genre: 'llm',
-    source_type: 'official',
-    thumbnail_url: null,
-    published_at: new Date('2026-03-10T08:00:00+09:00'),
-    summary_100: 'Google が Gemini 2.0 Flash を刷新。速度とコスト効率を前面に出し、社内業務や軽量推論の導入が現実味を帯びた。',
-    summary_200: 'Google が Gemini 2.0 Flash を刷新。速度とコスト効率を前面に出し、社内業務や軽量推論の導入が現実味を帯びた。既存ワークフローへ埋め込みやすい価格設計が話題になっている。',
-    critique: '差別化の本丸は性能より導入摩擦の低さ。運用負荷と単価が揃えば、比較対象は GPT 系より既存 FAQ システムになる。',
-    ai_model: 'template',
-    topic_group_id: 'tg1',
-    created_at: new Date(),
-    updated_at: new Date(),
-    score: 96.4,
-  },
-  {
-    id: '22222222-2222-2222-2222-222222222222',
-    url: 'https://example.com/claude-coding',
-    url_hash: 'a2',
-    title: 'Claude 3.7 Sonnet がコーディング精度を改善。レビュー用途の実運用報告が増加',
-    genre: 'coding',
-    source_type: 'blog',
-    thumbnail_url: null,
-    published_at: new Date('2026-03-10T07:40:00+09:00'),
-    summary_100: 'コーディング支援で Claude 3.7 Sonnet の評価が上昇。単発生成よりレビューと差分整理に強いという報告が目立つ。',
-    summary_200: 'コーディング支援で Claude 3.7 Sonnet の評価が上昇。単発生成よりレビューと差分整理に強いという報告が目立つ。PR レビューや仕様との差分確認に強みが見えてきた。',
-    critique: '生成モデルを自動補完よりレビュアとして使う方が価値が安定している。評価指標は速度ではなく手戻り削減量で見るべき。',
-    ai_model: 'template',
-    topic_group_id: 'tg2',
-    created_at: new Date(),
-    updated_at: new Date(),
-    score: 91.2,
-  },
-  {
-    id: '33333333-3333-3333-3333-333333333333',
-    url: 'https://example.com/openai-agent',
-    url_hash: 'a3',
-    title: 'Agent 実装の設計論が更新。タスク分解と権限制御を先に決める流れが主流に',
-    genre: 'agent',
-    source_type: 'news',
-    thumbnail_url: null,
-    published_at: new Date('2026-03-10T06:50:00+09:00'),
-    summary_100: 'Agent 実装では、モデル選定より先にタスク分解と権限制御を固める設計が主流になってきた。',
-    summary_200: 'Agent 実装では、モデル選定より先にタスク分解と権限制御を固める設計が主流になってきた。運用系では、許可されたアクションの明確化とログ監査が品質を左右する。',
-    critique: 'トレンドは賢い agent から、壊れても被害が限定される agent へ移っている。UI より先に監査と権限モデルを決める設計が増えるはずだ。',
-    ai_model: 'template',
-    topic_group_id: 'tg3',
-    created_at: new Date(),
-    updated_at: new Date(),
-    score: 87.8,
-  },
-  {
-    id: '44444444-4444-4444-4444-444444444444',
-    url: 'https://example.com/rag-stack',
-    url_hash: 'a4',
-    title: 'RAG 基盤の比較軸が変化。検索精度より更新頻度と保守性を問う議論が前面へ',
-    genre: 'rag',
-    source_type: 'blog',
-    thumbnail_url: null,
-    published_at: new Date('2026-03-10T06:10:00+09:00'),
-    summary_100: 'RAG の比較軸が検索精度一本から変化。更新頻度や運用保守まで含めて選定すべきという見方が強まっている。',
-    summary_200: 'RAG の比較軸が検索精度一本から変化。更新頻度や運用保守まで含めて選定すべきという見方が強まっている。再索引時間や品質監査の方法まで含めた設計が必要だ。',
-    critique: 'RAG はモデル比較よりデータ運用設計が差を作る段階に入っている。更新戦略が曖昧なまま検索精度だけを議論しても意味は薄い。',
-    ai_model: 'template',
-    topic_group_id: 'tg4',
-    created_at: new Date(),
-    updated_at: new Date(),
-    score: 82.5,
-  },
-]
 
 const initialNotifTimes = [
   { label: '07:00 ダイジェスト', on: true },
@@ -116,8 +48,19 @@ const initialNotifTimes = [
 const initialSearchState: LoadState = {
   articles: [],
   loading: false,
-  source: 'live',
   message: null,
+}
+
+const initialHomeStats: HomeStats = {
+  publishedToday: 0,
+  publishedTotal: 0,
+  officialCount: 0,
+  topRatedCount: 0,
+}
+
+const initialHomeActivity: HomeActivity = {
+  shareCountLastHour: 0,
+  activeArticlesLastHour: 0,
 }
 
 function categoryMatches(category: CategoryId, article: UiArticle): boolean {
@@ -176,11 +119,12 @@ export default function HomePage() {
   const [topicGroupArticleId, setTopicGroupArticleId] = useState<string | null>(null)
   const [shareStatus, setShareStatus] = useState<string | null>(null)
   const [trendState, setTrendState] = useState<LoadState>({
-    articles: mockArticles,
+    articles: [],
     loading: true,
-    source: 'mock',
     message: '初期表示を準備しています。',
   })
+  const [homeStats, setHomeStats] = useState<HomeStats>(initialHomeStats)
+  const [homeActivity, setHomeActivity] = useState<HomeActivity>(initialHomeActivity)
   const [searchState, setSearchState] = useState<LoadState>(initialSearchState)
 
   useEffect(() => {
@@ -220,39 +164,38 @@ export default function HomePage() {
   useEffect(() => {
     let ignore = false
 
-    async function loadTrends() {
+    async function loadHome() {
       setTrendState((current) => ({
         ...current,
         loading: true,
-        message: '最新ランキングを読み込んでいます。',
+        message: 'ホーム画面を読み込んでいます。',
       }))
 
       try {
-        const response = await fetchJson<TrendsResponse>(`/api/trends?period=${period}&genre=all&limit=20`)
+        const response = await fetchJson<HomeResponse>(`/api/home?period=${period}&limit=20`)
         if (ignore) return
         const liveArticles = toUiArticles(response.articles)
         setTrendState({
-          articles: liveArticles.length > 0 ? liveArticles : mockArticles,
+          articles: liveArticles,
           loading: false,
-          source: liveArticles.length > 0 ? 'live' : 'mock',
-          message:
-            liveArticles.length > 0
-              ? `${response.total} 件の実データを表示中です。`
-              : '実データが空のため、モック表示へフォールバックしています。',
+          message: `${response.total} 件の公開記事を表示中です。`,
         })
+        setHomeStats(response.stats)
+        setHomeActivity(response.activity)
       } catch (error) {
         if (ignore) return
         const message = error instanceof Error ? error.message : 'ランキングの取得に失敗しました。'
         setTrendState({
-          articles: mockArticles,
+          articles: [],
           loading: false,
-          source: 'mock',
-          message: `${message} モック表示を継続します。`,
+          message,
         })
+        setHomeStats(initialHomeStats)
+        setHomeActivity(initialHomeActivity)
       }
     }
 
-    void loadTrends()
+    void loadHome()
 
     return () => {
       ignore = true
@@ -271,7 +214,6 @@ export default function HomePage() {
       setSearchState({
         articles: [],
         loading: true,
-        source: 'live',
         message: `「${searchQuery}」を検索しています。`,
       })
 
@@ -281,21 +223,15 @@ export default function HomePage() {
         setSearchState({
           articles: toUiArticles(response.articles),
           loading: false,
-          source: 'live',
           message: `${response.total} 件ヒットしました。`,
         })
       } catch (error) {
         if (ignore) return
-        const fallbackArticles = mockArticles.filter((article) => {
-          const normalized = searchQuery.toLowerCase()
-          return article.title.toLowerCase().includes(normalized) || (article.summary_100 ?? '').toLowerCase().includes(normalized)
-        })
         const message = error instanceof Error ? error.message : '検索に失敗しました。'
         setSearchState({
-          articles: fallbackArticles,
+          articles: [],
           loading: false,
-          source: 'mock',
-          message: `${message} モック検索に切り替えています。`,
+          message,
         })
       }
     }
@@ -327,17 +263,14 @@ export default function HomePage() {
   )
 
   const kpis = useMemo(() => {
-    const todayKey = new Date().toDateString()
-    const todayCount = trendState.articles.filter((article) => article.published_at.toDateString() === todayKey).length
     const topicGrouped = trendState.articles.filter((article) => article.topic_group_id).length
-    const officialCount = trendState.articles.filter((article) => article.source_type === 'official').length
     return [
-      { label: '本日の新着', value: String(todayCount) },
-      { label: '表示中記事', value: String(trendState.articles.length) },
+      { label: '本日の新着', value: String(homeStats.publishedToday) },
+      { label: '公開記事', value: String(homeStats.publishedTotal) },
       { label: 'Topic Group 付与', value: String(topicGrouped) },
-      { label: '公式ソース', value: String(officialCount) },
+      { label: '公式ソース', value: String(homeStats.officialCount) },
     ]
-  }, [trendState.articles])
+  }, [homeStats, trendState.articles])
 
   const digestItems = useMemo(
     () => filteredArticles.slice(0, 3).map((article, index) => ({ ...article, digestRank: index + 1 })),
@@ -561,7 +494,7 @@ export default function HomePage() {
                   <TopicColumn
                     title="動画"
                     tone="bg-[#fef3c7] text-[#92400e]"
-                    items={topicGroupItems.items.filter((article) => article.source_type === 'youtube')}
+                    items={topicGroupItems.items.filter((article) => article.source_type === 'video')}
                   />
                   <TopicColumn
                     title="公式"
@@ -653,8 +586,10 @@ export default function HomePage() {
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
             unread={savedArticleIds.length}
-            topRated={trendState.articles.filter((article) => (article.score ?? 0) >= 90).length}
+            topRated={homeStats.topRatedCount}
             savedLater={savedArticleIds.length}
+            shareCountLastHour={homeActivity.shareCountLastHour}
+            activeArticlesLastHour={homeActivity.activeArticlesLastHour}
             notifTimes={notifTimes}
             onNotifToggle={(index) =>
               setNotifTimes((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, on: !item.on } : item)))

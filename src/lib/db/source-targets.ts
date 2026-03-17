@@ -14,35 +14,54 @@ type SourceTargetRow = {
   requires_auth: boolean
 }
 
-export async function listDueSourceTargets(limit = 20): Promise<SourceTarget[]> {
+export async function listDueSourceTargets(limit = 20, sourceKey?: string | null): Promise<SourceTarget[]> {
   const sql = getSql()
-  const rows = (await sql`
-    SELECT
-      st.source_target_id AS id,
-      st.source_key,
-      st.display_name,
-      st.fetch_kind,
-      st.source_category,
-      st.base_url,
-      st.content_access_policy,
-      st.fetch_interval_minutes,
-      st.supports_update_detection,
-      st.requires_auth
-    FROM source_targets st
-    LEFT JOIN LATERAL (
-      SELECT MAX(ar.fetch_run_at) AS last_fetch_run_at
-      FROM articles_raw ar
-      WHERE ar.source_target_id = st.source_target_id
-    ) latest_fetch ON true
-    WHERE st.is_active = true
-      AND st.fetch_kind IN ('rss', 'alerts')
-      AND (
-        latest_fetch.last_fetch_run_at IS NULL
-        OR latest_fetch.last_fetch_run_at <= now() - (st.fetch_interval_minutes * interval '1 minute')
-      )
-    ORDER BY latest_fetch.last_fetch_run_at ASC NULLS FIRST, st.display_name ASC
-    LIMIT ${limit}
-  `) as SourceTargetRow[]
+  const rows = sourceKey
+    ? ((await sql`
+        SELECT
+          st.source_target_id AS id,
+          st.source_key,
+          st.display_name,
+          st.fetch_kind,
+          st.source_category,
+          st.base_url,
+          st.content_access_policy,
+          st.fetch_interval_minutes,
+          st.supports_update_detection,
+          st.requires_auth
+        FROM source_targets st
+        WHERE st.is_active = true
+          AND st.fetch_kind IN ('rss', 'alerts', 'api')
+          AND st.source_key = ${sourceKey}
+        LIMIT ${limit}
+      `) as SourceTargetRow[])
+    : ((await sql`
+        SELECT
+          st.source_target_id AS id,
+          st.source_key,
+          st.display_name,
+          st.fetch_kind,
+          st.source_category,
+          st.base_url,
+          st.content_access_policy,
+          st.fetch_interval_minutes,
+          st.supports_update_detection,
+          st.requires_auth
+        FROM source_targets st
+        LEFT JOIN LATERAL (
+          SELECT MAX(ar.fetch_run_at) AS last_fetch_run_at
+          FROM articles_raw ar
+          WHERE ar.source_target_id = st.source_target_id
+        ) latest_fetch ON true
+        WHERE st.is_active = true
+          AND st.fetch_kind IN ('rss', 'alerts', 'api')
+          AND (
+            latest_fetch.last_fetch_run_at IS NULL
+            OR latest_fetch.last_fetch_run_at <= now() - (st.fetch_interval_minutes * interval '1 minute')
+          )
+        ORDER BY latest_fetch.last_fetch_run_at ASC NULLS FIRST, st.display_name ASC
+        LIMIT ${limit}
+      `) as SourceTargetRow[])
 
   return rows.map((row) => ({
     id: row.id,

@@ -6,6 +6,7 @@ export interface RawArticleForEnrichment {
   sourceTargetId: string
   sourceKey: string
   sourceCategory: string
+  sourceType: string
   contentAccessPolicy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
   observedDomain: string | null
   observedDomainFetchPolicy: 'needs_review' | 'fulltext_allowed' | 'snippet_only' | 'blocked' | null
@@ -23,6 +24,7 @@ type RawArticleRow = {
   source_target_id: string
   source_key: string
   source_category: string
+  source_type: string
   content_access_policy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
   observed_domain: string | null
   observed_domain_fetch_policy: 'needs_review' | 'fulltext_allowed' | 'snippet_only' | 'blocked' | null
@@ -75,6 +77,8 @@ export interface DuplicateMatch {
 export interface UpsertEnrichedInput {
   rawArticleId: number
   sourceTargetId: string
+  sourceCategory: string
+  sourceType: string
   normalizedUrl: string
   citedUrl: string | null
   canonicalUrl: string
@@ -110,6 +114,10 @@ type UpsertEnrichedResult = {
   enrichedArticleId: number
 }
 
+interface UpsertEnrichedOptions {
+  refreshTagCounts?: boolean
+}
+
 export async function listRawArticlesForEnrichment(
   limit = 50,
   sourceKey?: string | null,
@@ -122,6 +130,7 @@ export async function listRawArticlesForEnrichment(
           ar.source_target_id,
           st.source_key,
           st.source_category,
+          st.source_type,
           st.content_access_policy,
           lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS observed_domain,
           od.fetch_policy AS observed_domain_fetch_policy,
@@ -148,6 +157,7 @@ export async function listRawArticlesForEnrichment(
           ar.source_target_id,
           st.source_key,
           st.source_category,
+          st.source_type,
           st.content_access_policy,
           lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS observed_domain,
           od.fetch_policy AS observed_domain_fetch_policy,
@@ -173,6 +183,7 @@ export async function listRawArticlesForEnrichment(
     sourceTargetId: row.source_target_id,
     sourceKey: row.source_key,
     sourceCategory: row.source_category,
+    sourceType: row.source_type,
     contentAccessPolicy: row.content_access_policy,
     observedDomain: row.observed_domain,
     observedDomainFetchPolicy: row.observed_domain_fetch_policy,
@@ -283,7 +294,11 @@ export async function findSimilarTitleDuplicate(
   }
 }
 
-export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise<UpsertEnrichedResult> {
+export async function upsertEnrichedArticle(
+  input: UpsertEnrichedInput,
+  options: UpsertEnrichedOptions = {},
+): Promise<UpsertEnrichedResult> {
+  const refreshTagCounts = options.refreshTagCounts ?? true
   const sql = getSql()
   const existingRows = (await sql`
     SELECT *
@@ -362,6 +377,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
       SET
         raw_article_id = ${input.rawArticleId},
         source_target_id = ${input.sourceTargetId},
+        source_category = ${input.sourceCategory},
+        source_type = ${input.sourceType},
         cited_url = ${input.citedUrl},
         canonical_url = ${input.canonicalUrl},
         title = ${input.title},
@@ -388,7 +405,9 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
 
     await syncEnrichedTags(existing.enriched_article_id, input.matchedTagIds)
     await upsertTagCandidates(input.candidateTags, input.rawArticleId)
-    await refreshTagArticleCounts()
+    if (refreshTagCounts) {
+      await refreshTagArticleCounts()
+    }
 
     return { enrichedArticleId: existing.enriched_article_id }
   }
@@ -397,6 +416,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
     INSERT INTO articles_enriched (
       raw_article_id,
       source_target_id,
+      source_category,
+      source_type,
       normalized_url,
       cited_url,
       canonical_url,
@@ -421,6 +442,8 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
     VALUES (
       ${input.rawArticleId},
       ${input.sourceTargetId},
+      ${input.sourceCategory},
+      ${input.sourceType},
       ${input.normalizedUrl},
       ${input.citedUrl},
       ${input.canonicalUrl},
@@ -448,7 +471,9 @@ export async function upsertEnrichedArticle(input: UpsertEnrichedInput): Promise
   const enrichedArticleId = inserted[0].enriched_article_id
   await syncEnrichedTags(enrichedArticleId, input.matchedTagIds)
   await upsertTagCandidates(input.candidateTags, input.rawArticleId)
-  await refreshTagArticleCounts()
+  if (refreshTagCounts) {
+    await refreshTagArticleCounts()
+  }
 
   return { enrichedArticleId }
 }
@@ -495,7 +520,7 @@ async function upsertTagCandidates(
   }
 }
 
-async function refreshTagArticleCounts(): Promise<void> {
+export async function refreshTagArticleCounts(): Promise<void> {
   const sql = getSql()
   await sql`
     UPDATE tags_master tm

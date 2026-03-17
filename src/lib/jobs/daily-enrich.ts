@@ -12,10 +12,10 @@ import {
   upsertEnrichedArticle,
 } from '@/lib/db/enrichment'
 import { finishJobRun, recordJobRunItem, startJobRun } from '@/lib/db/job-runs'
-import { listActiveTagReferences } from '@/lib/db/tags'
+import { listActiveTagReferences, listCollectionTagKeywords } from '@/lib/db/tags'
 import { type ExtractedContentResult, resolveArticleContent } from '@/lib/extractors/content'
 import { assessSourceTargetRelevance } from '@/lib/relevance/source-target'
-import { matchTags } from '@/lib/tags/match'
+import { matchTags, matchTagsFromKeywords } from '@/lib/tags/match'
 import { decodeAndNormalizeText, normalizeHeadline } from '@/lib/text/normalize'
 
 export interface DailyEnrichItemResult {
@@ -47,6 +47,7 @@ export interface DailyEnrichOptions {
   limit?: number
   sourceKey?: string | null
   summaryBatchSize?: number
+  maxSummaryBatches?: number
 }
 
 interface PreparedEnrichArticle {
@@ -71,6 +72,7 @@ interface PreparedEnrichArticle {
 type ManualPendingExportItem = {
   rawArticleId: number
   sourceTargetId: string
+  sourceCategory: string
   sourceKey: string
   normalizedUrl: string
   citedUrl: string | null
@@ -269,6 +271,37 @@ function chunkItems<T>(items: T[], size: number): T[][] {
   return chunks
 }
 
+function normalizeAsciiTokens(value: string): string[] {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/[\s-]+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 3)
+}
+
+function passesSnippetConsistencyGate(input: {
+  summaryInputBasis: 'full_content' | 'source_snippet' | 'title_only'
+  title: string
+  summaryInputText: string
+  summary100: string
+  summary200: string
+}): boolean {
+  if (input.summaryInputBasis !== 'source_snippet') {
+    return true
+  }
+
+  const sourceTokens = Array.from(
+    new Set(normalizeAsciiTokens(`${input.title} ${input.summaryInputText}`)),
+  )
+  if (sourceTokens.length === 0) {
+    return true
+  }
+
+  const summaryText = `${input.summary100} ${input.summary200}`.toLowerCase()
+  return sourceTokens.some((token) => summaryText.includes(token))
+}
+
 function writeManualPendingExport(
   jobRunId: number,
   sourceKey: string | null,
@@ -323,12 +356,17 @@ export async function runDailyEnrich(
   const sourceKey = typeof options === 'number' ? null : options.sourceKey ?? null
   const summaryBatchSize =
     typeof options === 'number' ? 10 : Math.max(1, Math.min(10, options.summaryBatchSize ?? 10))
+  const maxSummaryBatches =
+    typeof options === 'number'
+      ? Number.POSITIVE_INFINITY
+      : Math.max(1, options.maxSummaryBatches ?? Number.POSITIVE_INFINITY)
   const jobRunId = await startJobRun({
     jobName: 'daily-enrich',
-    metadata: { limit, sourceKey, summaryBatchSize },
+    metadata: { limit, sourceKey, summaryBatchSize, maxSummaryBatches },
   })
   const rawArticles = await listRawArticlesForEnrichment(limit, sourceKey)
   const tagReferences = await listActiveTagReferences()
+  const tagKeywords = await listCollectionTagKeywords()
   const items: DailyEnrichItemResult[] = []
   const preparedArticles: PreparedEnrichArticle[] = []
   const manualPendingExports: ManualPendingExportItem[] = []
@@ -350,11 +388,11 @@ export async function runDailyEnrich(
         title,
       )
       const relevance = assessSourceTargetRelevance(rawArticle.sourceKey, title, normalizedSnippet)
+      // candidateTags 抽出のみに使用。matchedTagIds は summary 生成後に tag_keywords で確定する。
       const tagResult = matchTags(
         tagReferences,
         title,
         contentResult.content || normalizedSnippet,
-        rawArticle.sourceCategory,
       )
       const duplicate = await findDuplicateMatch(
         rawArticle.normalizedUrl,
@@ -420,12 +458,15 @@ export async function runDailyEnrich(
     }
   }
 
-  for (const batch of chunkItems(preparedArticles, summaryBatchSize)) {
-    const summaries = await generateEnrichedSummaries(
+  const summaryBatches = chunkItems(preparedArticles, summaryBatchSize).slice(0, maxSummaryBatches)
+
+  for (const batch of summaryBatches) {
+      const summaries = await generateEnrichedSummaries(
       batch.map((article) => ({
         id: String(article.rawArticle.id),
         title: article.title,
         content: article.summaryInput.summaryInputText,
+        summaryInputBasis: article.summaryInput.summaryInputBasis,
       })),
       summaryBatchSize,
     )
@@ -440,9 +481,18 @@ export async function runDailyEnrich(
             : article.snippetPublishable
               ? 'source_snippet'
               : 'hold'
+        const snippetConsistencyPassed = passesSnippetConsistencyGate({
+          summaryInputBasis: article.summaryInput.summaryInputBasis,
+          title: article.title,
+          summaryInputText: article.summaryInput.summaryInputText,
+          summary100: summariesForArticle.summary100,
+          summary200: summariesForArticle.summary200,
+        })
         const publicationBasis =
           summariesForArticle.summarySource === 'manual_pending'
             ? 'hold'
+            : !snippetConsistencyPassed
+              ? 'hold'
             : article.contentResult.contentPath === 'full'
               ? 'full_summary'
               : article.snippetPublishable
@@ -462,9 +512,32 @@ export async function runDailyEnrich(
           article.relevance.isRelevant
         const aiProcessingState =
           summariesForArticle.summarySource === 'manual_pending' ? 'manual_pending' : 'completed'
+
+        // summary_200 + title を使って tag_keywords でマッチング（準備フェーズより高精度）
+        const paperTag = tagReferences.find((ref) => ref.tagKey === 'paper')
+        const keywordMatchedTagIds =
+          article.rawArticle.sourceType === 'paper'
+            ? paperTag
+              ? [paperTag.id]
+              : []
+            : matchTagsFromKeywords(
+                tagKeywords,
+                article.title,
+                summariesForArticle.summary200 || summariesForArticle.summary100,
+              )
+        // source_category を Tier 1 タグとして自動付与。ただし paper は paper タグだけに限定する。
+        if (article.rawArticle.sourceType !== 'paper') {
+          const sourceCategoryTag = tagReferences.find(
+            (ref) => ref.tagKey === article.rawArticle.sourceCategory,
+          )
+          if (sourceCategoryTag && !keywordMatchedTagIds.includes(sourceCategoryTag.id)) {
+            keywordMatchedTagIds.push(sourceCategoryTag.id)
+          }
+        }
+
         const { score, scoreReason } = scoreArticle(
           article.contentResult.contentPath,
-          article.tagResult.matchedTagIds.length,
+          keywordMatchedTagIds.length,
           summariesForArticle.summarySource,
         )
         const adjustedScore = article.relevance.isRelevant ? score : Math.max(0, score - 25)
@@ -475,6 +548,8 @@ export async function runDailyEnrich(
         await upsertEnrichedArticle({
           rawArticleId: article.rawArticle.id,
           sourceTargetId: article.rawArticle.sourceTargetId,
+          sourceCategory: article.rawArticle.sourceCategory,
+          sourceType: article.rawArticle.sourceType,
           normalizedUrl: article.rawArticle.normalizedUrl,
           citedUrl: article.rawArticle.citedUrl,
           canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
@@ -495,7 +570,7 @@ export async function runDailyEnrich(
           scoreReason: adjustedScoreReason,
           aiProcessingState,
           sourceUpdatedAt: article.rawArticle.sourceUpdatedAt,
-          matchedTagIds: article.tagResult.matchedTagIds,
+          matchedTagIds: keywordMatchedTagIds,
           candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
         })
 
@@ -514,6 +589,7 @@ export async function runDailyEnrich(
             publicationBasis,
             summaryInputBasis: article.summaryInput.summaryInputBasis,
             publishCandidate,
+            snippetConsistencyPassed,
             dedupeStatus: article.dedupeStatus,
             relevanceMatchedKeyword: article.relevance.matchedKeyword,
             isRelevant: article.relevance.isRelevant,
@@ -533,6 +609,7 @@ export async function runDailyEnrich(
           manualPendingExports.push({
             rawArticleId: article.rawArticle.id,
             sourceTargetId: article.rawArticle.sourceTargetId,
+            sourceCategory: article.rawArticle.sourceCategory,
             sourceKey: article.rawArticle.sourceKey,
             normalizedUrl: article.rawArticle.normalizedUrl,
             citedUrl: article.rawArticle.citedUrl,
@@ -545,7 +622,7 @@ export async function runDailyEnrich(
             dedupeStatus: article.dedupeStatus,
             dedupeGroupKey: article.dedupeGroupKey,
             isRelevant: article.relevance.isRelevant,
-            matchedTagIds: article.tagResult.matchedTagIds,
+            matchedTagIds: keywordMatchedTagIds,
             candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
             publicationBasisIfSummaryExists,
             summaryInputBasis: article.summaryInput.summaryInputBasis,
@@ -603,6 +680,8 @@ export async function runDailyEnrich(
     metadata: {
       attempted: items.length,
       summaryBatchSize,
+      maxSummaryBatches:
+        Number.isFinite(maxSummaryBatches) ? maxSummaryBatches : 'unbounded',
       manualPendingCount: manualPendingExports.length,
       manualPendingExportPath,
       fullCount: items.filter((item) => item.contentPath === 'full').length,

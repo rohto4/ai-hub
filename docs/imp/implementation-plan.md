@@ -1,277 +1,296 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-03-15
+最終更新: 2026-03-18（snippet 整合強化、paper タグ制限、絵文字サムネイル暫定導入を反映）
 
-## 1. 目的
+## 1. この計画の位置づけ
 
-当面の主目的は `Layer1 -> Layer2` を運用可能な品質まで引き上げること。  
-特に次を優先する。
+このファイルは、現状の実装進捗メモではなく、**これから Web 公開面を作り切るための計画兼要件定義**として使う。  
+特に今回は、`docs/dim2_memo` を参考資料に留めつつ、**現行 L2 をどう L4 に載せるか**を明文化する。
 
-1. 公式 source を増やして `full_content` 母集団を広げる
-2. 毎時 `fetch -> enrich` を止まらず回せる状態を保つ
-3. 採用できない source / domain を後段で一覧化できるようにする
+前提:
 
-`Layer3 / Layer4` はまだ保留。
+1. `docs/dim2_memo` は参考資料であり SSOT ではない
+2. SSOT は `docs/spec` と `docs/imp`
+3. 公開面は `layer4` のみを読む
+4. `source_category` と `source_type` は既に本番データに入っているため、まずは **既存軸を壊さずに L4 側で使い切る**
 
-## 2. 現在地
+## 2. 2026-03-18 時点の確認済み現況
 
-### 2.1 実装済みの基盤
+### 2.1 データ到達点
 
-1. `hourly-fetch`
-2. `daily-enrich`
-3. `hourly-layer12` orchestration
-4. GitHub Actions による毎時実行入口
-5. `articles_enriched.is_provisional`
-6. `articles_enriched.provisional_reason`
-7. `articles_enriched.summary_basis`
-8. `source_targets.content_access_policy`
-9. `observed_article_domains.fetch_policy`
-10. `db:check-layer12`
-11. `db:check-source-policies`
-12. `db:check-domain-policies`
-13. `db:promote-domain-policy`
-14. `Gemini(primary) -> Gemini(secondary) -> OpenAI gpt-5-mini -> template` の要約フォールバック
-15. 主キー列の generic `id` 廃止とテーブル固有名への統一
-16. `raw_id` / `enriched_id` / `job_id` など可読な安定文字列 ID の追加
+1. `articles_raw = 2863`
+2. `articles_raw.is_processed = 2863`
+3. `articles_enriched = 2861`
+4. `articles_enriched.ai_processing_state='completed' = 2861`
+5. `articles_enriched.publish_candidate = 2371`
+6. `public_articles.visibility_status='published' = 911`
 
-### 2.2 現在の主要方針
+### 2.2 backlog 1882 件の状態
 
-1. Google Alerts は discovery 用で `feed_only`
-2. 公式 source は `fulltext_allowed`
-3. 一般ニュース媒体は bulk 投入後に `snippet_only / blocked / 要修正` として仕分ける
-4. `summary_basis` と `provisional_reason` は必ず残す
-5. `feed_only` source でも review 済み official domain は本文取得に進めてよい
-6. `articles_enriched` の `title` / `summary_100` / `summary_200` / `publication_text` は日本語を前提とし、英語残しは許容しない
-7. `articles_raw.title` は取得元の生タイトルとして扱い、日本語化や要約タイトルへの置換は運用対象にしない
+1. backlog `1882` 件は Neon へ登録済み
+2. backlog 分の title 日本語化漏れ `13` 件は補正済み
+3. backlog `1882` 件に限ると、**title の日本語化漏れは現在 `0`**
+4. `articles_enriched.title` の非日本語行は現在 `0`
 
-### 2.3 直近の観測
+### 2.3 分類カラムの現況
 
-1. `source_targets = 17`
-2. `fulltext_allowed sources = 8`
-3. `raw_total = 966`
-4. `raw_processed = 687`
-5. `raw_unprocessed = 279`
-6. `enriched_total = 687`
-7. `enriched_ready_total = 645`
-8. `enriched_provisional_total = 37`
-9. `openai-news` は `278/278` enrich 完了
-10. `nvidia-developer-blog` は `100/100` enrich 完了
-11. `huggingface-blog` は `91/277` まで enrich 完了、残り `186`
-12. 残 official backlog `186` 件は AI 入力ファイルへ export 済み
-13. export ファイル内訳は `full_content=100 / title_only=86`
-14. `GEMINI_API_KEY` に加えて `GEMINI_API_KEY2` も要約 fallback に利用可能
-15. `OPENAI_API_KEY` は有効で、`gpt-5-mini` 応答自体は取得できる
-16. `gpt-5-mini` は `reasoning.effort=minimal` と十分な `max_output_tokens` がないと空応答化し得る
-17. template fallback は公開要約には使わず `hold` に寄せる方針へ修正済み
-18. DB 主キー列は `id` ではなく `raw_article_id` / `enriched_article_id` / `job_run_id` などへ統一済み
+`articles_enriched.source_type` は backlog import の影響で古い `news` 既定値が大量混入していたが、  
+`source_targets` を正として `1866` 行を再同期し、現在の不一致は `0`。
 
-## 3. 現在の実行モード
+現在の L2 分布:
 
-### 3.1 方針転換
+1. `official = 1902`
+2. `paper = 437`
+3. `alerts = 328`
+4. `blog = 176`
+5. `news = 18`
 
-ここからは「1件ずつ丁寧に review」より「公式 source を一括投入して bulk fetch / bulk enrich を回す」を優先する。
+現在の L4 公開分布:
 
-review は投入前の前提条件ではなく、投入後の例外仕分けとして扱う。
+1. `official = 736`
+2. `alerts = 145`
+3. `blog = 30`
+4. `paper / news / video = 0`
 
-### 3.2 実行レーン
+補足:
 
-1. レーンA: 一括投入
-   - 公式 RSS / Atom / API source をまとめて seed
-   - official domain を先回り allowlist 登録
-   - `hourly-fetch` を大きめに回す
-   - `daily-enrich` を batch で連続消化する
-2. レーンB: 後段仕分け
-   - 採用成功 source
-   - `snippet_only` 維持 source
-   - `blocked` source
-   - 要修正 source
-   を一覧化する
+1. `hourly-publish` は 1 件ずつ upsert しており遅い
+2. 2026-03-18 の再 publish は長時間化したため途中で停止
+3. 停止前に `public_articles` は `745 -> 911` まで増加
+4. **L4 反映の完全化には publish job の高速化が必要**
 
-### 3.3 今の優先成果物
+### 2.4 抜き取り品質監査の結果
 
-1. 採用できる source を増やすこと
-2. 採用できない source を一覧で出すこと
-3. サービス開始フェーズへ移るための source 母集団を作ること
-4. official source backlog は raw title を URL から原題復旧して救済し、Google Alerts backlog は切り離して新規蓄積を優先すること
-5. AI 要約が重い区間は input/output ファイル往復でオフライン処理できるようにすること
+`articles_enriched` の公開候補からランダム `10` 件を確認した結果、**そのまま全面公開で安全と言い切れる状態ではない**。
 
-## 4. 直近タスク
+確認できた主な問題:
 
-### A. Bulk Source Expansion
+1. `summary_100` / `summary_200` / `publication_text` が固定長で途中切れしている行がある
+2. `source_snippet` 記事で title と summary の内容がずれている行がある
+3. `paper` 記事で tags が本文内容と噛み合っていない行がある
+4. 一部 summary が記事内容要約ではなく、メタ情報紹介に寄っている
 
-1. 公式 source の追加
-2. official domain preseed
-3. source seed の安定化
-4. bulk fetch
-5. bulk enrich
+補助観測:
 
-### B. Bulk Triage
+1. `summary_100` 長さ `100+` 件数: `398`
+2. `summary_200` 長さ `200+` 件数: `1016`
+3. `publication_basis='source_snippet'` 件数: `294`
+4. `summary_input_basis='source_snippet'` 件数: `415`
+5. `source_type='paper'` publish candidate: `437`
 
-1. `db:check-layer12` で full / provisional を確認
-2. `job_runs` で失敗 source を確認
-3. `db:check-domain-policies` で高頻度 domain を確認
-4. `snippet_only / blocked / 要修正` 一覧を作る
-5. summary provider が `template` に落ちた行は publish させない
-6. `articles_enriched.title` に英語残しがないことを確認し、日本語化漏れを都度解消する
+## 3. 今回確定した設計原則
 
-### C. Tag Hygiene
+### 3.1 `source_category`
 
-1. `full_content` 増加後の candidate ノイズ確認
-2. prune
-3. promote
+`source_category` は **トピック軸**として使う。
 
-## 5. 当面の投入対象
+値:
 
-### 5.1 既存 official source
+1. `llm`
+2. `agent`
+3. `voice`
+4. `policy`
+5. `safety`
+6. `search`
+7. `news`
 
-1. `anthropic-news`
-2. `google-ai-blog`
-3. `openai-news`
-4. `microsoft-foundry-blog`
-5. `aws-machine-learning-blog`
-6. `huggingface-blog`
-7. `nvidia-developer-blog`
+### 3.2 `source_type`
 
-### 5.2 次の追加候補
+`source_type` は **ソース種別 / UI レーン軸**として使う。
 
-1. Meta AI News
-2. Cohere official blog
-3. Mistral official news
-4. xAI official news
+値:
 
-ただし、次候補は feed 実在確認後に入れる。
+1. `official`
+2. `blog`
+3. `paper`
+4. `news`
+5. `alerts`
+6. `video`（将来）
 
-## 6. 今回の運用原則
+### 3.3 タグ
 
-1. Google Alerts を広く `fulltext_allowed` に戻さない
-2. 一般ニュース媒体の個別 review 完了を bulk 投入の前提にしない
-3. `summary_basis` / `provisional_reason` を消さない
-4. official source と official domain は先回りで seed する
-5. 例外は後段で一覧化して判断する
+タグは `source_category` / `source_type` の代替ではなく、**横断的な話題・企業・製品軸**として使う。
 
-## 7. 実行コマンド
+例:
 
-### 7.1 確認
+1. `openai`
+2. `huggingface`
+3. `rag`
+4. `agent`
+5. `policy`
 
-```bash
-npm run type-check
-npm run db:check-layer12
-npm run db:check-source-policies
-npm run db:check-domain-policies -- --needs-review
-```
+## 4. 現 Web 実装とのズレ
 
-### 7.2 seed / sync
+### 4.1 現在の UI が混在させている軸
 
-```bash
-npm run db:seed
-npm run db:sync-observed-domains
-```
+`src/app/page.tsx` と `src/components/sidebar/RightSidebar.tsx` のカテゴリ UI は:
 
-### 7.3 policy 操作
+1. `all`
+2. `video`
+3. `official`
+4. `blog`
+5. `agent`
 
-```bash
-npm run db:set-source-policy -- <source-key> <policy> --requeue
-npm run db:set-domain-policy -- <domain> <policy> <summary-policy>
-npm run db:promote-domain-policy -- <domain> <policy> <summary-policy>
-```
+となっており、`source_type` と `source_category` を同列に混ぜている。
 
-### 7.4 補助
+問題:
 
-```bash
-npm run db:check-snippet-domains
-npm run db:repair-stale-job-runs
-npm run db:repair-raw-titles-from-url -- --source-key <source-key> --limit <n>
-npm run db:export-ai-enrich-inputs
-npm run db:promote-tag-candidates
-npm run db:skip-raw-backlog -- --through-raw-id <raw_article_id>
-```
+1. `agent` だけトピック軸
+2. `official / blog / video` はソース種別軸
+3. `paper / news / alerts` が UI から落ちている
+4. `llm / voice / policy / safety / search` の topic filter が UI に存在しない
+5. `/api/search` / `/api/trends` の `genre` は実質 `source_category` であり、UI のカテゴリ概念と一致していない
 
-## 8. 次に読むファイル
+### 4.2 dim2_memo との関係
 
-1. `docs/guide` 配下
-2. `docs/imp/imp-hangover.md`
-3. `docs/imp/imp-status.md`
-4. `docs/imp/implementation-wait.md`
-5. `docs/spec/05-ingestion-and-ai-pipeline.md`
-6. `docs/spec/11-batch-job-design.md`
+`docs/dim2_memo` の `news / community / paper / overseas / oss` は、  
+現在 DB に存在する `source_category` ではなく、**表示分類の草案**として解釈する。
 
-## 9. Post-Launch Maintenance Kit
+この 5 分類を今後も使いたい場合は、L2 の列を壊して合わせるのではなく、**L4/API で派生分類を作る**。
 
-これは後期タスクとして扱う。現在の実装フェイズの blocker にはしない。
+## 5. L2 -> L4 要件定義
 
-1. サイト公開フローが安定してから作る
-2. 内容には以下を含める
-   - operator runbook
-   - incident / failure triage checklist
-   - inspection 用 SQL 集
-   - requeue / repair / backfill command catalog
-   - source review / domain review template
-   - publish verification checklist
+### 5.1 今回の結論
 
-## 10. 2026-03-16 現在の到達点
+P0/P1 では次の 3 軸を分離して扱う。
 
-1. 初期 official backlog の消化は完了した。
-   - `openai-news`
-   - `nvidia-developer-blog`
-   - `huggingface-blog`
-2. 手動 AI フローは end-to-end で成立確認済み。
-   - enrich input を JSON export
-   - 手動 CLI で title / summary を生成
-   - 出力 JSON の固有名詞を校正
-   - 出力を結合
-   - `scripts/import-ai-enrich-outputs.ts` で import
-3. 現在の確認済み状態:
-   - `articles_enriched = 873`
-   - `huggingface-blog = 277/277 enriched`
-   - `huggingface-blog raw_unprocessed = 0`
-4. 直近の主眼:
-   - `873` 件を前提にサービス開始準備へ寄せる
-   - 日次蓄積を manual AI fallback 前提でも回せるようにする
+1. topic filter: `source_category`
+2. source lane: `source_type`
+3. trend/entity filter: `tags`
 
-## 11. 2026-03-16 要約安定化方針
+### 5.2 L4 API の責務
 
-1. 自動要約経路は次の 2 点で安定化を進める。
-   - `10` 件単位の batch 要約
-   - Gemini / OpenAI 共通の固定 prompt template
-2. 毎時運用経路でも同じ batch 要約を使い、別系統の prompt にはしない。
-3. 実装反映済み:
-   - `daily-enrich` は `summaryBatchSize` に対応
-   - `hourly-layer12` は `summaryBatchSize` に対応
-   - prompt template は `src/lib/ai/prompts/enrich-batch-ja.ts`
-4. 次の運用確認:
-   - batch size `10` で Gemini / OpenAI が parse 可能な JSON を安定返却するか
-   - `job_runs` 上で latency / token usage / failure rate を観測する
+`/api/home` / `/api/search` / `/api/trends` は、少なくとも次の観点を切り替えられる形へ寄せる。
 
-## 12. 2026-03-16 Manual Pending 方針
+1. `sourceType`
+2. `topic`
+3. `tag`
+4. `period`
+5. `sort`
 
-1. Gemini と OpenAI が両方失敗した場合、Layer2 は template summary を公開用には使わない。
-2. その場合のシステム動作:
-   - deterministic な Layer2 項目は DB に保存する
-   - 記事は `hold` のまま保持する
-   - 行は `ai_processing_state=manual_pending` にする
-   - 手動 import 互換の JSON を `artifacts/manual-pending/` に出力する
-3. 手動復旧フロー:
-   - 出力ファイルを人手 / CLI 要約に渡す
-   - `scripts/import-ai-enrich-outputs.ts` で reviewed output を import する
-   - 行を `ai_processing_state=completed` へ戻す
+初期方針:
 
-## 13. 2026-03-16 サイクルテスト移行
+1. Home のメインレーンは `source_type` ベース
+2. 右サイドバーや上部 chips は `source_category` / tag ベース
+3. dim2 的な「国内トピック / エンジニア界隈 / 論文 / 海外メディア / OSS」は後段で `display_category` として派生定義する
 
-1. フェイズは `bulk implementation / backlog rescue` から `cycle test / hardening` へ移る。
-2. テスト順は次を基本とする。
-   - `hourly-fetch`
-   - `daily-enrich`
-   - `hourly-layer12`
-3. 各サイクルテストは、小さく固定した条件から始める。
-   - 明示的な `sourceKey`
-   - 小さい `limit`
-   - 明示的な `summaryBatchSize=10`
-4. 毎回の確認面は次の 3 つをセットにする。
-   - DB state (`articles_raw`, `articles_enriched`)
-   - `job_runs` / `job_run_items`
-   - 生成 artifact（必要時は `artifacts/manual-pending/`）
-5. 価値の高い確認項目:
-   - 正常系: official source fetch -> enrich -> `hold / full_summary / source_snippet` ルーティング
-   - provider 系: Gemini / OpenAI batch JSON の安定性
-   - 障害系: 両 provider 失敗 -> `manual_pending` export
-   - 復旧系: manual output import -> `ai_processing_state=completed`
+### 5.3 `display_category` の扱い
+
+現時点では DB カラム追加を確定しない。  
+まずは **API / view / SQL 派生列**で扱う前提にする。
+
+理由:
+
+1. `oss` は現行 source seed に存在しない
+2. `community` と `blog` は完全一致しない
+3. `overseas` はソース所在・言語・媒体種別が混ざる
+4. L2 の `source_category` を流用すると topic 軸が壊れる
+
+## 6. 実装フェーズ
+
+### Phase 0: データ整合と公開基盤安定化
+
+目的:
+
+1. L2/L4 の分類整合を確実にする
+2. L4 への再公開を安全に回せるようにする
+
+タスク:
+
+1. `docs/imp/sql/2026-03-18-l2-l4-data-realign.sql` を基準に分類是正を維持する
+2. `hourly-publish` を bulk upsert 化して `2371` publish candidate を完走できるようにする
+3. publish 後に `compute-ranks` を再実行し、`public_rankings` を更新する
+4. 残 `211` 件の旧 title 日本語化漏れを別バッチで整理する
+5. summary の途中切れを禁止する整形ルールへ直す
+6. `source_snippet` 記事の title-summary 内容ずれ検知を追加する
+7. `source_type='paper'` は `paper` タグのみ付与する
+8. `thumbnail_url` が空の間は `thumbnail_emoji` でカード先頭を補う
+
+### Phase 1: Home を設計に近づける
+
+目的:
+
+1. 現在の「導線図だけ」の状態から、実データで意味のある Home へ進める
+
+タスク:
+
+1. Home の primary tabs を `source_type` ベースへ整理する
+2. `agent` 単独タブは廃止し、topic chips へ移す
+3. `paper` / `alerts` / `news` の表示導線を追加する
+4. `source_type` ごとのカード / リスト差分を `ArticleCard` 周辺で吸収する
+5. `/api/home` を「ランキング」「最新」「source_type 別レーン」「tag / topic chips」を返せる形へ拡張する
+6. Home は定量フィルタで間引かず、できるだけ全体をまんべんなく出す
+7. ただし `daily-enrich` 側で明白な snippet 整合崩れだけは publish 前に止める
+
+### Phase 2: 公開ページ群の実装
+
+対象:
+
+1. `/articles/:public_key`
+2. `/category/:slug`
+3. `/tags/:slug`
+4. `/ranking`
+5. `/search`
+6. `/tags`
+7. `/about`
+8. `/feed`
+
+最低要件:
+
+1. すべて `layer4` だけを読む
+2. URL は `public_key` / slug を使う
+3. article detail は `public_articles + public_article_tags + public_article_sources` で完結する
+
+### Phase 3: L3 運用面の最小完成
+
+対象:
+
+1. `activity_logs.action_type` の正式整理
+2. `priority_processing_queue` の最小実装
+3. タグ人手レビュー UI
+4. 管理画面の最低限の hide / retag / republish 導線
+
+## 7. 分類検証の結論
+
+### 7.1 問題がない点
+
+1. `source_category` は現行設計どおり topic 軸として一貫している
+2. `tags_master` / `tag_keywords` の構造は topic/entity 横断軸として成立している
+3. `source_targets` 側の `source_type` seed は現行 Web 設計の土台として使える
+
+### 7.2 修正が必要だった点
+
+1. `articles_enriched.source_type` の大量ドリフト
+2. Home UI のカテゴリ定義がデータ軸と噛み合っていない
+3. `paper / news / alerts` が UI から落ちている
+4. 公開候補の一部で summary / tags の品質が掲載水準に達していない
+5. `thumbnail_url` が全空のため、視覚導線の補助が必要だった
+
+### 7.3 ここでまだやらないこと
+
+1. dim2_memo の 5 分類へ L2 カラムを合わせるための破壊的変更
+2. `source_category` の語彙を `community / overseas / oss` へ戻すこと
+3. `tags_master` を source 分類の代替にすること
+
+## 8. 今回の成果物
+
+1. backlog `1882` 件 import 完了
+2. `articles_enriched.title` の非日本語行 `211 -> 0`
+3. `source_type` 再同期 SQL:
+   - `docs/imp/sql/2026-03-18-l2-l4-data-realign.sql`
+4. L2/L4 分類整合の検証結果を本計画へ反映
+5. ランダム `10` 件の抜き取り品質監査を実施
+6. `source_snippet` 向け prompt 制約と整合チェックを追加
+7. `paper` タグを新設し、論文ソースは `paper` のみ付与へ変更
+8. `public_articles.thumbnail_emoji` を追加し、既存 `911` 件も backfill
+9. 判断待ちは `implementation-wait.md` へ分離
+
+## 9. 次に読むファイル
+
+1. `docs/guide/codex/AGENTS.md`
+2. `agents-task-status.md`
+3. `docs/imp/implementation-wait.md`
+4. `docs/imp/imp-status.md`
+5. `docs/imp/imp-hangover.md`
+6. `docs/imp/l3-l4-screen-flow.md`
+7. `docs/spec/04-data-model-and-sql.md`

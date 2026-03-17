@@ -1,41 +1,57 @@
-import type { RankBreakdown } from '@/lib/db/types'
+import type { RankBreakdown, RankingWindow } from '@/lib/db/types'
 
-/** スコア重み */
 const WEIGHTS = {
-  share: 5.0,
-  save: 4.0,
-  article_open: 2.0,
-  expand_200: 1.5,
-  critique_expand: 1.0,
-  view: 0.1,
+  impression: 0.5,
+  open: 1.0,
+  share: 1.0,
+  save: 1.0,
+  sourceOpen: 2.0,
 } as const
 
-/** 時間減衰係数 */
-const DECAY_LAMBDA = 0.1
+const WEEK_TO_ONE_FIFTH_DECAY = Math.log(5) / (7 * 24)
 
-export function computeScore(
-  breakdown: RankBreakdown,
-  publishedAt: Date,
-): number {
-  const rawScore =
-    (breakdown.share * WEIGHTS.share) +
-    (breakdown.save * WEIGHTS.save) +
-    (breakdown.article_open * WEIGHTS.article_open) +
-    (breakdown.expand_200 * WEIGHTS.expand_200) +
-    (breakdown.critique_expand * WEIGHTS.critique_expand) +
-    (breakdown.view * WEIGHTS.view)
+export function computeScore(input: {
+  contentScore: number
+  impressionCount: number
+  openCount: number
+  shareCount: number
+  saveCount: number
+  sourceOpenCount: number
+  publishedAt: Date
+}): { score: number; breakdown: RankBreakdown } {
+  const activityScore =
+    input.impressionCount * WEIGHTS.impression +
+    input.openCount * WEIGHTS.open +
+    input.shareCount * WEIGHTS.share +
+    input.saveCount * WEIGHTS.save +
+    input.sourceOpenCount * WEIGHTS.sourceOpen
 
-  const hoursSincePublish =
-    (Date.now() - publishedAt.getTime()) / (1000 * 60 * 60)
+  const hoursSincePublish = Math.max(
+    0,
+    (Date.now() - input.publishedAt.getTime()) / (1000 * 60 * 60),
+  )
+  const decayFactor = Math.exp(-WEEK_TO_ONE_FIFTH_DECAY * hoursSincePublish)
+  const score = (input.contentScore + activityScore) * decayFactor
 
-  const decay = Math.exp(-DECAY_LAMBDA * hoursSincePublish)
-
-  return rawScore * decay
+  return {
+    score,
+    breakdown: {
+      impression: input.impressionCount,
+      open: input.openCount,
+      share: input.shareCount,
+      save: input.saveCount,
+      source_open: input.sourceOpenCount,
+      content_score: input.contentScore,
+      decay_factor: Number(decayFactor.toFixed(6)),
+    },
+  }
 }
 
-export function getPeriodStart(period: '24h' | '7d' | '30d'): Date {
+export function getWindowStart(window: RankingWindow): Date {
   const now = new Date()
-  switch (period) {
+  switch (window) {
+    case 'hourly':
+      return new Date(now.getTime() - 60 * 60 * 1000)
     case '24h':
       return new Date(now.getTime() - 24 * 60 * 60 * 1000)
     case '7d':

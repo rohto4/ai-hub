@@ -5,11 +5,12 @@ import {
   type BatchSummaryPromptItem,
 } from '@/lib/ai/prompts/enrich-batch-ja'
 
-const GEMINI_SUMMARY_MODEL = 'gemini-2.5-flash'
+const GEMINI_SUMMARY_MODEL = process.env.GEMINI_SUMMARY_MODEL || 'gemini-2.5-flash'
 const OPENAI_SUMMARY_MODEL = process.env.OPENAI_SUMMARY_MODEL || 'gpt-5-mini'
 const OPENAI_REASONING_EFFORT = 'minimal'
 const OPENAI_MAX_OUTPUT_TOKENS = 4000
 const DEFAULT_SUMMARY_BATCH_SIZE = 10
+const DEFAULT_SUMMARY_BATCH_PAUSE_MS = 0
 const MANUAL_PENDING_SUMMARY_100 = '要約待ち'
 const MANUAL_PENDING_SUMMARY_200 = '要約待ち'
 
@@ -23,6 +24,7 @@ export interface EnrichedSummaryInput {
   id: string
   title: string
   content: string
+  summaryInputBasis?: 'full_content' | 'source_snippet' | 'title_only'
 }
 
 type ProviderSummaryItem = {
@@ -33,6 +35,11 @@ type ProviderSummaryItem = {
 
 type ProviderSummaryResponse = {
   items: ProviderSummaryItem[]
+}
+
+const providerCircuitBreaker = {
+  gemini: false,
+  gemini2: false,
 }
 
 function normalizeWhitespace(value: string): string {
@@ -148,6 +155,23 @@ function chunkInputs<T>(items: T[], size: number): T[][] {
   return chunks
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function shouldOpenCircuit(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false
+  }
+
+  const normalizedMessage = error.message.toLowerCase()
+  return (
+    normalizedMessage.includes('429') ||
+    normalizedMessage.includes('rate limit') ||
+    normalizedMessage.includes('spending cap')
+  )
+}
+
 function extractJsonBlock(text: string): string {
   const trimmed = text.trim()
   const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i)
@@ -210,6 +234,7 @@ function buildPromptItems(inputs: EnrichedSummaryInput[]): BatchSummaryPromptIte
     id: input.id,
     title: input.title,
     content: input.content,
+    summaryInputBasis: input.summaryInputBasis,
   }))
 }
 
@@ -251,24 +276,42 @@ function resolveBatchSize(batchSize?: number): number {
   return Math.max(1, Math.min(10, Math.trunc(candidate)))
 }
 
+function resolveBatchPauseMs(): number {
+  const parsedEnv = Number(process.env.ENRICH_SUMMARY_BATCH_PAUSE_MS)
+  if (!Number.isFinite(parsedEnv)) {
+    return DEFAULT_SUMMARY_BATCH_PAUSE_MS
+  }
+  return Math.max(0, Math.trunc(parsedEnv))
+}
+
 async function generateSummaryBatch(
   inputs: EnrichedSummaryInput[],
 ): Promise<Map<string, EnrichedSummary>> {
   const fallbackMap = buildFallbackMap(inputs)
 
   if (process.env.GEMINI_API_KEY) {
-    try {
-      return await generateWithGemini(inputs, process.env.GEMINI_API_KEY, 'gemini')
-    } catch (error) {
-      console.error('[enrich] Gemini summary batch failed, falling back to next provider', error)
+    if (!providerCircuitBreaker.gemini) {
+      try {
+        return await generateWithGemini(inputs, process.env.GEMINI_API_KEY, 'gemini')
+      } catch (error) {
+        if (shouldOpenCircuit(error)) {
+          providerCircuitBreaker.gemini = true
+        }
+        console.error('[enrich] Gemini summary batch failed, falling back to next provider', error)
+      }
     }
   }
 
   if (process.env.GEMINI_API_KEY2) {
-    try {
-      return await generateWithGemini(inputs, process.env.GEMINI_API_KEY2, 'gemini2')
-    } catch (error) {
-      console.error('[enrich] Gemini2 summary batch failed, falling back to next provider', error)
+    if (!providerCircuitBreaker.gemini2) {
+      try {
+        return await generateWithGemini(inputs, process.env.GEMINI_API_KEY2, 'gemini2')
+      } catch (error) {
+        if (shouldOpenCircuit(error)) {
+          providerCircuitBreaker.gemini2 = true
+        }
+        console.error('[enrich] Gemini2 summary batch failed, falling back to next provider', error)
+      }
     }
   }
 
@@ -296,18 +339,24 @@ export async function generateEnrichedSummaries(
     id: String(input.id),
     title: normalizeWhitespace(input.title),
     content: normalizeWhitespace(input.content),
+    summaryInputBasis: input.summaryInputBasis ?? 'full_content',
   }))
 
   const summaryMap = new Map<string, EnrichedSummary>()
   const chunks = chunkInputs(normalizedInputs, resolveBatchSize(batchSize))
+  const batchPauseMs = resolveBatchPauseMs()
 
-  for (const chunk of chunks) {
+  for (const [index, chunk] of chunks.entries()) {
     const chunkSummaries = await generateSummaryBatch(chunk)
     for (const input of chunk) {
       summaryMap.set(
         input.id,
         chunkSummaries.get(input.id) ?? buildManualPendingSummary(),
       )
+    }
+
+    if (batchPauseMs > 0 && index < chunks.length - 1) {
+      await sleep(batchPauseMs)
     }
   }
 

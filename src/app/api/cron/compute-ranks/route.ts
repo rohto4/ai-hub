@@ -1,25 +1,25 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { verifyCronSecret } from '@/lib/auth/admin'
 import { databaseUnavailableResponse } from '@/lib/api/responses'
 import { getSql, isDatabaseConfigured } from '@/lib/db'
-import { computeScore, getPeriodStart } from '@/lib/ranking/compute'
-import type { RankPeriod, RankBreakdown } from '@/lib/db/types'
+import { computeScore, getWindowStart } from '@/lib/ranking/compute'
+import type { RankingWindow } from '@/lib/db/types'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
 
-const PERIODS: RankPeriod[] = ['24h', '7d', '30d']
+const WINDOWS: RankingWindow[] = ['hourly', '24h', '7d', '30d']
 
-interface AggregatedRow {
-  article_id: string
-  share: number | string
-  save: number | string
-  view: number | string
-  expand_200: number | string
-  critique_expand: number | string
-  article_open: number | string
-  genre: string
-  published_at: string
+type AggregatedRow = {
+  public_article_id: string
+  content_score: number | string
+  original_published_at: string | null
+  created_at: string
+  impression_count: number | string
+  open_count: number | string
+  share_count: number | string
+  save_count: number | string
+  source_open_count: number | string
 }
 
 export async function POST(request: NextRequest) {
@@ -34,53 +34,78 @@ export async function POST(request: NextRequest) {
   const sql = getSql()
   let updated = 0
 
-  for (const period of PERIODS) {
-    const since = getPeriodStart(period)
-
-    const aggregated = await sql`
+  for (const window of WINDOWS) {
+    const since = getWindowStart(window)
+    const rows = (await sql`
       SELECT
-        article_id,
-        COUNT(*) FILTER (WHERE action_type IN ('share_x','share_threads','share_slack','share_misskey','share_copy')) AS share,
-        COUNT(*) FILTER (WHERE action_type = 'save')            AS save,
-        COUNT(*) FILTER (WHERE action_type = 'view')            AS view,
-        COUNT(*) FILTER (WHERE action_type = 'expand_200')      AS expand_200,
-        COUNT(*) FILTER (WHERE action_type = 'critique_expand') AS critique_expand,
-        COUNT(*) FILTER (WHERE action_type = 'article_open')    AS article_open,
-        a.genre,
-        a.published_at
-      FROM action_logs al
-      JOIN articles a ON a.id = al.article_id
-      WHERE al.created_at >= ${since.toISOString()}
-        AND al.article_id IS NOT NULL
-      GROUP BY al.article_id, a.genre, a.published_at
-    ` as AggregatedRow[]
+        pa.public_article_id,
+        pa.content_score,
+        pa.original_published_at,
+        pa.created_at,
+        COALESCE(SUM(am.impression_count), 0) AS impression_count,
+        COALESCE(SUM(am.open_count), 0) AS open_count,
+        COALESCE(SUM(am.share_count), 0) AS share_count,
+        COALESCE(SUM(am.save_count), 0) AS save_count,
+        COALESCE(SUM(am.source_open_count), 0) AS source_open_count
+      FROM public_articles pa
+      LEFT JOIN activity_metrics_hourly am
+        ON am.public_article_id = pa.public_article_id
+       AND am.hour_bucket >= ${since.toISOString()}
+      WHERE pa.visibility_status = 'published'
+      GROUP BY
+        pa.public_article_id,
+        pa.content_score,
+        pa.original_published_at,
+        pa.created_at
+    `) as AggregatedRow[]
 
-    for (const row of aggregated) {
-      const breakdown: RankBreakdown = {
-        share: Number(row.share),
-        save: Number(row.save),
-        view: Number(row.view),
-        expand_200: Number(row.expand_200),
-        critique_expand: Number(row.critique_expand),
-        article_open: Number(row.article_open),
-      }
-      const score = computeScore(breakdown, new Date(row.published_at))
+    const scored = rows
+      .map((row) => {
+        const publishedAt = new Date(row.original_published_at ?? row.created_at)
+        const { score } = computeScore({
+          contentScore: Number(row.content_score),
+          impressionCount: Number(row.impression_count),
+          openCount: Number(row.open_count),
+          shareCount: Number(row.share_count),
+          saveCount: Number(row.save_count),
+          sourceOpenCount: Number(row.source_open_count),
+          publishedAt,
+        })
 
-      for (const genre of ['all', row.genre] as const) {
-        await sql`
-          INSERT INTO rank_scores (article_id, period, genre, score, breakdown)
-          VALUES (
-            ${row.article_id}, ${period}, ${genre},
-            ${score}, ${JSON.stringify(breakdown)}
-          )
-          ON CONFLICT (article_id, period, genre)
-          DO UPDATE SET
-            score       = EXCLUDED.score,
-            breakdown   = EXCLUDED.breakdown,
-            computed_at = now()
-        `
-        updated++
-      }
+        return {
+          publicArticleId: row.public_article_id,
+          score,
+        }
+      })
+      .sort((left, right) => right.score - left.score)
+
+    await sql`
+      DELETE FROM public_rankings
+      WHERE ranking_window = ${window}
+    `
+
+    for (const [index, row] of scored.entries()) {
+      await sql`
+        INSERT INTO public_rankings (
+          public_article_id,
+          ranking_window,
+          score,
+          rank_position,
+          computed_at
+        )
+        VALUES (
+          ${row.publicArticleId},
+          ${window},
+          ${row.score},
+          ${index + 1},
+          now()
+        )
+        ON CONFLICT (public_article_id, ranking_window) DO UPDATE SET
+          score = EXCLUDED.score,
+          rank_position = EXCLUDED.rank_position,
+          computed_at = now()
+      `
+      updated++
     }
   }
 

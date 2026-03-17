@@ -17,9 +17,10 @@ export async function POST(request: NextRequest) {
   }
 
   const limitParam = request.nextUrl.searchParams.get('limit')
+  const sourceKey = request.nextUrl.searchParams.get('sourceKey')
   const parsedLimit = limitParam ? Number(limitParam) : 20
   const limit = Number.isFinite(parsedLimit) ? Math.max(1, Math.min(100, parsedLimit)) : 20
 
-  const result = await runHourlyFetch(limit)
+  const result = await runHourlyFetch({ limit, sourceKey })
   return NextResponse.json(result)
 }

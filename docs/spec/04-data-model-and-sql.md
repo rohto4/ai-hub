@@ -83,11 +83,22 @@
 
 1. `source_key`
 2. `display_name`
-3. `fetch_kind`
-4. `source_category`
-5. `content_access_policy`
-6. `fetch_interval_minutes`
-7. `supports_update_detection`
+3. `fetch_kind`（rss / api / alerts / manual ― 取得方法）
+4. `source_category`（llm / agent / voice / policy / safety / search / news ― トピック分類）
+5. `source_type`（official / blog / news / video / alerts ― ソース種別。Web カード表示分岐に使う）
+6. `content_access_policy`
+7. `fetch_interval_minutes`
+8. `supports_update_detection`
+
+#### `source_type` の値定義
+
+| 値 | 意味 | 現在の該当ソース |
+|---|---|---|
+| `official` | 企業・組織の公式技術ブログ | Google AI, Anthropic, OpenAI, Microsoft, AWS, HuggingFace, NVIDIA, Meta |
+| `blog` | 個人・コミュニティブログ | （将来追加予定） |
+| `news` | ニュースメディア / まとめサイト | AI News Roundup（inactive） |
+| `video` | 動画（YouTube 等） | （将来追加予定） |
+| `alerts` | Google Alerts（discovery feed） | 全 Google Alerts ソース |
 
 ### 4.2 `articles_raw`
 
@@ -159,27 +170,68 @@
 
 1. `raw_article_id`
 2. `source_target_id`
-3. `normalized_url`
-4. `cited_url`
-5. `canonical_url`
-6. `title`
-7. `thumbnail_url`
-8. `summary_100`
-9. `summary_200`
-10. `summary_basis`
-11. `content_path`
-12. `is_provisional`
-13. `provisional_reason`
-14. `dedupe_status`
-15. `dedupe_group_key`
-16. `publish_candidate`
-17. `publication_basis`
-18. `publication_text`
-19. `summary_input_basis`
-20. `score`
-21. `score_reason`
-22. `source_updated_at`
-23. `processed_at`
+3. `source_category` ← migration 024 追加。`source_targets.source_category` を enrich 時にコピー（llm / agent / voice / policy / safety / search / news）
+4. `source_type` ← migration 026 追加。`source_targets.source_type` を enrich 時にコピー（official / blog / news / video / alerts）
+5. `normalized_url`
+5. `cited_url`
+6. `canonical_url`
+7. `title`
+8. `thumbnail_url`（現状は常に NULL。OGP は `/api/og` エンドポイントで動的生成）
+9. `summary_100`
+10. `summary_200`
+11. `summary_basis`
+12. `content_path`
+13. `is_provisional`
+14. `provisional_reason`
+15. `dedupe_status`
+16. `dedupe_group_key`
+17. `publish_candidate`
+18. `publication_basis`
+19. `publication_text`
+20. `summary_input_basis`
+21. `score`（0〜100 整数。コンテンツ品質スコア。ランキング initial value に使う）
+22. `score_reason`
+23. `ai_processing_state`
+24. `source_updated_at`
+25. `processed_at`
+
+#### `source_category` の値定義（このプロジェクト固有）
+
+このプロジェクトの `source_category` は **トピック分類**であり、dim2_memo の display-layout 分類（news/paper/community 等）とは別軸。
+
+| 値 | 対象ソース例 |
+|---|---|
+| `llm` | Google AI, Anthropic, OpenAI, HuggingFace, NVIDIA, Microsoft, Meta AI |
+| `agent` | Google Alerts: AI Agents / Antigravity |
+| `voice` | Google Alerts: Voice AI |
+| `policy` | Google Alerts: AI Regulation |
+| `safety` | Google Alerts: AI Safety |
+| `search` | Google Alerts: RAG |
+| `news` | 一般 AI ニュース系 |
+
+表示レイアウト（カード型 / リスト型）の分岐は `content_access_policy` + `summary_input_basis` から導出する。
+
+#### 表示分類との関係
+
+Web の表示分類（例: `news / community / paper / overseas / oss`）を扱いたい場合でも、  
+`source_category` をその用途へ上書きしてはならない。
+
+理由:
+
+1. `source_category` は topic filter の基盤
+2. 表示分類は `source_type`、タグ、ソース固有 metadata を組み合わせた **L4 派生概念**だから
+
+必要なら `public_articles` の API 層または view 層で `display_category` 相当を派生させる。
+
+#### `score` の計算方式
+
+```
+base:        content_path=full → 70 / snippet → 45
+加算:        matchedTagCount × 8
+加算:        summarySource が manual_pending 以外 → +6
+減算:        isRelevant=false → -25
+上限:        100
+```
 
 ### 4.9 `articles_enriched_history`
 
@@ -210,7 +262,64 @@
 
 ### 4.15 `public_articles`
 
-1. サイトが読む公開記事本体
+サイトが読む公開記事本体。`hourly-publish` ジョブが `articles_enriched` から転送して upsert する。
+
+主な列（migration 025 追加分を含む）:
+
+1. `enriched_article_id` ← `articles_enriched` への FK
+2. `primary_source_target_id`
+3. `public_key`（スラッグ等の公開 ID）
+4. `canonical_url`
+5. `display_title`
+6. `display_summary_100`
+7. `display_summary_200`
+8. `thumbnail_url`（OGP 画像。NULL 許容。シェア時は `/api/og` で動的生成）
+9. `visibility_status`（published / hidden / suppressed）
+10. `original_published_at`
+11. `source_category` ← migration 025 追加。トピック分類（llm / agent 等）
+12. `source_type` ← migration 026 追加。ソース種別（official / blog / news / video / alerts）
+13. `summary_input_basis` ← migration 025 追加。Web 表示ラベル分岐に使う
+14. `publication_basis` ← migration 025 追加。full_summary / source_snippet
+15. `content_score` ← migration 025 追加。`articles_enriched.score` を転写（0〜100）
+16. `thumbnail_emoji` ← migration 031 追加。`thumbnail_url` が空の間の暫定カード表示用
+16. `critique` ← migration 027 追加。批評テキスト（将来実装。初期は NULL）
+15. `public_refreshed_at`
+
+#### スコアの役割分担
+
+| カラム | 用途 |
+|---|---|
+| `articles_enriched.score` | コンテンツ品質スコア（0〜100）。enrich 時に計算 |
+| `public_articles.content_score` | 同上を Layer 4 に転写。初期ランキング・一覧ソートに使う |
+| `public_rankings.score` | アクティビティ込みの最終ランキングスコア（将来実装） |
+
+#### thumbnail の方針
+
+- `thumbnail_url` は現状常に NULL
+- **表示用**: `@vercel/og` でカテゴリ絵文字 + タイトルから動的生成
+- **シェア用（OGP）**: `/api/og?id=xxx` エンドポイントで動的生成
+- 元記事の `<meta og:image>` が取得できた場合は格納してよい
+- 当面のカード UI では `thumbnail_url` が空なら `thumbnail_emoji` を使う
+
+#### L4 API で持つべき補助軸
+
+公開面は少なくとも次の 3 軸を分けて扱う。
+
+1. topic filter: `source_category`
+2. source lane: `source_type`
+3. trend/entity filter: tags（`public_article_tags`）
+
+この 3 軸を混ぜて 1 個の `category` パラメータへ押し込まない。
+
+#### source_type=paper のタグ方針
+
+`source_type='paper'` の記事は、当面 `paper` タグだけを付ける。
+
+理由:
+
+1. 論文本文は一般語やモデル名の誤ヒットが多い
+2. キーワード由来の企業・製品タグがノイズになりやすい
+3. まずは「論文であること」だけを安定して表現する方を優先する
 
 ### 4.16 `public_article_sources`
 
