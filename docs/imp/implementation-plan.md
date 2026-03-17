@@ -1,6 +1,6 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-03-18（snippet 整合強化、paper タグ制限、絵文字サムネイル暫定導入を反映）
+最終更新: 2026-03-17（snippet 整合強化、paper タグ制限、絵文字サムネイル暫定導入を反映）／2026-03-17 Phase 3 タスクを具体化（hide_article + タグレビュー UI、管理 UI セキュリティ方針を確定）
 
 ## 1. この計画の位置づけ
 
@@ -271,12 +271,45 @@ P0/P1 では次の 3 軸を分離して扱う。
 
 ### Phase 3: L3 運用面の最小完成
 
-対象:
+完了条件: `hide_article` + タグレビュー UI が動作すること
 
-1. `activity_logs.action_type` の正式整理
-2. `priority_processing_queue` の最小実装
-3. タグ人手レビュー UI
-4. 管理画面の最低限の hide / retag / republish 導線
+#### 3.1 前提タスク（他のタスクに先行する）
+
+1. `activity_logs.action_type` の正式マッピングを確定する
+   - 暫定実装済みの対応: `view → impression_count` / `expand_200・topic_group_open・digest_click → open_count` / `article_open → source_open_count` / `share_* → share_count` / `save → save_count`
+   - 未確定の扱いを決める: `share_open` / `return_focus` の集計対象可否、`unsave` の減算可否（`implementation-wait.md` 8.1 参照）
+   - 確定後に `compute-ranks` の係数調整を実施する
+
+#### 3.2 管理 UI 基盤
+
+1. 管理ルートのパスプレフィックスを env var（`ADMIN_PATH_PREFIX`）で定義する
+   - `/admin` のような推測可能なパスは使わない
+   - `src/app/[ADMIN_PATH_PREFIX]/` 相当のルートに管理画面を配置する
+2. 既存の `ADMIN_SECRET` トークン認証（`src/lib/auth/admin.ts`）をそのまま流用する
+3. 推測不能パス + トークン認証の二重防御を管理 API すべてに適用する
+
+#### 3.3 `priority_processing_queue` 最小実装
+
+対象: `hide_article` のみ
+
+1. `hide_article` キューを処理するロジックを実装する
+2. 処理タイミング: `hourly-publish` の先頭で queue を消化してから publish に進む
+3. 操作を `admin_operation_logs` に記録する
+4. `retag` / `republish` / `rebuild_rank` は後続フェーズ
+
+#### 3.4 タグレビュー UI
+
+1. `tag_candidate_pool` の一覧を管理画面に表示する
+   - 表示項目: `candidate_key` / `seen_count` / `review_status` / `latest_trends_score`
+   - 操作: 昇格（`tags_master` へ追加）/ 却下
+2. 昇格時に `tag_keywords` へのキーワード追加も合わせて行えるようにする
+3. 操作を `admin_operation_logs` に記録する
+
+#### 3.5 Phase 3 完了後に回すもの
+
+1. `retag` / `republish` / `rebuild_rank` の queue 実装
+2. `compute-ranks` 係数の本格調整（3.1 の action_type 確定後に実施）
+3. Topic Group の最終 URL 設計
 
 ## 7. 分類検証の結論
 

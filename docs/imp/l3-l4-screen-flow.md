@@ -1,56 +1,75 @@
 # AI Trend Hub L3/L4 画面遷移図
 
-最終更新: 2026-03-17
+最終更新: 2026-03-17（Phase 2 公開ページ群の実装完了を反映、L3 運用フローを追加）
 
 ## 1. このファイルの目的
 
-L3/L4 実装を進める前提として、公開面と運用面の遷移を 1 枚で議論できる状態にする。  
+L3/L4 実装を進める前提として、公開面と運用面の遷移を 1 枚で議論できる状態にする。
 「今どこまで実装済みか」「次にどの画面と API を繋ぐか」を、人と AI の両方が読みやすい形で固定する。
 
 ## 2. 現在の前提
 
 1. 公開面は `layer4` のみを読む
-2. `hourly-publish` により `public_articles` への転送は稼働済み
-3. `public_rankings` はこのセッションで実装着手する
-4. Topic Group の最終遷移は未確定のため、暫定導線を採用する
-5. 管理画面は最小限に留め、未確定な運営操作は `implementation-wait.md` 管理とする
+2. `hourly-publish` により `public_articles` への転送は稼働済み（bulk 化は Phase 0 残件）
+3. `public_rankings` は実装済み（`compute-ranks` cron 稼働中）
+4. Phase 2 の公開ページ群（detail / category / tags / ranking / search 等）は実装済み
+5. Topic Group の最終遷移は未確定のため、暫定導線（Home 内スクロール）を継続採用
+6. 管理画面は Phase 3 で最小実装する（推測不能パス + トークン認証の二重防御）
 
 ## 3. 公開面の遷移図
 
 ```mermaid
 flowchart TD
-    Home["Home / 公開トップ<br/>src/app/page.tsx"] -->|ランキング / 最新 / 検索| FeedCard["記事カード"]
+    Home["Home<br/>src/app/page.tsx"] -->|ランキング / 最新 / ソース別レーン| FeedCard["記事カード<br/>ArticleCard"]
     Home -->|右サイドバー| Activity["直近1時間の活動表示"]
-    Home -->|PWA導線| Pwa["PWA install banner"]
+    Home -->|PWA 導線| Pwa["PWA install banner"]
+    Home -->|ナビゲーション| Ranking["ランキング<br/>/ranking"]
+    Home -->|ナビゲーション| Search["検索<br/>/search"]
+    Home -->|ナビゲーション| Tags["タグ一覧<br/>/tags"]
 
     FeedCard -->|article_open| SourceSite["元記事サイト<br/>canonical_url"]
     FeedCard -->|share_open| ShareModal["共有モーダル"]
     FeedCard -->|expand_200| FeedCard
     FeedCard -->|topic_group_open| TopicGroup["Topic Group 暫定セクション<br/>Home 内スクロール"]
     FeedCard -->|save| SavedState["localStorage 保存状態"]
+    FeedCard -->|カードクリック| ArticleDetail["記事詳細<br/>/articles/:public_key"]
+
+    ArticleDetail -->|元記事リンク| SourceSite
+    ArticleDetail -->|タグクリック| TagDetail["タグ別一覧<br/>/tags/:tagKey"]
+    ArticleDetail -->|カテゴリクリック| Category["カテゴリ別一覧<br/>/category/:slug"]
+
+    Ranking -->|記事クリック| ArticleDetail
+    Search -->|記事クリック| ArticleDetail
+    Tags -->|タグクリック| TagDetail
+    TagDetail -->|記事クリック| ArticleDetail
+    Category -->|記事クリック| ArticleDetail
 
     Home -->|検索 submit| SearchApi["/api/search"]
     Home -->|初期表示 / 再読込| HomeApi["/api/home"]
-    Home -->|ランキング再計算済み一覧| TrendsApi["/api/trends"]
+    Home -->|ランキング一覧| TrendsApi["/api/trends"]
+    Ranking -->|一覧取得| TrendsApi
+    Search -->|検索実行| SearchApi
 
     HomeApi --> PublicArticles["public_articles"]
     HomeApi --> PublicRankings["public_rankings"]
     HomeApi --> ActivityMetrics["activity_metrics_hourly"]
-
     SearchApi --> PublicArticles
     TrendsApi --> PublicArticles
     TrendsApi --> PublicRankings
 
-    ShareModal -->|share_copy / share_x 等| ActivityLog["activity_logs"]
-    SourceSite -->|return_focus| ActivityLog
-    FeedCard -->|view / save / topic_group_open| ActivityLog
+    ShareModal -->|share_copy / share_x 等| ActionApi["/api/actions"]
+    SourceSite -->|return_focus| ActionApi
+    FeedCard -->|view / save / topic_group_open| ActionApi
+    ArticleDetail -->|article_open / share| ActionApi
 ```
 
 ## 4. 運用面の遷移図
 
 ```mermaid
 flowchart TD
-    L2["articles_enriched"] --> Publish["hourly-publish"]
+    L2["articles_enriched"] --> PriorityQueue["priority_processing_queue<br/>（hide_article のみ Phase 3 実装）"]
+    PriorityQueue -->|hide 処理を先行| Publish["hourly-publish"]
+    L2 --> Publish
     Publish --> PublicArticles["public_articles"]
     Publish --> PublicTags["public_article_tags"]
     Publish --> PublicSources["public_article_sources"]
@@ -66,8 +85,15 @@ flowchart TD
     PublicRankings --> HomeApi["/api/home / /api/trends"]
     PublicArticles --> SearchApi["/api/search"]
 
-    PriorityQueue["priority_processing_queue"] -. 未確定 .-> Publish
-    AdminOps["admin_operation_logs"] -. 後続 .-> PriorityQueue
+    PublicRankings --> DigestCron["/api/cron/send-digest"]
+    DigestCron --> PushSubscriptions["push_subscriptions"]
+
+    AdminUI["管理画面<br/>推測不能パス + ADMIN_SECRET"] --> PriorityQueue
+    AdminUI --> TagReview["タグレビュー UI<br/>tag_candidate_pool"]
+    TagReview -->|昇格| TagsMaster["tags_master"]
+    TagReview -->|キーワード追加| TagKeywords["tag_keywords"]
+    AdminUI --> AdminOpLogs["admin_operation_logs"]
+    TagReview --> AdminOpLogs
 ```
 
 ## 5. 画面ごとの責務
@@ -76,39 +102,83 @@ flowchart TD
 
 1. `public_articles` の公開一覧を表示する
 2. 初期表示は `/api/home` から取得する
-3. KPI は `public_articles` 集計 + `activity_metrics_hourly` 集計を使う
-4. 実データが空でもモックへ戻さず、空状態をそのまま出す
+3. source lane（source_type 別）と topic chips（source_category / tag 別）を分離して表示する
+4. KPI は `public_articles` 集計 + `activity_metrics_hourly` 集計を使う
+5. 実データが空でもモックへ戻さず、空状態をそのまま出す
 
-### 5.2 検索
+### 5.2 記事詳細（/articles/:public_key）
+
+1. `public_key` を使って `public_articles` + `public_article_tags` + `public_article_sources` を取得する
+2. `getPublicArticleDetail()` 経由で Layer4 だけを読む
+3. 元記事リンク、タグ、カテゴリへの導線を持つ
+
+### 5.3 検索（/search）
 
 1. `/api/search` を使い `public_articles` を検索する
 2. `ILIKE` ベースで title / summary を検索する
 3. 公開済み記事だけを対象にする
 
-### 5.3 Topic Group
+### 5.4 ランキング（/ranking）
 
-1. このセッションでは Home 内の暫定セクションに留める
+1. `/api/trends` から `public_rankings` を読んで一覧表示する
+2. ランキングスコア順に記事を並べる
+
+### 5.5 カテゴリ別（/category/:slug）
+
+1. `source_category` をキーに `public_articles` をフィルタして表示する
+2. slug は `source_category` の値に対応する
+
+### 5.6 タグ（/tags, /tags/:tagKey）
+
+1. `/tags`: `tags_master` から記事数上位のタグを一覧表示する
+2. `/tags/:tagKey`: `public_article_tags` 経由で当該タグの記事一覧を表示する
+
+### 5.7 About / Feed
+
+1. `/about`: 静的ページ
+2. `/feed`: RSS Atom フィードを `public_articles` から生成する
+
+### 5.8 Topic Group
+
+1. このフェーズでは Home 内の暫定セクションに留める
 2. 別画面遷移や専用 URL はまだ持たない
 3. 最終仕様は `implementation-wait.md` に残す
 
-### 5.4 共有
+### 5.9 共有
 
 1. 共有操作は UI を止めない
-2. ログは `activity_logs` と `activity_metrics_hourly` に送る
+2. ログは `/api/actions` 経由で `activity_logs` と `activity_metrics_hourly` に送る
 3. Misskey インスタンス設定はローカル保持する
 
-## 6. 次に繋ぐ実装ポイント
+### 5.10 管理画面（Phase 3）
 
-1. `Home -> /api/home -> public_articles/public_rankings`
-2. `公開面操作 -> /api/actions -> activity_logs/activity_metrics_hourly`
-3. `activity_metrics_hourly -> /api/cron/compute-ranks -> public_rankings`
-4. `public_rankings -> digest/send-digest`
+1. 推測不能なパス（`ADMIN_PATH_PREFIX` env var で定義）+ `ADMIN_SECRET` トークン認証
+2. 初期実装対象: `hide_article` 操作、タグレビュー UI
+3. 操作はすべて `admin_operation_logs` に記録する
+
+## 6. 実装済みポイントと残件
+
+### 実装済み
+
+1. `Home → /api/home → public_articles / public_rankings`
+2. `公開面操作 → /api/actions → activity_logs / activity_metrics_hourly`
+3. `activity_metrics_hourly → /api/cron/compute-ranks → public_rankings`
+4. `public_rankings → /api/cron/send-digest`
+5. Phase 2 全公開ページ（detail / category / tags / ranking / search / about / feed）
+
+### 残件（Phase 0 / Phase 3）
+
+1. `hourly-publish` の bulk upsert 化（Phase 0）
+2. 管理画面基盤（推測不能パス + トークン二重認証）（Phase 3）
+3. `priority_processing_queue → hourly-publish` の実線化（hide_article のみ）（Phase 3）
+4. タグレビュー UI（Phase 3）
+5. `activity_logs.action_type` 正式マッピング確定 → `compute-ranks` 係数調整（Phase 3）
 
 ## 7. 未確定でこのファイルに書かないもの
 
 1. 管理画面の詳細なレイアウト
 2. Topic Group の最終 URL 設計
-3. `priority_processing_queue` の queue_type 別完全仕様
-4. `activity_logs.action_type` の厳密な運用一覧
+3. `priority_processing_queue` の queue_type 別完全仕様（hide 以外）
+4. `activity_logs.action_type` の厳密な運用一覧（`share_open` / `return_focus` / `unsave` の扱い）
 
 それらは `implementation-wait.md` で管理する。
