@@ -322,3 +322,17 @@ L3/L4 仕様では `priority_processing_queue` を `hourly-publish` より先に
 1. bulk SQL 化するか
 2. tag 転写だけ別ジョブに分けるか
 3. `public_article_tags` を delete/insert ではなく差分更新にするか
+
+### 9.5 `/api/home` の返却粒度
+
+現状:
+
+1. Home UI と `mock4` は source lane / topic chips / digest / topic group を表示できる
+2. ただし `/api/home` 自体はまだ単一の ranked article 配列 + stats/activity の返却に留まる
+3. lane 別の配列分割は現在 UI 側で行っている
+
+未確定:
+
+1. `/api/home` で `latest` や `source_type` 別 lane を返すか
+2. `topic chips` 用の集計を API 側で返すか
+3. Home を最終的に SSR 主体へ寄せるか、現行 client fetch を残すか

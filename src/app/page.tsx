@@ -18,19 +18,10 @@ import {
   toggleSavedArticleId,
   trackAction,
 } from '@/lib/client/home'
-import type {
-  ActionType,
-  Article,
-  HomeActivity,
-  HomeResponse,
-  HomeStats,
-  RankPeriod,
-  SearchResponse,
-} from '@/lib/db/types'
+import type { ActionType, Article, HomeActivity, HomeResponse, HomeStats, RankPeriod, SearchResponse } from '@/lib/db/types'
 
 type TabId = 'ranking' | 'latest' | 'unique'
-type CategoryId = 'all' | 'video' | 'official' | 'blog' | 'agent'
-
+type CategoryId = 'all' | 'official' | 'alerts' | 'blog' | 'paper' | 'news'
 type UiArticle = Article & { score?: number }
 
 type LoadState = {
@@ -38,6 +29,8 @@ type LoadState = {
   loading: boolean
   message: string | null
 }
+
+const TOPIC_CHIPS = ['all', 'llm', 'agent', 'voice', 'policy', 'safety', 'search', 'news'] as const
 
 const initialNotifTimes = [
   { label: '07:00 ダイジェスト', on: true },
@@ -61,12 +54,6 @@ const initialHomeStats: HomeStats = {
 const initialHomeActivity: HomeActivity = {
   shareCountLastHour: 0,
   activeArticlesLastHour: 0,
-}
-
-function categoryMatches(category: CategoryId, article: UiArticle): boolean {
-  if (category === 'all') return true
-  if (category === 'agent') return article.genre === 'agent'
-  return article.source_type === category
 }
 
 function hydrateArticle(article: UiArticle): UiArticle {
@@ -98,7 +85,11 @@ async function fetchJson<T>(url: string): Promise<T> {
 }
 
 function buildShareText(article: UiArticle, appendTag: boolean): string {
-  return [article.title, article.summary_100 ?? '要約準備中', appendTag ? `${article.url}\n#AIHub` : article.url].join('\n\n')
+  return [article.title, article.summary_100 ?? '要約は準備中です。', appendTag ? `${article.url}\n#AIHub` : article.url].join('\n\n')
+}
+
+function matchesSourceType(category: CategoryId, article: UiArticle): boolean {
+  return category === 'all' ? true : article.source_type === category
 }
 
 export default function HomePage() {
@@ -107,6 +98,7 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabId>('ranking')
   const [period, setPeriod] = useState<RankPeriod>('24h')
   const [activeCategory, setActiveCategory] = useState<CategoryId>('all')
+  const [activeTopic, setActiveTopic] = useState<(typeof TOPIC_CHIPS)[number]>('all')
   const [summaryMode, setSummaryMode] = useState<100 | 200>(100)
   const [showCritique, setShowCritique] = useState(false)
   const [notifTimes, setNotifTimes] = useState(initialNotifTimes)
@@ -121,7 +113,7 @@ export default function HomePage() {
   const [trendState, setTrendState] = useState<LoadState>({
     articles: [],
     loading: true,
-    message: '初期表示を準備しています。',
+    message: 'ランキングを読み込み中です。',
   })
   const [homeStats, setHomeStats] = useState<HomeStats>(initialHomeStats)
   const [homeActivity, setHomeActivity] = useState<HomeActivity>(initialHomeActivity)
@@ -168,11 +160,11 @@ export default function HomePage() {
       setTrendState((current) => ({
         ...current,
         loading: true,
-        message: 'ホーム画面を読み込んでいます。',
+        message: 'Home を読み込み中です。',
       }))
 
       try {
-        const response = await fetchJson<HomeResponse>(`/api/home?period=${period}&limit=20`)
+        const response = await fetchJson<HomeResponse>(`/api/home?period=${period}&limit=24`)
         if (ignore) return
         const liveArticles = toUiArticles(response.articles)
         setTrendState({
@@ -214,7 +206,7 @@ export default function HomePage() {
       setSearchState({
         articles: [],
         loading: true,
-        message: `「${searchQuery}」を検索しています。`,
+        message: `「${searchQuery}」を検索中です。`,
       })
 
       try {
@@ -244,7 +236,9 @@ export default function HomePage() {
   }, [searchQuery])
 
   const filteredArticles = useMemo(() => {
-    const result = trendState.articles.filter((article) => categoryMatches(activeCategory, article))
+    const result = trendState.articles.filter(
+      (article) => matchesSourceType(activeCategory, article) && (activeTopic === 'all' || article.genre === activeTopic),
+    )
 
     if (activeTab === 'latest') {
       return [...result].sort((left, right) => right.published_at.getTime() - left.published_at.getTime())
@@ -255,27 +249,46 @@ export default function HomePage() {
     }
 
     return [...result].sort((left, right) => (right.score ?? 0) - (left.score ?? 0))
-  }, [activeCategory, activeTab, trendState.articles])
+  }, [activeCategory, activeTab, activeTopic, trendState.articles])
 
   const visibleSearchArticles = useMemo(
-    () => searchState.articles.filter((article) => categoryMatches(activeCategory, article)),
-    [activeCategory, searchState.articles]
+    () =>
+      searchState.articles.filter(
+        (article) => matchesSourceType(activeCategory, article) && (activeTopic === 'all' || article.genre === activeTopic),
+      ),
+    [activeCategory, activeTopic, searchState.articles],
   )
 
   const kpis = useMemo(() => {
     const topicGrouped = trendState.articles.filter((article) => article.topic_group_id).length
     return [
       { label: '本日の新着', value: String(homeStats.publishedToday) },
-      { label: '公開記事', value: String(homeStats.publishedTotal) },
-      { label: 'Topic Group 付与', value: String(topicGrouped) },
+      { label: '公開総数', value: String(homeStats.publishedTotal) },
+      { label: 'Topic Group', value: String(topicGrouped) },
       { label: '公式ソース', value: String(homeStats.officialCount) },
     ]
   }, [homeStats, trendState.articles])
 
   const digestItems = useMemo(
     () => filteredArticles.slice(0, 3).map((article, index) => ({ ...article, digestRank: index + 1 })),
-    [filteredArticles]
+    [filteredArticles],
   )
+
+  const sourceLaneCounts = useMemo(() => {
+    const counts = {
+      official: 0,
+      alerts: 0,
+      blog: 0,
+      paper: 0,
+      news: 0,
+    }
+    filteredArticles.forEach((article) => {
+      if (article.source_type in counts) {
+        counts[article.source_type as keyof typeof counts] += 1
+      }
+    })
+    return counts
+  }, [filteredArticles])
 
   const topicGroupItems = useMemo(() => {
     const featured =
@@ -283,14 +296,17 @@ export default function HomePage() {
       filteredArticles.find((article) => article.topic_group_id) ??
       filteredArticles[0] ??
       null
+
     if (!featured) return { title: 'Topic Group', items: [] as UiArticle[] }
+
     const items = filteredArticles
       .filter((article) =>
-        featured.topic_group_id ? article.topic_group_id === featured.topic_group_id || article.id === featured.id : article.id === featured.id
+        featured.topic_group_id ? article.topic_group_id === featured.topic_group_id || article.id === featured.id : article.id === featured.id,
       )
       .slice(0, 6)
+
     return {
-      title: `${featured.title.slice(0, 40)}${featured.title.length > 40 ? '…' : ''}`,
+      title: featured.title,
       items,
     }
   }, [filteredArticles, topicGroupArticleId])
@@ -319,8 +335,17 @@ export default function HomePage() {
     })
   }
 
+  function findArticle(articleId: string): UiArticle | null {
+    return (
+      filteredArticles.find((item) => item.id === articleId) ??
+      visibleSearchArticles.find((item) => item.id === articleId) ??
+      trendState.articles.find((item) => item.id === articleId) ??
+      null
+    )
+  }
+
   function handleOpenArticle(articleId: string) {
-    const article = filteredArticles.find((item) => item.id === articleId) ?? visibleSearchArticles.find((item) => item.id === articleId)
+    const article = findArticle(articleId)
     if (!article) return
     setReturnFocusArticleId(article.id)
     window.open(article.url, '_blank', 'noopener,noreferrer')
@@ -343,7 +368,7 @@ export default function HomePage() {
     }
 
     if (target === 'misskey' && !misskeyInstance) {
-      setShareStatus('Misskey のインスタンスを設定してください。')
+      setShareStatus('Misskey インスタンスを設定してください。')
       return
     }
 
@@ -371,10 +396,7 @@ export default function HomePage() {
   }
 
   function handleArticleAction(type: ActionType, articleId: string) {
-    const article =
-      filteredArticles.find((item) => item.id === articleId) ??
-      visibleSearchArticles.find((item) => item.id === articleId) ??
-      null
+    const article = findArticle(articleId)
     if (!article) return
 
     if (type === 'share_open') {
@@ -422,12 +444,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-bg text-ink">
-      <Header
-        searchValue={searchDraft}
-        critiqueVisible={showCritique}
-        onSearchChange={setSearchDraft}
-        onSearchSubmit={handleSearchSubmit}
-      />
+      <Header searchValue={searchDraft} critiqueVisible={showCritique} onSearchChange={setSearchDraft} onSearchSubmit={handleSearchSubmit} />
 
       <div className="fixed bottom-0 left-0 top-[52px] hidden w-[120px] bg-dim-fg xl:block" />
       <div className="fixed bottom-0 right-0 top-[52px] hidden w-[120px] bg-dim-fg xl:block" />
@@ -445,7 +462,7 @@ export default function HomePage() {
           <div className="flex-1 rounded-[14px] bg-white/10 p-2.5">
             <div className="mb-2 flex items-center gap-2 rounded-lg border border-[#f4d9c1] bg-[#fff8ef] px-3 py-2 text-[11px] text-accent-darker">
               <span className="font-bold">Focus</span>
-              <span>{trendState.message ?? '表示状態を確認中です。'}</span>
+              <span>{trendState.message ?? '公開状況を表示中です。'}</span>
             </div>
 
             <Toolbar activeTab={activeTab} onTabChange={setActiveTab} period={period} onPeriodChange={setPeriod} />
@@ -458,8 +475,34 @@ export default function HomePage() {
                 200字
               </ModeButton>
               <ModeButton active={showCritique} onClick={() => setShowCritique((current) => !current)}>
-                批評表示
+                批評を表示
               </ModeButton>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2 px-2">
+              {TOPIC_CHIPS.map((topic) => (
+                <button
+                  key={topic}
+                  type="button"
+                  className="rounded-full border px-3 py-1 text-[11px] font-bold"
+                  style={{
+                    background: activeTopic === topic ? 'var(--color-accent-lighter)' : '#fff',
+                    color: activeTopic === topic ? 'var(--color-accent-darker)' : 'var(--color-subtle)',
+                    borderColor: activeTopic === topic ? '#f4c29a' : 'rgba(0,0,0,0.05)',
+                  }}
+                  onClick={() => setActiveTopic(topic)}
+                >
+                  {topic === 'all' ? 'all' : topic}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2 px-2 md:grid-cols-5">
+              <LaneCard label="official" value={sourceLaneCounts.official} />
+              <LaneCard label="alerts" value={sourceLaneCounts.alerts} />
+              <LaneCard label="blog" value={sourceLaneCounts.blog} />
+              <LaneCard label="paper" value={sourceLaneCounts.paper} />
+              <LaneCard label="news" value={sourceLaneCounts.news} />
             </div>
 
             <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
@@ -470,7 +513,7 @@ export default function HomePage() {
                   <ArticleCard
                     key={article.id}
                     article={article}
-                    rank={index + 1}
+                    rank={activeTab === 'ranking' ? index + 1 : undefined}
                     summaryMode={expandedArticleId === article.id ? 200 : summaryMode}
                     showCritique={showCritique}
                     isFocused={focusedArticleId === article.id}
@@ -480,29 +523,26 @@ export default function HomePage() {
                   />
                 ))
               ) : (
-                <EmptyState title="記事がありません" description="カテゴリまたは期間を変更してください。" />
+                <EmptyState title="記事がありません" description="カテゴリまたは topic を切り替えて再確認してください。" />
               )}
             </div>
 
             <div id="topic-group-section">
-              <SectionLabel>[5] Topic Group</SectionLabel>
-              <BoxSection
-                title={topicGroupItems.title}
-                subtitle="暫定実装です。いまはカード押下でこのセクションへスクロールし、対象トピックを固定表示します。"
-              >
+              <SectionLabel>Topic Group</SectionLabel>
+              <BoxSection title={topicGroupItems.title} subtitle="topic_group_open の暫定着地点です。Home 内で関連カードをまとめて見せます。">
                 <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-3">
                   <TopicColumn
-                    title="動画"
-                    tone="bg-[#fef3c7] text-[#92400e]"
-                    items={topicGroupItems.items.filter((article) => article.source_type === 'video')}
-                  />
-                  <TopicColumn
-                    title="公式"
+                    title="Official"
                     tone="bg-[#dbeafe] text-[#1e40af]"
                     items={topicGroupItems.items.filter((article) => article.source_type === 'official')}
                   />
                   <TopicColumn
-                    title="ブログ"
+                    title="Alerts"
+                    tone="bg-[#fef3c7] text-[#92400e]"
+                    items={topicGroupItems.items.filter((article) => article.source_type === 'alerts')}
+                  />
+                  <TopicColumn
+                    title="Blog"
                     tone="bg-[#d1fae5] text-[#065f46]"
                     items={topicGroupItems.items.filter((article) => article.source_type === 'blog')}
                   />
@@ -510,30 +550,11 @@ export default function HomePage() {
               </BoxSection>
             </div>
 
-            <SectionLabel>[6] 検索結果</SectionLabel>
+            <SectionLabel>検索</SectionLabel>
             <BoxSection
-              title="検索 / タグ絞り込み"
-              subtitle={
-                searchQuery
-                  ? `現在の検索語: ${searchQuery} / ${visibleSearchArticles.length}件`
-                  : 'Enter または検索ボタンで実行します。'
-              }
+              title="検索 / タグ寄り確認"
+              subtitle={searchQuery ? `検索語: ${searchQuery} / ${visibleSearchArticles.length} 件` : '検索フォームから公開記事を確認できます。'}
             >
-              <div className="mb-3 mt-2 flex flex-wrap gap-1.5">
-                {['LLM', 'Google', 'Agent', 'Coding', 'Security'].map((tag, index) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border px-2 py-1 text-[10px]"
-                    style={{
-                      background: index === 0 ? 'var(--color-accent-lighter)' : 'var(--color-card-second)',
-                      borderColor: 'rgba(0,0,0,0.05)',
-                      color: index === 0 ? 'var(--color-accent-darker)' : 'var(--color-ink)',
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
               {searchState.loading ? (
                 <LoadingGrid compact />
               ) : searchQuery ? (
@@ -553,32 +574,34 @@ export default function HomePage() {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState title="該当記事なし" description={searchState.message ?? '検索語またはカテゴリを変更してください。'} />
+                  <EmptyState title="該当記事なし" description={searchState.message ?? '検索条件を変えて再確認してください。'} />
                 )
               ) : (
-                <EmptyState title="検索待ち" description="ヘッダーの検索フォームからキーワードを送信してください。" />
+                <EmptyState title="検索待ち" description="ヘッダーの検索フォームからキーワードを入力してください。" />
               )}
             </BoxSection>
 
-            <SectionLabel>[7] ダイジェスト</SectionLabel>
-            <BoxSection title="07:00 朝の AI ダイジェスト" subtitle="共有向けに整理した上位3件">
+            <SectionLabel>Digest</SectionLabel>
+            <BoxSection title="07:00 ダイジェスト" subtitle="上位記事を digest/send-digest に流す前提で簡易表示します。">
               <div className="mt-2 flex flex-col gap-2">
                 {digestItems.map((item) => (
                   <div key={item.id} className="flex overflow-hidden rounded-[10px] border border-black/5 bg-card-second">
-                    <div className="w-[70px] bg-[linear-gradient(145deg,#ffe8d6,#ffd8bd)]" />
+                    <div className="flex w-[70px] items-center justify-center bg-[linear-gradient(145deg,#ffe8d6,#ffd8bd)] text-2xl">
+                      {item.thumbnail_emoji ?? '📝'}
+                    </div>
                     <div className="flex flex-1 flex-col gap-1 p-2 text-[11px]">
                       <div className="flex gap-2">
-                        <span className="text-[18px] font-extrabold text-[#f2dfd0]">{item.digestRank}</span>
+                        <span className="text-[18px] font-extrabold text-[#c87935]">{item.digestRank}</span>
                         <span className="font-extrabold leading-[1.3]">{item.title}</span>
                       </div>
-                      <p className="text-muted">{item.summary_100 ?? '要約準備中'}</p>
+                      <p className="text-muted">{item.summary_100 ?? '要約は準備中です。'}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </BoxSection>
 
-            <SectionLabel>[8] PWA</SectionLabel>
+            <SectionLabel>PWA</SectionLabel>
             <PwaInstallBanner />
           </div>
 
@@ -611,11 +634,7 @@ export default function HomePage() {
               </button>
             </div>
             <div className="flex flex-col gap-3 p-4">
-              <textarea
-                className="min-h-24 rounded-lg border border-black/5 p-2 text-[12px] leading-6 outline-none"
-                value={shareText}
-                readOnly
-              />
+              <textarea className="min-h-24 rounded-lg border border-black/5 p-2 text-[12px] leading-6 outline-none" value={shareText} readOnly />
               <label className="flex items-center gap-2 text-[11px] text-muted">
                 <input
                   type="checkbox"
@@ -625,14 +644,14 @@ export default function HomePage() {
                     setShareAppendTag(event.target.checked)
                   }}
                 />
-                <span>#AIHub タグを URL の後ろに付ける</span>
+                <span>#AIHub と URL を末尾に付与する</span>
               </label>
               <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
                 <ShareButton label="X" onClick={() => void handleShareAction('x')} />
                 <ShareButton label="Threads" onClick={() => void handleShareAction('threads')} />
                 <ShareButton label="Slack" onClick={() => void handleShareAction('slack')} />
                 <ShareButton label="Misskey" onClick={() => void handleShareAction('misskey')} />
-                <ShareButton label="URLをコピー" accent onClick={() => void handleShareAction('copy')} />
+                <ShareButton label="コピー" accent onClick={() => void handleShareAction('copy')} />
               </div>
               <div className="flex flex-col gap-2 rounded-lg border border-black/5 bg-white/70 p-3">
                 <span className="text-[11px] font-bold text-ink">Misskey 設定</span>
@@ -671,6 +690,15 @@ function KpiCard({ label, value }: { label: string; value: string }) {
       <div className="text-[11px] text-subtle">{label}</div>
       <div className="text-[22px] font-extrabold text-ink">{value}</div>
     </article>
+  )
+}
+
+function LaneCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl bg-white p-3">
+      <div className="text-[11px] uppercase tracking-[0.08em] text-muted">{label}</div>
+      <div className="mt-1 text-[18px] font-extrabold text-ink">{value}</div>
+    </div>
   )
 }
 
@@ -716,9 +744,11 @@ function TopicColumn({ title, items, tone }: { title: string; items: UiArticle[]
     <div className="overflow-hidden rounded-[10px] border border-black/5 bg-card-second">
       <div className={`px-2.5 py-1.5 text-[10px] font-extrabold ${tone}`}>{title}</div>
       <div className="flex flex-col gap-1.5 p-2 text-[11px]">
-        <div className="h-[60px] rounded-md bg-[linear-gradient(145deg,#ffe8d6,#ffd8bd)]" />
-        <div className="font-extrabold">{item?.title ?? '関連項目を収集中'}</div>
-        <div className="text-muted">{item ? `${title} 導線の暫定実装です。` : '最終導線は implementation-wait.md 管理。'}</div>
+        <div className="flex h-[60px] items-center justify-center rounded-md bg-[linear-gradient(145deg,#ffe8d6,#ffd8bd)] text-2xl">
+          {item?.thumbnail_emoji ?? '🧠'}
+        </div>
+        <div className="font-extrabold">{item?.title ?? '関連カードを準備中'}</div>
+        <div className="text-muted">{item ? item.summary_100 ?? '要約は準備中です。' : '実データが無い場合は Home 内に空状態を出します。'}</div>
       </div>
     </div>
   )

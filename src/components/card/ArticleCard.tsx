@@ -1,6 +1,6 @@
 'use client'
 
-import type { Article, ActionType } from '@/lib/db/types'
+import type { ActionType, Article } from '@/lib/db/types'
 
 interface Props {
   article: Article & { score?: number }
@@ -14,12 +14,12 @@ interface Props {
 }
 
 const sourceLabel: Record<Article['source_type'], string> = {
-  blog: 'Blog',
   official: 'Official',
+  alerts: 'Alerts',
+  blog: 'Blog',
+  paper: 'Paper',
   news: 'News',
   video: 'Video',
-  alerts: 'Alerts',
-  paper: 'Paper',
 }
 
 export function ArticleCard({
@@ -42,7 +42,7 @@ export function ArticleCard({
   const summary =
     (summaryMode === 200 ? article.summary_200 : article.summary_100) ??
     article.summary_100 ??
-    '要約準備中'
+    '要約は準備中です。'
 
   const meta = [
     rank ? `#${rank}` : null,
@@ -51,19 +51,19 @@ export function ArticleCard({
     typeof numericScore === 'number' && Number.isFinite(numericScore) ? `Score ${numericScore.toFixed(1)}` : null,
   ]
     .filter(Boolean)
-    .join(' ・ ')
+    .join(' / ')
 
   return (
     <article
+      id={`article-card-${article.id}`}
       className="relative overflow-hidden rounded-xl border bg-card-second"
       style={{
         minHeight: showCritique ? 320 : 272,
-        borderColor: isFocused || showCritique ? 'var(--color-orange)' : '#e5e5e5',
-        boxShadow: '0 4px 4px rgba(0,0,0,0.25)',
+        borderColor: isFocused ? 'var(--color-orange)' : '#e5e5e5',
+        boxShadow: '0 4px 4px rgba(0,0,0,0.18)',
       }}
-      id={`article-card-${article.id}`}
     >
-      <div className="flex gap-3 p-2.5 pb-24 md:pb-12">
+      <div className="flex gap-3 p-2.5 pb-24 md:pb-14">
         <div
           className="relative mt-0.5 h-[128px] w-[84px] shrink-0 overflow-hidden rounded-lg md:h-[163px] md:w-[94px]"
           style={{ background: 'linear-gradient(145deg, #ffe8d6, #ffd8bd)' }}

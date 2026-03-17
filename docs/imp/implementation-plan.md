@@ -222,6 +222,15 @@ P0/P1 では次の 3 軸を分離して扱う。
 6. Home は定量フィルタで間引かず、できるだけ全体をまんべんなく出す
 7. ただし `daily-enrich` 側で明白な snippet 整合崩れだけは publish 前に止める
 
+2026-03-18 実装反映:
+
+1. Home の右サイドバーを `official / alerts / blog / paper / news` の source lane 基準へ更新
+2. `agent` 単独タブは廃止し、Home 上部の topic chips 側へ寄せた
+3. `paper / alerts / news` の表示導線を Home / category / mock4 に追加
+4. `ArticleCard` を絵文字サムネイル前提で整備し、source lane 表示を統一
+5. Home は ranking / latest / unique の切り替えと topic/source の組み合わせで全体を広く見せる形へ整理
+6. `/api/home` の source_type 別 lane 返却までは未完。現時点は 1 本の公開記事列を UI 側で lane/topic 表示に分解している
+
 ### Phase 2: 公開ページ群の実装
 
 対象:
@@ -240,6 +249,25 @@ P0/P1 では次の 3 軸を分離して扱う。
 1. すべて `layer4` だけを読む
 2. URL は `public_key` / slug を使う
 3. article detail は `public_articles + public_article_tags + public_article_sources` で完結する
+
+2026-03-18 実装反映:
+
+1. `/ranking`
+2. `/search`
+3. `/articles/:public_key`
+4. `/category/:slug`
+5. `/tags`
+6. `/tags/:tagKey`
+7. `/about`
+8. `/feed`
+9. `/mock4`
+
+補足:
+
+1. 公開ページ群はすべて Layer4 読み取りで構成した
+2. article detail は `getPublicArticleDetail()` 経由で `public_articles + public_article_tags + public_article_sources` を読む
+3. 一覧 query でも `public_key` を返すようにし、公開リンクは `/articles/:public_key` へ寄せた
+4. `mock4` は `l3-l4-screen-flow.md` の Home / Ranking / Search / Detail / Category / Tag / About / Feed / PWA / Share / Topic Group を順に触れる確認用モック
 
 ### Phase 3: L3 運用面の最小完成
 
@@ -284,6 +312,7 @@ P0/P1 では次の 3 軸を分離して扱う。
 7. `paper` タグを新設し、論文ソースは `paper` のみ付与へ変更
 8. `public_articles.thumbnail_emoji` を追加し、既存 `911` 件も backfill
 9. 判断待ちは `implementation-wait.md` へ分離
+10. L4 公開ページ群と `mock4` の動作確認用導線を実装
 
 ## 9. 次に読むファイル
 

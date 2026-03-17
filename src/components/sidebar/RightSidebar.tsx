@@ -1,6 +1,6 @@
-﻿'use client'
+'use client'
 
-type CategoryId = 'all' | 'video' | 'official' | 'blog' | 'agent'
+type SourceLane = 'all' | 'official' | 'alerts' | 'blog' | 'paper' | 'news'
 
 interface NotifTime {
   label: string
@@ -8,8 +8,8 @@ interface NotifTime {
 }
 
 interface Props {
-  activeCategory: CategoryId
-  onCategoryChange: (category: CategoryId) => void
+  activeCategory: SourceLane
+  onCategoryChange: (category: SourceLane) => void
   unread: number
   topRated: number
   savedLater: number
@@ -19,12 +19,13 @@ interface Props {
   onNotifToggle: (index: number) => void
 }
 
-const categories: Array<{ id: CategoryId; label: string }> = [
+const categories: Array<{ id: SourceLane; label: string }> = [
   { id: 'all', label: '総合' },
-  { id: 'video', label: '動画' },
   { id: 'official', label: '公式' },
-  { id: 'blog', label: 'ブログ' },
-  { id: 'agent', label: 'Agent' },
+  { id: 'alerts', label: 'Alerts' },
+  { id: 'blog', label: 'Blog' },
+  { id: 'paper', label: 'Paper' },
+  { id: 'news', label: 'News' },
 ]
 
 export function RightSidebar({
@@ -44,7 +45,7 @@ export function RightSidebar({
       style={{ background: 'var(--color-card-second)', padding: 10 }}
     >
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-1">
-        <SideSection title="ランキングカテゴリ">
+        <SideSection title="ソースレーン">
           {categories.map((category) => (
             <button
               key={category.id}
@@ -52,8 +53,7 @@ export function RightSidebar({
               onClick={() => onCategoryChange(category.id)}
               className="w-full rounded-lg border-none px-2 py-2 text-left text-[12px] text-accent-darker"
               style={{
-                background:
-                  activeCategory === category.id ? 'var(--color-accent-light)' : 'transparent',
+                background: activeCategory === category.id ? 'var(--color-accent-light)' : 'transparent',
                 fontWeight: activeCategory === category.id ? 700 : 400,
                 borderBottom: '1px solid rgba(0,0,0,0.06)',
               }}
@@ -63,21 +63,16 @@ export function RightSidebar({
           ))}
         </SideSection>
 
-        <SideSection title="保存管理（ブラウザ依存）">
+        <SideSection title="保存管理">
           <SideRow label="未読" value={unread} />
           <SideRow label="高評価" value={topRated} />
           <SideRow label="後で読む" value={savedLater} />
         </SideSection>
 
         <SideSection title="リアルタイム活動">
-          <div
-            className="rounded-lg px-2.5 py-2 text-[12px] font-bold leading-[1.4] text-accent-dark"
-            style={{ background: '#fff9f3' }}
-          >
+          <div className="rounded-lg px-2.5 py-2 text-[12px] font-bold leading-[1.4] text-accent-dark" style={{ background: '#fff9f3' }}>
             この1時間で {shareCountLastHour} 件シェア
-            <div className="mt-1 text-[11px] font-normal text-muted">
-              {activeArticlesLastHour} 件の記事で反応あり
-            </div>
+            <div className="mt-1 text-[11px] font-normal text-muted">{activeArticlesLastHour} 件の記事で反応あり</div>
           </div>
         </SideSection>
 
