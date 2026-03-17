@@ -9,6 +9,10 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-18 10:15 | done | L4 公開ページ群を実装 | ranking/search/detail/category/tags/about/feed を Layer4 読み取りで追加
+- 2026-03-18 10:12 | done | mock4 を作成 | Home/Ranking/Search/Detail/Category/Tag/About/Feed/PWA/Share/Topic Group を一通り確認可能
+- 2026-03-18 10:08 | done | Home 導線を再整理 | source lane を `official/alerts/blog/paper/news` に統一し topic chips と分離
+- 2026-03-18 10:05 | done | `public-feed.ts` 拡張 | tag/detail/feed query と `public_key` 導線を追加
 - 2026-03-18 07:30 | done | 絵文字サムネイル backfill | `public_articles 911` 件に `thumbnail_emoji` を反映
 - 2026-03-18 07:24 | done | paper タグ制限を DB 反映 | `source_type='paper'` は `paper` タグのみ `437` 件
 - 2026-03-18 07:22 | done | migration 031/032 適用 | `thumbnail_emoji` 列と `paper` タグを追加

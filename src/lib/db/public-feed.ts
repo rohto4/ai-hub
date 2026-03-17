@@ -11,6 +11,7 @@ import type {
 
 type PublicArticleRow = {
   id: string
+  public_key?: string | null
   url: string
   title: string
   genre: Article['genre']
@@ -48,7 +49,44 @@ type DigestRow = {
   summary_100: string | null
 }
 
-function toArticle(row: PublicArticleRow): ArticleWithScore {
+type PublicTagRow = {
+  tag_key: string
+  display_name: string
+  article_count: number | string
+}
+
+type ArticleTagRow = {
+  tag_key: string
+  display_name: string
+  sort_order: number | string
+}
+
+type ArticleSourceRow = {
+  source_key: string
+  display_name: string
+  source_type: Article['source_type']
+}
+
+export type PublicTagSummary = {
+  tagKey: string
+  displayName: string
+  articleCount: number
+}
+
+export type PublicArticleDetail = ArticleWithScore & {
+  publicKey: string
+  tags: Array<{
+    tagKey: string
+    displayName: string
+  }>
+  sources: Array<{
+    sourceKey: string
+    displayName: string
+    sourceType: Article['source_type']
+  }>
+}
+
+function toArticle(row: PublicArticleRow): ArticleWithScore & { publicKey?: string } {
   return {
     id: row.id,
     url: row.url,
@@ -68,6 +106,7 @@ function toArticle(row: PublicArticleRow): ArticleWithScore {
     updated_at: new Date(row.updated_at),
     score: Number(row.score),
     breakdown: row.breakdown ?? undefined,
+    ...(row.public_key ? { publicKey: row.public_key } : {}),
   }
 }
 
@@ -80,6 +119,13 @@ function buildGenreFilter(genre?: string | null): string | null {
     return null
   }
   return genre
+}
+
+function buildSourceTypeFilter(sourceType?: string | null): string | null {
+  if (!sourceType || sourceType === 'all') {
+    return null
+  }
+  return sourceType
 }
 
 export async function listRankedPublicArticles(options: {
@@ -97,6 +143,7 @@ export async function listRankedPublicArticles(options: {
     ? ((await sql`
         SELECT
           pa.public_article_id AS id,
+          pa.public_key,
           pa.canonical_url AS url,
           pa.display_title AS title,
           pa.source_category AS genre,
@@ -129,6 +176,7 @@ export async function listRankedPublicArticles(options: {
     : ((await sql`
         SELECT
           pa.public_article_id AS id,
+          pa.public_key,
           pa.canonical_url AS url,
           pa.display_title AS title,
           pa.source_category AS genre,
@@ -157,6 +205,50 @@ export async function listRankedPublicArticles(options: {
         LIMIT ${options.limit}
         OFFSET ${offset}
       `) as PublicArticleRow[])
+
+  return rows.map(toArticle)
+}
+
+export async function listLatestPublicArticles(options: {
+  limit: number
+  offset?: number
+  genre?: string | null
+  sourceType?: string | null
+}): Promise<ArticleWithScore[]> {
+  const sql = getSql()
+  const offset = options.offset ?? 0
+  const genre = buildGenreFilter(options.genre)
+  const sourceType = buildSourceTypeFilter(options.sourceType)
+
+  const rows = (await sql`
+    SELECT
+      pa.public_article_id AS id,
+      pa.public_key,
+      pa.canonical_url AS url,
+      pa.display_title AS title,
+      pa.source_category AS genre,
+      pa.source_type,
+      pa.thumbnail_url,
+      pa.thumbnail_emoji,
+      COALESCE(pa.original_published_at, pa.created_at) AS published_at,
+      pa.display_summary_100 AS summary_100,
+      pa.display_summary_200 AS summary_200,
+      pa.critique,
+      pa.publication_basis,
+      pa.summary_input_basis,
+      NULL::text AS topic_group_id,
+      pa.created_at,
+      pa.updated_at,
+      pa.content_score AS score,
+      NULL::jsonb AS breakdown
+    FROM public_articles pa
+    WHERE pa.visibility_status = 'published'
+      AND (${genre}::text IS NULL OR pa.source_category = ${genre})
+      AND (${sourceType}::text IS NULL OR pa.source_type = ${sourceType})
+    ORDER BY COALESCE(pa.original_published_at, pa.created_at) DESC
+    LIMIT ${options.limit}
+    OFFSET ${offset}
+  `) as PublicArticleRow[]
 
   return rows.map(toArticle)
 }
@@ -176,6 +268,7 @@ export async function searchPublicArticles(options: {
     ? ((await sql`
         SELECT
           pa.public_article_id AS id,
+          pa.public_key,
           pa.canonical_url AS url,
           pa.display_title AS title,
           pa.source_category AS genre,
@@ -208,6 +301,7 @@ export async function searchPublicArticles(options: {
     : ((await sql`
         SELECT
           pa.public_article_id AS id,
+          pa.public_key,
           pa.canonical_url AS url,
           pa.display_title AS title,
           pa.source_category AS genre,
@@ -238,6 +332,137 @@ export async function searchPublicArticles(options: {
       `) as PublicArticleRow[])
 
   return rows.map(toArticle)
+}
+
+export async function listTagSummaries(limit = 50): Promise<PublicTagSummary[]> {
+  const sql = getSql()
+  const rows = (await sql`
+    SELECT tm.tag_key, tm.display_name, COUNT(*)::int AS article_count
+    FROM public_article_tags pat
+    JOIN tags_master tm ON tm.tag_id = pat.tag_id
+    JOIN public_articles pa ON pa.public_article_id = pat.public_article_id
+    WHERE pa.visibility_status = 'published'
+    GROUP BY tm.tag_key, tm.display_name
+    ORDER BY article_count DESC, tm.display_name ASC
+    LIMIT ${limit}
+  `) as PublicTagRow[]
+
+  return rows.map((row) => ({
+    tagKey: row.tag_key,
+    displayName: row.display_name,
+    articleCount: Number(row.article_count),
+  }))
+}
+
+export async function listArticlesByTag(options: {
+  tagKey: string
+  limit: number
+  offset?: number
+}): Promise<ArticleWithScore[]> {
+  const sql = getSql()
+  const offset = options.offset ?? 0
+
+  const rows = (await sql`
+    SELECT
+      pa.public_article_id AS id,
+      pa.public_key,
+      pa.canonical_url AS url,
+      pa.display_title AS title,
+      pa.source_category AS genre,
+      pa.source_type,
+      pa.thumbnail_url,
+      pa.thumbnail_emoji,
+      COALESCE(pa.original_published_at, pa.created_at) AS published_at,
+      pa.display_summary_100 AS summary_100,
+      pa.display_summary_200 AS summary_200,
+      pa.critique,
+      pa.publication_basis,
+      pa.summary_input_basis,
+      NULL::text AS topic_group_id,
+      pa.created_at,
+      pa.updated_at,
+      pa.content_score AS score,
+      NULL::jsonb AS breakdown
+    FROM public_articles pa
+    JOIN public_article_tags pat ON pat.public_article_id = pa.public_article_id
+    JOIN tags_master tm ON tm.tag_id = pat.tag_id
+    WHERE pa.visibility_status = 'published'
+      AND tm.tag_key = ${options.tagKey}
+    ORDER BY COALESCE(pa.original_published_at, pa.created_at) DESC
+    LIMIT ${options.limit}
+    OFFSET ${offset}
+  `) as PublicArticleRow[]
+
+  return rows.map(toArticle)
+}
+
+export async function getPublicArticleDetail(publicKey: string): Promise<PublicArticleDetail | null> {
+  const sql = getSql()
+  const articleRows = (await sql`
+    SELECT
+      pa.public_article_id AS id,
+      pa.public_key,
+      pa.canonical_url AS url,
+      pa.display_title AS title,
+      pa.source_category AS genre,
+      pa.source_type,
+      pa.thumbnail_url,
+      pa.thumbnail_emoji,
+      COALESCE(pa.original_published_at, pa.created_at) AS published_at,
+      pa.display_summary_100 AS summary_100,
+      pa.display_summary_200 AS summary_200,
+      pa.critique,
+      pa.publication_basis,
+      pa.summary_input_basis,
+      NULL::text AS topic_group_id,
+      pa.created_at,
+      pa.updated_at,
+      pa.content_score AS score,
+      NULL::jsonb AS breakdown
+    FROM public_articles pa
+    WHERE pa.visibility_status = 'published'
+      AND (pa.public_key = ${publicKey} OR pa.public_article_id::text = ${publicKey})
+      LIMIT 1
+  `) as Array<PublicArticleRow & { public_key: string }>
+
+  const row = articleRows[0]
+  if (!row) return null
+
+  const [tagRows, sourceRows] = await Promise.all([
+    (sql`
+      SELECT tm.tag_key, tm.display_name, pat.sort_order
+      FROM public_article_tags pat
+      JOIN tags_master tm ON tm.tag_id = pat.tag_id
+      WHERE pat.public_article_id = ${row.id}
+      ORDER BY pat.sort_order ASC, tm.display_name ASC
+    `) as unknown as Promise<ArticleTagRow[]>,
+    (sql`
+      SELECT st.source_key, st.display_name, st.source_type
+      FROM public_article_sources pas
+      JOIN source_targets st ON st.source_target_id = pas.source_target_id
+      WHERE pas.public_article_id = ${row.id}
+      ORDER BY pas.is_primary DESC, pas.source_priority DESC
+    `) as unknown as Promise<ArticleSourceRow[]>,
+  ])
+
+  const article = toArticle(row)
+  return {
+    ...article,
+    publicKey: row.public_key,
+    tags: tagRows.map((tag) => ({
+      tagKey: tag.tag_key,
+      displayName: tag.display_name,
+    })),
+    sources: sourceRows.map((source) => ({
+      sourceKey: source.source_key,
+      displayName: source.display_name,
+      sourceType: source.source_type,
+    })),
+  }
+}
+
+export async function listFeedArticles(limit = 20): Promise<ArticleWithScore[]> {
+  return listLatestPublicArticles({ limit })
 }
 
 export async function getHomeStats(): Promise<HomeStats> {

@@ -913,3 +913,33 @@
     - `🛡️=12`
     - `🎙️=6`
     - `🔬=6`
+
+## 2026-03-18 L4 公開ページ群と mock4 反映
+
+- 公開ページ群を追加した。
+  - `src/app/ranking/page.tsx`
+  - `src/app/search/page.tsx`
+  - `src/app/articles/[publicKey]/page.tsx`
+  - `src/app/category/[slug]/page.tsx`
+  - `src/app/tags/page.tsx`
+  - `src/app/tags/[tagKey]/page.tsx`
+  - `src/app/about/page.tsx`
+  - `src/app/feed/page.tsx`
+  - `src/app/feed/route.ts`
+- 公開ページはすべて Layer4 だけを読む形に揃えた。
+  - detail は `public_articles + public_article_tags + public_article_sources`
+  - ranking / search / category / tags は `public-feed.ts` 経由
+- Home を L2/L4 設計に寄せて更新した。
+  - 右サイドバーを `source_type` ベースの lane UI へ変更
+  - `paper / alerts / news` を Home 導線へ追加
+  - topic chips と source lane を分離
+  - カードは `thumbnail_emoji` 前提に統一
+- `mock4` を追加した。
+  - `l3-l4-screen-flow.md` の Home / Ranking / Search / Detail / Category / Tag / About / Feed / PWA / Share / Topic Group を一通り確認可能
+  - live API が使えるときは `/api/home` / `/api/search` を読む
+  - DB 未接続時は fixture に自動フォールバックする
+- `public-feed.ts` を拡張した。
+  - tag 一覧 / tag 詳細 / detail / feed 用 query を追加
+  - 一覧系 query から `public_key` を返し、公開 URL を `/articles/:public_key` に寄せた
+- 確認済み:
+  - `npm run type-check` OK
