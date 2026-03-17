@@ -1,6 +1,6 @@
 ﻿'use client'
 
-type CategoryId = 'all' | 'youtube' | 'official' | 'blog' | 'agent'
+type CategoryId = 'all' | 'video' | 'official' | 'blog' | 'agent'
 
 interface NotifTime {
   label: string
@@ -13,13 +13,15 @@ interface Props {
   unread: number
   topRated: number
   savedLater: number
+  shareCountLastHour: number
+  activeArticlesLastHour: number
   notifTimes: NotifTime[]
   onNotifToggle: (index: number) => void
 }
 
 const categories: Array<{ id: CategoryId; label: string }> = [
   { id: 'all', label: '総合' },
-  { id: 'youtube', label: '動画' },
+  { id: 'video', label: '動画' },
   { id: 'official', label: '公式' },
   { id: 'blog', label: 'ブログ' },
   { id: 'agent', label: 'Agent' },
@@ -31,6 +33,8 @@ export function RightSidebar({
   unread,
   topRated,
   savedLater,
+  shareCountLastHour,
+  activeArticlesLastHour,
   notifTimes,
   onNotifToggle,
 }: Props) {
@@ -70,8 +74,10 @@ export function RightSidebar({
             className="rounded-lg px-2.5 py-2 text-[12px] font-bold leading-[1.4] text-accent-dark"
             style={{ background: '#fff9f3' }}
           >
-            この1時間で 28 件シェア
-            <div className="mt-1 text-[11px] font-normal text-muted">+3 件が急上昇</div>
+            この1時間で {shareCountLastHour} 件シェア
+            <div className="mt-1 text-[11px] font-normal text-muted">
+              {activeArticlesLastHour} 件の記事で反応あり
+            </div>
           </div>
         </SideSection>
 

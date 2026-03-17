@@ -1,291 +1,248 @@
 # AI Trend Hub Implementation Hangover
 
-最終更新: 2026-03-15
+最終更新: 2026-03-17（Gemini 100件試験・backlog 1882件 manual export 反映）
 
 ## 1. このファイルの役割
 
 セッションが切れても、ここから再開できるように現状を短く固定する。
-今の主戦場は `Layer1 -> Layer2`。`Layer3 / Layer4` はまだ本格着手していない。
 
-## 2. 現在の基本方針
+---
 
-1. Google Alerts は discovery 用。原則 `feed_only`。
-2. 公式 source は `fulltext_allowed` を基本にする。
-3. ただし本文取得は source だけでなく domain review も通す。
-4. snippet は捨てない。Layer2 で
-   - `full_summary`
-   - `source_snippet`
-   - `hold`
-   に分ける。
-5. `source_snippet` は「生 snippet を出す」のではなく、「snippet を入力に 100/200 要約したもの」を公開文に使う。
-6. web 側は `summary_input_basis` を見て
-   - 本文要約
-   - snippet 要約
-   を表示上で区別できるようにする。
+## 2. 現在のフェーズ
 
-## 3. 現在の重要カラム
+**Layer 4 稼働済み。公開面 API は L4 系へ切替済み。Gemini 100件試験は通過。残り 1882 件は manual artifact flow へ切替済み。**
 
-### 3.1 source_targets
+- Layer 1 → 2 → 4 の自動パイプライン完成・動作確認済み
+- 745 件が `public_articles` に公開済み
+- `daily-enrich` の `100件 / 10 batch` Gemini 試験は完走
+- `articles_raw` の未処理は `1882` 件
+- `src/app/page.tsx` は `/api/home` ベースへ切替済み
+- `hackernews-ai` targeted fetch / enrich は再開確認済み
+- backlog 1882 件は `artifacts/ai-enrich-inputs-backlog-1882.json` へ export 済み
+- manual 作業しやすいように `part1` 〜 `part8` へ分割済み
 
-- `content_access_policy`
-  - `feed_only`
-  - `fulltext_allowed`
-  - `blocked_snippet_only`
+---
 
-### 3.2 observed_article_domains
+## 3. バッチ構成（現在稼働中）
 
-- `fetch_policy`
-  - `needs_review`
-  - `fulltext_allowed`
-  - `snippet_only`
-  - `blocked`
+```
+hourly-layer12（毎時 :05）
+  ├── hourly-fetch  → articles_raw（Layer 1）
+  └── daily-enrich → articles_enriched（Layer 2）
+        ↑ tag_keywords を使った summary_200 ベースのタグマッチ
 
-### 3.3 articles_enriched
-
-- `summary_basis`
-  - `full_content`
-  - `feed_snippet`
-  - `blocked_snippet`
-  - `fallback_snippet`
-- `publication_basis`
-  - `hold`
-  - `full_summary`
-  - `source_snippet`
-- `summary_input_basis`
-  - `full_content`
-  - `source_snippet`
-  - `title_only`
-- `publication_text`
-  - 公開面で使う本文
-- `is_provisional`
-- `provisional_reason`
-- `publish_candidate`
-
-## 4. 現在の source 状態
-
-### 4.1 active source 数
-
-- active source: `17`
-- `feed_only`: `9`
-- `fulltext_allowed`: `8`
-
-### 4.2 fulltext_allowed source
-
-- `anthropic-news`
-- `google-ai-blog`
-- `openai-news`
-- `microsoft-foundry-blog`
-- `aws-machine-learning-blog`
-- `huggingface-blog`
-- `nvidia-developer-blog`
-- `meta-ai-news`
-
-### 4.3 active だが discovery 用の source
-
-- Google Alerts 系 9本
-
-## 5. 現在の Layer2 スナップショット
-
-`npm run db:check-layer12` の最新観測:
-
-- `raw_total = 966`
-- `raw_processed = 490`
-- `raw_unprocessed = 476`
-- `raw_with_error = 253`
-- `enriched_total = 490`
-- `enriched_ready_total = 459`
-- `enriched_provisional_total = 31`
-
-### 5.1 content path
-
-- `full = 317`
-- `snippet = 173`
-
-### 5.2 publication basis
-
-- `full_summary = 317`
-- `source_snippet = 142`
-- `hold = 31`
-
-### 5.3 summary input basis
-
-- `full_content = 317`
-- `source_snippet = 168`
-- `title_only = 5`
-
-意味:
-
-- 317件は本文を取って要約済み
-- 142件は snippet を入力に要約し、公開候補まで進めた
-- 31件はまだ保留
-
-## 6. official source の進み具合
-
-- `openai-news ready=91 / unprocessed=187`
-- `huggingface-blog ready=91 / unprocessed=186`
-- `nvidia-developer-blog ready=90 / unprocessed=10`
-- `aws-machine-learning-blog ready=20 / unprocessed=0`
-- `microsoft-foundry-blog ready=10 / unprocessed=0`
-- `meta-ai-news ready=10 / unprocessed=0`
-- `anthropic-news ready=1 / unprocessed=0`
-- `google-ai-blog ready=1 / unprocessed=0`
-
-ここでいう `ready` は、現状ほぼ「Layer2 で公開候補に進める状態」の数。
-
-## 7. 最近入れた大きい変更
-
-### 7.1 summary_300 廃止
-
-- 300文字要約は削除済み
-- 要約は `100 / 200` のみ
-- Gemini 呼び出しは 1記事あたり 3回から 2回へ削減
-
-### 7.2 source-targeted daily enrich
-
-- `daily-enrich` に `sourceKey` 指定を追加
-- 公式 source を狙い撃ちで消化可能
-
-API:
-
-```bash
-POST /api/cron/daily-enrich?limit=20&sourceKey=openai-news
+hourly-publish（毎時 :35）
+  └── articles_enriched → public_articles（Layer 4）
+        ↑ nanoid(11) の public_key で YouTube 風 URL
 ```
 
-### 7.3 snippet publication path
+GitHub Actions: `.github/workflows/hourly-layer12.yml` + `.github/workflows/hourly-publish.yml`
 
-- Layer2 で `hold / full_summary / source_snippet` を確定
-- `source_snippet` は snippet をそのまま出すのではなく、snippet を入力に作った 100/200 要約を `publication_text` に保存
-- `summary_input_basis` で web 側が表示ラベルを切り替えられる
+---
 
-## 8. まだ残っている主な課題
+## 4. Layer 2 スナップショット（2026-03-17 時点）
 
-1. web 側にまだ公開面がない
-2. web 側で `summary_input_basis` を見て
-   - 本文要約
-   - snippet 要約
-   を表示分岐する必要がある
-3. official source backlog がまだ大きい
-   - OpenAI
-   - Hugging Face
-   - NVIDIA の残り
-4. raw の古い `could not determine data type of parameter $7` 系エラー残骸がまだ残っている
-5. dedupe はまだ全件一律寄り
-   - 再配信サイト向けの重み付けに整理余地あり
-6. tag candidate はまだ運用調整余地あり
+| 指標 | 値 |
+|---|---|
+| `articles_enriched` (総数) | 981件 |
+| `articles_raw` 未処理 (enrich待ち) | 1882件 |
+| `publication_basis=full_summary` | 611件 |
+| `publication_basis=source_snippet` | 148件 |
+| `ai_processing_state=manual_pending` | 0件 |
 
-## 9. 次にやると自然なタスク
+---
 
-優先順:
+## 5. Layer 4 スナップショット（2026-03-17 時点）
 
-1. web 公開面の暫定実装
-   - `publish_candidate = true`
-   - `publication_text`
-   - `publication_basis`
-   - `summary_input_basis`
-   を使って一覧化
-2. `source_snippet` に「配信元スニペットを要約」と表示ラベルを出す
-3. official source backlog を source 指定 enrich で継続消化
-4. raw error 残骸の再キュー整理
-5. dedupe を「再配信サイト寄り」に寄せて再設計
+| 指標 | 値 |
+|---|---|
+| `public_articles` published | 745件 |
+| `public_article_tags` 総数 | 1,638件 |
+| `public_rankings` | 実装済み（activity + content_score の暫定式） |
+
+---
+
+## 6. ソース構成（2026-03-17 確定版）
+
+### 6.1 アクティブソース（32件）
+
+| source_type | 件数 | 主要ソース |
+|---|---|---|
+| official | 11 | openai, huggingface-blog, nvidia, aws, meta, microsoft, google-ai, anthropic, deepmind, langchain, bair |
+| alerts | 9 | Google Alerts 各種（llm/agent/voice/policy/safety/search） |
+| blog | 9 | zenn, reddit-ml, reddit-llama, devto, hackernews, simonwillison, the-gradient, last-week-in-ai, towards-data-science |
+| paper | 1 | arxiv-ai（437件取得済み） |
+| news | 2 | venturebeat-ai, mit-technology-review-ai |
+
+### 6.2 無効化ソース（要対応）
+
+| ソース | 理由 |
+|---|---|
+| `anthropic-news` | feed URL 404（継続中） |
+| `google-ai-blog` | parse error（継続中） |
+| `huggingface-papers` | 公式 RSS 存在しない |
+| `mistral-ai-news` | 公式 RSS 存在しない |
+| `ledge-ai` | feed URL 不明 |
+| `paperswithcode` | RSS XML 不正エンコーディング |
+| `ai-news-roundup` | placeholder URL のまま無効 |
+
+---
+
+## 7. タグシステム構成（2026-03-17 確定版）
+
+### 7.1 構造
+
+- **Tier 1**（トピック分類）: llm, agent, coding-ai, enterprise-ai, generative-ai, rag, safety, voice-ai, policy, google-ai
+- **Tier 2**（製品・企業）: claude, chatgpt, gpt-5, gemini, llama, cursor, openai, anthropic ... 全 67 タグ
+- **tag_keywords**: 368 キーワード（収集フィルタ + Web 検索サジェスト）
+
+### 7.2 タグマッチの仕組み
+
+```
+daily-enrich 内:
+  AI 要約生成（summary_200）
+    ↓
+  matchTagsFromKeywords(tagKeywords, title, summary_200)
+    ↓
+  articles_enriched_tags に保存
+
+hourly-publish 内:
+  articles_enriched_tags → public_article_tags へ転写
+```
+
+### 7.3 既存記事のバックフィル
+
+`npm run db:backfill-article-tags` で 745 件に一括再タグ付け済み。
+
+---
+
+## 8. DB スキーマの主要追加（このセッションで実施）
+
+| migration | 内容 |
+|---|---|
+| 024 | `articles_enriched` に `source_category` 追加 |
+| 025 | `public_articles` に `source_category` / `summary_input_basis` / `publication_basis` / `content_score` 追加 |
+| 026 | `source_type`（official/blog/paper/news/video/alerts）を全テーブルに追加 |
+| 027 | `critique` を拡張カラムとして追加（初期 NULL、将来付与） |
+| 028 | mock3 残骸テーブル削除 |
+| 029 | `source_type` CHECK に `paper` 追加 |
+| 030 | `tag_keywords` テーブル新規作成 |
+
+---
+
+## 9. 残っている主な課題
+
+1. **manual artifact flow の実施**
+   - `artifacts/ai-enrich-inputs-backlog-1882.json` を外部要約フローへ投入
+   - `artifacts/ai-enrich-output-template-backlog-1882.json` を埋めて import する
+2. **manual import 後の publish 反映**
+   - `scripts/import-ai-enrich-outputs.ts` で L2 へ戻す
+   - `hourly-publish` を実行して L4 公開面へ反映する
+3. **無効化ソースの修復または代替**
+   - `anthropic-news` / `google-ai-blog` の feed URL を調査
+   - `huggingface-papers` の代替 RSS を探す（例: tldr.takara.ai）
+4. **L3 正式運用の詰め**
+   - `activity_logs.action_type` の正式マッピングを確定
+   - `public_rankings` の係数調整を行う
+5. **priority_processing_queue の最小実装**
+   - `hide_article` から入るか、別 worker に分けるかを決める
+
+---
 
 ## 10. すぐ使うコマンド
 
-### 状態確認
-
 ```bash
+# 型チェック
 npm run type-check
+
+# ソース状態確認
 npm run db:check-layer12
 npm run db:check-source-policies
-npm run db:check-domain-policies -- --needs-review
+
+# Gemini 100件 / 10 batch 試験
+npx tsx scripts/run-daily-enrich.ts --limit 100 --summary-batch-size 10 --max-summary-batches 10
+
+# manual backlog export
+npx tsx scripts/export-ai-enrich-inputs.ts --limit 1882 --policy all --export-mode seed_only --output artifacts/ai-enrich-inputs-backlog-1882.json
+npx tsx scripts/import-ai-enrich-outputs.ts --input artifacts/ai-enrich-inputs-backlog-1882.json --write-template-only --template-output artifacts/ai-enrich-output-template-backlog-1882.json
+
+# 分割済み manual backlog
+artifacts/ai-enrich-inputs-backlog-1882-part1.json
+artifacts/ai-enrich-inputs-backlog-1882-part2.json
+artifacts/ai-enrich-inputs-backlog-1882-part3.json
+artifacts/ai-enrich-inputs-backlog-1882-part4.json
+artifacts/ai-enrich-inputs-backlog-1882-part5.json
+artifacts/ai-enrich-inputs-backlog-1882-part6.json
+artifacts/ai-enrich-inputs-backlog-1882-part7.json
+artifacts/ai-enrich-inputs-backlog-1882-part8.json
+
+# fetch / enrich / publish
+npx tsx scripts/run-hourly-fetch.ts --limit 50
+# npx tsx scripts/run-daily-enrich.ts --limit 50  ← スクリプト未作成
+npx tsx scripts/run-hourly-publish.ts
+
+# タグ系
+npm run db:seed-keywords       # tag_keywords 再投入
+npm run db:backfill-article-tags  # 既存記事タグ再付与
+
+# Layer 4 確認 SQL（Neon）
+SELECT source_type, COUNT(*) FROM public_articles GROUP BY source_type;
+SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT 20;
 ```
 
-### source / domain 操作
+---
 
-```bash
-npm run db:set-source-policy -- <source-key> <policy> --requeue
-npm run db:set-domain-policy -- <domain> <policy> <summary-policy>
-npm run db:promote-domain-policy -- <domain> <policy> <summary-policy>
-```
+## 11. 次セッションの推奨読込み順
 
-### raw 再処理
+1. `docs/imp/imp-hangover.md`（このファイル）
+2. `docs/imp/implementation-wait.md`（判断待ち）
+3. `docs/imp/implementation-plan.md`（全体方針）
+4. `docs/imp/l3-l4-screen-flow.md`（画面遷移と L3/L4 接続点）
+5. `docs/spec/04-data-model-and-sql.md`（スキーマ）
 
-```bash
-node scripts/requeue-raw.mjs --source-key openai-news --limit 20
-node scripts/requeue-raw.mjs --domain example.com --provisional-only --limit 20
-```
+---
 
-### source 指定 enrich
+## 12. 2026-03-18 引き継ぎメモ
 
-```bash
-POST /api/cron/daily-enrich?limit=20&sourceKey=openai-news
-POST /api/cron/daily-enrich?limit=20&sourceKey=huggingface-blog
-POST /api/cron/daily-enrich?limit=20&sourceKey=nvidia-developer-blog
-```
+### 12.1 backlog 1882 件は登録済み
 
-## 11. 参照すべきファイル
+1. `articles_raw.is_processed = 2863/2863`
+2. `articles_enriched = 2861`
+3. backlog `1882` 件に限る title 日本語化漏れは `0`
+4. 旧データ由来の非日本語 title は全体で `211`
 
-優先:
+### 12.2 L2/L4 の分類整合は回復済み
 
-1. `docs/guide/*`
-2. `docs/imp/implementation-plan.md`
-3. `docs/imp/imp-status.md`
-4. `docs/imp/implementation-wait.md`
-5. `docs/spec/04-data-model-and-sql.md`
-6. `docs/spec/05-ingestion-and-ai-pipeline.md`
-7. `docs/spec/11-batch-job-design.md`
+1. `source_targets` を正として `articles_enriched.source_type` を再同期済み
+2. 修正件数は `1866`
+3. 現在の `source_type` 不一致は `0`
+4. 補正 SQL は `docs/imp/sql/2026-03-18-l2-l4-data-realign.sql`
 
-実装本体:
+### 12.3 publish はまだ遅い
 
-1. `src/lib/jobs/daily-enrich.ts`
-2. `src/lib/db/enrichment.ts`
-3. `src/lib/extractors/content.ts`
-4. `scripts/check-layer12.mjs`
+1. `hourly-publish` 再実行で `public_articles` は `745 -> 911` まで増えた
+2. ただし job は長時間化し、`job_run_id=93` を停止して `failed` にした
+3. 2371 publish candidate を安定反映するには bulk 化が必要
 
-## 12. 直近コミット
+### 12.4 次にやるべきこと
 
-- `d545ee9` feat: remove summary 300 pipeline
-- `d756700` feat: support source-targeted daily enrich
-- `34592e3` feat: finalize snippet publication path in layer2
-- `84bf669` feat: summarize publishable snippets in layer2
+1. `hourly-publish` の bulk upsert 化
+2. publish 完走後の `compute-ranks` 再実行
+3. Home UI のカテゴリ定義を `source_type` / `source_category` 分離前提で整理
+4. summary 途中切れ対策と snippet 品質 gate の導入
 
-## 13. 2026-03-16 追検証タスク
+### 12.5 2026-03-18 抜き取り品質監査メモ
 
-1. 自動要約の障害系テスト
-   - `GEMINI_API_KEY` と `OPENAI_API_KEY` を無効化または外す
-   - 小さな `daily-enrich` を実行する
-   - `articles_enriched.ai_processing_state=manual_pending` を確認する
-   - `publication_basis=hold` を確認する
-   - `artifacts/manual-pending/` に JSON が出力されることを確認する
-2. manual recovery テスト
-   - 出力された manual-pending JSON を 1 本使う
-   - reviewed output JSON を作る
-   - `scripts/import-ai-enrich-outputs.ts` で import する
-   - `ai_processing_state=completed` と summary 更新を確認する
-3. batch provider テスト
-   - `summaryBatchSize=10` で要約生成を流す
-   - Gemini / OpenAI が parse 可能な JSON を安定返却するか確認する
-   - `job_runs` / `job_run_items` で latency と failure pattern を見る
-4. 毎時 orchestration テスト
-   - `hourly-fetch -> daily-enrich` を `hourly-layer12` 経由で直列実行する
-   - totals と batch count が整合するか確認する
-   - stale な `running` job が残らないことを確認する
+1. `articles_enriched.title` の非日本語行は `0` になった
+2. ただし公開候補 10 件のランダム監査で、次の問題を確認した
+   - summary の途中切れ
+   - `source_snippet` の title-summary 内容ずれ
+   - `paper` でのタグ誤付与
+3. `summary_100` 長さ `100+` は `398` 件、`summary_200` 長さ `200+` は `1016` 件
+4. `publication_basis='source_snippet'` は `294` 件あり、Web 表示前に品質 gate が必要
 
-## 14. サイクルテスト移行メモ
+### 12.6 2026-03-18 追加実装
 
-1. まずジョブを分離して試す
-   - `hourly-fetch`
-   - `daily-enrich`
-   - `hourly-layer12`
-2. テスト条件は小さく固定する
-   - `sourceKey` を固定
-   - `limit` を小さく
-   - `summaryBatchSize` を明示
-3. 毎回 3 面で確認する
-   - DB state
-   - `job_runs` / `job_run_items`
-   - 生成 artifact
-4. 現フェイズの主要回帰リスク
-   - requeue 後の重複処理
-   - batch provider JSON の parse 崩れ
-   - 低品質 fallback の混入
-   - `manual_pending` 行が export されないこと
+1. `source_snippet` 向け prompt 制約を強化し、明白な title-summary 不一致は `daily-enrich` 側で止めるようにした
+2. `source_type='paper'` は `paper` タグのみ付与に変更済み
+3. `public_articles.thumbnail_emoji` を追加し、既存 911 件も backfill 済み

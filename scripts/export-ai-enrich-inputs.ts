@@ -141,6 +141,59 @@ function determineSummaryInput(
   }
 }
 
+function determineSeedOnlyContentState(
+  contentAccessPolicy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only',
+  observedDomainFetchPolicy: 'needs_review' | 'fulltext_allowed' | 'snippet_only' | 'blocked' | null,
+) {
+  if (contentAccessPolicy === 'feed_only') {
+    return {
+      contentPath: 'snippet' as const,
+      extractionStage: 'feed_only_policy' as const,
+      extractionError: 'feed_only_policy',
+      extractedLength: 0,
+      snippetLength: 0,
+    }
+  }
+
+  if (contentAccessPolicy === 'blocked_snippet_only' || observedDomainFetchPolicy === 'blocked') {
+    return {
+      contentPath: 'snippet' as const,
+      extractionStage: 'domain_snippet_only' as const,
+      extractionError: 'domain_snippet_only',
+      extractedLength: 0,
+      snippetLength: 0,
+    }
+  }
+
+  if (observedDomainFetchPolicy === 'snippet_only') {
+    return {
+      contentPath: 'snippet' as const,
+      extractionStage: 'domain_snippet_only' as const,
+      extractionError: 'domain_snippet_only',
+      extractedLength: 0,
+      snippetLength: 0,
+    }
+  }
+
+  if (observedDomainFetchPolicy === 'needs_review') {
+    return {
+      contentPath: 'snippet' as const,
+      extractionStage: 'domain_needs_review' as const,
+      extractionError: 'domain_needs_review',
+      extractedLength: 0,
+      snippetLength: 0,
+    }
+  }
+
+  return {
+    contentPath: 'snippet' as const,
+    extractionStage: 'feed_only_policy' as const,
+    extractionError: 'seed_only_export',
+    extractedLength: 0,
+    snippetLength: 0,
+  }
+}
+
 function isSnippetPublicationEligible(
   summaryBasis: 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet',
   contentPath: 'full' | 'snippet',
@@ -183,28 +236,39 @@ loadEnvFile('.env')
 
 const limit = Math.max(1, Number(readArg('--limit', '500')))
 const sourceKey = readArg('--source-key')
+const policyMode = readArg('--policy', 'all')
+const exportMode = readArg('--export-mode', 'full') ?? 'full'
 const outputPath =
   readArg('--output') ??
   path.join(process.cwd(), 'artifacts', `ai-enrich-inputs-${sourceKey ?? 'official-remaining'}.json`)
 
 async function main(): Promise<void> {
   const rawArticles = await listRawArticlesForEnrichment(limit, sourceKey)
-  const targetRawArticles = rawArticles.filter((row) => row.contentAccessPolicy === 'fulltext_allowed')
+  const targetRawArticles =
+    policyMode === 'fulltext_only'
+      ? rawArticles.filter((row) => row.contentAccessPolicy === 'fulltext_allowed')
+      : rawArticles
   const tagReferences = await listActiveTagReferences()
   const items = []
 
   for (const rawArticle of targetRawArticles) {
     const title = rawArticle.title ? normalizeHeadline(rawArticle.title) : rawArticle.normalizedUrl
     const normalizedSnippet = rawArticle.snippet ? decodeAndNormalizeText(rawArticle.snippet) : ''
-    const contentResult = await resolveArticleContent(
-      rawArticle.citedUrl ?? rawArticle.sourceUrl,
-      normalizedSnippet,
-      rawArticle.contentAccessPolicy,
-      rawArticle.observedDomainFetchPolicy,
-    )
+    const contentResult =
+      exportMode === 'seed_only'
+        ? determineSeedOnlyContentState(
+            rawArticle.contentAccessPolicy,
+            rawArticle.observedDomainFetchPolicy,
+          )
+        : await resolveArticleContent(
+            rawArticle.citedUrl ?? rawArticle.sourceUrl,
+            normalizedSnippet,
+            rawArticle.contentAccessPolicy,
+            rawArticle.observedDomainFetchPolicy,
+          )
     const summaryInput = determineSummaryInput(
       contentResult.contentPath,
-      contentResult.content,
+      'content' in contentResult ? contentResult.content : '',
       normalizedSnippet,
       title,
     )
@@ -212,7 +276,7 @@ async function main(): Promise<void> {
     const tagResult = matchTags(
       tagReferences,
       title,
-      contentResult.content || normalizedSnippet,
+      ('content' in contentResult ? contentResult.content : '') || normalizedSnippet,
       rawArticle.sourceCategory,
     )
     const duplicate = await findDuplicateMatch(
@@ -258,7 +322,7 @@ async function main(): Promise<void> {
       extractionError: contentResult.extractionError ?? null,
       extractedLength: contentResult.extractedLength,
       snippetLength: contentResult.snippetLength,
-      content: contentResult.content,
+      content: 'content' in contentResult ? contentResult.content : '',
       summaryInputBasis: summaryInput.summaryInputBasis,
       summaryInputText: summaryInput.summaryInputText,
       summaryBasis,
@@ -286,6 +350,8 @@ async function main(): Promise<void> {
       {
         generatedAt: new Date().toISOString(),
         sourceKey: sourceKey ?? null,
+        policyMode,
+        exportMode,
         limit,
         totalRawFetched: rawArticles.length,
         totalExported: items.length,
@@ -298,6 +364,8 @@ async function main(): Promise<void> {
   )
 
   console.log(`exported=${items.length}`)
+  console.log(`policyMode=${policyMode}`)
+  console.log(`exportMode=${exportMode}`)
   console.log(`output=${outputPath}`)
 }
 

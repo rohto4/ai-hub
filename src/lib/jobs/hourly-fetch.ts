@@ -26,6 +26,11 @@ export interface HourlyFetchResult {
   targets: HourlyFetchTargetResult[]
 }
 
+export interface HourlyFetchOptions {
+  limit?: number
+  sourceKey?: string | null
+}
+
 async function processSourceTarget(sourceTarget: SourceTarget): Promise<HourlyFetchTargetResult> {
   const collector = getCollector(sourceTarget.fetchKind)
   const result: HourlyFetchTargetResult = {
@@ -60,12 +65,14 @@ async function processSourceTarget(sourceTarget: SourceTarget): Promise<HourlyFe
   return result
 }
 
-export async function runHourlyFetch(limit = 20): Promise<HourlyFetchResult> {
+export async function runHourlyFetch(options: number | HourlyFetchOptions = 20): Promise<HourlyFetchResult> {
+  const limit = typeof options === 'number' ? options : options.limit ?? 20
+  const sourceKey = typeof options === 'number' ? null : options.sourceKey ?? null
   const jobRunId = await startJobRun({
     jobName: 'hourly-fetch',
-    metadata: { limit },
+    metadata: { limit, sourceKey },
   })
-  const sourceTargets = await listDueSourceTargets(limit)
+  const sourceTargets = await listDueSourceTargets(limit, sourceKey)
   const settled = await Promise.allSettled(sourceTargets.map((sourceTarget) => processSourceTarget(sourceTarget)))
 
   const targets: HourlyFetchTargetResult[] = settled.map((entry, index) => {

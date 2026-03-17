@@ -1,5 +1,5 @@
 import { getSql } from '@/lib/db'
-import type { TagReference } from '@/lib/tags/match'
+import type { TagKeywordReference, TagReference } from '@/lib/tags/match'
 
 type TagRow = {
   id: string
@@ -7,6 +7,28 @@ type TagRow = {
   display_name: string
   trend_keyword: string | null
   aliases: string[] | null
+}
+
+type TagKeywordRow = {
+  tag_id: string
+  keyword: string
+  is_case_sensitive: boolean
+}
+
+export async function listCollectionTagKeywords(): Promise<TagKeywordReference[]> {
+  const sql = getSql()
+  const rows = (await sql`
+    SELECT tag_id, keyword, is_case_sensitive
+    FROM tag_keywords
+    WHERE use_for_collection = true
+    ORDER BY tag_id, keyword
+  `) as TagKeywordRow[]
+
+  return rows.map((row) => ({
+    tagId: row.tag_id,
+    keyword: row.keyword,
+    isCaseSensitive: row.is_case_sensitive,
+  }))
 }
 
 export async function listActiveTagReferences(): Promise<TagReference[]> {

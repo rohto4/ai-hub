@@ -1,6 +1,6 @@
 # AI Trend Hub 実装ステータス
 
-最終更新: 2026-03-15
+最終更新: 2026-03-16（主要タスク・確認順を現フェイズへ更新）
 
 ## 進捗サマリ
 
@@ -21,26 +21,31 @@
 
 ## いま残っている主要タスク
 
-1. Neon 上で migration 適用確認
-2. `daily-enrich` の処理時間短縮
-3. `tag_candidate_pool` のノイズ削減
-4. `content_path=full` の抽出率改善
-5. `job_runs` migration 適用と監視結果の実データ確認
-6. 旧 raw を再処理して title 正規化と候補タグ改善の効果確認
-7. hourly publish 実装
-8. 日次タグ昇格バッチ実装
-9. 週次アーカイブ実装
-10. `public_articles` 系を読む本実装 API 接続
+現フェイズ: **cycle test / hardening → service-start hardening**
+
+1. **web 公開面の暫定実装**（最優先）
+   - `publish_candidate=true` / `publication_text` / `publication_basis` / `summary_input_basis` を使った記事一覧
+   - `source_snippet` 行に「配信元スニペットを要約」ラベルを出す
+2. **`anthropic-news` の feed URL 修復または停止判断**
+   - 複数回の fetch / hourly-layer12 で `Status code 404` を継続確認
+3. **Gemini key ローテーション / 運用方針整理**
+   - `GEMINI_API_KEY` = `403 leaked key` → 無効化が必要
+   - `GEMINI_API_KEY2` = `429 spending cap`
+4. **git filter-repo 後の remote push 確認**
+   - `git push --force-with-lease origin main`（履歴 rewrite 済みだが push が残っている可能性あり）
+5. `raw_unprocessed=89` の日次消化継続
+6. raw error 残骸（古い `could not determine data type of parameter $7` 系）の再キュー整理
+7. `hourly-publish` 実装（Layer2 → Layer4 公開反映）
+8. `daily-tag-promote` バッチ実装
+9. `weekly-archive` 実装
 
 ## 再開時の推奨確認順
 
-1. `docs/imp/implementation-wait.md`
-2. `docs/memo/20260312-data-design.md`
-3. `docs/spec/04-data-model-and-sql.md`
-4. `docs/spec/05-ingestion-and-ai-pipeline.md`
-5. `docs/spec/10-ingestion-layer-design.md`
-6. `migrations/001_extensions.sql` から `migrations/009_rls.sql`
-7. `docs/mock3/`
+1. `docs/imp/imp-hangover.md`（現状スナップショット・次タスク）
+2. `docs/imp/implementation-wait.md`（判断待ち論点）
+3. `docs/imp/implementation-plan.md`（現フェイズ方針）
+4. `docs/spec/11-batch-job-design.md`（ジョブ仕様）
+5. `docs/spec/05-ingestion-and-ai-pipeline.md`（全体フロー）
 
 ## 今回の一連のタスクで使った入力トークン量と出力トークン量
 
@@ -348,6 +353,186 @@
 - 現在フェイズ:
   - 実装追加よりも、ジョブ経路の cycle test と hardening が主課題
 
+## 2026-03-16 サイクルテスト + manual recovery 更新
+
+- 2026-03-16 05:18 JST から小さい固定条件でジョブ経路を再検証した。
+- 実行内容:
+  - `hourly-fetch limit=1`
+  - `daily-enrich limit=2 sourceKey=google-alerts-ai-agents-coding-agents summaryBatchSize=10`
+  - provider 全停止の `daily-enrich limit=1`
+  - `manual_pending` 1 件 import
+  - `hourly-layer12 fetchLimit=1 enrichBatchSize=1 maxEnrichBatches=1 summaryBatchSize=10`
+- 観測結果:
+  - `hourly-fetch limit=1` は今回も `anthropic-news` で `Status code 404`
+  - 通常 `daily-enrich` 2 件は Gemini primary=`403 leaked key`, Gemini secondary=`429 spending cap` の後に OpenAI fallback で処理成功
+  - provider 全停止の `daily-enrich` 1 件は `manualPendingCount=1`、artifact=`artifacts/manual-pending/ai-enrich-inputs-manual-pending-google-alerts-ai-agents-coding-agents-job-77-2026-03-15T20-18-58-091Z.json`
+  - reviewed output import 1 件が成功し、`raw_article_id=880` は `ai_processing_state=completed` に戻った
+  - `hourly-layer12` の totals は `attempted=1 / processed=1 / failed=0 / manualPending=0 / completedBatches=1`
+- この検証中に `scripts/import-ai-enrich-outputs.ts` の実バグを発見して修正した。
+  - 現象: export 側 input JSON の `rawArticleId` が文字列化されると、output JSON 側の数値 `rawArticleId` と突合できず `Missing output items` で import 失敗する
+  - 対応: input/output 両方の `rawArticleId` を正の整数へ正規化してから突合・upsert するように変更
+- 最新スナップショット (`npm run db:check-layer12` at 2026-03-16 05:22 JST):
+  - `raw_total = 966`
+  - `raw_processed = 877`
+  - `raw_unprocessed = 89`
+  - `enriched_total = 877`
+  - `enriched_ready_total = 750`
+  - `enriched_provisional_total = 127`
+  - `publication_basis full_summary = 608 / source_snippet = 142 / hold = 127`
+  - `summary_input_basis full_content = 608 / source_snippet = 172 / title_only = 97`
+
+## 2026-03-17 ソース fetch 実行・URL修正・状況確定
+
+- `source-targets.ts` の `listDueSourceTargets()` に `'api'` を追加（fetch_kind='api' が除外されていたバグ修正）
+- `hourly-fetch` を実行し新規ソースから **1,858件** を articles_raw に投入
+- URL 修正:
+  - `simonwillison-blog`: `rss/` → `atom/everything/` に修正（30件取得成功）
+  - `paperswithcode`: API→RSS 切り替えもXML不正エラー → `is_active=false`
+  - `huggingface-papers`: 公式 RSS なし → `is_active=false`
+  - `mistral-ai-news`: RSS 非提供 → `is_active=false`
+  - `ledge-ai`: feed URL 不明 → `is_active=false`
+- `scripts/run-hourly-fetch.ts` を新規作成（CLI 直接実行用）
+- 現在のアクティブソース構成（Google Alerts 除く）:
+  - official: 11（1,902件 raw）
+  - blog: 9（172件 raw）
+  - paper: 1 arXiv のみ（437件 raw）
+  - news: 2（17件 raw）
+- 未解決ソース: `anthropic-news`（404継続）、`google-ai-blog`（parse error継続）
+- 次のステップ: 新規 raw 記事の enrich → hourly-publish で Layer 4 更新
+
+## 2026-03-17 hourly-publish 実装・Layer 4 転送完了
+
+- `src/lib/jobs/hourly-publish.ts` を新規実装
+  - articles_enriched WHERE publish_candidate=true AND dedupe_status='unique' を取得
+  - nanoid(11) で YouTube 風 public_key を生成（既存行は再利用）
+  - public_articles / public_article_sources / public_article_tags に UPSERT
+  - publish_candidate=false になった記事を visibility_status='hidden' に更新
+  - job_runs / job_run_items に記録
+- `src/app/api/cron/hourly-publish/route.ts` を新規作成
+- `.github/workflows/hourly-publish.yml` を新規作成（毎時 :35 実行）
+- `scripts/run-hourly-publish.ts` を新規作成（CLI 直接実行用）
+- `package.json` に `db:run-hourly-publish` スクリプト追加
+- 動作確認結果（2回実行）:
+  - processed=745 / success=745 / failed=0 / tagsUpdated=1638 / hidden=0
+- 現在の Layer 4 状態:
+  - `public_articles` published=745件
+  - official/llm: 最多（タグ付き 600件）
+  - alerts 系: llm/agent/search/safety/policy/voice 計 145件
+- 確認済み: `npm run type-check` エラーなし
+
+## 2026-03-17 新規ソース追加・カスタムコレクター実装
+
+- 新規コレクター実装:
+  - `src/lib/collectors/paperswithcode.ts` — Papers with Code API（JSON）
+  - `src/lib/collectors/hackernews.ts` — Hacker News API（keyword filter）+ DB から tag_keywords を動的ロード
+  - `src/lib/collectors/api.ts` — fetchKind='api' の dispatcher（sourceKey パターンで振り分け）
+  - `src/lib/collectors/index.ts` に `api: apiCollector` を登録
+- `scripts/seed.mjs` に 20 ソースを追加（合計 37 ソース）:
+  - **paper**: huggingface-papers, arxiv-ai（arXiv RSS）, paperswithcode
+  - **blog**: zenn-ai, reddit-machinelearning, reddit-localllama, devto-ai, hackernews-ai, simonwillison-blog, the-gradient, last-week-in-ai, towards-data-science
+  - **news**: venturebeat-ai, mit-technology-review-ai, ledge-ai
+  - **official**: bair-blog, langchain-blog, mistral-ai-news, deepmind-research-blog
+- officialDomains に 8 ドメインを追加（arxiv.org, simonwillison.net, thegradient.pub, bair.berkeley.edu, blog.langchain.com, mistral.ai, deepmind.google, paperswithcode.com）
+- DB 状態（source_targets / is_active=true）:
+  - official: 12（fulltext_allowed）
+  - alerts: 9（feed_only）
+  - blog: 9（fulltext 2 / feed_only 7）
+  - paper: 3（fulltext_allowed 3）
+  - news: 3（feed_only）
+- 確認済み: `npm run type-check` エラーなし、`db:seed` 正常完了
+
+## 2026-03-16 daily-enrich タグマッチ改修・L2 バックフィル
+
+- `daily-enrich` のタグマッチング戦略を変更した:
+  - 旧: 準備フェーズで `matchTags()`（tag_key/alias）を使い full content に照合
+  - 新: 準備フェーズは `candidateTags` 抽出のみ。バッチフェーズで AI summary 生成後に `matchTagsFromKeywords()` を使い **title + summary_200（〜250字）** に照合
+  - 効果: 高速化（full content vs 250字）＋ Tier 2 タグ（claude, chatgpt 等）の自動付与
+- `src/lib/db/tags.ts` に `listCollectionTagKeywords()` 追加
+- `src/lib/tags/match.ts` に `TagKeywordReference` 型と `matchTagsFromKeywords()` 追加
+- `src/lib/jobs/daily-enrich.ts` を改修（summary 生成後にキーワードマッチ、source_category を Tier 1 タグとして自動付与）
+- `scripts/backfill-article-tags.mjs` を新規作成
+  - 既存 L2 記事（publish_candidate=true）に tag_keywords ベースのタグを一括付与
+  - AI 再呼び出し不要（キーワードマッチのみ）
+  - `tags_master.article_count` も更新
+- `package.json` に `db:backfill-article-tags` スクリプト追加
+- 確認済み: `npm run type-check` エラーなし
+
+## 2026-03-16 tag_keywords・generative-ai タグ・source_type paper 追加
+
+- migration 029: source_type CHECK 制約に `paper` を追加（source_targets / articles_enriched / public_articles）
+- migration 030: `tag_keywords` テーブルを新規作成
+  - タグマスタと収集フィルタ・Web 検索を繋ぐ統合キーワードマスタ
+  - `use_for_collection`: HN 等の収集フィルタに使うか
+  - `use_for_search`: Web 検索サジェストに使うか
+  - 1 キーワードが複数タグに重複登録可能
+- `tags_master` に `generative-ai`（Generative AI）タグを追加
+- `scripts/seed-keywords.mjs` を新規作成し、142 件のキーワードを投入
+  - llm(38), coding-ai(17), generative-ai(17), rag(12), agent(12), safety(10), voice-ai(10), policy(9), nvidia(9), google-ai(8)
+- `package.json` に `db:seed-keywords` スクリプトを追加
+- `tag_aliases`（表記ゆれ正規化）と `tag_keywords`（検索・収集語）は別テーブルとして明確に分離
+- HN コレクター実装時は `tag_keywords WHERE use_for_collection=true` からキーワードを動的ロードする
+
+## 2026-03-16 source_type・critique・mock3 テーブル整理
+
+- mock3 暫定実装テーブルを DB から確認・整理した。
+- 発見:
+  - `articles` / `feeds` / `topic_groups` / `rank_scores` / `source_items` は mock3 残骸（fake データのみ）
+  - `action_logs`（パーティション付き）は実クリックデータ 16 件あり → 継続使用
+  - `articles.source_type`（official/blog/news）と `critique`（批評）が現行 Layer 2 に不足していた
+- 実施した変更:
+  - migration 026: `source_targets` / `articles_enriched` / `articles_enriched_history` / `public_articles` に `source_type` 追加・バックフィル
+  - migration 027: `articles_enriched` / `articles_enriched_history` / `public_articles` に `critique` を拡張カラムとして追加（全 NULL、将来 full_content 記事に付与予定）
+  - migration 028: mock3 テーブル（articles/feeds/topic_groups/rank_scores/source_items）を DROP
+  - `src/lib/db/enrichment.ts`: `RawArticleForEnrichment` / `UpsertEnrichedInput` に `sourceType` 追加、SELECT / INSERT / UPDATE に反映
+  - `src/lib/jobs/daily-enrich.ts`: `sourceType` を upsert 呼び出しに追加
+  - `scripts/import-ai-enrich-outputs.ts`: `sourceType` optional 対応（`?? 'news'` フォールバック）
+  - `scripts/seed.mjs`: 全 source に `sourceType` 追加、INSERT SQL に `source_type` 列追加
+  - `docs/spec/04-data-model-and-sql.md`: `source_targets` / `articles_enriched` / `public_articles` のカラムリスト更新
+- DB の現在状態（migration 028 適用後のテーブル一覧）:
+  - articles_raw / articles_enriched / articles_enriched_history / articles_enriched_tags
+  - public_articles / public_article_sources / public_article_tags / public_rankings
+  - source_targets / source_priority_rules / observed_article_domains
+  - tags_master / tag_aliases / tag_candidate_pool
+  - job_runs / job_run_items / migration_history
+  - activity_logs（パーティション）/ activity_metrics_hourly / admin_operation_logs
+  - priority_processing_queue / push_subscriptions / digest_logs
+- 確認済み: `npm run type-check` エラーなし
+
+## 2026-03-16 Layer 4 設計・dim2_memo 差分解消
+
+- `docs/dim2_memo/` 配下（Layer 3/4 の別セッション設計）と現行 spec を照合し、差分を解消した。
+- 主な発見:
+  - `source_category` はトピック分類（llm/agent/voice/policy/safety/search）であり dim2_memo の display-layout 分類とは別軸
+  - `articles_enriched.score` は 0〜100 整数として既に実装済み（dim2_memo 想定の 0.0〜1.0 とスケール違い）
+  - `thumbnail_url` は DB 列は存在するが常に NULL（OGP は `/api/og` 動的生成で対応）
+  - `source_meta` は RSS 基本情報のみ（star 数・著者・likes は未実装ソースの話）
+- 実施した変更:
+  - migration 024: `articles_enriched` + `articles_enriched_history` に `source_category` 追加 + バックフィル
+  - migration 025: `public_articles` に `source_category` / `summary_input_basis` / `publication_basis` / `content_score` を追加
+  - `src/lib/db/enrichment.ts`: `UpsertEnrichedInput` に `sourceCategory` 追加、INSERT/UPDATE に反映
+  - `src/lib/jobs/daily-enrich.ts`: `upsertEnrichedArticle()` 呼び出しに `sourceCategory` 追加、`ManualPendingExportItem` 型を更新
+  - `scripts/import-ai-enrich-outputs.ts`: `sourceCategory` optional 対応（既存 JSON との後方互換を保持）
+  - `docs/spec/04-data-model-and-sql.md`: `articles_enriched` / `public_articles` のカラムリストと設計方針を更新
+  - `docs/imp/implementation-plan.md`: Section 9 に Layer 4 設計方針を追記
+- 確認が必要:
+  - `npm run type-check`
+  - `npm run db:migrate`（migration 024/025 を適用）
+  - `npm run db:check-layer12`（source_category が enriched に入っているか確認）
+- 次: `hourly-publish` 実装（`articles_enriched` → `public_articles` upsert スクリプト）
+
+## 2026-03-16 履歴スクラブ更新
+
+- `git filter-repo` を使って履歴中の `.env.example` 機密値をスクラブした。
+- 除去対象:
+  - 旧 `GEMINI_API_KEY`
+  - Neon の pooled / unpooled 接続文字列
+  - 上記に含まれていた DB password
+- rewrite 後は `git log -S "<旧Geminiキー>" --all` と `git log -S "<旧DB password>" --all` が空になることを確認した。
+- `git filter-repo` 実行により `origin` remote は一度外れたため、同じ GitHub URL を再登録済み。
+- 次の実運用手順:
+  - `git push --force-with-lease origin main`
+  - 旧履歴を参照している clone / CI cache があれば取り直す
+
 ## 2026-03-15 Primary Key Naming + Stable Text ID Update
 
 - Renamed generic primary key columns away from bare `id` so table-local and joined SQL can use unambiguous names such as:
@@ -550,3 +735,181 @@
   - `summaryInputBasis full_content = 100`
   - `summaryInputBasis title_only = 86`
 - この方式は実現可能。ただし最終登録は生 SQL 生成より、既存の `upsertEnrichedArticle` / `markRawProcessed` を呼ぶ import スクリプトに寄せた方が安全。
+
+## 2026-03-17 L3/L4 公開面切替・source 再開テスト
+
+- L3/L4 の公開経路を実コードに反映した。
+  - `src/app/api/home/route.ts` を追加し、Home 初期表示を `public_articles` / `public_rankings` / `activity_metrics_hourly` から返すようにした
+  - `src/app/api/trends/route.ts` と `src/app/api/search/route.ts` を `public_articles` ベースへ切り替えた
+  - `src/app/page.tsx` のモック記事前提を外し、`/api/home` を使う実データ読込へ変更した
+  - `src/components/sidebar/RightSidebar.tsx` の「リアルタイム活動」を `activity_metrics_hourly` の実数表示に差し替えた
+- L3 記録を有効化した。
+  - `src/app/api/actions/route.ts` は `activity_logs` へ記録しつつ、`activity_metrics_hourly` を hour bucket で upsert 更新するようにした
+  - 暫定マッピング:
+    - `view -> impression_count`
+    - `expand_200 / topic_group_open / digest_click -> open_count`
+    - `article_open -> source_open_count`
+    - `share_* -> share_count`
+    - `save -> save_count`
+- L4 ランキング系を `public_rankings` ベースに実装した。
+  - `src/lib/ranking/compute.ts` を `content_score + activity` と時間減衰の式へ差し替えた
+  - `src/app/api/cron/compute-ranks/route.ts` は `activity_metrics_hourly` と `public_articles` から `public_rankings` を再計算する
+  - `src/app/api/cron/send-digest/route.ts` は `public_rankings` / `public_articles` を読むようにした
+- source 単位の再開テスト用に CLI を拡張した。
+  - `src/lib/db/source-targets.ts` / `src/lib/jobs/hourly-fetch.ts` / `scripts/run-hourly-fetch.ts` に `sourceKey` 指定を追加
+  - `scripts/run-daily-enrich.ts` と `npm run db:run-daily-enrich` を追加した
+- Gemini 429 対策を強化した。
+  - 要約は既存どおり batch 前提（最大 10 件）
+  - `src/lib/ai/enrich.ts` に `GEMINI_SUMMARY_MODEL` 環境変数対応を追加
+  - `ENRICH_SUMMARY_BATCH_PAUSE_MS` で batch 間 pause を入れられるようにした
+  - 同一 process 内で Gemini が `429 / spending cap` を返した場合、その run 中は同 provider を再度叩かない簡易サーキットブレーカを追加した
+- 実行確認:
+  - `npm run type-check` OK
+  - `npx tsx scripts/run-hourly-fetch.ts --source-key arxiv-ai --limit 1`
+    - `inserted=0 / skipped=437`
+  - `npx tsx scripts/run-hourly-fetch.ts --source-key hackernews-ai --limit 1`
+    - `inserted=4 / skipped=4`
+  - `npx tsx scripts/run-daily-enrich.ts --source-key hackernews-ai --limit 4 --summary-batch-size 4`
+    - `processed=4 / failed=0 / manualPending=0`
+    - 4 件とも `snippet + feed_only_policy`
+    - Gemini primary / secondary は `429 spending cap`、OpenAI fallback で完走
+- 現状の解釈:
+  - 新規 source の targeted fetch / enrich 再開は可能
+  - L3/L4 の公開面は `public_articles` 系へ揃い、旧 `articles` / `rank_scores` 依存は今回の主要経路から外れた
+  - なお `priority_processing_queue` の完全運用と `activity_logs.action_type` の正式一覧は未確定のため `implementation-wait.md` に残す
+
+## 2026-03-17 Gemini 100件試験 + backlog 1882件 manual export
+
+- Gemini の有料 key / Tier1 前提で、`daily-enrich` に call 数上限を持たせる方向へ寄せた。
+  - `src/lib/jobs/daily-enrich.ts` に `maxSummaryBatches` を追加
+  - `src/app/api/cron/daily-enrich/route.ts` と `scripts/run-daily-enrich.ts` から指定可能にした
+- Gemini 稼働確認として、`10 batch x 10件 = 100件` を先行実施した。
+  - 実行:
+    - `ENRICH_SUMMARY_BATCH_PAUSE_MS=1500`
+    - `npx tsx scripts/run-daily-enrich.ts --limit 100 --summary-batch-size 10 --max-summary-batches 10`
+  - 結果:
+    - `processed=100 / failed=0 / manualPending=0`
+    - この run では Gemini `429` は再現しなかった
+    - 最新診断は `feed_only_policy=96`, `extracted=3`, `extracted_below_threshold=1`
+- backlog は `raw_unprocessed=1882` まで減少した。
+  - `raw_total=2863`
+  - `raw_processed=981`
+  - `enriched_total=981`
+  - `enriched_ready_total=759`
+  - `enriched_provisional_total=222`
+- 残り 1882 件は、手動投入前提の `artifacts` export へ切り替えた。
+  - 既存 `scripts/export-ai-enrich-inputs.ts` は full content 解決まで行うため 1882 件一括では重すぎた
+  - 手動 backlog 用に `--export-mode seed_only` を追加し、snippet/title ベースの要約タネだけを高速 export できるようにした
+  - 実行:
+    - `npx tsx scripts/export-ai-enrich-inputs.ts --limit 1882 --policy all --export-mode seed_only --output artifacts/ai-enrich-inputs-backlog-1882.json`
+    - `npx tsx scripts/import-ai-enrich-outputs.ts --input artifacts/ai-enrich-inputs-backlog-1882.json --write-template-only --template-output artifacts/ai-enrich-output-template-backlog-1882.json`
+  - 生成物:
+    - `artifacts/ai-enrich-inputs-backlog-1882.json`
+    - `artifacts/ai-enrich-output-template-backlog-1882.json`
+    - 分割版:
+      - `artifacts/ai-enrich-inputs-backlog-1882-part1.json` 〜 `part8.json`
+      - `artifacts/ai-enrich-output-template-backlog-1882-part1.json` 〜 `part8.json`
+- 現時点の運用判断:
+  - Gemini は `100件 / 10 call` 程度なら再試験可能
+  - backlog 全件は Gemini に直接流さず、manual artifact flow を使う
+- manual output import 後に `hourly-publish` を回せば L4 側へ反映できる
+
+## 2026-03-18 backlog 1882件 import・title補正・L2/L4分類再同期
+
+- `artifacts` は Git 管理対象から外した。
+  - `.gitignore` に `artifacts/` を追加
+  - `git rm --cached -r -- artifacts` 実施
+- backlog `1882` 件を Neon に登録済み。
+  - `articles_enriched = 1882/1882`
+  - `ai_processing_state='completed' = 1882/1882`
+  - `articles_raw.is_processed=true = 1882/1882`
+- backlog import 用に importer を軽量化した。
+  - `src/lib/db/enrichment.ts`
+    - `refreshTagArticleCounts()` を export
+    - `upsertEnrichedArticle(..., { refreshTagCounts: false })` に対応
+  - `scripts/import-ai-enrich-outputs.ts`
+    - `loadEnvConfig(process.cwd())` を追加
+    - tag count を各記事ごとではなく最後に 1 回だけ更新
+    - `--skip-existing` オプション追加
+- backlog 分の title 日本語化漏れを確認し、`13` 件を補正した。
+  - `docs/imp/sql/2026-03-18-l2-l4-data-realign.sql` に補正 SQL を保存
+  - backlog `1882` 件に限ると title 漏れは `0`
+  - ただし `articles_enriched` 全体では旧データ由来の非日本語 title が `211` 件残る
+- `source_targets` を正として `articles_enriched.source_type` を再同期した。
+  - 修正件数: `1866`
+  - 修正後の不一致件数: `0`
+- 2026-03-18 時点の L2 分布:
+  - `official = 1902`
+  - `paper = 437`
+  - `alerts = 328`
+  - `blog = 176`
+  - `news = 18`
+- 現行 Web 設計とのズレを確認した。
+  - `src/app/page.tsx` / `RightSidebar.tsx` は `source_type` と `source_category` を混在利用
+  - `paper / news / alerts` がカテゴリ UI から落ちている
+  - `dim2_memo` の 5 分類は DB 既存カラムではなく表示分類の参考草案として扱うべきと整理
+- `hourly-publish` を再実行して L4 反映を進めたが、現行実装は遅く長時間化したため停止した。
+  - `job_run_id=93` を `failed` で明示終了
+  - 停止前に `public_articles` published は `745 -> 911` へ増加
+  - `official = 736`, `alerts = 145`, `blog = 30`
+- `implementation-plan.md` を「実装履歴メモ」から「L2 -> L4 要件定義を兼ねた前向きな計画」へ更新した。
+- `implementation-wait.md` に次を追加した。
+  - Home のトップレベル分類方針
+  - `paper / news / alerts` の公開優先度
+  - 残 `211` 件の title 補正タイミング
+  - `hourly-publish` 高速化方式
+
+## 2026-03-18 非日本語 title 全件補正・抜き取り品質監査
+
+- `articles_enriched.title` の非日本語行 `211` 件を OpenAI API で一括翻訳し、Neon へ反映した。
+  - 出力保存先: `artifacts/title-translations-non-ja-20260318.json`
+  - `public_articles.display_title` も同時同期
+  - 最終結果:
+    - `articles_enriched` 非日本語 title = `0`
+    - `public_articles` 非日本語 title = `0`
+- 公開候補の `articles_enriched` からランダム `10` 件を抜き取り監査した。
+  - 良好:
+    - official の full_content 系記事は概ね掲載可能
+    - title / source_type / publication_basis / canonical_url は大きな破綻なし
+  - 問題あり:
+    - `summary_100` / `summary_200` / `publication_text` の途中切れ
+    - `source_snippet` 記事で title と summary の内容ずれ
+    - `paper` 記事で tag が本文内容と噛み合わない例
+    - 一部 summary が本文要約ではなく metadata 紹介に寄る
+- 補助確認:
+  - `summary_100` 長さ `100+` = `398`
+  - `summary_200` 長さ `200+` = `1016`
+  - `publication_basis='source_snippet'` = `294`
+  - `summary_input_basis='source_snippet'` = `415`
+- 結論:
+  - title の日本語化は完了
+  - ただし **L2 データ品質はまだ「Web 全面公開で安全」とは言えない**
+  - 次段は `hourly-publish` 高速化と並行して、summary 整形・snippet 品質 gate・タグ精度改善が必要
+
+## 2026-03-18 snippet 整合強化・paper タグ制限・絵文字サムネイル
+
+- `source_snippet` / `title_only` 向け要約 prompt を強化した。
+  - `src/lib/ai/prompts/enrich-batch-ja.ts`
+  - `summaryInputBasis` を prompt に渡し、snippet 由来の要約では入力にない会社名・数値・出来事を補わないよう制約追加
+- `daily-enrich` に snippet 整合チェックを追加した。
+  - `src/lib/jobs/daily-enrich.ts`
+  - `summary_input_basis='source_snippet'` のとき、入力 title/snippet の ASCII シグナル語が summary に全く現れない行は `publication_basis='hold'` へ寄せる
+- 論文ソースのタグ方針を変更した。
+  - migration `032_add_paper_tag.sql` で `paper` タグを追加
+  - `scripts/seed-keywords.mjs` に `paper` タグを追加
+  - `daily-enrich` / `backfill-article-tags.mjs` は `source_type='paper'` のとき `paper` タグだけを付与するよう変更
+  - 既存 DB も backfill し、`source_type='paper'` の `437` 件は現在すべて `paper` タグのみ
+- 暫定サムネイル絵文字を追加した。
+  - migration `031_add_thumbnail_emoji_to_public_articles.sql`
+  - `src/lib/publish/thumbnail-emoji.ts` を追加
+  - `hourly-publish` は `thumbnail_url` が空でも `thumbnail_emoji` を L4 転送時に付与
+  - `ArticleCard` は画像が無い場合に絵文字を表示
+  - 既存 `public_articles 911` 件にも backfill 済み
+- 確認済み:
+  - `npm run type-check` OK
+  - `public_articles.thumbnail_emoji` 分布:
+    - `🧠=691`
+    - `🤖=186`
+    - `🛡️=12`
+    - `🎙️=6`
+    - `🔬=6`

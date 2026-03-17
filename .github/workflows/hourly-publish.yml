@@ -1,0 +1,20 @@
+name: hourly-publish
+
+on:
+  schedule:
+    - cron: '35 * * * *'  # 毎時 :35 実行（hourly-layer12 の :05 から30分後）
+  workflow_dispatch:
+
+jobs:
+  hourly-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Layer 4 publish job
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --fail --show-error --silent \
+            -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "${APP_URL}/api/cron/hourly-publish"

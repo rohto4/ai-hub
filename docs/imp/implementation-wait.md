@@ -1,6 +1,6 @@
 # AI Trend Hub 実装判断待ち
 
-最終更新: 2026-03-15
+最終更新: 2026-03-17
 
 ## 1. 目的
 
@@ -148,3 +148,177 @@
      - `manual_pending` export が通る
      - manual import 復旧が通る
      - stale `running` job が残らない
+5. `anthropic-news` の扱い
+   - 2026-03-16 〜 2026-03-17 の複数回の fetch で `Status code 404` を継続確認
+   - feed URL 修復を優先するか、いったん source 停止に寄せるかの運用判断が必要
+
+## 7. 2026-03-17 現在の判断待ち（新規追加）
+
+### 7.1 無効化ソースの代替・修復方針
+
+以下のソースが現在 `is_active=false`。それぞれの対応方針を判断する。
+
+| ソース | 状況 | 選択肢 |
+|---|---|---|
+| `anthropic-news` | 404 継続 | A) feed URL を調査して修復 / B) 停止のまま維持 |
+| `google-ai-blog` | parse error | A) RSS パーサ修正 / B) 別 feed URL を探す |
+| `huggingface-papers` | 公式 RSS なし | A) tldr.takara.ai 等のサードパーティ RSS を使う / B) 不採用 |
+| `mistral-ai-news` | 公式 RSS なし | A) メール購読経由の非公式 feed / B) 不採用 |
+| `ledge-ai` | feed URL 不明 | A) 運営に問い合わせ / B) 不採用 |
+| `paperswithcode` | RSS XML 不正 | A) rss-parser の lax モード対応 / B) 不採用 |
+
+### 7.2 新規 raw 記事の enrich 消化戦略
+
+新規ソース取得で ~1,900 件の未処理 raw が追加された。
+
+未確定:
+- bulk enrich を一気にかけるか（AI API コスト発生）
+- 毎時バッチの自然消化に任せるか
+- 手動 AI フロー（export → CLI 要約 → import）を混ぜるか
+
+現状: Gemini primary=403(leaked)、Gemini secondary=429、OpenAI のみ有効
+
+### 7.3 Web ホームページ実装の優先度
+
+`src/app/page.tsx` は現在モックデータ表示中。
+Layer 4 が稼働したので、いつ実データ切り替えを実施するかを決める。
+
+未確定:
+- `/api/home` エンドポイントの実装（カテゴリ別 4件・重み付きランダム）
+- `page.tsx` のモックデータ削除・API 呼び出し切り替え
+- source_type ベースのカード/リスト表示分岐
+
+### 7.4 `critique`（批評）生成の追加タイミング
+
+`articles_enriched.critique` は拡張カラムとして追加済み（全 NULL）。
+full_content 記事のみに付与する予定だが、いつ実装に入るかが未確定。
+
+### 7.5 タグ昇格閾値・条件の見直し
+
+`tag_candidate_pool` の昇格閾値は暫定 `seen_count >= 8`。
+新規 tag_keywords 方式に移行したため、候補プールの役割が変化している。
+
+未確定:
+- `tag_candidate_pool` を引き続き使うか
+- 新しい昇格フローを設計するか（tag_keywords への追加 PR として）
+
+### 7.6 `run-daily-enrich.ts` CLI スクリプト
+
+新規 raw 記事の手動消化用に CLI スクリプトが必要。
+
+未確定:
+- `scripts/run-daily-enrich.ts` を作成する
+- GitHub Actions の自動バッチに任せる（毎時 hourly-layer12 で消化）
+
+## 8. 2026-03-17 L3/L4 実装で残した未確定事項
+
+### 8.1 `activity_logs.action_type` の正式運用一覧
+
+今回の実装では、次の暫定マッピングで `activity_metrics_hourly` を更新している。
+
+- `view -> impression_count`
+- `expand_200 / topic_group_open / digest_click -> open_count`
+- `article_open -> source_open_count`
+- `share_* -> share_count`
+- `save -> save_count`
+
+未確定:
+- `share_open` を集計対象に含めるか
+- `return_focus` を集計対象に含めるか
+- `unsave` を減算イベントにするか無視するか
+
+### 8.2 `priority_processing_queue` の最小実装範囲
+
+L3/L4 仕様では `priority_processing_queue` を `hourly-publish` より先に処理する前提だが、
+今回の実装では queue 自体の完全処理は入れていない。
+
+未確定:
+- `hide_article` を最初の queue_type として本当に固定するか
+- `target_kind` を `public_article` / `enriched_article` / `canonical_url` のどれで持つか
+- queue 処理を `hourly-publish` に入れるか、別 worker に切り出すか
+
+### 8.3 Topic Group の最終遷移
+
+`docs/imp/l3-l4-screen-flow.md` では Home 内の暫定セクションに留めた。
+
+未確定:
+- 専用 URL を持つか
+- `public_article_sources` ベースの関連ソース表示をそのまま使うか
+- `source_type=video/official/blog` の 3 カラム固定でよいか
+
+### 8.4 Gemini 429 時の既定運用
+
+実装上は batch 要約 + OpenAI fallback + process 内 circuit breaker を追加済み。
+
+未確定:
+- 本番既定を `Gemini(primary) -> OpenAI` にするか
+- Gemini secondary を残すか
+- `ENRICH_SUMMARY_BATCH_PAUSE_MS` の推奨値を何 ms にするか
+- spending cap 解消までは Gemini を明示 disable に寄せるか
+
+## 9. 2026-03-18 追加の判断待ち
+
+### 9.1 Web のトップレベル分類を何で固定するか
+
+現状:
+
+1. L2/L4 は `source_category`=topic, `source_type`=source lane で整理済み
+2. Home UI は `official / blog / video / agent` のように軸を混在させている
+3. dim2_memo は `news / community / paper / overseas / oss` の表示分類を想定している
+
+未確定:
+
+1. P1 の Home primary tabs を `source_type` ベースで固定するか
+2. dim2 の 5 分類を early に導入するか
+3. 5 分類を導入する場合、`display_category` を L4 派生概念として追加するか
+
+現在の暫定方針:
+
+1. 破壊的変更を避けるため、まずは `source_type` + `source_category` + tags の 3 軸で進める
+2. dim2 5 分類は後段で API/view 派生として検討する
+
+### 9.2 `paper / news / alerts` の公開優先度
+
+現状:
+
+1. publish candidate には `paper=437`, `news=16`, `alerts=174` が存在する
+2. `public_articles` 公開済みはまだ `official / alerts / blog` 偏重
+3. `hourly-publish` が遅く、L4 への全面反映が未完了
+
+未確定:
+
+1. `paper` を Home primary lane に早期追加するか
+2. `news` を official/blog と同列で出すか、別ページ先行にするか
+3. `alerts` を Home メイン表示に残すか、topic 導線に寄せるか
+
+### 9.3 snippet 系記事をどこまで Home に出すか
+
+現状:
+
+1. `articles_enriched.title` / `public_articles.display_title` の非日本語行は `0`
+2. ただし抜き取り監査で、`source_snippet` 記事の一部に title-summary 内容ずれを確認した
+3. `publication_basis='source_snippet'` は `294` 件ある
+
+未確定:
+
+1. Home メインレーンに `source_snippet` 記事を含めるか
+2. `alerts` を topic 導線専用に寄せるか
+
+補足:
+
+1. ユーザー方針として、Home 側での定量的な絞り込みは強くかけない
+2. 代わりに、明白な title-summary 内容ずれだけ `daily-enrich` 側で止める方向にした
+
+### 9.4 `hourly-publish` の高速化方式
+
+現状:
+
+1. 2026-03-18 の再実行は長時間化して停止した
+2. 停止前に `public_articles` は `745 -> 911` まで増加した
+3. 現行実装は記事ごとに `public_articles` / `public_article_sources` / `public_article_tags` を順次 upsert している
+
+未確定:
+
+1. bulk SQL 化するか
+2. tag 転写だけ別ジョブに分けるか
+3. `public_article_tags` を delete/insert ではなく差分更新にするか

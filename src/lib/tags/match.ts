@@ -51,6 +51,37 @@ export interface TagMatchResult {
   candidateTags: Array<{ candidateKey: string; displayName: string }>
 }
 
+export interface TagKeywordReference {
+  tagId: string
+  keyword: string
+  isCaseSensitive: boolean
+}
+
+/**
+ * tag_keywords テーブルのキーワードで title + summary_200 をマッチングする。
+ * daily-enrich の AI 要約生成後に呼び出すことで summary_200 ベースの高精度マッチを実現する。
+ * 全文照合より遥かに高速（〜250文字 vs 数千文字）。
+ */
+export function matchTagsFromKeywords(
+  keywords: TagKeywordReference[],
+  title: string,
+  summary: string,
+): string[] {
+  const text = `${title} ${summary}`
+  const textLower = text.toLowerCase()
+  const matchedIds = new Set<string>()
+
+  for (const kw of keywords) {
+    const haystack = kw.isCaseSensitive ? text : textLower
+    const needle = kw.isCaseSensitive ? kw.keyword : kw.keyword.toLowerCase()
+    if (needle.length >= 2 && haystack.includes(needle)) {
+      matchedIds.add(kw.tagId)
+    }
+  }
+
+  return Array.from(matchedIds)
+}
+
 function normalizeText(value: string): string {
   return value.toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, ' ').replace(/\s+/g, ' ').trim()
 }

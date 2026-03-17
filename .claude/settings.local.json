@@ -12,7 +12,23 @@
       "mcp__ide__executeCode",
       "Bash(ls:*)",
       "mcp__Neon__describe_project",
-      "mcp__Neon__describe_table_schema"
+      "mcp__Neon__describe_table_schema",
+      "mcp__Neon__list_projects",
+      "mcp__Neon__get_database_tables",
+      "WebSearch",
+      "WebFetch(domain:simonwillison.net)",
+      "WebFetch(domain:thegradient.pub)",
+      "WebFetch(domain:deepmind.google)",
+      "WebFetch(domain:www.together.ai)",
+      "WebFetch(domain:blog.langchain.dev)",
+      "WebFetch(domain:neptune.ai)",
+      "WebFetch(domain:bair.berkeley.edu)",
+      "WebFetch(domain:blog.langchain.com)",
+      "Bash(curl:*)",
+      "WebFetch(domain:papers.takara.ai)",
+      "WebFetch(domain:mistral.ai)",
+      "WebFetch(domain:ledge.ai)",
+      "WebFetch(domain:tldr.takara.ai)"
     ]
   }
 }

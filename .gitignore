@@ -26,6 +26,9 @@ out/
 # Build
 dist/
 
+# Local artifacts
+artifacts/
+
 # Environment
 .env
 .env.local

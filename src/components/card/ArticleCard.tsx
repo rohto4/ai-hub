@@ -14,10 +14,12 @@ interface Props {
 }
 
 const sourceLabel: Record<Article['source_type'], string> = {
-  youtube: 'YouTube',
   blog: 'Blog',
   official: 'Official',
   news: 'News',
+  video: 'Video',
+  alerts: 'Alerts',
+  paper: 'Paper',
 }
 
 export function ArticleCard({
@@ -69,7 +71,11 @@ export function ArticleCard({
           {article.thumbnail_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={article.thumbnail_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
-          ) : null}
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-[44px] md:text-[52px]">
+              {article.thumbnail_emoji ?? '📝'}
+            </div>
+          )}
           <span className="absolute bottom-3 right-3 text-[10px] font-semibold text-white">
             {sourceLabel[article.source_type]}
           </span>

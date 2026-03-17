@@ -2,10 +2,13 @@ import { z } from 'zod'
 import type { Genre, RankPeriod, Platform, ActionType } from '@/lib/db/types'
 
 const GENRES: [Genre, ...Genre[]] = [
-  'llm', 'agent', 'coding', 'image_gen', 'voice',
-  'rag', 'fine_tuning', 'enterprise', 'safety',
-  'hardware', 'robotics', 'education', 'medical',
-  'legal', 'finance', 'regulation',
+  'llm',
+  'agent',
+  'voice',
+  'policy',
+  'safety',
+  'search',
+  'news',
 ]
 
 const RANK_PERIODS: [RankPeriod, ...RankPeriod[]] = ['24h', '7d', '30d']

@@ -2,17 +2,20 @@ export interface BatchSummaryPromptItem {
   id: string
   title: string
   content: string
+  summaryInputBasis?: 'full_content' | 'source_snippet' | 'title_only'
 }
 
 function toPromptItem(item: BatchSummaryPromptItem): {
   id: string
   title: string
   content: string
+  summaryInputBasis: 'full_content' | 'source_snippet' | 'title_only'
 } {
   return {
     id: item.id,
     title: item.title,
     content: item.content.slice(0, 5000),
+    summaryInputBasis: item.summaryInputBasis ?? 'full_content',
   }
 }
 
@@ -42,6 +45,8 @@ export function buildEnrichBatchPrompt(items: BatchSummaryPromptItem[]): string 
 12. 「この記事では」「このブログでは」などのメタ表現は禁止。
 13. 根拠の薄い評価語は禁止。
 14. summary200Ja は summary100Ja の言い換えではなく、確実に言える範囲で少しだけ情報を足す。
+15. summaryInputBasis が source_snippet または title_only のときは、入力にない会社名・製品名・数字・出来事を絶対に補わない。
+16. summaryInputBasis が source_snippet のときは、title と content の両方に整合する内容だけを書く。
 
 content の扱い:
 1. item.content が十分にある場合は、それを最優先の情報源にする。
