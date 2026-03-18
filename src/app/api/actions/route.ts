@@ -5,33 +5,47 @@ import { ActionLogSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
-function toHourlyDeltas(actionType: string): {
+type HourlyDeltas = {
   impression: number
   open: number
   share: number
   save: number
   sourceOpen: number
-} {
-  switch (actionType) {
-    case 'view':
-      return { impression: 1, open: 0, share: 0, save: 0, sourceOpen: 0 }
-    case 'expand_200':
-    case 'topic_group_open':
-    case 'digest_click':
-      return { impression: 0, open: 1, share: 0, save: 0, sourceOpen: 0 }
-    case 'article_open':
-      return { impression: 0, open: 0, share: 0, save: 0, sourceOpen: 1 }
-    case 'share_copy':
-    case 'share_x':
-    case 'share_threads':
-    case 'share_slack':
-    case 'share_misskey':
-      return { impression: 0, open: 0, share: 1, save: 0, sourceOpen: 0 }
-    case 'save':
-      return { impression: 0, open: 0, share: 0, save: 1, sourceOpen: 0 }
-    default:
-      return { impression: 0, open: 0, share: 0, save: 0, sourceOpen: 0 }
-  }
+}
+
+const ZERO: HourlyDeltas = { impression: 0, open: 0, share: 0, save: 0, sourceOpen: 0 }
+
+/**
+ * action_type → activity_metrics_hourly の加算値マッピング。
+ * ボタン追加/削除時はここだけ編集する。
+ *
+ * 集計対象外（意図的に無視）の action_type はコメントで明示しておく:
+ *   share_open   … 共有モーダルを開いただけ（実際の share_copy が別途送られる）
+ *   return_focus … visibilitychange によるフォーカス復帰（誤検知が多い）
+ *   unsave       … 保存取り消し（save した事実はランキングシグナルとして保持）
+ */
+const ACTION_DELTA_MAP: Record<string, HourlyDeltas> = {
+  // ── インプレッション ──────────────────────────────────────────
+  view:             { ...ZERO, impression: 1 },
+
+  // ── エンゲージメント（開封系） ─────────────────────────────────
+  expand_200:       { ...ZERO, open: 1 },
+  topic_group_open: { ...ZERO, open: 1 },
+  digest_click:     { ...ZERO, open: 1 },
+
+  // ── ソース記事へのアクセス ────────────────────────────────────
+  article_open:     { ...ZERO, sourceOpen: 1 },
+
+  // ── シェア ────────────────────────────────────────────────────
+  // SNS 連携は廃止済み。テキストコピーのみ。
+  share_copy:       { ...ZERO, share: 1 },
+
+  // ── 保存 ──────────────────────────────────────────────────────
+  save:             { ...ZERO, save: 1 },
+}
+
+function toHourlyDeltas(actionType: string): HourlyDeltas {
+  return ACTION_DELTA_MAP[actionType] ?? ZERO
 }
 
 export async function POST(request: NextRequest) {
