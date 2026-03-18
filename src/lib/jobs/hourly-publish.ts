@@ -29,12 +29,14 @@ type PublishCandidate = {
 }
 
 type TagRow = {
+  enriched_article_id: number
   tag_id: string
   is_primary: boolean
 }
 
 type UpsertedRow = {
   public_article_id: string
+  canonical_url: string
 }
 
 export async function runHourlyPublish(): Promise<HourlyPublishResult> {
@@ -77,68 +79,70 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
   let tagsUpdated = 0
   let failed = 0
 
-  // ── 2. 記事ごとに public_articles へ UPSERT ──────────────────────
-  for (const candidate of candidates) {
+  if (candidates.length > 0) {
     try {
-      // 既存行の public_key を保持（URL が同じ記事の再公開時にキーを変えない）
-      const existing = (await sql`
-        SELECT public_article_id, public_key
+      // ── 2. 既存 public_key を一括 SELECT ──────────────────────────────
+      const canonicalUrls = candidates.map(c => c.canonical_url)
+      const existingRows = (await sql`
+        SELECT canonical_url, public_key
         FROM public_articles
-        WHERE canonical_url = ${candidate.canonical_url}
-        LIMIT 1
-      `) as Array<{ public_article_id: string; public_key: string }>
+        WHERE canonical_url = ANY(${canonicalUrls})
+      `) as Array<{ canonical_url: string; public_key: string }>
+      const existingKeyMap = new Map(existingRows.map(r => [r.canonical_url, r.public_key]))
 
-      const publicKey = existing[0]?.public_key ?? nanoid(11)
-      // publication_text → summary_200 → summary_100 の優先順で表示用テキストを決定
-      const displaySummary =
-        candidate.publication_text ?? candidate.summary_200 ?? candidate.summary_100
-      const thumbnailEmoji = pickThumbnailEmoji({
-        title: candidate.title,
-        summary100: candidate.summary_100,
-        summary200: displaySummary,
-        sourceType: candidate.source_type,
-        sourceCategory: candidate.source_category,
+      // ── 3. public_articles 行を準備 ────────────────────────────────
+      const now = new Date()
+      const articleRows = candidates.map(c => {
+        const displaySummary = c.publication_text ?? c.summary_200 ?? c.summary_100
+        return {
+          enriched_article_id: c.enriched_article_id,
+          primary_source_target_id: c.source_target_id,
+          public_key: existingKeyMap.get(c.canonical_url) ?? nanoid(11),
+          canonical_url: c.canonical_url,
+          display_title: c.title,
+          display_summary_100: c.summary_100,
+          display_summary_200: displaySummary,
+          thumbnail_url: c.thumbnail_url ?? null,
+          thumbnail_emoji: pickThumbnailEmoji({
+            title: c.title,
+            summary100: c.summary_100,
+            summary200: displaySummary,
+            sourceType: c.source_type,
+            sourceCategory: c.source_category,
+          }),
+          source_category: c.source_category,
+          source_type: c.source_type,
+          summary_input_basis: c.summary_input_basis,
+          publication_basis: c.publication_basis,
+          content_score: Number(c.score),
+          original_published_at: c.source_updated_at ?? null,
+          visibility_status: 'published',
+          public_refreshed_at: now,
+        }
       })
 
-      const upsertedRow = (await sql`
-        INSERT INTO public_articles (
-          enriched_article_id,
-          primary_source_target_id,
-          public_key,
-          canonical_url,
-          display_title,
-          display_summary_100,
-          display_summary_200,
-          thumbnail_url,
-          thumbnail_emoji,
-          source_category,
-          source_type,
-          summary_input_basis,
-          publication_basis,
-          content_score,
-          original_published_at,
-          visibility_status,
-          public_refreshed_at
-        )
-        VALUES (
-          ${candidate.enriched_article_id},
-          ${candidate.source_target_id},
-          ${publicKey},
-          ${candidate.canonical_url},
-          ${candidate.title},
-          ${candidate.summary_100},
-          ${displaySummary},
-          ${candidate.thumbnail_url},
-          ${thumbnailEmoji},
-          ${candidate.source_category},
-          ${candidate.source_type},
-          ${candidate.summary_input_basis},
-          ${candidate.publication_basis},
-          ${Number(candidate.score)},
-          ${candidate.source_updated_at},
-          'published',
-          now()
-        )
+      // ── 4. public_articles を一括 UPSERT ──────────────────────────────
+      const upsertedRows = (await sql`
+        INSERT INTO public_articles ${sql(
+          articleRows,
+          'enriched_article_id',
+          'primary_source_target_id',
+          'public_key',
+          'canonical_url',
+          'display_title',
+          'display_summary_100',
+          'display_summary_200',
+          'thumbnail_url',
+          'thumbnail_emoji',
+          'source_category',
+          'source_type',
+          'summary_input_basis',
+          'publication_basis',
+          'content_score',
+          'original_published_at',
+          'visibility_status',
+          'public_refreshed_at',
+        )}
         ON CONFLICT (canonical_url) DO UPDATE SET
           enriched_article_id      = EXCLUDED.enriched_article_id,
           primary_source_target_id = EXCLUDED.primary_source_target_id,
@@ -156,66 +160,93 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
           visibility_status        = 'published',
           public_refreshed_at      = now(),
           updated_at               = now()
-        RETURNING public_article_id
+        RETURNING public_article_id, canonical_url
       `) as UpsertedRow[]
+      upserted = upsertedRows.length
 
-      const publicArticleId = upsertedRow[0].public_article_id
+      // ── 5. canonical_url / enriched_article_id → public_article_id マップ ──
+      const candidateByCanonical = new Map(candidates.map(c => [c.canonical_url, c]))
+      const enrichedToPublic = new Map(
+        upsertedRows.map(r => {
+          const c = candidateByCanonical.get(r.canonical_url)!
+          return [c.enriched_article_id, r.public_article_id]
+        }),
+      )
 
-      // public_article_sources
+      // ── 6. public_article_sources を一括 UPSERT ───────────────────────
+      const sourceRows = upsertedRows.map(r => {
+        const c = candidateByCanonical.get(r.canonical_url)!
+        return {
+          public_article_id: r.public_article_id,
+          enriched_article_id: c.enriched_article_id,
+          source_target_id: c.source_target_id,
+          source_priority: Number(c.priority_score ?? 100),
+          is_primary: true,
+        }
+      })
       await sql`
-        INSERT INTO public_article_sources (
-          public_article_id, enriched_article_id, source_target_id,
-          source_priority, is_primary
-        )
-        VALUES (
-          ${publicArticleId},
-          ${candidate.enriched_article_id},
-          ${candidate.source_target_id},
-          ${Number(candidate.priority_score ?? 100)},
-          true
-        )
+        INSERT INTO public_article_sources ${sql(
+          sourceRows,
+          'public_article_id',
+          'enriched_article_id',
+          'source_target_id',
+          'source_priority',
+          'is_primary',
+        )}
         ON CONFLICT (public_article_id, enriched_article_id) DO UPDATE SET
           source_priority = EXCLUDED.source_priority
       `
 
-      // public_article_tags: articles_enriched_tags から転写
-      const tags = (await sql`
-        SELECT tag_id, is_primary
+      // ── 7. タグを一括転写 ──────────────────────────────────────────────
+      const enrichedIds = candidates.map(c => c.enriched_article_id)
+      const allTags = (await sql`
+        SELECT enriched_article_id, tag_id, is_primary
         FROM articles_enriched_tags
-        WHERE enriched_article_id = ${candidate.enriched_article_id}
-        ORDER BY is_primary DESC
+        WHERE enriched_article_id = ANY(${enrichedIds})
+        ORDER BY enriched_article_id, is_primary DESC, tag_id
       `) as TagRow[]
 
-      if (tags.length > 0) {
-        await sql`DELETE FROM public_article_tags WHERE public_article_id = ${publicArticleId}`
-        for (const [idx, tag] of tags.entries()) {
-          await sql`
-            INSERT INTO public_article_tags (public_article_id, tag_id, sort_order)
-            VALUES (${publicArticleId}, ${tag.tag_id}, ${idx})
-            ON CONFLICT (public_article_id, tag_id) DO UPDATE SET sort_order = EXCLUDED.sort_order
-          `
-        }
-        tagsUpdated += tags.length
-      }
+      const publicIds = upsertedRows.map(r => r.public_article_id)
+      await sql`DELETE FROM public_article_tags WHERE public_article_id = ANY(${publicIds})`
 
-      upserted++
+      const tagCountByEnriched = new Map<number, number>()
+      const tagRows = allTags
+        .map(t => {
+          const publicArticleId = enrichedToPublic.get(t.enriched_article_id)
+          if (!publicArticleId) return null
+          const sortOrder = tagCountByEnriched.get(t.enriched_article_id) ?? 0
+          tagCountByEnriched.set(t.enriched_article_id, sortOrder + 1)
+          return { public_article_id: publicArticleId, tag_id: t.tag_id, sort_order: sortOrder }
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null)
+
+      if (tagRows.length > 0) {
+        await sql`
+          INSERT INTO public_article_tags ${sql(tagRows, 'public_article_id', 'tag_id', 'sort_order')}
+          ON CONFLICT (public_article_id, tag_id) DO UPDATE SET sort_order = EXCLUDED.sort_order
+        `
+        tagsUpdated = tagRows.length
+      }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown publish error'
-      failed++
-      await recordJobRunItem({
-        jobRunId,
-        itemKey: String(candidate.enriched_article_id),
-        itemStatus: 'failed',
-        detail: {
-          enrichedArticleId: candidate.enriched_article_id,
-          canonicalUrl: candidate.canonical_url,
-        },
-        errorMessage: message,
-      })
+      // bulk 失敗時はバッチ全体を failed として記録
+      const message = error instanceof Error ? error.message : 'Unknown bulk publish error'
+      failed = candidates.length
+      for (const candidate of candidates) {
+        await recordJobRunItem({
+          jobRunId,
+          itemKey: String(candidate.enriched_article_id),
+          itemStatus: 'failed',
+          detail: {
+            enrichedArticleId: candidate.enriched_article_id,
+            canonicalUrl: candidate.canonical_url,
+          },
+          errorMessage: message,
+        })
+      }
     }
   }
 
-  // ── 3. publish_candidate=false になった記事を hidden に ──────────
+  // ── 8. publish_candidate=false になった記事を hidden に ──────────
   const hiddenRows = (await sql`
     UPDATE public_articles pa
     SET visibility_status = 'hidden', updated_at = now()
@@ -228,7 +259,7 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
           AND ae.ai_processing_state = 'completed'
       )
     RETURNING public_article_id
-  `) as UpsertedRow[]
+  `) as Array<{ public_article_id: string }>
 
   const hidden = hiddenRows.length
 
