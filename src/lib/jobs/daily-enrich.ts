@@ -263,6 +263,9 @@ function isSnippetPublicationEligible(
   return tokenCount >= 12
 }
 
+// summaryBatchSize の AI 呼び出しが失敗したとき試す中間バッチサイズ
+const SUMMARY_FALLBACK_BATCH_SIZE = 3
+
 function chunkItems<T>(items: T[], size: number): T[][] {
   const chunks: T[][] = []
   for (let index = 0; index < items.length; index += size) {
@@ -460,201 +463,255 @@ export async function runDailyEnrich(
 
   const summaryBatches = chunkItems(preparedArticles, summaryBatchSize).slice(0, maxSummaryBatches)
 
-  for (const batch of summaryBatches) {
-      const summaries = await generateEnrichedSummaries(
-      batch.map((article) => ({
-        id: String(article.rawArticle.id),
-        title: article.title,
-        content: article.summaryInput.summaryInputText,
-        summaryInputBasis: article.summaryInput.summaryInputBasis,
-      })),
-      summaryBatchSize,
-    )
+  // AI 呼び出し引数を組み立てるヘルパー
+  function toSummaryInput(article: PreparedEnrichArticle) {
+    return {
+      id: String(article.rawArticle.id),
+      title: article.title,
+      content: article.summaryInput.summaryInputText,
+      summaryInputBasis: article.summaryInput.summaryInputBasis,
+    }
+  }
 
-    for (const [index, article] of batch.entries()) {
-      const summariesForArticle = summaries[index]
-
-      try {
-        const publicationBasisIfSummaryExists =
-          article.contentResult.contentPath === 'full'
+  // 1件分の永続化（AI サマリー取得後の処理）。失敗時は throw する。
+  async function persistEnrichedArticle(
+    article: PreparedEnrichArticle,
+    summaryForArticle: Awaited<ReturnType<typeof generateEnrichedSummaries>>[number],
+  ): Promise<void> {
+    const publicationBasisIfSummaryExists =
+      article.contentResult.contentPath === 'full'
+        ? 'full_summary'
+        : article.snippetPublishable
+          ? 'source_snippet'
+          : 'hold'
+    const snippetConsistencyPassed = passesSnippetConsistencyGate({
+      summaryInputBasis: article.summaryInput.summaryInputBasis,
+      title: article.title,
+      summaryInputText: article.summaryInput.summaryInputText,
+      summary100: summaryForArticle.summary100,
+      summary200: summaryForArticle.summary200,
+    })
+    const publicationBasis =
+      summaryForArticle.summarySource === 'manual_pending'
+        ? 'hold'
+        : !snippetConsistencyPassed
+          ? 'hold'
+          : article.contentResult.contentPath === 'full'
             ? 'full_summary'
             : article.snippetPublishable
               ? 'source_snippet'
               : 'hold'
-        const snippetConsistencyPassed = passesSnippetConsistencyGate({
-          summaryInputBasis: article.summaryInput.summaryInputBasis,
-          title: article.title,
-          summaryInputText: article.summaryInput.summaryInputText,
-          summary100: summariesForArticle.summary100,
-          summary200: summariesForArticle.summary200,
-        })
-        const publicationBasis =
-          summariesForArticle.summarySource === 'manual_pending'
-            ? 'hold'
-            : !snippetConsistencyPassed
-              ? 'hold'
-            : article.contentResult.contentPath === 'full'
-              ? 'full_summary'
-              : article.snippetPublishable
-                ? 'source_snippet'
-                : 'hold'
-        const publicationText =
-          publicationBasis === 'hold'
-            ? null
-            : summariesForArticle.summary200 || summariesForArticle.summary100
-        const finalIsProvisional =
-          publicationBasis === 'source_snippet' ? false : article.provisionalState.isProvisional
-        const finalProvisionalReason =
-          publicationBasis === 'source_snippet' ? null : article.provisionalState.provisionalReason
-        const publishCandidate =
-          publicationBasis !== 'hold' &&
-          article.dedupeStatus === 'unique' &&
-          article.relevance.isRelevant
-        const aiProcessingState =
-          summariesForArticle.summarySource === 'manual_pending' ? 'manual_pending' : 'completed'
+    const publicationText =
+      publicationBasis === 'hold'
+        ? null
+        : summaryForArticle.summary200 || summaryForArticle.summary100
+    const finalIsProvisional =
+      publicationBasis === 'source_snippet' ? false : article.provisionalState.isProvisional
+    const finalProvisionalReason =
+      publicationBasis === 'source_snippet' ? null : article.provisionalState.provisionalReason
+    const publishCandidate =
+      publicationBasis !== 'hold' &&
+      article.dedupeStatus === 'unique' &&
+      article.relevance.isRelevant
+    const aiProcessingState =
+      summaryForArticle.summarySource === 'manual_pending' ? 'manual_pending' : 'completed'
 
-        // summary_200 + title を使って tag_keywords でマッチング（準備フェーズより高精度）
-        const paperTag = tagReferences.find((ref) => ref.tagKey === 'paper')
-        const keywordMatchedTagIds =
-          article.rawArticle.sourceType === 'paper'
-            ? paperTag
-              ? [paperTag.id]
-              : []
-            : matchTagsFromKeywords(
-                tagKeywords,
-                article.title,
-                summariesForArticle.summary200 || summariesForArticle.summary100,
-              )
-        // source_category を Tier 1 タグとして自動付与。ただし paper は paper タグだけに限定する。
-        if (article.rawArticle.sourceType !== 'paper') {
-          const sourceCategoryTag = tagReferences.find(
-            (ref) => ref.tagKey === article.rawArticle.sourceCategory,
+    // summary_200 + title を使って tag_keywords でマッチング（準備フェーズより高精度）
+    const paperTag = tagReferences.find((ref) => ref.tagKey === 'paper')
+    const keywordMatchedTagIds =
+      article.rawArticle.sourceType === 'paper'
+        ? paperTag
+          ? [paperTag.id]
+          : []
+        : matchTagsFromKeywords(
+            tagKeywords,
+            article.title,
+            summaryForArticle.summary200 || summaryForArticle.summary100,
           )
-          if (sourceCategoryTag && !keywordMatchedTagIds.includes(sourceCategoryTag.id)) {
-            keywordMatchedTagIds.push(sourceCategoryTag.id)
+    // source_category を Tier 1 タグとして自動付与。ただし paper は paper タグだけに限定する。
+    if (article.rawArticle.sourceType !== 'paper') {
+      const sourceCategoryTag = tagReferences.find(
+        (ref) => ref.tagKey === article.rawArticle.sourceCategory,
+      )
+      if (sourceCategoryTag && !keywordMatchedTagIds.includes(sourceCategoryTag.id)) {
+        keywordMatchedTagIds.push(sourceCategoryTag.id)
+      }
+    }
+
+    const { score, scoreReason } = scoreArticle(
+      article.contentResult.contentPath,
+      keywordMatchedTagIds.length,
+      summaryForArticle.summarySource,
+    )
+    const adjustedScore = article.relevance.isRelevant ? score : Math.max(0, score - 25)
+    const adjustedScoreReason = article.relevance.isRelevant
+      ? scoreReason
+      : `${scoreReason}; low source relevance`
+
+    await upsertEnrichedArticle({
+      rawArticleId: article.rawArticle.id,
+      sourceTargetId: article.rawArticle.sourceTargetId,
+      sourceCategory: article.rawArticle.sourceCategory,
+      sourceType: article.rawArticle.sourceType,
+      normalizedUrl: article.rawArticle.normalizedUrl,
+      citedUrl: article.rawArticle.citedUrl,
+      canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
+      title: article.title,
+      summary100: summaryForArticle.summary100,
+      summary200: summaryForArticle.summary200,
+      summaryBasis: article.summaryBasis,
+      contentPath: article.contentResult.contentPath,
+      isProvisional: finalIsProvisional,
+      provisionalReason: finalProvisionalReason,
+      dedupeStatus: article.dedupeStatus,
+      dedupeGroupKey: article.dedupeGroupKey,
+      publishCandidate,
+      publicationBasis,
+      publicationText,
+      summaryInputBasis: article.summaryInput.summaryInputBasis,
+      score: adjustedScore,
+      scoreReason: adjustedScoreReason,
+      aiProcessingState,
+      sourceUpdatedAt: article.rawArticle.sourceUpdatedAt,
+      matchedTagIds: keywordMatchedTagIds,
+      candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
+    })
+
+    await markRawProcessed(article.rawArticle.id)
+    await recordJobRunItem({
+      jobRunId,
+      itemKey: String(article.rawArticle.id),
+      itemStatus: 'processed',
+      detail: {
+        rawArticleId: article.rawArticle.id,
+        title: article.title,
+        contentPath: article.contentResult.contentPath,
+        isProvisional: finalIsProvisional,
+        provisionalReason: finalProvisionalReason,
+        summaryBasis: article.summaryBasis,
+        publicationBasis,
+        summaryInputBasis: article.summaryInput.summaryInputBasis,
+        publishCandidate,
+        snippetConsistencyPassed,
+        dedupeStatus: article.dedupeStatus,
+        relevanceMatchedKeyword: article.relevance.matchedKeyword,
+        isRelevant: article.relevance.isRelevant,
+        extractionStage: article.contentResult.extractionStage,
+        extractedLength: article.contentResult.extractedLength,
+        snippetLength: article.contentResult.snippetLength,
+        extractionError: article.contentResult.extractionError ?? null,
+        matchedTagCount: article.tagResult.matchedTagIds.length,
+        candidateTagCount: article.shouldPersistCandidateTags
+          ? article.tagResult.candidateTags.length
+          : 0,
+        summarySource: summaryForArticle.summarySource,
+        aiProcessingState,
+      },
+    })
+    if (aiProcessingState === 'manual_pending') {
+      manualPendingExports.push({
+        rawArticleId: article.rawArticle.id,
+        sourceTargetId: article.rawArticle.sourceTargetId,
+        sourceCategory: article.rawArticle.sourceCategory,
+        sourceKey: article.rawArticle.sourceKey,
+        normalizedUrl: article.rawArticle.normalizedUrl,
+        citedUrl: article.rawArticle.citedUrl,
+        canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
+        sourceUpdatedAt: article.rawArticle.sourceUpdatedAt,
+        title: article.title,
+        contentPath: article.contentResult.contentPath,
+        summaryBasis: article.summaryBasis,
+        provisionalBase: article.provisionalState,
+        dedupeStatus: article.dedupeStatus,
+        dedupeGroupKey: article.dedupeGroupKey,
+        isRelevant: article.relevance.isRelevant,
+        matchedTagIds: keywordMatchedTagIds,
+        candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
+        publicationBasisIfSummaryExists,
+        summaryInputBasis: article.summaryInput.summaryInputBasis,
+        summaryInputText: article.summaryInput.summaryInputText,
+        content: article.contentResult.content,
+      })
+    }
+    items.push({
+      rawArticleId: article.rawArticle.id,
+      status: 'processed',
+      contentPath: article.contentResult.contentPath,
+      isProvisional: finalIsProvisional,
+      provisionalReason: finalProvisionalReason,
+    })
+  }
+
+  // AI 呼び出し失敗時の共通エラー記録
+  async function handleEnrichError(article: PreparedEnrichArticle, error: unknown): Promise<void> {
+    const message = error instanceof Error ? error.message : 'Unknown enrich error'
+    await markRawError(article.rawArticle.id, message)
+    await recordJobRunItem({
+      jobRunId,
+      itemKey: String(article.rawArticle.id),
+      itemStatus: 'failed',
+      detail: { rawArticleId: article.rawArticle.id, title: article.rawArticle.title },
+      errorMessage: message,
+    })
+    items.push({ rawArticleId: article.rawArticle.id, status: 'failed', error: message })
+  }
+
+  // ── AI サマリー生成 + 永続化: 3段階フォールバック ────────────────────
+  //   Tier-1: summaryBatchSize 件まとめて AI 呼び出し（通常ケース）
+  //     ↓ 失敗
+  //   Tier-2: SUMMARY_FALLBACK_BATCH_SIZE(=3) 件ずつ → 原因の束を3件以内に絞る
+  //     ↓ チャンク失敗
+  //   Tier-3: 1件ずつ AI 呼び出し → 壊れた記事を特定・隔離
+  //
+  // generateEnrichedSummaries が throw した場合のみ上位 tier へ。
+  // persistEnrichedArticle が throw しても当該記事のみ失敗扱い（次の記事は継続）。
+  for (const batch of summaryBatches) {
+    // Helper: batchSizeHint は generateEnrichedSummaries 内部での分割単位
+    async function runAiBatch(
+      subBatch: PreparedEnrichArticle[],
+      batchSizeHint: number,
+    ): Promise<void> {
+      const summaries = await generateEnrichedSummaries(
+        subBatch.map(toSummaryInput),
+        batchSizeHint,
+      )
+      for (const [idx, article] of subBatch.entries()) {
+        try {
+          await persistEnrichedArticle(article, summaries[idx])
+        } catch (error) {
+          await handleEnrichError(article, error)
+        }
+      }
+    }
+
+    try {
+      // Tier-1
+      await runAiBatch(batch, summaryBatchSize)
+    } catch (tier1Error) {
+      console.warn(
+        `[daily-enrich] Tier-1 AI batch failed (${batch.length} articles, raw_ids: ${batch.map(a => a.rawArticle.id).join(',')}). Switching to sub-batches of ${SUMMARY_FALLBACK_BATCH_SIZE}:`,
+        tier1Error instanceof Error ? tier1Error.message : tier1Error,
+      )
+
+      for (const subBatch of chunkItems(batch, SUMMARY_FALLBACK_BATCH_SIZE)) {
+        try {
+          // Tier-2
+          await runAiBatch(subBatch, subBatch.length)
+        } catch (tier2Error) {
+          console.warn(
+            `[daily-enrich] Tier-2 sub-batch failed (${subBatch.length} articles, raw_ids: ${subBatch.map(a => a.rawArticle.id).join(',')}). Falling back to per-article:`,
+            tier2Error instanceof Error ? tier2Error.message : tier2Error,
+          )
+
+          for (const article of subBatch) {
+            try {
+              // Tier-3: 1件ずつ
+              await runAiBatch([article], 1)
+            } catch (error) {
+              await handleEnrichError(article, error)
+            }
           }
         }
-
-        const { score, scoreReason } = scoreArticle(
-          article.contentResult.contentPath,
-          keywordMatchedTagIds.length,
-          summariesForArticle.summarySource,
-        )
-        const adjustedScore = article.relevance.isRelevant ? score : Math.max(0, score - 25)
-        const adjustedScoreReason = article.relevance.isRelevant
-          ? scoreReason
-          : `${scoreReason}; low source relevance`
-
-        await upsertEnrichedArticle({
-          rawArticleId: article.rawArticle.id,
-          sourceTargetId: article.rawArticle.sourceTargetId,
-          sourceCategory: article.rawArticle.sourceCategory,
-          sourceType: article.rawArticle.sourceType,
-          normalizedUrl: article.rawArticle.normalizedUrl,
-          citedUrl: article.rawArticle.citedUrl,
-          canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
-          title: article.title,
-          summary100: summariesForArticle.summary100,
-          summary200: summariesForArticle.summary200,
-          summaryBasis: article.summaryBasis,
-          contentPath: article.contentResult.contentPath,
-          isProvisional: finalIsProvisional,
-          provisionalReason: finalProvisionalReason,
-          dedupeStatus: article.dedupeStatus,
-          dedupeGroupKey: article.dedupeGroupKey,
-          publishCandidate,
-          publicationBasis,
-          publicationText,
-          summaryInputBasis: article.summaryInput.summaryInputBasis,
-          score: adjustedScore,
-          scoreReason: adjustedScoreReason,
-          aiProcessingState,
-          sourceUpdatedAt: article.rawArticle.sourceUpdatedAt,
-          matchedTagIds: keywordMatchedTagIds,
-          candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
-        })
-
-        await markRawProcessed(article.rawArticle.id)
-        await recordJobRunItem({
-          jobRunId,
-          itemKey: String(article.rawArticle.id),
-          itemStatus: 'processed',
-          detail: {
-            rawArticleId: article.rawArticle.id,
-            title: article.title,
-            contentPath: article.contentResult.contentPath,
-            isProvisional: finalIsProvisional,
-            provisionalReason: finalProvisionalReason,
-            summaryBasis: article.summaryBasis,
-            publicationBasis,
-            summaryInputBasis: article.summaryInput.summaryInputBasis,
-            publishCandidate,
-            snippetConsistencyPassed,
-            dedupeStatus: article.dedupeStatus,
-            relevanceMatchedKeyword: article.relevance.matchedKeyword,
-            isRelevant: article.relevance.isRelevant,
-            extractionStage: article.contentResult.extractionStage,
-            extractedLength: article.contentResult.extractedLength,
-            snippetLength: article.contentResult.snippetLength,
-            extractionError: article.contentResult.extractionError ?? null,
-            matchedTagCount: article.tagResult.matchedTagIds.length,
-            candidateTagCount: article.shouldPersistCandidateTags
-              ? article.tagResult.candidateTags.length
-              : 0,
-            summarySource: summariesForArticle.summarySource,
-            aiProcessingState,
-          },
-        })
-        if (aiProcessingState === 'manual_pending') {
-          manualPendingExports.push({
-            rawArticleId: article.rawArticle.id,
-            sourceTargetId: article.rawArticle.sourceTargetId,
-            sourceCategory: article.rawArticle.sourceCategory,
-            sourceKey: article.rawArticle.sourceKey,
-            normalizedUrl: article.rawArticle.normalizedUrl,
-            citedUrl: article.rawArticle.citedUrl,
-            canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
-            sourceUpdatedAt: article.rawArticle.sourceUpdatedAt,
-            title: article.title,
-            contentPath: article.contentResult.contentPath,
-            summaryBasis: article.summaryBasis,
-            provisionalBase: article.provisionalState,
-            dedupeStatus: article.dedupeStatus,
-            dedupeGroupKey: article.dedupeGroupKey,
-            isRelevant: article.relevance.isRelevant,
-            matchedTagIds: keywordMatchedTagIds,
-            candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
-            publicationBasisIfSummaryExists,
-            summaryInputBasis: article.summaryInput.summaryInputBasis,
-            summaryInputText: article.summaryInput.summaryInputText,
-            content: article.contentResult.content,
-          })
-        }
-        items.push({
-          rawArticleId: article.rawArticle.id,
-          status: 'processed',
-          contentPath: article.contentResult.contentPath,
-          isProvisional: finalIsProvisional,
-          provisionalReason: finalProvisionalReason,
-        })
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown enrich error'
-        await markRawError(article.rawArticle.id, message)
-        await recordJobRunItem({
-          jobRunId,
-          itemKey: String(article.rawArticle.id),
-          itemStatus: 'failed',
-          detail: {
-            rawArticleId: article.rawArticle.id,
-            title: article.rawArticle.title,
-          },
-          errorMessage: message,
-        })
-        items.push({
-          rawArticleId: article.rawArticle.id,
-          status: 'failed',
-          error: message,
-        })
       }
     }
   }
