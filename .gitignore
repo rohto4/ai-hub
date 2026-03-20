@@ -28,6 +28,7 @@ dist/
 
 # Local artifacts
 artifacts/
+backups/
 
 # Environment
 .env

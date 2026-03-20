@@ -23,6 +23,17 @@
 17. migration 034（`commercial_use_policy`）を適用し、ToS 調査済みドメインを初期投入した
 18. `/api/home` を `{ random, latest, unique, lanes, stats, activity }` 形式へ更新した
 19. Home / digest / saved / liked / `/api/articles/[id]` を追加し、ArticleCard の 200 字モーダルと共有 UI を更新した
+20. Neon 向け `pg_dump` バックアップ基盤を追加した
+21. GitHub Actions に日次 DB バックアップ workflow を追加した（artifact 保持 7 日）
+
+## 2026-03-20 バックアップ運用追加
+
+1. Neon 公式 docs に従い、`DATABASE_URL_UNPOOLED` を使う `pg_dump` ベースのバックアップ運用へ寄せた
+2. `scripts/backup-neon-all.mjs` を追加し、非 template DB を列挙して全 DB を dump できるようにした
+3. `.github/workflows/daily-db-backup.yml` を追加し、毎日 18:15 UTC に backup を実行する
+4. GitHub Actions artifact は `retention-days: 7` とし、1 週間で自動削除する
+5. 初回手動バックアップを `backups/manual-2026-03-20/` に取得済み
+6. `artifacts/` はバックアップ成功後に削除対象とする
 
 ## 2026-03-20 時点の次着手
 

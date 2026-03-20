@@ -9,6 +9,7 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-20 15:05 | done | DB バックアップ基盤を追加 | `pg_dump` 全 DB バックアップを取得し日次 GitHub Actions と 7 日保持を追加、`artifacts/` を削除
 - 2026-03-20 12:10 | done | 計画タスクを20件へ拡張 | `content_language`→日本語ソース→公開面調整→管理画面→ランキング調整まで分解
 - 2026-03-20 12:00 | done | `implementation-plan.md` / `imp-status.md` 更新 | `content_language` 先行導入と日本語ソース追加前提の 10 タスク分解を反映
 - 2026-03-18 10:15 | done | L4 公開ページ群を実装 | ranking/search/detail/category/tags/about/feed を Layer4 読み取りで追加

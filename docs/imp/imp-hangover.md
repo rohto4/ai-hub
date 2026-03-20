@@ -152,6 +152,9 @@ hourly-publish 内:
 ## 10. すぐ使うコマンド
 
 ```bash
+# 全 DB バックアップ
+node scripts/backup-neon-all.mjs --output-dir backups/manual
+
 # 型チェック
 npm run type-check
 
@@ -189,6 +192,14 @@ npm run db:backfill-article-tags  # 既存記事タグ再付与
 SELECT source_type, COUNT(*) FROM public_articles GROUP BY source_type;
 SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT 20;
 ```
+
+## 10.1 バックアップ運用（2026-03-20 追加）
+
+1. Neon の direct 接続 (`DATABASE_URL_UNPOOLED`) を使う `pg_dump` ベースで全 DB バックアップを取る
+2. `scripts/backup-neon-all.mjs` は `pg_dumpall --globals-only` + 各 DB `pg_dump -Fc` を実行する
+3. GitHub Actions `daily-db-backup.yml` を追加済み
+4. backup artifact は 7 日保持し、その後 GitHub 側で自動削除される
+5. `artifacts/` は手動 import/export の残骸なので、バックアップ確認後は削除してよい
 
 ---
 
