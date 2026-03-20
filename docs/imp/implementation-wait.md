@@ -336,3 +336,45 @@ L3/L4 仕様では `priority_processing_queue` を `hourly-publish` より先に
 1. `/api/home` で `latest` や `source_type` 別 lane を返すか
 2. `topic chips` 用の集計を API 側で返すか
 3. Home を最終的に SSR 主体へ寄せるか、現行 client fetch を残すか
+
+## 11. 2026-03-19 resolved notes
+
+1. `source_targets` is now treated as the master source registry
+2. `pgvector` is adopted for the initial semantic duplicate pass
+3. duplicate source names are preserved in `public_article_sources`
+4. `source_targets.is_active` ON/OFF is scheduled in Phase 3 admin UI
+
+## 12. OGP共有ボードの詳細（要判断）
+
+### 12.1 概要
+
+実装済みの「紹介文をコピー」「URLをコピー」に加えて、今後 OGP 共有ボードとして提供する場合の設計を決める必要がある。
+
+### 12.2 決める必要がある事項
+
+1. OGP 共有ボードの位置づけ
+   - `/api/og?id=xxx` の動的 OGP 画像生成エンドポイントは既に存在する
+   - SNS シェア時に記事カードをビジュアルとして表示する仕組みを本格利用するか
+
+2. 共有ページの有無
+   - 記事詳細ページ（`/articles/:publicKey`）がそのまま OGP の着地先になるか
+   - 共有専用の軽量ページ（`/share/:publicKey`）を別途作るか
+
+3. X（旧 Twitter）カードの種別
+   - `summary_large_image` vs `summary` どちらを使うか
+   - `/api/og` で生成する画像のサイズ（1200x630 が標準）
+
+4. 紹介文の最大文字数制限
+   - X の 280 文字制限を意識した自動トリミングをするか
+   - 現状は制限なし（ユーザーが手動編集）
+
+5. 共有追跡のログ設計
+   - `share_copy` アクションのみ記録（現状）で十分か
+   - URL コピーと紹介文コピーを区別して記録するか（`share_url_copy` / `share_text_copy`）
+
+### 12.3 現在の暫定実装
+
+- URLをコピー: `/articles/:publicKey` の絶対 URL をクリップボードへ
+- 紹介文をコピー: タイトル＋要約＋URL＋#AiTrendHub をテキストエリアから
+- チェックボックス: ✅#AiTrendHub / ✅タイトル のカスタムチェックボックスで制御
+- SNS 別シェアボタン: 削除済み（imp-plan に後発として残す）

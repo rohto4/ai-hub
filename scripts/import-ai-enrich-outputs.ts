@@ -301,8 +301,11 @@ async function main(): Promise<void> {
         scoreReason: adjustedScoreReason,
         aiProcessingState: 'completed',
         sourceUpdatedAt: inputItem.sourceUpdatedAt,
+        sourceKey: inputItem.sourceKey,
+        sourceDisplayName: inputItem.sourceKey,
         matchedTagIds: inputItem.matchedTagIds,
         candidateTags: inputItem.candidateTags,
+        commercialUsePolicy: 'permitted',
       },
       {
         refreshTagCounts: false,

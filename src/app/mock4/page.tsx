@@ -31,7 +31,7 @@ type RouteState =
   | { page: 'feed' }
 
 type MockArticle = ArticleWithScore & { tags: string[] }
-type SourceLane = 'all' | 'official' | 'alerts' | 'blog' | 'paper' | 'news'
+type SourceLane = 'all' | 'official' | 'paper' | 'news'
 
 const ROUTE_BUTTONS: Array<{ id: RouteState['page']; label: string }> = [
   { id: 'home', label: 'Home' },
@@ -140,7 +140,7 @@ export default function Mock4Page() {
         setLoadingMessage('Home / Ranking を live API から取得しています。')
         const home = await fetchJson<HomeResponse>(`/api/home?period=${period}&limit=18`)
         if (ignore) return
-        setArticles(home.articles.map(toMockArticle))
+        setArticles(home.random.map(toMockArticle))
         setLoadingMessage('live API を表示中です。')
       } catch {
         if (ignore) return
@@ -301,7 +301,7 @@ export default function Mock4Page() {
 
   return (
     <div className="min-h-screen bg-bg text-ink">
-      <Header searchValue={searchDraft} critiqueVisible={showCritique} onSearchChange={setSearchDraft} onSearchSubmit={handleSearchSubmit} />
+      <Header searchValue={searchDraft} onSearchChange={setSearchDraft} onSearchSubmit={handleSearchSubmit} savedCount={savedArticleIds.length} />
 
       <main className="mx-auto max-w-[1440px] px-4 pb-10 pt-[68px] md:px-6 xl:px-[120px]">
         <section className="rounded-3xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
@@ -332,7 +332,7 @@ export default function Mock4Page() {
 
         <section className="mt-4 flex flex-col gap-4 xl:flex-row">
           <div className="flex-1 rounded-[14px] bg-white/20 p-2.5">
-            <Toolbar activeTab={activeTab} onTabChange={setActiveTab} period={period} onPeriodChange={setPeriod} />
+            <Toolbar period={period} onPeriodChange={setPeriod} />
 
             <div className="mt-3 flex flex-wrap gap-2 px-2">
               {(['all', 'official', 'alerts', 'blog', 'paper', 'news'] as SourceLane[]).map((item) => (
@@ -371,17 +371,17 @@ export default function Mock4Page() {
             {route.page === 'home' || route.page === 'ranking' ? (
               <section className="mt-4">
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                  {visibleArticles.map((article, index) => (
+                  {visibleArticles.map((article) => (
                     <ArticleCard
                       key={article.id}
                       article={article}
-                      rank={route.page === 'ranking' ? index + 1 : undefined}
                       summaryMode={expandedArticleId === article.id ? 200 : summaryMode}
-                      showCritique={showCritique}
                       isFocused={focusedArticleId === article.id}
                       isSaved={savedArticleIds.includes(article.id)}
+                      onCardClick={(id) => { setFocusedArticleId(id); setExpandedArticleId(id) }}
                       onAction={handleArticleAction}
                       onOpenArticle={openDetail}
+                      onLike={(id) => handleArticleAction('like', id)}
                     />
                   ))}
                 </div>
@@ -438,11 +438,12 @@ export default function Mock4Page() {
                         key={article.id}
                         article={article}
                         summaryMode={expandedArticleId === article.id ? 200 : summaryMode}
-                        showCritique={showCritique}
                         isFocused={focusedArticleId === article.id}
                         isSaved={savedArticleIds.includes(article.id)}
+                        onCardClick={(id) => { setFocusedArticleId(id); setExpandedArticleId(id) }}
                         onAction={handleArticleAction}
                         onOpenArticle={openDetail}
+                        onLike={(id) => handleArticleAction('like', id)}
                       />
                     ))
                   ) : (
@@ -504,11 +505,12 @@ export default function Mock4Page() {
                         key={article.id}
                         article={article}
                         summaryMode={expandedArticleId === article.id ? 200 : summaryMode}
-                        showCritique={showCritique}
                         isFocused={focusedArticleId === article.id}
                         isSaved={savedArticleIds.includes(article.id)}
+                        onCardClick={(id) => { setFocusedArticleId(id); setExpandedArticleId(id) }}
                         onAction={handleArticleAction}
                         onOpenArticle={openDetail}
+                        onLike={(id) => handleArticleAction('like', id)}
                       />
                     ))}
                 </div>
@@ -526,11 +528,12 @@ export default function Mock4Page() {
                         key={article.id}
                         article={article}
                         summaryMode={expandedArticleId === article.id ? 200 : summaryMode}
-                        showCritique={showCritique}
                         isFocused={focusedArticleId === article.id}
                         isSaved={savedArticleIds.includes(article.id)}
+                        onCardClick={(id) => { setFocusedArticleId(id); setExpandedArticleId(id) }}
                         onAction={handleArticleAction}
                         onOpenArticle={openDetail}
+                        onLike={(id) => handleArticleAction('like', id)}
                       />
                     ))}
                 </div>
@@ -569,17 +572,10 @@ export default function Mock4Page() {
           </div>
 
           <RightSidebar
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-            unread={savedArticleIds.length}
-            topRated={articles.filter((item) => Number(item.score) >= 90).length}
-            savedLater={savedArticleIds.length}
+            savedCount={savedArticleIds.length}
+            likedCount={articles.filter((item) => Number(item.score) >= 90).length}
+            impressionCountLastHour={visibleArticles.length}
             shareCountLastHour={savedArticleIds.length}
-            activeArticlesLastHour={visibleArticles.length}
-            notifTimes={notifTimes}
-            onNotifToggle={(index) =>
-              setNotifTimes((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, on: !item.on } : item)))
-            }
           />
         </section>
       </main>

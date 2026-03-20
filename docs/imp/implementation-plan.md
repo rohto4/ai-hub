@@ -1,6 +1,6 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-03-17（snippet 整合強化、paper タグ制限、絵文字サムネイル暫定導入を反映）／2026-03-17 Phase 3 タスクを具体化（hide_article + タグレビュー UI、管理 UI セキュリティ方針を確定）
+最終更新: 2026-03-20（content_language 先行導入方針、日本語ソース追加前提、Phase 3 先後関係を更新）
 
 ## 1. この計画の位置づけ
 
@@ -206,6 +206,16 @@ P0/P1 では次の 3 軸を分離して扱う。
 7. `source_type='paper'` は `paper` タグのみ付与する
 8. `thumbnail_url` が空の間は `thumbnail_emoji` でカード先頭を補う
 
+2026-03-20 実装反映（Phase 0 完了）:
+
+1. `hourly-publish` の bulk upsert 化完了（unnest ベース）。L4 公開件数 = 2371 件
+2. migration 033（pgvector + source provenance）適用済み
+3. migration 034（commercial_use_policy）適用済み
+   - `source_targets` / `observed_article_domains` / `articles_enriched` に追加
+   - ToS 調査結果（prohibited 6件・permitted 6件）を初期投入
+   - enrich 時の自動判定・hourly-publish 時のフィルタ実装済み
+4. Phase 0 のタスクはすべて完了。Phase 1 / Phase 2 も実装済み
+
 ### Phase 1: Home を設計に近づける
 
 目的:
@@ -230,6 +240,104 @@ P0/P1 では次の 3 軸を分離して扱う。
 4. `ArticleCard` を絵文字サムネイル前提で整備し、source lane 表示を統一
 5. Home は ranking / latest / unique の切り替えと topic/source の組み合わせで全体を広く見せる形へ整理
 6. `/api/home` の source_type 別 lane 返却までは未完。現時点は 1 本の公開記事列を UI 側で lane/topic 表示に分解している
+
+2026-03-19 実装反映:
+
+1. `/api/home` が `{ ranked, lanes, stats, activity }` を返す形に変更
+   - `lanes`: source_type 5種（official/alerts/blog/paper/news）を並列クエリで各 4 件取得
+   - `stats`: source_type 別・source_category 別件数を 1 SQL で返すように拡張
+2. `types.ts` に `HomeLaneKey` / `HomeLanes` を追加。`Article` に `publicKey?: string` を追加。`HomeStats` / `HomeResponse` を拡張
+3. `ArticleCard` のタイトルクリックを `/articles/:publicKey` への内部 Link に変更。「元記事」ボタンを追加。`resolveEmoji()` で絵文字を多様化
+4. `page.tsx` を全面更新
+   - Stats ダッシュボード（16 KPI）を最上部に設置（total/lane/genre/activity を色分け）
+   - ランキングセクション：`ranked` 配列を topic chips + tab でフィルタして表示
+   - Source Lanes セクション：5 レーンを常時表示、各 4 件、`id="lane-{key}"` アンカー付き
+   - サイドバーのレーンボタン → 対応レーンへスクロール（フィルタではなくナビ）
+   - `findArticle` は ranked + lanes + search の全記事プールを検索
+
+2026-03-20 実装反映（Phase 1 / Phase 2 追加）:
+
+1. `/api/home` を `{ random, latest, unique, lanes, stats, activity }` 形式に変更
+
+## 6.5 2026-03-20 の着手順見直し
+
+`Phase 3` の全体土台は引き続き管理画面基盤だが、**直近の実装順**としては `content_language` を先行させる。
+
+理由:
+
+1. 日本語ソース 14 件追加の直前依存である
+2. JP/EN 混在後の表示制御を中途半端にしないため、言語軸を先に通す必要がある
+3. 既存 `public_articles` 2371 件は delete / republish ではなく、列追加 + backfill で安全に整合を取れる
+
+方針:
+
+1. `source_targets.content_language` を SSOT にする
+2. `articles_enriched.content_language` は enrich 時に `source_targets` から伝搬する
+3. `public_articles.content_language` は publish 時に `articles_enriched` から伝搬する
+4. migration 直後に既存 L2 / L4 を一括 backfill する
+5. 日本語ソース 14 件の seed 追加は上記完了後に行う
+
+既定値:
+
+1. 日本語ソース候補として seed する `source_targets` は `ja`
+2. 既存の英語系ソースは当面 `en`
+3. 判定不能値のために `unknown` を将来余地として残してもよいが、初期運用は `ja / en` を優先する
+
+## 6.6 次の実装を 20 タスクへ分解
+
+次セッション以降の推奨実行順:
+
+### A. `content_language` 導入と既存データ整合
+
+1. migration 035 を作成し、`source_targets` / `articles_enriched` / `public_articles` に `content_language` を追加する
+2. migration 035 とは別に backfill SQL か専用スクリプトを用意し、既存 L2 / L4 を安全に埋め直せるようにする
+3. `source_targets.content_language` を seed の SSOT として反映し、既存ソースを `ja / en` に分類する
+4. enrich 側で `source_targets.content_language -> articles_enriched.content_language` の伝搬を実装する
+5. publish 側で `articles_enriched.content_language -> public_articles.content_language` の伝搬を実装する
+6. 公開 API / 型定義 / query を `content_language` 対応へ更新する
+7. `ArticleCard` と必要最小限の一覧 UI に `JP / EN` バッジを追加する
+8. 既存 L2 / L4 の backfill 実行結果を確認し、件数差分と例外ソースを記録する
+
+### B. 日本語ソース 14 件投入
+
+9. `imp-hangover.md 13.4` の日本語ソース候補 14 件を seed 追加する
+10. 日本語ソースに対する `commercial_use_policy` / `content_language='ja'` / `is_active` 初期値を整理する
+11. 日本語ソース追加後に fetch 対象 / feed 妥当性 / URL 正規化を確認する
+12. 日本語ソース追加後の enrich/publish を流し、L2 / L4 への初回反映を確認する
+13. Home / category / tags / detail で JP/EN 混在表示が破綻しないかを監査する
+
+### C. 言語軸導入後の公開面調整
+
+14. 言語軸を使った将来フィルタの必要性を整理し、実装しない場合でも docs に非対象と明記する
+15. `content_language` を検索 / ranking / digest でどう扱うかを整理し、少なくとも型と集計の受け口を揃える
+16. 日本語ソース投入後の表示分布を確認し、必要なら Home の lane 件数や見せ方を微調整する
+
+### D. Phase 3 管理画面基盤
+
+17. 管理画面基盤（`ADMIN_PATH_PREFIX` + `ADMIN_SECRET`）を実装する
+18. `priority_processing_queue` 最小実装として `hide_article` を通す
+19. タグレビュー UI と `source_targets.is_active` ON/OFF を管理画面へ追加する
+
+### E. ランキングと運用調整
+
+20. `activity_logs.action_type` の正式化、`compute-ranks` 係数確認、再実行、結果監査を行う
+
+補足:
+
+1. 管理画面基盤は Phase 3 の共通土台として重要なまま維持する
+2. ただし日本語ソース投入の直前依存は `content_language` なので、実装順は A → B → C → D → E を優先する
+   - `random`: 1年以内の全記事からランダム 10 件
+   - `latest`: 新着順 10 件
+   - `unique`: source_category 多様順 10 件
+   - `lanes`: official / paper / news を期間フィルタ付きで各 8 件
+   - `stats`: source_type 別・source_category 別件数（14 項目）
+   - `activity`: 1h 閲覧数・シェア数
+2. Home を 3 セクション構成に変更（ランダム表示・新着順・ユニーク順）
+3. ソースレーンは ArticleRow によるコンパクト表示（official / paper / news）
+4. `/saved` / `/liked` ページ追加（localStorage + `/api/articles/[id]`）
+5. `/digest` ページ追加（ランキング上位 10 件、200字表示）
+6. モバイル対応: BottomNav、Header auto-hide、Stats 横スクロール、Lane カルーセル
+7. 商用利用ポリシー（commercial_use_policy）をデータモデルに統合済み
 
 ### Phase 2: 公開ページ群の実装
 
@@ -356,3 +464,60 @@ P0/P1 では次の 3 軸を分離して扱う。
 5. `docs/imp/imp-hangover.md`
 6. `docs/imp/l3-l4-screen-flow.md`
 7. `docs/spec/04-data-model-and-sql.md`
+
+## 10. 2026-03-19 decisions
+
+### 10.1 source_targets as SSOT
+
+1. `scripts/seed.mjs` is the only master seed for `source_targets`
+2. L2 must resync `articles_enriched.source_category / source_type` from `source_targets`
+3. L4 must resync `public_articles.source_category / source_type` and `public_article_sources` source snapshots from `source_targets`
+4. Operational SQL: `docs/imp/sql/2026-03-19-source-targets-master-sync.sql`
+
+### 10.2 pgvector initial rollout
+
+1. Add `articles_enriched.summary_embedding`
+2. Generate embeddings from `title + summary`
+3. Use cosine similarity in `daily-enrich` to mark `similar_candidate`
+4. Initial threshold is `0.92`
+
+### 10.3 source provenance retention
+
+1. Add `articles_enriched_sources` for `selected / supporting / rejected`
+2. Extend `public_article_sources` with `source_key / source_display_name / selection_status`
+3. L4 keeps duplicate source names only, not duplicate source links
+
+### 10.4 admin UI backlog
+
+1. Add a `source_targets.is_active` ON/OFF switch to the admin screen in Phase 3
+2. Required list columns: `source_key`, `display_name`, `fetch_kind`, `source_category`, `source_type`, `is_active`
+3. OFF sources must be excluded from `hourly-fetch`
+
+## 11. 2026-03-20 未実装として残した機能（後発 imp-plan）
+
+### 11.1 通知機能
+
+1. **月曜・土曜: 人気記事通知**
+   - 毎週月曜 / 土曜に「この記事がよく見られています / シェアされています」通知を送信
+   - `weekly-popular` バッチで `public_rankings` から上位 3 件を選出
+   - Web Push で `push_subscriptions` に配信
+
+2. **更新通知: 閲覧済み記事の更新**
+   - ユーザーが `article_open` または `expand_200` したことがある記事に更新があった場合に通知
+   - `activity_logs` の `action_type IN ('article_open', 'expand_200')` の記事 URL を追跡
+   - `articles_enriched.source_updated_at` の変化を検知して通知
+
+### 11.2 SNS シェアボタン
+
+- X / Threads / Slack 向けシェアボタンは UI から削除済み
+- 必要に応じて再追加する場合は共有モーダルの「詳細オプション」以下に格納する
+
+### 11.3 批評 (Critique) 表示
+
+- `public_articles.critique` カラムは実装済みだが UI から非表示
+- `daily-enrich` で critique 生成を有効化してから UI に追加する
+
+### 11.4 Source Targets の is_active 管理 UI
+
+- 管理画面 Phase 3 で `source_targets.is_active` ON/OFF スイッチを追加
+- `imp-plan Section 10.4` に記載済み

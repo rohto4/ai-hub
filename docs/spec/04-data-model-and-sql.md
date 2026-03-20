@@ -398,3 +398,53 @@ base:        content_path=full → 70 / snippet → 45
 2. タグ追加だけ、必要なら人手レビューを挟めるようにする
 3. `layer4` はサイト表示専用の安定層として扱う
 4. 公開面は `layer2` を直接参照しない
+
+## 11. 2026-03-19 additions
+
+1. `articles_enriched.summary_embedding`
+   - `vector(1536)`
+   - generated from `title + summary`
+   - used for initial semantic duplicate detection
+2. `articles_enriched_sources`
+   - keeps `selected / supporting / rejected` source provenance for L2
+3. `public_article_sources.source_key / source_display_name / selection_status`
+   - keeps L4 source-name snapshots even when source master labels change later
+
+## 12. 2026-03-20 additions
+
+### 12.1 commercial_use_policy（migration 034）
+
+ToS 調査結果を永続化し、商用利用可否をレイヤーをまたいで管理する仕組みを追加。
+
+1. `source_targets.commercial_use_policy`
+   - `'permitted' | 'prohibited' | 'unknown'`、DEFAULT `'permitted'`
+   - ソース単位の商用利用可否。新規ソース追加時に必ず設定する
+
+2. `observed_article_domains.commercial_use_policy`
+   - `'permitted' | 'prohibited' | 'unknown'`、DEFAULT `'unknown'`
+   - ドメイン単位の商用利用可否。ToS 調査結果を蓄積する台帳
+   - 2026-03-20 初期投入: prohibited 6件（itmedia/techcrunch/nikkei系/qiita）、permitted 6件
+
+3. `articles_enriched.commercial_use_policy`
+   - `'permitted' | 'prohibited' | 'unknown'`、DEFAULT `'permitted'`
+   - enrich 時に `source_targets` + `observed_article_domains` の最厳値を保存
+   - **prohibited でも enrich データは保持する**（非商用利用への流用を残すため）
+
+4. `articles_enriched_history.commercial_use_policy`
+   - 上記と同じ型・用途。履歴テーブルへの伝播分
+
+#### フィルタリングポイント
+
+- enrich: 常に実行（フィルタなし）。`commercial_use_policy` を記録するのみ
+- publish（`hourly-publish`）: `COALESCE(ae.commercial_use_policy, 'permitted') != 'prohibited'` の記事のみ公開
+
+#### 恒久ルール
+
+- 広告掲載・課金・収益化を行う場合は「商用利用」に該当する（費用回収目的も含む）
+- 新規ソース追加・収益化機能追加時は必ず ToS 再確認し `observed_article_domains` を更新する
+- 詳細は `docs/guide/PROJECT.md` の「商用利用と ToS の恒久ルール」セクションを参照
+
+### 12.2 `public_articles` の公開件数
+
+- `hourly-publish` の bulk upsert 化（unnest ベース）により L4 に 2371 件が公開済み（2026-03-20）
+- `hourly-publish` は 200 件チャンクで処理し、失敗時は 10 件→1 件のフォールバック構成

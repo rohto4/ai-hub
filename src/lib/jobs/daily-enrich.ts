@@ -1,3 +1,4 @@
+import { generateTextEmbeddings } from '@/lib/ai/embeddings'
 import fs from 'node:fs'
 import path from 'node:path'
 import { generateEnrichedSummaries } from '@/lib/ai/enrich'
@@ -5,6 +6,7 @@ import {
   type RawArticleForEnrichment,
   type DedupeStatus,
   findDuplicateMatch,
+  findSemanticDuplicate,
   findSimilarTitleDuplicate,
   listRawArticlesForEnrichment,
   markRawError,
@@ -477,6 +479,7 @@ export async function runDailyEnrich(
   async function persistEnrichedArticle(
     article: PreparedEnrichArticle,
     summaryForArticle: Awaited<ReturnType<typeof generateEnrichedSummaries>>[number],
+    embeddingResult: { embedding: number[] | null; model: string | null },
   ): Promise<void> {
     const publicationBasisIfSummaryExists =
       article.contentResult.contentPath === 'full'
@@ -509,12 +512,35 @@ export async function runDailyEnrich(
       publicationBasis === 'source_snippet' ? false : article.provisionalState.isProvisional
     const finalProvisionalReason =
       publicationBasis === 'source_snippet' ? null : article.provisionalState.provisionalReason
+    const semanticDuplicate =
+      article.dedupeStatus === 'unique'
+        ? await findSemanticDuplicate(embeddingResult.embedding, article.rawArticle.id)
+        : null
+    const finalDedupeStatus = semanticDuplicate?.dedupeStatus ?? article.dedupeStatus
+    const finalDedupeGroupKey = semanticDuplicate?.dedupeGroupKey ?? article.dedupeGroupKey
     const publishCandidate =
       publicationBasis !== 'hold' &&
-      article.dedupeStatus === 'unique' &&
+      finalDedupeStatus === 'unique' &&
       article.relevance.isRelevant
     const aiProcessingState =
       summaryForArticle.summarySource === 'manual_pending' ? 'manual_pending' : 'completed'
+    const relatedSources = [
+      {
+        sourceTargetId: article.rawArticle.sourceTargetId,
+        sourceKey: article.rawArticle.sourceKey,
+        sourceDisplayName: article.rawArticle.sourceDisplayName,
+        sourceCategory: article.rawArticle.sourceCategory,
+        sourceType: article.rawArticle.sourceType,
+        selectionStatus: finalDedupeStatus === 'unique' ? 'selected' : 'rejected',
+        selectionReason:
+          semanticDuplicate
+            ? 'semantic duplicate candidate'
+            : finalDedupeStatus === 'unique'
+              ? 'primary article source'
+              : 'dedupe group member',
+        similarityScore: semanticDuplicate?.similarityScore ?? null,
+      },
+    ] as const
 
     // summary_200 + title を使って tag_keywords でマッチング（準備フェーズより高精度）
     const paperTag = tagReferences.find((ref) => ref.tagKey === 'paper')
@@ -553,6 +579,8 @@ export async function runDailyEnrich(
       sourceTargetId: article.rawArticle.sourceTargetId,
       sourceCategory: article.rawArticle.sourceCategory,
       sourceType: article.rawArticle.sourceType,
+      sourceKey: article.rawArticle.sourceKey,
+      sourceDisplayName: article.rawArticle.sourceDisplayName,
       normalizedUrl: article.rawArticle.normalizedUrl,
       citedUrl: article.rawArticle.citedUrl,
       canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
@@ -563,8 +591,8 @@ export async function runDailyEnrich(
       contentPath: article.contentResult.contentPath,
       isProvisional: finalIsProvisional,
       provisionalReason: finalProvisionalReason,
-      dedupeStatus: article.dedupeStatus,
-      dedupeGroupKey: article.dedupeGroupKey,
+      dedupeStatus: finalDedupeStatus,
+      dedupeGroupKey: finalDedupeGroupKey,
       publishCandidate,
       publicationBasis,
       publicationText,
@@ -573,8 +601,12 @@ export async function runDailyEnrich(
       scoreReason: adjustedScoreReason,
       aiProcessingState,
       sourceUpdatedAt: article.rawArticle.sourceUpdatedAt,
+      relatedSources: [...relatedSources],
+      summaryEmbedding: embeddingResult.embedding,
+      embeddingModel: embeddingResult.model,
       matchedTagIds: keywordMatchedTagIds,
       candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
+      commercialUsePolicy: article.rawArticle.commercialUsePolicy,
     })
 
     await markRawProcessed(article.rawArticle.id)
@@ -593,7 +625,9 @@ export async function runDailyEnrich(
         summaryInputBasis: article.summaryInput.summaryInputBasis,
         publishCandidate,
         snippetConsistencyPassed,
-        dedupeStatus: article.dedupeStatus,
+        dedupeStatus: finalDedupeStatus,
+        dedupeGroupKey: finalDedupeGroupKey,
+        semanticSimilarityScore: semanticDuplicate?.similarityScore ?? null,
         relevanceMatchedKeyword: article.relevance.matchedKeyword,
         isRelevant: article.relevance.isRelevant,
         extractionStage: article.contentResult.extractionStage,
@@ -622,8 +656,8 @@ export async function runDailyEnrich(
         contentPath: article.contentResult.contentPath,
         summaryBasis: article.summaryBasis,
         provisionalBase: article.provisionalState,
-        dedupeStatus: article.dedupeStatus,
-        dedupeGroupKey: article.dedupeGroupKey,
+        dedupeStatus: finalDedupeStatus,
+        dedupeGroupKey: finalDedupeGroupKey,
         isRelevant: article.relevance.isRelevant,
         matchedTagIds: keywordMatchedTagIds,
         candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
@@ -675,9 +709,23 @@ export async function runDailyEnrich(
         subBatch.map(toSummaryInput),
         batchSizeHint,
       )
+      const embeddings = await generateTextEmbeddings(
+        subBatch.map((article, index) => ({
+          id: String(article.rawArticle.id),
+          text: `${article.title}\n${summaries[index]?.summary200 || summaries[index]?.summary100 || ''}`,
+        })),
+      )
+      const embeddingById = new Map(
+        embeddings.map((embedding) => [embedding.id, embedding]),
+      )
+
       for (const [idx, article] of subBatch.entries()) {
         try {
-          await persistEnrichedArticle(article, summaries[idx])
+          const embedding = embeddingById.get(String(article.rawArticle.id))
+          await persistEnrichedArticle(article, summaries[idx], {
+            embedding: embedding?.embedding ?? null,
+            model: embedding?.model ?? null,
+          })
         } catch (error) {
           await handleEnrichError(article, error)
         }

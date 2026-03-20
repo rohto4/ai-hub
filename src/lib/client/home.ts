@@ -115,3 +115,32 @@ export async function trackAction(params: {
     // Action logging should never block UX.
   }
 }
+
+// ── 高評価（ライク）管理 ───────────────────────────────────────
+const LIKED_IDS_KEY = 'ai-trend-hub/liked-article-ids'
+
+export function getLikedArticleIds(): string[] {
+  if (!canUseStorage()) return []
+  const raw = window.localStorage.getItem(LIKED_IDS_KEY)
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw) as unknown
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+export function toggleLikedArticleId(articleId: string): string[] {
+  const current = new Set(getLikedArticleIds())
+  if (current.has(articleId)) {
+    current.delete(articleId)
+  } else {
+    current.add(articleId)
+  }
+  const next = [...current]
+  if (canUseStorage()) {
+    window.localStorage.setItem(LIKED_IDS_KEY, JSON.stringify(next))
+  }
+  return next
+}

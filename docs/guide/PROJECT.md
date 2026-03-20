@@ -80,6 +80,34 @@
 初期方針:
 - 初期投入する重要ソースは、公式 RSS / Atom / API がある範囲に限定してよい。
 
+### 商用利用と ToS の恒久ルール
+
+**広告掲載・課金・収益化を行うサービスは「商用利用」に該当する。**
+費用の元を取る目的であっても例外はない。
+
+ソースの `commercial_use_policy` 判定基準:
+
+- `permitted`: 商用利用禁止の明示がないことを確認済み
+- `prohibited`: 商用利用禁止を ToS・声明等で明示確認済み
+- `unknown`: 未調査（デフォルト。新規ソース追加時は必ず調査すること）
+
+**広告・課金・収益化機能を追加・変更するとき、または新規ソースを追加するときは、必ず以下を再確認すること:**
+
+1. 対象ソースの ToS・利用規約・RSS利用条件を読む
+2. 「商用」「非商用」「広告」「ロボット」「自動取得」などのキーワードで制限がないか確認する
+3. `observed_article_domains` の `commercial_use_policy` を更新する
+4. 確認できない場合は `unknown` のままにし、`prohibited` 扱いで運用する
+
+**2026-03-20 調査済み:**
+
+| ドメイン | 判定 | 根拠 |
+|---|---|---|
+| itmedia.co.jp | prohibited | RSS利用条件に「ロボット自動取得・商業行為」禁止を明示 |
+| techcrunch.com | prohibited | ToS に「personal noncommercial use only」を明記 |
+| nikkei.com / xtech.nikkei.com / nikkei.co.jp | prohibited | 「AI学習・データマイニング目的での蓄積・加工禁止」を明示 |
+| qiita.com | prohibited | 外部からの商用配信を拒否する声明を公開 |
+| sakana.ai / tech.preferred.jp / zenn.dev / jdla.org / ainow.ai / publickey1.jp | permitted | 明示的な禁止なしを確認済み（広告追加時は再確認推奨） |
+
 ---
 
 ## Home 実装の恒久方針

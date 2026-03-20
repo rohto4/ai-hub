@@ -1,6 +1,6 @@
 # AI Trend Hub 実装ステータス
 
-最終更新: 2026-03-16（主要タスク・確認順を現フェイズへ更新）
+最終更新: 2026-03-20（content_language 先行導入と日本語ソース追加前提の実行順を追記）
 
 ## 進捗サマリ
 
@@ -18,26 +18,73 @@
 12. `job_runs` / `job_run_items` の監視テーブルと記録ロジックを追加し、長時間ジョブの可視化基盤を入れた
 13. enrich 前の title / snippet 正規化を追加し、媒体名サフィックスや HTML エンティティ混入を減らした
 14. 候補タグの stopword / generic phrase 除外を強化した
+15. `hourly-publish` の bulk upsert 化を完了し、`public_articles` published = `2371` まで公開済み
+16. migration 033（pgvector + `articles_enriched_sources` + `public_article_sources` 拡張）を適用した
+17. migration 034（`commercial_use_policy`）を適用し、ToS 調査済みドメインを初期投入した
+18. `/api/home` を `{ random, latest, unique, lanes, stats, activity }` 形式へ更新した
+19. Home / digest / saved / liked / `/api/articles/[id]` を追加し、ArticleCard の 200 字モーダルと共有 UI を更新した
+
+## 2026-03-20 時点の次着手
+
+次は `Phase 3` の管理画面基盤ではなく、**`content_language` の先行導入**から着手する。
+
+理由:
+
+1. 日本語ソース 14 件追加の直前依存だから
+2. JP/EN 混在後の表示制御を先に揃える必要があるから
+3. 既存 L4 2371 件は backfill で整合を取れ、手戻りが小さいから
+
+## 次タスクの分解（20 個）
+
+### A. `content_language` 導入
+
+1. migration 035 で `source_targets` / `articles_enriched` / `public_articles` に `content_language` を追加する
+2. backfill SQL または専用スクリプトを用意し、既存 L2 / L4 を一括更新できる状態にする
+3. `source_targets.content_language` を SSOT として既存ソースを `ja / en` に分類する
+4. enrich で `source_targets -> articles_enriched` の言語伝搬を実装する
+5. publish で `articles_enriched -> public_articles` の言語伝搬を実装する
+6. 公開 API / 型定義 / 取得 query に `content_language` を通す
+7. `ArticleCard` に `JP / EN` バッジを追加する
+8. backfill 後の件数検証を行い、例外ソースがあれば `imp-hangover.md` へ残す
+
+### B. 日本語ソース追加
+
+9. `imp-hangover.md 13.4` の日本語ソース候補 14 件を seed に追加する
+10. 各ソースの `commercial_use_policy` / `content_language` / `is_active` 初期値を確認する
+11. feed 妥当性、URL 正規化、重複混入リスクを確認する
+12. 日本語ソース追加後の fetch / enrich / publish を通す
+13. Home / category / tags / detail で混在表示を確認する
+
+### C. 公開面調整
+
+14. 言語軸の将来フィルタ要否を整理し、未実装なら docs に明記する
+15. search / ranking / digest への `content_language` 受け口を揃える
+16. Home の見せ方や lane 件数の必要調整を行う
+
+### D. 管理画面 Phase 3
+
+17. 管理画面基盤（`ADMIN_PATH_PREFIX` + `ADMIN_SECRET`）を実装する
+18. `priority_processing_queue` の `hide_article` 最小実装を入れる
+19. タグレビュー UI と `source_targets.is_active` ON/OFF を追加する
+
+### E. ランキング調整
+
+20. `activity_logs.action_type` 正式化、`compute-ranks` 再実行、結果監査を行う
 
 ## いま残っている主要タスク
 
-現フェイズ: **cycle test / hardening → service-start hardening**
+現フェイズ: **言語軸導入 → 日本語ソース追加 → Phase 3 管理機能**
 
-1. **web 公開面の暫定実装**（最優先）
-   - `publish_candidate=true` / `publication_text` / `publication_basis` / `summary_input_basis` を使った記事一覧
-   - `source_snippet` 行に「配信元スニペットを要約」ラベルを出す
-2. **`anthropic-news` の feed URL 修復または停止判断**
-   - 複数回の fetch / hourly-layer12 で `Status code 404` を継続確認
-3. **Gemini key ローテーション / 運用方針整理**
-   - `GEMINI_API_KEY` = `403 leaked key` → 無効化が必要
-   - `GEMINI_API_KEY2` = `429 spending cap`
-4. **git filter-repo 後の remote push 確認**
-   - `git push --force-with-lease origin main`（履歴 rewrite 済みだが push が残っている可能性あり）
-5. `raw_unprocessed=89` の日次消化継続
-6. raw error 残骸（古い `could not determine data type of parameter $7` 系）の再キュー整理
-7. `hourly-publish` 実装（Layer2 → Layer4 公開反映）
-8. `daily-tag-promote` バッチ実装
-9. `weekly-archive` 実装
+1. `content_language` の migration 035 / backfill / L2-L4 伝搬
+2. 日本語ソース 14 件の seed 追加
+3. `ArticleCard` の `JP / EN` バッジ表示
+4. 管理画面基盤（`ADMIN_PATH_PREFIX` + `ADMIN_SECRET`）
+5. `priority_processing_queue` 最小実装（`hide_article` のみ）
+6. タグレビュー UI
+7. `source_targets.is_active` ON/OFF スイッチ
+8. `activity_logs.action_type` 正式化
+9. `compute-ranks` 係数調整と再実行
+10. 日本語ソース投入後の分布監査と検索・ランキング影響確認
 
 ## 再開時の推奨確認順
 

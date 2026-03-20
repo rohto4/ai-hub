@@ -4,13 +4,14 @@ import type { ActionType, Article } from '@/lib/db/types'
 
 interface Props {
   article: Article & { score?: number }
-  rank?: number
   summaryMode: 100 | 200
-  showCritique?: boolean
   isFocused?: boolean
   isSaved?: boolean
-  onAction: (type: ActionType, articleId: string) => void
+  isLiked?: boolean
+  onCardClick: (articleId: string) => void
   onOpenArticle: (articleId: string) => void
+  onAction: (type: ActionType, articleId: string) => void
+  onLike: (articleId: string) => void
 }
 
 const sourceLabel: Record<Article['source_type'], string> = {
@@ -22,33 +23,48 @@ const sourceLabel: Record<Article['source_type'], string> = {
   video: 'Video',
 }
 
+const LANE_EMOJIS: Record<string, string[]> = {
+  official: ['🤖', '💡', '🔬', '⚡', '🌐', '🔮', '📡', '⚙️', '🛰️', '🔵'],
+  alerts: ['🔔', '📢', '📣', '🚨', '🔍', '🚀', '🌟', '🔥', '💬', '⚡'],
+  blog: ['✍️', '💭', '🧩', '🎯', '🏆', '💫', '🎨', '🔑', '🌱', '🖊️'],
+  paper: ['📄', '🔬', '🧬', '📊', '🔭', '🎓', '🧪', '📐', '🔢', '🌍'],
+  news: ['📰', '🗞️', '📡', '🌍', '💼', '📈', '🎙️', '📻', '🏛️', '🌐'],
+  video: ['🎬', '🎥', '📹', '🎞️', '🎦', '🎭', '📺', '🖥️', '🎪', '🎬'],
+}
+
+const BLAND_EMOJI = new Set(['🧠', '📝', ''])
+
+function resolveEmoji(article: { id: string; source_type: string; thumbnail_emoji?: string | null }): string {
+  if (article.thumbnail_emoji && !BLAND_EMOJI.has(article.thumbnail_emoji)) {
+    return article.thumbnail_emoji
+  }
+  const emojis = LANE_EMOJIS[article.source_type] ?? ['📰', '🔬', '💡', '🌐', '🔔']
+  const hash = article.id.split('').reduce((acc, ch) => ((acc * 31 + ch.charCodeAt(0)) >>> 0), 0)
+  return emojis[hash % emojis.length]
+}
+
 export function ArticleCard({
   article,
-  rank,
   summaryMode,
-  showCritique = false,
   isFocused = false,
   isSaved = false,
-  onAction,
+  isLiked = false,
+  onCardClick,
   onOpenArticle,
+  onAction,
+  onLike,
 }: Props) {
-  const numericScore =
-    typeof article.score === 'number'
-      ? article.score
-      : typeof article.score === 'string'
-        ? Number(article.score)
-        : undefined
+  const rawScore = article.score
+  const numericScore = rawScore != null && Number.isFinite(Number(rawScore)) ? Number(rawScore) : undefined
 
   const summary =
     (summaryMode === 200 ? article.summary_200 : article.summary_100) ??
     article.summary_100 ??
     '要約は準備中です。'
 
-  const meta = [
-    rank ? `#${rank}` : null,
+  const metaText = [
     article.genre,
-    `${summaryMode}字`,
-    typeof numericScore === 'number' && Number.isFinite(numericScore) ? `Score ${numericScore.toFixed(1)}` : null,
+    numericScore != null ? `Score ${numericScore.toFixed(1)}` : null,
   ]
     .filter(Boolean)
     .join(' / ')
@@ -58,58 +74,70 @@ export function ArticleCard({
       id={`article-card-${article.id}`}
       className="relative overflow-hidden rounded-xl border bg-card-second"
       style={{
-        minHeight: showCritique ? 320 : 272,
+        minHeight: 180,
         borderColor: isFocused ? 'var(--color-orange)' : '#e5e5e5',
-        boxShadow: '0 4px 4px rgba(0,0,0,0.18)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.12)',
       }}
     >
-      <div className="flex gap-3 p-2.5 pb-24 md:pb-14">
+      {/* ☆ 高評価ボタン (右上) */}
+      <button
+        type="button"
+        className="absolute right-2 top-2 z-10 text-[18px] leading-none"
+        style={{ color: isLiked ? 'var(--color-orange)' : 'var(--color-second-orange)' }}
+        onClick={(e) => {
+          e.stopPropagation()
+          onLike(article.id)
+        }}
+        aria-label={isLiked ? '高評価を取り消す' : '高評価'}
+      >
+        {isLiked ? '★' : '☆'}
+      </button>
+
+      {/* メインコンテンツ（クリックでモーダル） */}
+      <button
+        type="button"
+        className="flex w-full gap-2.5 p-2.5 pb-12 text-left"
+        onClick={() => onCardClick(article.id)}
+      >
+        {/* サムネイル (小型) */}
         <div
-          className="relative mt-0.5 h-[128px] w-[84px] shrink-0 overflow-hidden rounded-lg md:h-[163px] md:w-[94px]"
+          className="relative mt-0.5 h-[72px] w-[56px] shrink-0 overflow-hidden rounded-lg"
           style={{ background: 'linear-gradient(145deg, #ffe8d6, #ffd8bd)' }}
         >
           {article.thumbnail_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={article.thumbnail_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-[44px] md:text-[52px]">
-              {article.thumbnail_emoji ?? '📝'}
+            <div className="absolute inset-0 flex items-center justify-center text-[28px]">
+              {resolveEmoji(article)}
             </div>
           )}
-          <span className="absolute bottom-3 right-3 text-[10px] font-semibold text-white">
+          <span className="absolute bottom-1 right-1 rounded-sm bg-black/30 px-0.5 text-[7px] font-semibold text-white">
             {sourceLabel[article.source_type]}
           </span>
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-2 pt-0.5">
-          <button
-            type="button"
-            className="line-clamp-2 text-left text-[14px] font-extrabold leading-[1.45] text-ink"
-            onClick={() => onOpenArticle(article.id)}
-          >
+        {/* テキスト */}
+        <div className="flex min-w-0 flex-1 flex-col gap-1 pr-6 pt-0.5">
+          <p className="line-clamp-2 text-[13px] font-extrabold leading-[1.4] text-ink">
             {article.title}
-          </button>
-          <p className="text-[11px] text-muted">{meta}</p>
-          <p className="text-[12px] leading-[1.7] text-[#4f5969]" style={{ fontFamily: 'Voces, serif' }}>
+          </p>
+          <p className="line-clamp-3 text-[11px] leading-[1.6] text-[#4f5969]">
             {summary}
           </p>
-          {showCritique && article.critique ? (
-            <div className="rounded-lg border border-[#f4d3bf] bg-[#fff8ef] px-3 py-2 text-[11px] leading-5 text-subtle">
-              <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-accent-dark">
-                Critique
-              </span>
-              {article.critique}
-            </div>
-          ) : null}
+          <p className="text-[10px] text-muted">{metaText}</p>
         </div>
-      </div>
+      </button>
 
-      <div className="absolute inset-x-0 bottom-2 grid grid-cols-3 gap-1.5 px-2 md:flex md:items-center md:justify-center md:gap-[7px]">
-        <ActButton label="200字" onClick={() => onAction('expand_200', article.id)} />
-        <ActButton label="Topic Group" onClick={() => onAction('topic_group_open', article.id)} />
+      {/* アクションボタン */}
+      <div className="absolute inset-x-0 bottom-1.5 flex items-center gap-1 px-2">
+        <ActButton label="元記事" variant="external" onClick={() => onOpenArticle(article.id)} />
+        <ActButton label="関連トピック" wide onClick={() => onAction('topic_group_open', article.id)} />
         <ActButton label="共有" variant="share" onClick={() => onAction('share_open', article.id)} />
-        <ActButton label={isSaved ? '保存済み' : '保存'} onClick={() => onAction(isSaved ? 'unsave' : 'save', article.id)} />
-        <ActButton label="批評" onClick={() => onAction('critique_expand', article.id)} />
+        <ActButton
+          label={isSaved ? '保存済み' : '後で読む'}
+          onClick={() => onAction(isSaved ? 'unsave' : 'save', article.id)}
+        />
       </div>
     </article>
   )
@@ -118,28 +146,43 @@ export function ArticleCard({
 function ActButton({
   label,
   variant = 'default',
+  wide = false,
   onClick,
 }: {
   label: string
-  variant?: 'default' | 'share'
+  variant?: 'default' | 'share' | 'external'
+  wide?: boolean
   onClick: () => void
 }) {
   const isShare = variant === 'share'
+  const isExternal = variant === 'external'
   return (
     <button
       type="button"
       onClick={onClick}
-      className="min-w-0 rounded-full border-none px-2 text-[10px] md:min-w-[72px] md:text-[11px]"
+      className="rounded-full text-[10px]"
       style={{
-        height: 26,
-        background: isShare ? 'var(--color-orange)' : 'transparent',
-        color: isShare ? '#fff' : 'var(--color-ink)',
-        fontWeight: isShare ? 700 : 500,
-        borderTop: isShare ? '1px solid transparent' : '1px solid var(--color-second-orange)',
-        borderLeft: isShare ? '1px solid transparent' : '1px solid var(--color-second-orange)',
-        borderBottom: isShare ? '1px solid var(--color-accent-darker)' : '1px solid transparent',
-        borderRight: isShare ? '1px solid var(--color-accent-darker)' : '1px solid transparent',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.18)',
+        height: 24,
+        minWidth: wide ? 96 : 48,
+        paddingLeft: 8,
+        paddingRight: 8,
+        background: isShare
+          ? 'var(--color-orange)'
+          : isExternal
+            ? 'var(--color-accent-light)'
+            : 'transparent',
+        color: isShare
+          ? '#fff'
+          : isExternal
+            ? 'var(--color-accent-darker)'
+            : 'var(--color-ink)',
+        fontWeight: isShare || isExternal ? 700 : 500,
+        border: isShare
+          ? '1px solid var(--color-accent-darker)'
+          : isExternal
+            ? '1px solid var(--color-accent-dark)'
+            : '1px solid var(--color-second-orange)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
       }}
     >
       {label}

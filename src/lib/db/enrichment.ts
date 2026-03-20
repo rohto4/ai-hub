@@ -5,6 +5,7 @@ export interface RawArticleForEnrichment {
   id: number
   sourceTargetId: string
   sourceKey: string
+  sourceDisplayName: string
   sourceCategory: string
   sourceType: string
   contentAccessPolicy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
@@ -17,12 +18,14 @@ export interface RawArticleForEnrichment {
   sourceUrl: string
   sourceUpdatedAt: string | null
   hasSourceUpdate: boolean
+  commercialUsePolicy: 'permitted' | 'prohibited' | 'unknown'
 }
 
 type RawArticleRow = {
   raw_article_id: number
   source_target_id: string
   source_key: string
+  display_name: string
   source_category: string
   source_type: string
   content_access_policy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
@@ -35,6 +38,8 @@ type RawArticleRow = {
   source_url: string
   source_updated_at: string | null
   has_source_update: boolean
+  source_commercial_use_policy: 'permitted' | 'prohibited' | 'unknown'
+  domain_commercial_use_policy: 'permitted' | 'prohibited' | 'unknown' | null
 }
 
 type ExistingEnrichedRow = {
@@ -62,6 +67,9 @@ type ExistingEnrichedRow = {
   score_reason: string | null
   ai_processing_state: 'completed' | 'manual_pending'
   source_updated_at: string | null
+  summary_embedding: string | null
+  embedding_model: string | null
+  embedding_updated_at: string | null
   processed_at: string
   created_at: string
   updated_at: string
@@ -72,6 +80,7 @@ export type DedupeStatus = 'unique' | 'url_duplicate' | 'source_duplicate' | 'si
 export interface DuplicateMatch {
   dedupeStatus: DedupeStatus
   dedupeGroupKey: string | null
+  similarityScore?: number
 }
 
 export interface UpsertEnrichedInput {
@@ -106,8 +115,23 @@ export interface UpsertEnrichedInput {
   scoreReason: string
   aiProcessingState?: 'completed' | 'manual_pending'
   sourceUpdatedAt: string | null
+  sourceKey: string
+  sourceDisplayName: string
+  relatedSources?: Array<{
+    sourceTargetId: string | null
+    sourceKey: string
+    sourceDisplayName: string
+    sourceCategory: string | null
+    sourceType: string | null
+    selectionStatus: 'selected' | 'supporting' | 'rejected'
+    selectionReason: string | null
+    similarityScore?: number | null
+  }>
+  summaryEmbedding?: number[] | null
+  embeddingModel?: string | null
   matchedTagIds: string[]
   candidateTags: Array<{ candidateKey: string; displayName: string }>
+  commercialUsePolicy: 'permitted' | 'prohibited' | 'unknown'
 }
 
 type UpsertEnrichedResult = {
@@ -129,9 +153,12 @@ export async function listRawArticlesForEnrichment(
           ar.raw_article_id,
           ar.source_target_id,
           st.source_key,
+          st.display_name,
           st.source_category,
           st.source_type,
           st.content_access_policy,
+          COALESCE(st.commercial_use_policy, 'permitted') AS source_commercial_use_policy,
+          od.commercial_use_policy AS domain_commercial_use_policy,
           lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS observed_domain,
           od.fetch_policy AS observed_domain_fetch_policy,
           ar.normalized_url,
@@ -156,9 +183,12 @@ export async function listRawArticlesForEnrichment(
           ar.raw_article_id,
           ar.source_target_id,
           st.source_key,
+          st.display_name,
           st.source_category,
           st.source_type,
           st.content_access_policy,
+          COALESCE(st.commercial_use_policy, 'permitted') AS source_commercial_use_policy,
+          od.commercial_use_policy AS domain_commercial_use_policy,
           lower(regexp_replace(split_part(split_part(coalesce(ar.cited_url, ar.source_url, ar.normalized_url), '://', 2), '/', 1), '^www\\.', '')) AS observed_domain,
           od.fetch_policy AS observed_domain_fetch_policy,
           ar.normalized_url,
@@ -182,6 +212,7 @@ export async function listRawArticlesForEnrichment(
     id: row.raw_article_id,
     sourceTargetId: row.source_target_id,
     sourceKey: row.source_key,
+    sourceDisplayName: row.display_name,
     sourceCategory: row.source_category,
     sourceType: row.source_type,
     contentAccessPolicy: row.content_access_policy,
@@ -194,6 +225,10 @@ export async function listRawArticlesForEnrichment(
     sourceUrl: row.source_url,
     sourceUpdatedAt: row.source_updated_at,
     hasSourceUpdate: row.has_source_update,
+    commercialUsePolicy: (
+      row.source_commercial_use_policy === 'prohibited' ||
+      row.domain_commercial_use_policy === 'prohibited'
+    ) ? 'prohibited' : row.source_commercial_use_policy,
   }))
 }
 
@@ -294,6 +329,54 @@ export async function findSimilarTitleDuplicate(
   }
 }
 
+function toVectorLiteral(embedding: number[]): string {
+  return `[${embedding.join(',')}]`
+}
+
+export async function findSemanticDuplicate(
+  embedding: number[] | null | undefined,
+  currentRawArticleId: number,
+  threshold = 0.92,
+): Promise<DuplicateMatch | null> {
+  if (!embedding || embedding.length === 0) {
+    return null
+  }
+
+  const sql = getSql()
+  const vectorLiteral = toVectorLiteral(embedding)
+  const rows = (await sql`
+    SELECT
+      enriched_article_id,
+      dedupe_group_key,
+      1 - (summary_embedding <=> ${vectorLiteral}::vector) AS similarity
+    FROM articles_enriched
+    WHERE raw_article_id <> ${currentRawArticleId}
+      AND summary_embedding IS NOT NULL
+    ORDER BY summary_embedding <=> ${vectorLiteral}::vector ASC
+    LIMIT 1
+  `) as Array<{
+    enriched_article_id: number
+    dedupe_group_key: string | null
+    similarity: string | number
+  }>
+
+  const row = rows[0]
+  if (!row) {
+    return null
+  }
+
+  const similarity = Number(row.similarity ?? 0)
+  if (!Number.isFinite(similarity) || similarity < threshold) {
+    return null
+  }
+
+  return {
+    dedupeStatus: 'similar_candidate',
+    dedupeGroupKey: row.dedupe_group_key ?? `semantic:${row.enriched_article_id}`,
+    similarityScore: similarity,
+  }
+}
+
 export async function upsertEnrichedArticle(
   input: UpsertEnrichedInput,
   options: UpsertEnrichedOptions = {},
@@ -309,6 +392,31 @@ export async function upsertEnrichedArticle(
   `) as ExistingEnrichedRow[]
 
   const existing = existingRows[0] ?? null
+
+  const embeddingLiteral = input.summaryEmbedding ? toVectorLiteral(input.summaryEmbedding) : null
+
+  const sourceRows = (input.relatedSources?.length ? input.relatedSources : [
+    {
+      sourceTargetId: input.sourceTargetId,
+      sourceKey: input.sourceKey,
+      sourceDisplayName: input.sourceDisplayName,
+      sourceCategory: input.sourceCategory,
+      sourceType: input.sourceType,
+      selectionStatus: input.dedupeStatus === 'unique' ? 'selected' : 'rejected',
+      selectionReason: input.dedupeStatus === 'unique' ? 'primary article source' : 'dedupe group member',
+      similarityScore: null,
+    },
+  ]).map((source) => ({
+    enriched_article_id: existing?.enriched_article_id,
+    source_target_id: source.sourceTargetId,
+    source_key: source.sourceKey,
+    source_display_name: source.sourceDisplayName,
+    source_category: source.sourceCategory,
+    source_type: source.sourceType,
+    selection_status: source.selectionStatus,
+    selection_reason: source.selectionReason,
+    similarity_score: source.similarityScore ?? null,
+  }))
 
   if (existing) {
     await sql`
@@ -337,6 +445,9 @@ export async function upsertEnrichedArticle(
         score_reason,
         ai_processing_state,
         source_updated_at,
+        summary_embedding,
+        embedding_model,
+        embedding_updated_at,
         processed_at,
         created_at,
         updated_at
@@ -366,6 +477,9 @@ export async function upsertEnrichedArticle(
         ${existing.score_reason},
         ${existing.ai_processing_state},
         ${existing.source_updated_at},
+        ${existing.summary_embedding ?? null}::vector,
+        ${existing.embedding_model ?? null},
+        ${existing.embedding_updated_at ?? null},
         ${existing.processed_at},
         ${existing.created_at},
         ${existing.updated_at}
@@ -397,11 +511,44 @@ export async function upsertEnrichedArticle(
         score = ${input.score},
         score_reason = ${input.scoreReason},
         ai_processing_state = ${input.aiProcessingState ?? 'completed'},
+        commercial_use_policy = ${input.commercialUsePolicy},
         source_updated_at = ${input.sourceUpdatedAt},
+        summary_embedding = ${embeddingLiteral}::vector,
+        embedding_model = ${input.embeddingModel ?? null},
+        embedding_updated_at = CASE
+          WHEN ${embeddingLiteral !== null} THEN now()
+          ELSE embedding_updated_at
+        END,
         processed_at = now(),
         updated_at = now()
       WHERE enriched_article_id = ${existing.enriched_article_id}
     `
+
+    await sql`DELETE FROM articles_enriched_sources WHERE enriched_article_id = ${existing.enriched_article_id}`
+    if (sourceRows.length > 0) {
+      await sql`
+        INSERT INTO articles_enriched_sources ${(sql as any)(
+          sourceRows.map((row) => ({ ...row, enriched_article_id: existing.enriched_article_id })),
+          'enriched_article_id',
+          'source_target_id',
+          'source_key',
+          'source_display_name',
+          'source_category',
+          'source_type',
+          'selection_status',
+          'selection_reason',
+          'similarity_score',
+        )}
+        ON CONFLICT (enriched_article_id, source_key, selection_status) DO UPDATE SET
+          source_target_id = EXCLUDED.source_target_id,
+          source_display_name = EXCLUDED.source_display_name,
+          source_category = EXCLUDED.source_category,
+          source_type = EXCLUDED.source_type,
+          selection_reason = EXCLUDED.selection_reason,
+          similarity_score = EXCLUDED.similarity_score,
+          updated_at = now()
+      `
+    }
 
     await syncEnrichedTags(existing.enriched_article_id, input.matchedTagIds)
     await upsertTagCandidates(input.candidateTags, input.rawArticleId)
@@ -437,7 +584,11 @@ export async function upsertEnrichedArticle(
       score,
       score_reason,
       ai_processing_state,
-      source_updated_at
+      source_updated_at,
+      summary_embedding,
+      embedding_model,
+      embedding_updated_at,
+      commercial_use_policy
     )
     VALUES (
       ${input.rawArticleId},
@@ -463,12 +614,40 @@ export async function upsertEnrichedArticle(
       ${input.score},
       ${input.scoreReason},
       ${input.aiProcessingState ?? 'completed'},
-      ${input.sourceUpdatedAt}
+      ${input.sourceUpdatedAt},
+      ${embeddingLiteral}::vector,
+      ${input.embeddingModel ?? null},
+      CASE WHEN ${embeddingLiteral !== null} THEN now() ELSE null END,
+      ${input.commercialUsePolicy}
     )
     RETURNING enriched_article_id
   `) as Array<{ enriched_article_id: number }>
 
   const enrichedArticleId = inserted[0].enriched_article_id
+  if (sourceRows.length > 0) {
+    await sql`
+      INSERT INTO articles_enriched_sources ${(sql as any)(
+        sourceRows.map((row) => ({ ...row, enriched_article_id: enrichedArticleId })),
+        'enriched_article_id',
+        'source_target_id',
+        'source_key',
+        'source_display_name',
+        'source_category',
+        'source_type',
+        'selection_status',
+        'selection_reason',
+        'similarity_score',
+      )}
+      ON CONFLICT (enriched_article_id, source_key, selection_status) DO UPDATE SET
+        source_target_id = EXCLUDED.source_target_id,
+        source_display_name = EXCLUDED.source_display_name,
+        source_category = EXCLUDED.source_category,
+        source_type = EXCLUDED.source_type,
+        selection_reason = EXCLUDED.selection_reason,
+        similarity_score = EXCLUDED.similarity_score,
+        updated_at = now()
+    `
+  }
   await syncEnrichedTags(enrichedArticleId, input.matchedTagIds)
   await upsertTagCandidates(input.candidateTags, input.rawArticleId)
   if (refreshTagCounts) {

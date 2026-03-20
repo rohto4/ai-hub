@@ -19,6 +19,13 @@ export type SourceType =
   | 'alerts'
   | 'paper'
 
+export type HomeLaneKey = 'official' | 'alerts' | 'blog' | 'paper' | 'news'
+export type HomeLanes = Record<HomeLaneKey, ArticleWithScore[]>
+
+// Home のコンテンツレーン（Alerts/Blog は除外）
+export type ContentLaneKey = 'official' | 'paper' | 'news'
+export type ContentLanes = Record<ContentLaneKey, ArticleWithScore[]>
+
 export type RankPeriod = '24h' | '7d' | '30d'
 export type RankingWindow = 'hourly' | RankPeriod
 
@@ -39,6 +46,8 @@ export type ActionType =
   | 'share_misskey'
   | 'save'
   | 'unsave'
+  | 'like'
+  | 'unlike'
   | 'topic_group_open'
   | 'critique_expand'
   | 'search'
@@ -46,6 +55,7 @@ export type ActionType =
 
 export interface Article {
   id: string
+  publicKey?: string
   url: string
   title: string
   genre: Genre
@@ -94,21 +104,35 @@ export interface SearchResponse {
 export interface HomeStats {
   publishedToday: number
   publishedTotal: number
+  // source_type 別件数（Alerts は除外）
   officialCount: number
+  blogCount: number
+  paperCount: number
+  newsCount: number
+  // 品質
   topRatedCount: number
+  // source_category(genre) 別件数（LLM は全体と等価のため除外）
+  agentCount: number
+  voiceCount: number
+  policyCount: number
+  safetyCount: number
+  searchCount: number
 }
 
 export interface HomeActivity {
+  impressionCountLastHour: number
   shareCountLastHour: number
   activeArticlesLastHour: number
 }
 
 export interface HomeResponse {
-  articles: ArticleWithScore[]
+  random: ArticleWithScore[]
+  latest: ArticleWithScore[]
+  unique: ArticleWithScore[]
+  lanes: ContentLanes
   period: RankPeriod
   stats: HomeStats
   activity: HomeActivity
-  total: number
 }
 
 export interface PushSubscription {

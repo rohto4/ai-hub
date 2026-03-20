@@ -228,7 +228,7 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 
 1. `hourly-publish` の bulk upsert 化
 2. publish 完走後の `compute-ranks` 再実行
-3. Home UI のカテゴリ定義を `source_type` / `source_category` 分離前提で整理
+3. Home UI のカテゴリ定義を `source_type` / `source_category` 分離前提で整理 → **2026-03-19 完了**
 4. summary 途中切れ対策と snippet 品質 gate の導入
 
 ### 12.5 2026-03-18 抜き取り品質監査メモ
@@ -246,3 +246,82 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 1. `source_snippet` 向け prompt 制約を強化し、明白な title-summary 不一致は `daily-enrich` 側で止めるようにした
 2. `source_type='paper'` は `paper` タグのみ付与に変更済み
 3. `public_articles.thumbnail_emoji` を追加し、既存 911 件も backfill 済み
+
+---
+
+## 13. 2026-03-19 引き継ぎメモ
+
+### 13.1 Home 本実装完了
+
+1. `/api/home` を `{ ranked, lanes, stats, activity }` 形式に変更
+2. `lanes` は source_type 5 種を並列クエリで各 4 件取得（件数保証）
+3. `stats` は source_type 別・source_category 別の件数を 1 SQL で返す
+4. `page.tsx` を全面更新：Stats ダッシュボード（16 KPI）+ ranked セクション + Source Lanes 常時表示
+5. `ArticleCard` のタイトルを `/articles/:publicKey` へ内部遷移 Link に変更
+6. `resolveEmoji()` で thumbnail_emoji が 🧠/📝 の場合は source_type ベースで多様化
+
+### 13.3 2026-03-20 追加実装
+
+1. **migration 034 適用済み（Neon 本番）**
+   - `source_targets.commercial_use_policy` / `observed_article_domains.commercial_use_policy` / `articles_enriched.commercial_use_policy` / `articles_enriched_history.commercial_use_policy` 追加
+   - ToS 調査結果を初期データとして投入: prohibited 6件（itmedia/techcrunch/nikkei/qiita）、permitted 6件（sakana/pfn/zenn/jdla/ainow/publickey）
+   - `articles_enriched` の existing データをバックフィル
+   - enrich 時に source+domain の最厳値で自動判定・保存
+   - hourly-publish 時に `prohibited` を公開対象から除外
+
+2. **hourly-publish の bulk upsert 化完了**
+   - `(sql as any)(rows, ...cols)` 構文（postgres.js 専用）を `unnest(array::type[], ...)` 方式に全面書き換え
+   - L4 が 911 → 2371 件に増加（upserted: 2371, failed: 0）
+
+3. **ホーム本実装**
+   - `/api/home` lanes 化、Stats ダッシュボード（14 KPI）、ランダム/新着/ユニーク 3セクション
+   - サマリーモーダル、共有モーダル再設計（URLコピー/紹介文コピー、✅チェックボックス）
+   - `/digest` ページ新規作成
+   - `/saved`、`/liked` ページ新規作成
+   - `/api/articles/[id]` 新規作成
+
+4. **モバイル・タブレット対応**
+   - BottomNav（mobile のみ）、ヘッダー auto-hide、Stats 横スクロール、Lane カルーセル
+
+### 13.4 日本語ソース追加候補（ToS確認・RSS動作確認済み）
+
+| ソース | RSS URL | source_type | content_language |
+|---|---|---|---|
+| Sakana AI Blog | `https://sakana.ai/feed.xml` | official | ja |
+| PFN Tech Blog | `https://tech.preferred.jp/ja/feed/` | official | ja |
+| ELYZA | `https://note.com/elyza/rss` | official | ja |
+| Zenn LLM | `https://zenn.dev/topics/llm/feed` | blog | ja |
+| Zenn 生成AI | `https://zenn.dev/topics/生成ai/feed` | blog | ja |
+| Zenn AIエージェント | `https://zenn.dev/topics/aiagent/feed` | blog | ja |
+| Zenn RAG | `https://zenn.dev/topics/rag/feed` | blog | ja |
+| Zenn OpenAI | `https://zenn.dev/topics/openai/feed` | blog | ja |
+| Zenn Claude | `https://zenn.dev/topics/claude/feed` | blog | ja |
+| Zenn Gemini | `https://zenn.dev/topics/gemini/feed` | blog | ja |
+| CyberAgent Dev Blog | `https://developers.cyberagent.co.jp/blog/feed/` | official | ja |
+| JDLA | `https://www.jdla.org/news/rss/` | official | ja |
+| AINOW | `https://ainow.ai/feed/` | news | ja |
+| Publickey | `https://www.publickey1.jp/atom.xml` | news | ja |
+
+追加時は `scripts/seed.mjs` に追記し、`commercial_use_policy: 'permitted'` を設定。
+`content_language` カラムは migration 035 で追加予定（実装待ち）。
+
+### 13.5 残件（次セッション向け）
+
+1. **日本語ソース追加**（上記 13.4 の候補を seed に追記）
+2. `content_language` カラム追加 migration（migration 035）
+3. ArticleCard に language バッジ（JP/EN）を表示
+4. Phase 3: 管理画面基盤（推測不能パス + ADMIN_SECRET）
+5. Phase 3: `hide_article` キュー最小実装
+6. Phase 3: タグレビュー UI
+7. Phase 3: `source_targets.is_active` ON/OFF スイッチ（admin UI）
+8. `compute-ranks` 再実行（L4 が 2371 件に増えたため）
+
+### 13.3 未コミットの変更一覧
+
+- `src/lib/db/types.ts` — HomeLaneKey/HomeLanes 追加、HomeStats/HomeResponse 拡張
+- `src/lib/db/public-feed.ts` — listPublicArticlesLanes/getHomeStats 拡張
+- `src/app/api/home/route.ts` — lanes 返却
+- `src/components/card/ArticleCard.tsx` — Link 化、元記事ボタン、resolveEmoji
+- `src/app/page.tsx` — 全面更新
+- `docs/imp/implementation-plan.md` — 本ファイル更新
+- `docs/imp/imp-hangover.md` — 本ファイル更新

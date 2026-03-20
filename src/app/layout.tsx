@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from 'next'
 import { BIZ_UDPGothic } from 'next/font/google'
+import { BottomNav } from '@/components/mobile/BottomNav'
 import './globals.css'
 
 const bizUDPGothic = BIZ_UDPGothic({
@@ -33,8 +34,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className={`${bizUDPGothic.variable} font-sans bg-bg text-ink antialiased`}>
+      <body className={`${bizUDPGothic.variable} font-sans bg-bg text-ink antialiased pb-[56px] md:pb-0`}>
         {children}
+        <BottomNav />
       </body>
     </html>
   )

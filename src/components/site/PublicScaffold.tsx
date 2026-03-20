@@ -6,7 +6,6 @@ const navItems = [
   { href: '/search', label: 'Search' },
   { href: '/tags', label: 'Tags' },
   { href: '/about', label: 'About' },
-  { href: '/mock4', label: 'Mock4' },
 ]
 
 export function PublicScaffold({
@@ -25,7 +24,8 @@ export function PublicScaffold({
           <Link href="/" className="text-lg font-extrabold">
             AI Trend Hub
           </Link>
-          <nav className="flex flex-wrap gap-2">
+          {/* モバイルでは BottomNav が代替するため非表示 */}
+          <nav className="hidden flex-wrap gap-2 md:flex">
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -39,7 +39,7 @@ export function PublicScaffold({
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 pb-[80px] pt-8 md:pb-8">
         <div className="mb-6 rounded-3xl bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
           <h1 className="text-3xl font-extrabold">{title}</h1>
           <p className="mt-2 text-sm text-muted">{description}</p>

@@ -34,8 +34,8 @@ export type SearchQuery = z.infer<typeof SearchQuerySchema>
 const ACTION_TYPES: [ActionType, ...ActionType[]] = [
   'view', 'expand_200', 'article_open', 'return_focus',
   'share_open', 'share_copy', 'share_x', 'share_threads', 'share_slack',
-  'share_misskey', 'save', 'unsave', 'topic_group_open', 'critique_expand',
-  'search', 'digest_click',
+  'share_misskey', 'save', 'unsave', 'like', 'unlike',
+  'topic_group_open', 'critique_expand', 'search', 'digest_click',
 ]
 
 const PLATFORMS: [Platform, ...Platform[]] = ['pc', 'sp', 'tb']

@@ -10,12 +10,15 @@ export interface HourlyPublishResult {
   failed: number
 }
 
-// フォールバック時に試す束のサイズ。調整はここだけ。
-const FALLBACK_BATCH_SIZE = 10
+// チャンクサイズ設定
+const BULK_CHUNK_SIZE = 200     // 通常処理: 200 件ずつ
+const FALLBACK_BATCH_SIZE = 10  // Tier-2 フォールバック
 
 type PublishCandidate = {
   enriched_article_id: number
   source_target_id: string
+  source_key: string
+  source_display_name: string
   canonical_url: string
   title: string
   summary_100: string
@@ -23,6 +26,7 @@ type PublishCandidate = {
   publication_text: string | null
   source_category: string
   source_type: string
+  dedupe_group_key: string | null
   summary_input_basis: string
   publication_basis: string
   score: string | number
@@ -40,6 +44,17 @@ type TagRow = {
 type UpsertedRow = {
   public_article_id: string
   canonical_url: string
+}
+
+type RelatedSourceRow = {
+  representative_enriched_article_id: number
+  source_enriched_article_id: number
+  source_target_id: string | null
+  source_key: string | null
+  source_display_name: string | null
+  source_priority: string | number | null
+  is_primary: boolean
+  selection_status: 'selected' | 'supporting' | 'rejected'
 }
 
 function toChunks<T>(arr: T[], size: number): T[][] {
@@ -60,6 +75,8 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
     SELECT
       ae.enriched_article_id,
       ae.source_target_id,
+      st.source_key,
+      st.display_name AS source_display_name,
       ae.canonical_url,
       ae.title,
       ae.summary_100,
@@ -67,6 +84,7 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
       ae.publication_text,
       ae.source_category,
       ae.source_type,
+      ae.dedupe_group_key,
       ae.summary_input_basis,
       ae.publication_basis,
       ae.score,
@@ -74,6 +92,7 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
       ae.thumbnail_url,
       COALESCE(spr.priority_score, 100) AS priority_score
     FROM articles_enriched ae
+    JOIN source_targets st ON st.source_target_id = ae.source_target_id
     LEFT JOIN source_priority_rules spr
       ON spr.source_target_id = ae.source_target_id
       AND spr.usage_type = 'public_primary'
@@ -81,12 +100,140 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
     WHERE ae.publish_candidate = true
       AND ae.dedupe_status = 'unique'
       AND ae.ai_processing_state = 'completed'
+      AND COALESCE(ae.commercial_use_policy, 'permitted') != 'prohibited'
     ORDER BY COALESCE(spr.priority_score, 100) DESC, ae.processed_at DESC
   `) as PublishCandidate[]
 
   let upserted = 0
   let tagsUpdated = 0
   let failed = 0
+
+  async function syncPublicArticleSources(
+    rows: UpsertedRow[],
+    candidateByCanonical: Map<string, PublishCandidate>,
+  ): Promise<void> {
+    if (rows.length === 0) {
+      return
+    }
+
+    const publicArticleIds = rows.map((row) => row.public_article_id)
+    const representativeEnrichedIds = rows
+      .map((row) => candidateByCanonical.get(row.canonical_url)?.enriched_article_id)
+      .filter((value): value is number => typeof value === 'number')
+
+    const representativeToPublic = new Map<number, string>()
+    for (const row of rows) {
+      const candidate = candidateByCanonical.get(row.canonical_url)
+      if (candidate) {
+        representativeToPublic.set(candidate.enriched_article_id, row.public_article_id)
+      }
+    }
+
+    const relatedRows = (await sql`
+      WITH representative_articles AS (
+        SELECT enriched_article_id, dedupe_group_key
+        FROM articles_enriched
+        WHERE enriched_article_id = ANY(${representativeEnrichedIds})
+      )
+      SELECT
+        rep.enriched_article_id AS representative_enriched_article_id,
+        rel.enriched_article_id AS source_enriched_article_id,
+        rel.source_target_id,
+        COALESCE(aes.source_key, st.source_key) AS source_key,
+        COALESCE(aes.source_display_name, st.display_name) AS source_display_name,
+        COALESCE(spr.priority_score, 100) AS source_priority,
+        rel.enriched_article_id = rep.enriched_article_id AS is_primary,
+        CASE
+          WHEN rel.enriched_article_id = rep.enriched_article_id THEN 'selected'
+          WHEN rel.dedupe_status = 'similar_candidate' THEN 'supporting'
+          ELSE 'rejected'
+        END AS selection_status
+      FROM representative_articles rep
+      JOIN articles_enriched rel
+        ON rel.dedupe_group_key = rep.dedupe_group_key
+      LEFT JOIN source_targets st
+        ON st.source_target_id = rel.source_target_id
+      LEFT JOIN source_priority_rules spr
+        ON spr.source_target_id = rel.source_target_id
+       AND spr.usage_type = 'public_secondary'
+       AND spr.is_active = true
+      LEFT JOIN LATERAL (
+        SELECT aes.source_key, aes.source_display_name
+        FROM articles_enriched_sources aes
+        WHERE aes.enriched_article_id = rel.enriched_article_id
+        ORDER BY
+          CASE aes.selection_status
+            WHEN 'selected' THEN 0
+            WHEN 'supporting' THEN 1
+            ELSE 2
+          END,
+          aes.updated_at DESC
+        LIMIT 1
+      ) aes ON true
+      ORDER BY rep.enriched_article_id, is_primary DESC, COALESCE(spr.priority_score, 100) DESC, rel.processed_at DESC
+    `) as RelatedSourceRow[]
+
+    await sql`DELETE FROM public_article_sources WHERE public_article_id = ANY(${publicArticleIds})`
+
+    const insertRows = relatedRows
+      .map((row) => {
+        const publicArticleId = representativeToPublic.get(row.representative_enriched_article_id)
+        if (!publicArticleId || !row.source_key || !row.source_display_name) {
+          return null
+        }
+        return {
+          public_article_id: publicArticleId,
+          enriched_article_id: row.source_enriched_article_id,
+          source_target_id: row.source_target_id,
+          source_key: row.source_key,
+          source_display_name: row.source_display_name,
+          source_priority: Number(row.source_priority ?? 100),
+          is_primary: row.is_primary,
+          selection_status: row.selection_status,
+        }
+      })
+      .filter((row): row is NonNullable<typeof row> => row !== null)
+
+    if (insertRows.length === 0) {
+      return
+    }
+
+    const rPaIds = insertRows.map(r => r.public_article_id)
+    const rEaIds = insertRows.map(r => r.enriched_article_id)
+    const rStIds = insertRows.map(r => r.source_target_id ?? null)
+    const rSourceKeys = insertRows.map(r => r.source_key)
+    const rSourceDisplayNames = insertRows.map(r => r.source_display_name)
+    const rSourcePriorities = insertRows.map(r => r.source_priority)
+    const rIsPrimaries = insertRows.map(r => r.is_primary)
+    const rSelectionStatuses = insertRows.map(r => r.selection_status)
+
+    await sql`
+      INSERT INTO public_article_sources (
+        public_article_id, enriched_article_id, source_target_id,
+        source_key, source_display_name, source_priority, is_primary, selection_status
+      )
+      SELECT
+        pa_id::uuid, ea_id::bigint, NULLIF(st_id, '')::uuid,
+        sk, sdn, sp::numeric, ip, ss
+      FROM unnest(
+        ${rPaIds}::text[],
+        ${rEaIds}::bigint[],
+        ${rStIds}::text[],
+        ${rSourceKeys}::text[],
+        ${rSourceDisplayNames}::text[],
+        ${rSourcePriorities}::numeric[],
+        ${rIsPrimaries}::boolean[],
+        ${rSelectionStatuses}::text[]
+      ) AS t(pa_id, ea_id, st_id, sk, sdn, sp, ip, ss)
+      ON CONFLICT (public_article_id, enriched_article_id) DO UPDATE SET
+        source_target_id     = EXCLUDED.source_target_id,
+        source_key           = EXCLUDED.source_key,
+        source_display_name  = EXCLUDED.source_display_name,
+        source_priority      = EXCLUDED.source_priority,
+        is_primary           = EXCLUDED.is_primary,
+        selection_status     = EXCLUDED.selection_status
+    `
+  }
 
   // ── Tier-1 / Tier-2 共通: batch を bulk UPSERT する内部関数 ───────
   // 成功時は { upserted, tagsUpdated } を返す。失敗時は throw する。
@@ -101,57 +248,80 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
     `) as Array<{ canonical_url: string; public_key: string }>
     const existingKeyMap = new Map(existingRows.map(r => [r.canonical_url, r.public_key]))
 
-    const now = new Date()
-    const articleRows = batch.map(c => {
+    // unnest 用の列配列を準備
+    const eaIds: number[] = []
+    const stIds: (string | null)[] = []
+    const pKeys: string[] = []
+    const cUrls: string[] = []
+    const titles: string[] = []
+    const sum100s: string[] = []
+    const sum200s: (string | null)[] = []
+    const tUrls: (string | null)[] = []
+    const tEmojis: (string | null)[] = []
+    const sCats: string[] = []
+    const sTypes: string[] = []
+    const sibases: string[] = []
+    const pbases: string[] = []
+    const scores: number[] = []
+    const pubAts: (string | null)[] = []
+
+    for (const c of batch) {
       const displaySummary = c.publication_text ?? c.summary_200 ?? c.summary_100
-      return {
-        enriched_article_id: c.enriched_article_id,
-        primary_source_target_id: c.source_target_id,
-        public_key: existingKeyMap.get(c.canonical_url) ?? nanoid(11),
-        canonical_url: c.canonical_url,
-        display_title: c.title,
-        display_summary_100: c.summary_100,
-        display_summary_200: displaySummary,
-        thumbnail_url: c.thumbnail_url ?? null,
-        thumbnail_emoji: pickThumbnailEmoji({
-          title: c.title,
-          summary100: c.summary_100,
-          summary200: displaySummary,
-          sourceType: c.source_type,
-          sourceCategory: c.source_category,
-        }),
-        source_category: c.source_category,
-        source_type: c.source_type,
-        summary_input_basis: c.summary_input_basis,
-        publication_basis: c.publication_basis,
-        content_score: Number(c.score),
-        original_published_at: c.source_updated_at ?? null,
-        visibility_status: 'published',
-        public_refreshed_at: now,
-      }
-    })
+      eaIds.push(Number(c.enriched_article_id))
+      stIds.push(c.source_target_id ?? null)
+      pKeys.push(existingKeyMap.get(c.canonical_url) ?? nanoid(11))
+      cUrls.push(c.canonical_url)
+      titles.push(c.title)
+      sum100s.push(c.summary_100)
+      sum200s.push(displaySummary ?? null)
+      tUrls.push(c.thumbnail_url ?? null)
+      tEmojis.push(pickThumbnailEmoji({
+        title: c.title,
+        summary100: c.summary_100,
+        summary200: displaySummary,
+        sourceType: c.source_type,
+        sourceCategory: c.source_category,
+      }))
+      sCats.push(c.source_category)
+      sTypes.push(c.source_type)
+      sibases.push(c.summary_input_basis)
+      pbases.push(c.publication_basis)
+      scores.push(Number(c.score))
+      pubAts.push(c.source_updated_at ?? null)
+    }
 
     const upsertedRows = (await sql`
-      INSERT INTO public_articles ${sql(
-        articleRows,
-        'enriched_article_id',
-        'primary_source_target_id',
-        'public_key',
-        'canonical_url',
-        'display_title',
-        'display_summary_100',
-        'display_summary_200',
-        'thumbnail_url',
-        'thumbnail_emoji',
-        'source_category',
-        'source_type',
-        'summary_input_basis',
-        'publication_basis',
-        'content_score',
-        'original_published_at',
-        'visibility_status',
-        'public_refreshed_at',
-      )}
+      INSERT INTO public_articles (
+        enriched_article_id, primary_source_target_id, public_key, canonical_url,
+        display_title, display_summary_100, display_summary_200,
+        thumbnail_url, thumbnail_emoji,
+        source_category, source_type, summary_input_basis, publication_basis,
+        content_score, original_published_at, visibility_status, public_refreshed_at
+      )
+      SELECT
+        ea_id::bigint,
+        NULLIF(st_id, '')::uuid,
+        pkey, curl, title, s100, s200, turl, temoji,
+        scat, stype, sibasis, pbasis,
+        score::numeric, NULLIF(pubat, '')::timestamptz,
+        'published', now()
+      FROM unnest(
+        ${eaIds}::bigint[],
+        ${stIds}::text[],
+        ${pKeys}::text[],
+        ${cUrls}::text[],
+        ${titles}::text[],
+        ${sum100s}::text[],
+        ${sum200s}::text[],
+        ${tUrls}::text[],
+        ${tEmojis}::text[],
+        ${sCats}::text[],
+        ${sTypes}::text[],
+        ${sibases}::text[],
+        ${pbases}::text[],
+        ${scores}::numeric[],
+        ${pubAts}::text[]
+      ) AS t(ea_id, st_id, pkey, curl, title, s100, s200, turl, temoji, scat, stype, sibasis, pbasis, score, pubat)
       ON CONFLICT (canonical_url) DO UPDATE SET
         enriched_article_id      = EXCLUDED.enriched_article_id,
         primary_source_target_id = EXCLUDED.primary_source_target_id,
@@ -180,28 +350,7 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
       }),
     )
 
-    const sourceRows = upsertedRows.map(r => {
-      const c = candidateByCanonical.get(r.canonical_url)!
-      return {
-        public_article_id: r.public_article_id,
-        enriched_article_id: c.enriched_article_id,
-        source_target_id: c.source_target_id,
-        source_priority: Number(c.priority_score ?? 100),
-        is_primary: true,
-      }
-    })
-    await sql`
-      INSERT INTO public_article_sources ${sql(
-        sourceRows,
-        'public_article_id',
-        'enriched_article_id',
-        'source_target_id',
-        'source_priority',
-        'is_primary',
-      )}
-      ON CONFLICT (public_article_id, enriched_article_id) DO UPDATE SET
-        source_priority = EXCLUDED.source_priority
-    `
+    await syncPublicArticleSources(upsertedRows, candidateByCanonical)
 
     const enrichedIds = batch.map(c => c.enriched_article_id)
     const allTags = (await sql`
@@ -226,8 +375,17 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
       .filter((r): r is NonNullable<typeof r> => r !== null)
 
     if (tagRows.length > 0) {
+      const tPaIds = tagRows.map(r => r.public_article_id)
+      const tTagIds = tagRows.map(r => String(r.tag_id))
+      const tSortOrders = tagRows.map(r => r.sort_order)
       await sql`
-        INSERT INTO public_article_tags ${sql(tagRows, 'public_article_id', 'tag_id', 'sort_order')}
+        INSERT INTO public_article_tags (public_article_id, tag_id, sort_order)
+        SELECT pa_id::uuid, tag_id::uuid, sort_order::int
+        FROM unnest(
+          ${tPaIds}::text[],
+          ${tTagIds}::text[],
+          ${tSortOrders}::int[]
+        ) AS t(pa_id, tag_id, sort_order)
         ON CONFLICT (public_article_id, tag_id) DO UPDATE SET sort_order = EXCLUDED.sort_order
       `
     }
@@ -290,17 +448,10 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
 
     const publicArticleId = upsertedRow[0].public_article_id
 
-    await sql`
-      INSERT INTO public_article_sources (
-        public_article_id, enriched_article_id, source_target_id, source_priority, is_primary
-      )
-      VALUES (
-        ${publicArticleId}, ${c.enriched_article_id},
-        ${c.source_target_id}, ${Number(c.priority_score ?? 100)}, true
-      )
-      ON CONFLICT (public_article_id, enriched_article_id) DO UPDATE SET
-        source_priority = EXCLUDED.source_priority
-    `
+    await syncPublicArticleSources(
+      [{ public_article_id: publicArticleId, canonical_url: c.canonical_url }],
+      new Map([[c.canonical_url, c]]),
+    )
 
     const tags = (await sql`
       SELECT tag_id, is_primary
@@ -326,33 +477,32 @@ export async function runHourlyPublish(): Promise<HourlyPublishResult> {
   }
 
   // ── 2. 3段階フォールバック ─────────────────────────────────────────
-  if (candidates.length > 0) {
+  // Tier-1: BULK_CHUNK_SIZE (200) 件ずつ処理（デフォルト・通常ケース）
+  // Tier-2: FALLBACK_BATCH_SIZE (10) 件ずつ（Tier-1 チャンクが失敗した場合）
+  // Tier-3: 1件ずつ（Tier-2 でも失敗した記事を特定・隔離）
+  for (const chunk of toChunks(candidates, BULK_CHUNK_SIZE)) {
     try {
-      // Tier 1: 全件 bulk（通常ケース）
-      const result = await bulkBatch(candidates)
+      const result = await bulkBatch(chunk)
       upserted += result.upserted
       tagsUpdated += result.tagsUpdated
     } catch (tier1Error) {
-      // Tier 2: FALLBACK_BATCH_SIZE 件ずつの bulk
-      // → 原因の束を FALLBACK_BATCH_SIZE 件以内に絞る
       console.warn(
-        `[hourly-publish] Tier-1 bulk failed (${candidates.length} articles). Switching to batch-of-${FALLBACK_BATCH_SIZE}:`,
+        `[hourly-publish] Tier-1 chunk failed (${chunk.length} articles, ids: ${chunk[0]?.enriched_article_id}-${chunk[chunk.length - 1]?.enriched_article_id}). Switching to batch-of-${FALLBACK_BATCH_SIZE}:`,
         tier1Error instanceof Error ? tier1Error.message : tier1Error,
       )
 
-      for (const chunk of toChunks(candidates, FALLBACK_BATCH_SIZE)) {
+      for (const smallChunk of toChunks(chunk, FALLBACK_BATCH_SIZE)) {
         try {
-          const result = await bulkBatch(chunk)
+          const result = await bulkBatch(smallChunk)
           upserted += result.upserted
           tagsUpdated += result.tagsUpdated
         } catch (tier2Error) {
-          // Tier 3: このチャンク内を1件ずつ処理して壊れた記事を特定・隔離
           console.warn(
-            `[hourly-publish] Tier-2 batch-of-${FALLBACK_BATCH_SIZE} failed (enriched_ids: ${chunk.map(c => c.enriched_article_id).join(',')}). Switching to per-article:`,
+            `[hourly-publish] Tier-2 batch-of-${FALLBACK_BATCH_SIZE} failed (enriched_ids: ${smallChunk.map(c => c.enriched_article_id).join(',')}). Switching to per-article:`,
             tier2Error instanceof Error ? tier2Error.message : tier2Error,
           )
 
-          for (const candidate of chunk) {
+          for (const candidate of smallChunk) {
             try {
               const articleTagsUpdated = await publishOne(candidate)
               upserted++
