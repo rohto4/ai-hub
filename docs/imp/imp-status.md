@@ -965,6 +965,93 @@
   - 既存 `public_articles 911` 件にも backfill 済み
 - 確認済み:
   - `npm run type-check` OK
+
+## 2026-03-20 リファクタリング Tier1/T2-A 先行実施
+
+- `src/app/mock4/page.tsx` を削除し、公開ルーティングから開発用モックを外した。
+- `src/lib/db/types.ts` の Home 用レーン型を整理した。
+  - `HomeLaneKey/HomeLanes` を削除
+  - `ContentLaneKey/ContentLanes` を `LaneKey/Lanes` へ改名
+- `Genre` / `article.genre` を `SourceCategory` / `article.sourceCategory` へ統一した。
+  - `public-feed.ts`
+  - `ArticleCard`
+  - `PublicArticleList`
+  - `digest/saved/liked`
+  - `articles/[publicKey]`
+  - `category/[slug]`
+  - `ranking`
+  - `api/trends`
+  - `api/search`
+  - `validation/schemas`
+- `/api/trends` と `/api/search` は旧 `genre` クエリも受け取りつつ、内部では `sourceCategory` を使うようにした。
+- `src/app/page.tsx` を薄いオーケストレーターへ分割した。
+  - 新規: `src/components/home/useHomeState.ts`
+  - 新規: `src/components/home/HomeStatsBar.tsx`
+  - 新規: `src/components/home/HomeArticleSection.tsx`
+  - 新規: `src/components/home/HomeLaneSection.tsx`
+  - 新規: `src/components/home/SummaryModal.tsx`
+  - 新規: `src/components/home/ShareModal.tsx`
+  - 新規: `src/components/ui/KpiCard.tsx`
+  - 新規: `src/components/ui/SectionHeading.tsx`
+  - 新規: `src/components/ui/EmptyState.tsx`
+  - 新規: `src/components/ui/LoadingGrid.tsx`
+  - 新規: `src/components/ui/CustomCheckbox.tsx`
+- `resolveEmoji` を `src/lib/publish/thumbnail-emoji.ts` の `resolveThumbnailEmoji()` へ共通化した。
+- `/feed` の build 衝突を解消した。
+  - `src/app/feed/page.tsx` は案内ページのまま維持
+  - RSS ルートは `src/app/feed.xml/route.ts` へ移動
+- 確認結果:
+  - `npx next typegen` OK
+  - `npm run type-check` OK
+  - `npm run build` OK
+
+## 2026-03-20 public-feed 分割（T2-B）
+
+- `src/lib/db/public-feed.ts` を barrel に変更した。
+- 下記へ責務分割した。
+  - `src/lib/db/public-shared.ts`
+  - `src/lib/db/public-articles.ts`
+  - `src/lib/db/public-home.ts`
+  - `src/lib/db/public-search.ts`
+  - `src/lib/db/public-tags.ts`
+- 既存 import は `public-feed.ts` 経由のままでも動く状態を維持した。
+- 行数:
+  - `public-feed.ts`: `698 -> 15`
+  - `public-articles.ts`: `384`
+  - `public-home.ts`: `46`
+  - `public-search.ts`: `81`
+  - `public-tags.ts`: `60`
+  - `public-shared.ts`: `139`
+- 確認結果:
+  - `npm run build` OK
+  - `npm run type-check` OK
+
+## 2026-03-20 追加分割（機能単位への再整理）
+
+- `src/lib/db/public-articles.ts` をさらに分割した。
+  - `src/lib/db/public-rankings.ts`
+  - `src/lib/db/public-listings.ts`
+  - `src/lib/db/public-detail.ts`
+  - `src/lib/db/public-articles.ts` は barrel のみ
+- 行数:
+  - `public-articles.ts`: `384 -> 10`
+  - `public-rankings.ts`: `68`
+  - `public-listings.ts`: `114`
+  - `public-detail.ts`: `49`
+- Home 状態管理をさらに分割した。
+  - `src/components/home/home-state-shared.ts`
+  - `src/components/home/useHomeData.ts`
+  - `src/components/home/useHomeActions.ts`
+  - `src/components/home/useHomeState.ts` はオーケストレーター化
+- 行数:
+  - `useHomeState.ts`: `396 -> 88`
+  - `useHomeData.ts`: `85`
+  - `useHomeActions.ts`: `216`
+  - `home-state-shared.ts`: `81`
+- 確認結果:
+  - `npm run build` OK
+  - `npx next typegen` OK
+  - `npm run type-check` OK
   - `public_articles.thumbnail_emoji` 分布:
     - `🧠=691`
     - `🤖=186`
@@ -1000,4 +1087,76 @@
   - tag 一覧 / tag 詳細 / detail / feed 用 query を追加
   - 一覧系 query から `public_key` を返し、公開 URL を `/articles/:public_key` に寄せた
 - 確認済み:
+  - `npm run type-check` OK
+## 2026-03-20 Home action 再分割
+- `src/components/home/useHomeActions.ts` を責務ごとに再分割
+  - `src/components/home/useHomeDerivedArticles.ts`
+  - `src/components/home/useHomeArticleActions.ts`
+  - `src/components/home/useHomeShare.ts`
+  - `src/components/home/useHomeActions.ts` は orchestrator のみ
+- 行数:
+  - `useHomeActions.ts`: `216 -> 104`
+  - `useHomeDerivedArticles.ts`: `111`
+  - `useHomeArticleActions.ts`: `107`
+  - `useHomeShare.ts`: `71`
+- 検証:
+  - `npm run build` OK
+  - `npx next typegen` OK
+  - `npm run type-check` OK
+
+## 2026-03-21 Home page shell 分割
+- `src/app/page.tsx` から左カラム UI を `src/components/home/HomePrimaryColumn.tsx` へ抽出
+- 行数:
+  - `src/app/page.tsx`: `222 -> 65`
+  - `src/components/home/HomePrimaryColumn.tsx`: `182`
+- 検証:
+  - `npm run build` OK
+  - `npx next typegen` OK
+  - `npm run type-check` OK
+## 2026-03-21 hourly-publish 分割
+- `src/lib/jobs/hourly-publish.ts` を orchestrator に縮小
+- 追加:
+  - `src/lib/publish/hourly-publish-shared.ts`
+  - `src/lib/publish/hourly-publish-candidates.ts`
+  - `src/lib/publish/hourly-publish-sources.ts`
+  - `src/lib/publish/hourly-publish-tags.ts`
+  - `src/lib/publish/hourly-publish-upsert.ts`
+  - `src/lib/publish/hourly-publish-hide.ts`
+- 行数:
+  - `src/lib/jobs/hourly-publish.ts`: `553 -> 88`
+  - `hourly-publish-upsert.ts`: `197`
+  - `hourly-publish-sources.ts`: `127`
+  - `hourly-publish-tags.ts`: `73`
+  - `hourly-publish-candidates.ts`: `36`
+  - `hourly-publish-hide.ts`: `19`
+  - `hourly-publish-shared.ts`: `64`
+- 検証:
+  - `npm run build` OK
+  - `npx next typegen` OK
+  - `npm run type-check` OK
+## 2026-03-21 summarize / enrichment / daily-enrich / topic 分割
+- `src/lib/ai/summarize.ts` を thin facade 化
+  - `summarize-types.ts`
+  - `summarize-prompts.ts`
+  - `summarize-fallback.ts`
+  - `summarize-gemini.ts`
+- `src/lib/db/enrichment.ts` を barrel 化
+  - `enrichment-types.ts`
+  - `enrichment-raw.ts`
+  - `enrichment-dedupe.ts`
+  - `enrichment-upsert.ts`
+- `src/lib/jobs/daily-enrich.ts` を orchestrator 化
+  - `src/lib/enrich/daily-enrich-shared.ts`
+  - `src/lib/enrich/prepare-articles.ts`
+  - `src/lib/enrich/persist-enriched.ts`
+- `/api/home?topic=...` を追加し、Home の topic filter を server-side 化
+- 行数:
+  - `src/lib/ai/summarize.ts`: `129 -> 35`
+  - `src/lib/db/enrichment.ts`: `757 -> 24`
+  - `src/lib/jobs/daily-enrich.ts`: `800 -> 92`
+  - `src/app/api/home/route.ts`: `53`
+  - `src/components/home/useHomeData.ts`: `98`
+- 検証:
+  - `npm run build` OK
+  - `npx next typegen` OK
   - `npm run type-check` OK

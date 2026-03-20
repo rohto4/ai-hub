@@ -21,11 +21,11 @@ export async function POST(request: NextRequest) {
   }
 
   const sql = getSql()
-  const { session_id, endpoint, keys, genres } = parsed.data
+  const { session_id, endpoint, keys, sourceCategories } = parsed.data
 
   await sql`
     INSERT INTO push_subscriptions (session_id, endpoint, keys, genres, active)
-    VALUES (${session_id}, ${endpoint}, ${JSON.stringify(keys)}, ${genres}, true)
+    VALUES (${session_id}, ${endpoint}, ${JSON.stringify(keys)}, ${sourceCategories}, true)
     ON CONFLICT (endpoint)
     DO UPDATE SET
       session_id = EXCLUDED.session_id,

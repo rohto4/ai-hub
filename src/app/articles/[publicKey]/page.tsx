@@ -27,7 +27,7 @@ export default async function ArticleDetailPage({
 
   const related = await listLatestPublicArticles({
     limit: 6,
-    genre: article.genre,
+    sourceCategory: article.sourceCategory,
     sourceType: article.source_type,
   })
 
@@ -42,7 +42,7 @@ export default async function ArticleDetailPage({
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex flex-wrap gap-2 text-xs">
                 <span className="rounded-full bg-[#dbeafe] px-2 py-1 font-bold text-[#1d4ed8]">{article.source_type}</span>
-                <span className="rounded-full bg-[#f6f0ea] px-2 py-1 font-bold text-accent-darker">{article.genre}</span>
+                <span className="rounded-full bg-[#f6f0ea] px-2 py-1 font-bold text-accent-darker">{article.sourceCategory}</span>
                 <span className="text-muted">{article.published_at.toLocaleString('ja-JP')}</span>
               </div>
               <h2 className="text-2xl font-extrabold leading-tight">{article.title}</h2>

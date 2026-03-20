@@ -12,16 +12,17 @@ export async function GET(request: NextRequest) {
   }
 
   const params = Object.fromEntries(request.nextUrl.searchParams)
+  const sourceCategory = typeof params.sourceCategory === 'string' ? params.sourceCategory : params.genre
   const parsed = SearchQuerySchema.safeParse(params)
 
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
 
-  const { q, genre, limit, offset } = parsed.data
+  const { q, limit, offset } = parsed.data
   const articles = await searchPublicArticles({
     query: q,
-    genre,
+    sourceCategory,
     limit,
     offset,
   })

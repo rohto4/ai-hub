@@ -11,6 +11,17 @@ const EMOJI_RULES: Array<{ emoji: string; patterns: RegExp[] }> = [
   { emoji: '🛰️', patterns: [/search/i, /retrieval/i, /rag/i, /vector/i, /検索/, /検索拡張/] },
 ]
 
+const FALLBACK_EMOJIS: Record<string, string[]> = {
+  official: ['🤖', '💡', '🔬', '⚡', '🌐', '🔮', '📡', '⚙️', '🛰️', '🔵'],
+  alerts: ['🔔', '📢', '📣', '🚨', '🔍', '🚀', '🌟', '🔥', '💬', '⚡'],
+  blog: ['✍️', '💭', '🧩', '🎯', '🏆', '💫', '🎨', '🔑', '🌱', '🖊️'],
+  paper: ['📄', '🔬', '🧬', '📊', '🔭', '🎓', '🧪', '📐', '🔢', '🌍'],
+  news: ['📰', '🗞️', '📡', '🌍', '💼', '📈', '🎙️', '📻', '🏛️', '🌐'],
+  video: ['🎬', '🎥', '📹', '🎞️', '🎦', '🎭', '📺', '🖥️', '🎪', '🎬'],
+}
+
+const BLAND_EMOJI = new Set(['🧠', '📝', ''])
+
 function normalize(value: string | null | undefined): string {
   return (value ?? '').trim()
 }
@@ -43,4 +54,18 @@ export function pickThumbnailEmoji(input: {
   }
 
   return '📝'
+}
+
+export function resolveThumbnailEmoji(input: {
+  id: string
+  sourceType: string
+  thumbnailEmoji?: string | null
+}): string {
+  if (input.thumbnailEmoji && !BLAND_EMOJI.has(input.thumbnailEmoji)) {
+    return input.thumbnailEmoji
+  }
+
+  const emojis = FALLBACK_EMOJIS[input.sourceType] ?? ['📰', '🔬', '💡', '🌐', '🔔']
+  const hash = input.id.split('').reduce((acc, ch) => ((acc * 31 + ch.charCodeAt(0)) >>> 0), 0)
+  return emojis[hash % emojis.length]
 }

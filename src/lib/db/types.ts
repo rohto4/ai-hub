@@ -1,8 +1,4 @@
-// ============================================================
-// 公開面 / L3-L4 向けの型定義
-// ============================================================
-
-export type Genre =
+export type SourceCategory =
   | 'llm'
   | 'agent'
   | 'voice'
@@ -19,12 +15,8 @@ export type SourceType =
   | 'alerts'
   | 'paper'
 
-export type HomeLaneKey = 'official' | 'alerts' | 'blog' | 'paper' | 'news'
-export type HomeLanes = Record<HomeLaneKey, ArticleWithScore[]>
-
-// Home のコンテンツレーン（Alerts/Blog は除外）
-export type ContentLaneKey = 'official' | 'paper' | 'news'
-export type ContentLanes = Record<ContentLaneKey, ArticleWithScore[]>
+export type LaneKey = 'official' | 'paper' | 'news'
+export type Lanes = Record<LaneKey, ArticleWithScore[]>
 
 export type RankPeriod = '24h' | '7d' | '30d'
 export type RankingWindow = 'hourly' | RankPeriod
@@ -58,7 +50,7 @@ export interface Article {
   publicKey?: string
   url: string
   title: string
-  genre: Genre
+  sourceCategory: SourceCategory
   source_type: SourceType
   thumbnail_url: string | null
   thumbnail_emoji: string | null
@@ -91,7 +83,7 @@ export interface ArticleWithScore extends Article {
 export interface TrendsResponse {
   articles: ArticleWithScore[]
   period: RankPeriod
-  genre: string
+  sourceCategory: string
   total: number
 }
 
@@ -104,14 +96,11 @@ export interface SearchResponse {
 export interface HomeStats {
   publishedToday: number
   publishedTotal: number
-  // source_type 別件数（Alerts は除外）
   officialCount: number
   blogCount: number
   paperCount: number
   newsCount: number
-  // 品質
   topRatedCount: number
-  // source_category(genre) 別件数（LLM は全体と等価のため除外）
   agentCount: number
   voiceCount: number
   policyCount: number
@@ -129,7 +118,7 @@ export interface HomeResponse {
   random: ArticleWithScore[]
   latest: ArticleWithScore[]
   unique: ArticleWithScore[]
-  lanes: ContentLanes
+  lanes: Lanes
   period: RankPeriod
   stats: HomeStats
   activity: HomeActivity
@@ -141,7 +130,7 @@ export interface PushSubscription {
   session_id: string
   endpoint: string
   keys: { auth: string; p256dh: string }
-  genres: Genre[]
+  sourceCategories: SourceCategory[]
   active: boolean
   created_at: Date
 }

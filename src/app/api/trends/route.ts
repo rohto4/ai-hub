@@ -12,19 +12,20 @@ export async function GET(request: NextRequest) {
   }
 
   const params = Object.fromEntries(request.nextUrl.searchParams)
+  const sourceCategory = typeof params.sourceCategory === 'string' ? params.sourceCategory : params.genre
   const parsed = TrendsQuerySchema.safeParse(params)
 
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
 
-  const { period, genre, limit, offset } = parsed.data
-  const articles = await listRankedPublicArticles({ period, genre, limit, offset })
+  const { period, limit, offset } = parsed.data
+  const articles = await listRankedPublicArticles({ period, sourceCategory, limit, offset })
 
   return NextResponse.json({
     articles,
     period,
-    genre,
+    sourceCategory: sourceCategory ?? 'all',
     total: articles.length,
   })
 }

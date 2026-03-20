@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import type { Genre, RankPeriod, Platform, ActionType } from '@/lib/db/types'
+import type { SourceCategory, RankPeriod, Platform, ActionType } from '@/lib/db/types'
 
-const GENRES: [Genre, ...Genre[]] = [
+const SOURCE_CATEGORIES: [SourceCategory, ...SourceCategory[]] = [
   'llm',
   'agent',
   'voice',
@@ -15,7 +15,7 @@ const RANK_PERIODS: [RankPeriod, ...RankPeriod[]] = ['24h', '7d', '30d']
 
 export const TrendsQuerySchema = z.object({
   period: z.enum(RANK_PERIODS).default('24h'),
-  genre: z.string().default('all'),
+  sourceCategory: z.string().default('all'),
   limit: z.coerce.number().int().min(1).max(50).default(20),
   offset: z.coerce.number().int().min(0).default(0),
 })
@@ -24,7 +24,7 @@ export type TrendsQuery = z.infer<typeof TrendsQuerySchema>
 
 export const SearchQuerySchema = z.object({
   q: z.string().min(1).max(100).trim(),
-  genre: z.string().optional(),
+  sourceCategory: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
   offset: z.coerce.number().int().min(0).default(0),
 })
@@ -58,7 +58,7 @@ export const PushSubscribeSchema = z.object({
     auth: z.string().min(1),
     p256dh: z.string().min(1),
   }),
-  genres: z.array(z.enum(GENRES)).default([]),
+  sourceCategories: z.array(z.enum(SOURCE_CATEGORIES)).default([]),
 })
 
 export type PushSubscribeInput = z.infer<typeof PushSubscribeSchema>

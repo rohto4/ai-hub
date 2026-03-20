@@ -4,7 +4,7 @@ import { isDatabaseConfigured } from '@/lib/db'
 import { listRankedPublicArticles } from '@/lib/db/public-feed'
 
 export default async function RankingPage() {
-  const articles = isDatabaseConfigured() ? await listRankedPublicArticles({ period: '24h', genre: 'all', limit: 30 }) : []
+  const articles = isDatabaseConfigured() ? await listRankedPublicArticles({ period: '24h', sourceCategory: 'all', limit: 30 }) : []
 
   return (
     <PublicScaffold title="ランキング" description="public_rankings と public_articles から 24 時間ランキングを表示します。">

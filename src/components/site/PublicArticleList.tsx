@@ -37,7 +37,7 @@ export function PublicArticleList({
               <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
                 {showRank ? <span className="font-extrabold text-accent-dark">#{index + 1}</span> : null}
                 <span className={`rounded-full px-2 py-1 font-bold ${sourceTone(article.source_type)}`}>{article.source_type}</span>
-                <span className="rounded-full bg-[#f6f0ea] px-2 py-1 font-bold text-accent-darker">{article.genre}</span>
+                <span className="rounded-full bg-[#f6f0ea] px-2 py-1 font-bold text-accent-darker">{article.sourceCategory}</span>
                 <span className="text-muted">{article.published_at.toLocaleDateString('ja-JP')}</span>
               </div>
               <Link href={`/articles/${article.publicKey ?? article.id}`} className="text-lg font-extrabold leading-tight hover:underline">

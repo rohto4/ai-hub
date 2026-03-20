@@ -48,7 +48,7 @@ export default async function DigestPage() {
                         {article.source_type}
                       </span>
                       <span className="rounded-full bg-[#f6f0ea] px-2 py-0.5 font-bold text-accent-darker">
-                        {article.genre}
+                        {article.sourceCategory}
                       </span>
                       <span className="text-muted">
                         {article.published_at.toLocaleDateString('ja-JP')}

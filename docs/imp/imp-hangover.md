@@ -336,3 +336,66 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 - `src/app/page.tsx` — 全面更新
 - `docs/imp/implementation-plan.md` — 本ファイル更新
 - `docs/imp/imp-hangover.md` — 本ファイル更新
+
+## 14. 2026-03-20 リファクタリング引き継ぎ
+
+### 14.1 完了
+
+1. `mock4` を削除した
+2. `Genre` を `SourceCategory`、`article.genre` を `article.sourceCategory` へ統一した
+3. `LaneKey/Lanes` へ型名を整理した
+4. `src/app/page.tsx` を分割し、Home ロジックを `src/components/home/useHomeState.ts` へ移した
+5. `resolveEmoji` を `src/lib/publish/thumbnail-emoji.ts` へ集約した
+6. RSS ルートを `/feed.xml` へ移し、`/feed` の案内ページと競合しない構成にした
+
+### 14.2 残件
+
+1. `src/components/home/useHomeState.ts` 自体は 88 行まで縮小したが、Home 状態系は全体としてまだ 4 ファイルにまたがる
+2. `src/app/page.tsx` は 203 行で、計画目標の 150 行未満は未達
+3. `src/components/home/useHomeActions.ts` が 216 行あり、share/search/article interaction でまだ分割余地がある
+4. コメント整理は `hourly-publish.ts` / `summarize.ts` / `auth/admin.ts` などが未着手
+5. `push_subscriptions` テーブル列名はまだ `genres` のままなので、DB 仕様変更を行うなら Human-in-the-Loop 対象
+
+### 14.4 追加完了（2026-03-20）
+
+1. `public-feed` を `public-articles/home/search/tags/shared` に分割した
+2. `public-feed.ts` は互換維持の barrel として残した
+3. `npm run build` / `npm run type-check` を再確認した
+4. `public-articles` を `rankings/listings/detail` へ再分割した
+5. Home 状態を `shared/data/actions/state` の4層へ再分割した
+
+### 14.3 確認済み
+
+1. `npx next typegen`
+2. `npm run type-check`
+3. `npm run build`
+### 2026-03-20 追加進捗: Home action 再分割
+
+1. `src/components/home/useHomeActions.ts` は 216 行から 104 行へ縮小
+2. article 操作は `src/components/home/useHomeArticleActions.ts` へ分離
+3. share modal state は `src/components/home/useHomeShare.ts` へ分離
+4. topic filter / KPI / article 集約は `src/components/home/useHomeDerivedArticles.ts` へ分離
+5. 検証は `npm run build` / `npx next typegen` / `npm run type-check` を通過
+6. 次候補は `src/app/page.tsx` の section 単位分割、または `hourly-publish.ts` などのコメント整理
+
+### 2026-03-21 追加進捗: Home page shell 分割
+
+1. `src/app/page.tsx` は 65 行まで縮小
+2. 左カラム UI は `src/components/home/HomePrimaryColumn.tsx` へ移動
+3. `HomePage` の責務は shell / sidebar / modal 配置へ限定
+4. 次候補は `HomePrimaryColumn.tsx` の further split ではなく、`hourly-publish.ts` など未着手の大物へ移るのが自然
+### 2026-03-21 追加進捗: hourly-publish 分割
+
+1. `src/lib/jobs/hourly-publish.ts` は 553 行から 88 行へ縮小
+2. 候補取得、source 同期、tag 同期、bulk/per-article upsert、hidden 化を `src/lib/publish/` 配下へ分離
+3. `runHourlyPublish()` の公開インターフェースは維持
+4. 検証は `npm run build` / `npx next typegen` / `npm run type-check` を通過
+5. 次候補は `src/lib/ai/summarize.ts` または `src/lib/db/enrichment.ts`
+### 2026-03-21 追加進捗: summarize / enrichment / daily-enrich / topic
+
+1. `src/lib/ai/summarize.ts` は facade のみに縮小し、prompt/provider/fallback を分離
+2. `src/lib/db/enrichment.ts` は raw/dedupe/upsert の barrel に変更
+3. `src/lib/jobs/daily-enrich.ts` は orchestrator のみに縮小し、prepare/persist/shared を `src/lib/enrich/` へ分離
+4. `/api/home?topic=...` を追加し、Home の topic filter を server-side 化
+5. build / typegen / type-check は通過
+6. 大きい未完了は `scripts` 系の統一と、一部コメント整理

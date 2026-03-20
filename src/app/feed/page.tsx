@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { PublicScaffold } from '@/components/site/PublicScaffold'
 
 const feedLinks = [
-  { href: '/feed', label: '全体 RSS' },
+  { href: '/feed.xml', label: '全体 RSS' },
   { href: '/category/official', label: 'official レーン' },
   { href: '/category/blog', label: 'blog レーン' },
   { href: '/category/paper', label: 'paper レーン' },

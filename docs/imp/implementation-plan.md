@@ -1,6 +1,13 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-03-20（content_language 先行導入方針、日本語ソース追加前提、Phase 3 先後関係を更新）
+最終更新: 2026-03-20（content_language 先行導入方針、日本語ソース追加前提、Phase 3 先後関係を更新。Tier1 リファクタリング反映）
+
+## 0. 直近更新（2026-03-20）
+
+1. Home の Client Component を分割し、`src/app/page.tsx` の責務を縮小した
+2. 公開面の型名を `SourceCategory` / `LaneKey` 基準へ整理した
+3. `mock4` を削除した
+4. RSS は `/feed` ページと `/feed.xml` ルートに分離した
 
 ## 1. この計画の位置づけ
 
@@ -521,3 +528,66 @@ P0/P1 では次の 3 軸を分離して扱う。
 
 - 管理画面 Phase 3 で `source_targets.is_active` ON/OFF スイッチを追加
 - `imp-plan Section 10.4` に記載済み
+## 2026-03-20 追加実施: Home action 再分割
+
+1. `src/components/home/useHomeActions.ts` を orchestrator に縮小した
+2. 新規追加:
+   - `src/components/home/useHomeDerivedArticles.ts`
+   - `src/components/home/useHomeArticleActions.ts`
+   - `src/components/home/useHomeShare.ts`
+3. 行数:
+   - `useHomeActions.ts`: `216 -> 104`
+   - `useHomeDerivedArticles.ts`: `111`
+   - `useHomeArticleActions.ts`: `107`
+   - `useHomeShare.ts`: `71`
+4. 検証:
+   - `npm run build`
+   - `npx next typegen`
+   - `npm run type-check`
+5. 次の分割候補:
+   - `src/app/page.tsx`
+   - `src/lib/jobs/hourly-publish.ts`
+   - `src/lib/ai/summarize.ts`
+
+## 2026-03-21 追加実施: Home page shell 分割
+
+1. `src/app/page.tsx` は left column の組み立てを `src/components/home/HomePrimaryColumn.tsx` へ移譲
+2. 行数:
+   - `src/app/page.tsx`: `222 -> 65`
+   - `src/components/home/HomePrimaryColumn.tsx`: `182`
+3. 検証:
+   - `npm run build`
+   - `npx next typegen`
+   - `npm run type-check`
+4. Home 側は page/state/actions が機能単位で概ね分割済み
+## 2026-03-21 追加実施: hourly-publish 分割
+
+1. `src/lib/jobs/hourly-publish.ts` を orchestration のみに縮小した
+2. 新規追加:
+   - `src/lib/publish/hourly-publish-shared.ts`
+   - `src/lib/publish/hourly-publish-candidates.ts`
+   - `src/lib/publish/hourly-publish-sources.ts`
+   - `src/lib/publish/hourly-publish-tags.ts`
+   - `src/lib/publish/hourly-publish-upsert.ts`
+   - `src/lib/publish/hourly-publish-hide.ts`
+3. 行数:
+   - `hourly-publish.ts`: `553 -> 88`
+   - 最大分割先は `hourly-publish-upsert.ts: 197`
+4. 検証:
+   - `npm run build`
+   - `npx next typegen`
+   - `npm run type-check`
+## 2026-03-21 追加実施: summarize / enrichment / daily-enrich / topic
+
+1. `src/lib/ai/summarize.ts` を facade 化し、Gemini provider / prompt / fallback を分離
+2. `src/lib/db/enrichment.ts` を raw取得 / dedupe / upsert に分割
+3. `src/lib/jobs/daily-enrich.ts` を orchestrator にし、`src/lib/enrich/` 配下へ helper を分離
+4. Home topic filter を `/api/home?topic=...` の server-side 条件へ移行
+5. 行数:
+   - `summarize.ts`: `129 -> 35`
+   - `enrichment.ts`: `757 -> 24`
+   - `daily-enrich.ts`: `800 -> 92`
+6. 検証:
+   - `npm run build`
+   - `npx next typegen`
+   - `npm run type-check`

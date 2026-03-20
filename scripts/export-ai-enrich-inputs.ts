@@ -282,7 +282,6 @@ async function main(): Promise<void> {
     const duplicate = await findDuplicateMatch(
       rawArticle.normalizedUrl,
       rawArticle.citedUrl,
-      title,
       rawArticle.id,
     )
     const similarDuplicate = duplicate ? null : await findSimilarTitleDuplicate(title, rawArticle.id)

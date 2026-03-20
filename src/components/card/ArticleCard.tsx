@@ -1,6 +1,7 @@
 'use client'
 
 import type { ActionType, Article } from '@/lib/db/types'
+import { resolveThumbnailEmoji } from '@/lib/publish/thumbnail-emoji'
 
 interface Props {
   article: Article & { score?: number }
@@ -23,26 +24,6 @@ const sourceLabel: Record<Article['source_type'], string> = {
   video: 'Video',
 }
 
-const LANE_EMOJIS: Record<string, string[]> = {
-  official: ['🤖', '💡', '🔬', '⚡', '🌐', '🔮', '📡', '⚙️', '🛰️', '🔵'],
-  alerts: ['🔔', '📢', '📣', '🚨', '🔍', '🚀', '🌟', '🔥', '💬', '⚡'],
-  blog: ['✍️', '💭', '🧩', '🎯', '🏆', '💫', '🎨', '🔑', '🌱', '🖊️'],
-  paper: ['📄', '🔬', '🧬', '📊', '🔭', '🎓', '🧪', '📐', '🔢', '🌍'],
-  news: ['📰', '🗞️', '📡', '🌍', '💼', '📈', '🎙️', '📻', '🏛️', '🌐'],
-  video: ['🎬', '🎥', '📹', '🎞️', '🎦', '🎭', '📺', '🖥️', '🎪', '🎬'],
-}
-
-const BLAND_EMOJI = new Set(['🧠', '📝', ''])
-
-function resolveEmoji(article: { id: string; source_type: string; thumbnail_emoji?: string | null }): string {
-  if (article.thumbnail_emoji && !BLAND_EMOJI.has(article.thumbnail_emoji)) {
-    return article.thumbnail_emoji
-  }
-  const emojis = LANE_EMOJIS[article.source_type] ?? ['📰', '🔬', '💡', '🌐', '🔔']
-  const hash = article.id.split('').reduce((acc, ch) => ((acc * 31 + ch.charCodeAt(0)) >>> 0), 0)
-  return emojis[hash % emojis.length]
-}
-
 export function ArticleCard({
   article,
   summaryMode,
@@ -63,7 +44,7 @@ export function ArticleCard({
     '要約は準備中です。'
 
   const metaText = [
-    article.genre,
+    article.sourceCategory,
     numericScore != null ? `Score ${numericScore.toFixed(1)}` : null,
   ]
     .filter(Boolean)
@@ -109,7 +90,11 @@ export function ArticleCard({
             <img src={article.thumbnail_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-[28px]">
-              {resolveEmoji(article)}
+              {resolveThumbnailEmoji({
+                id: article.id,
+                sourceType: article.source_type,
+                thumbnailEmoji: article.thumbnail_emoji,
+              })}
             </div>
           )}
           <span className="absolute bottom-1 right-1 rounded-sm bg-black/30 px-0.5 text-[7px] font-semibold text-white">

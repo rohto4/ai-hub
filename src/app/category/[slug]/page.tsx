@@ -13,11 +13,11 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params
   const sourceType = SOURCE_TYPES.has(slug) ? slug : null
-  const genre = !sourceType && TOPICS.has(slug) ? slug : 'all'
+  const sourceCategory = !sourceType && TOPICS.has(slug) ? slug : 'all'
   const articles = isDatabaseConfigured()
     ? sourceType
       ? await listLatestPublicArticles({ limit: 30, sourceType })
-      : await listRankedPublicArticles({ period: '24h', genre, limit: 30 })
+      : await listRankedPublicArticles({ period: '24h', sourceCategory, limit: 30 })
     : []
 
   return (

@@ -13,6 +13,8 @@ import { TrendsQuerySchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
+const HOME_TOPICS = new Set(['all', 'llm', 'agent', 'voice', 'policy', 'safety', 'search', 'news'])
+
 export async function GET(request: NextRequest) {
   if (!isDatabaseConfigured()) {
     return databaseUnavailableResponse()
@@ -26,14 +28,15 @@ export async function GET(request: NextRequest) {
   }
 
   const { period } = parsed.data
+  const topicParam = request.nextUrl.searchParams.get('topic') ?? 'all'
+  const topic = HOME_TOPICS.has(topicParam) ? topicParam : 'all'
+  const sourceCategory = topic === 'all' ? null : topic
 
   const [random, latest, unique, lanes, stats, activity] = await Promise.all([
-    // ランダム・最新・ユニークは1年以内から各10件取得（期間フィルタなし）
-    listRandomPublicArticles({ limit: 10 }),
-    listLatestPublicArticles({ limit: 10 }),
-    listUniquePublicArticles({ limit: 10 }),
-    // ソースレーンのみ期間フィルタを適用
-    listContentLanes({ period, perLane: 8 }),
+    listRandomPublicArticles({ limit: 10, sourceCategory }),
+    listLatestPublicArticles({ limit: 10, sourceCategory }),
+    listUniquePublicArticles({ limit: 10, sourceCategory }),
+    listContentLanes({ period, perLane: 8, sourceCategory }),
     getHomeStats(),
     getHomeActivity(),
   ])

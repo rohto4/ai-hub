@@ -9,6 +9,9 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-20 23:46 | done | 機能単位へ追加分割 | `public-articles` を rankings/listings/detail に再分割、Home 状態を shared/data/actions/state に分割、build/type-check OK
+- 2026-03-20 23:15 | done | T2-B public-feed 分割 | `public-feed` を 5 ファイル + barrel に分割、build/type-check OK、記事系 384 行は残課題
+- 2026-03-20 22:58 | done | Tier1 リファクタリングを先行実施 | `mock4` 削除、`SourceCategory/LaneKey` へ整理、Home 分割、`/feed.xml` へ分離、type-check/build OK
 - 2026-03-20 15:05 | done | DB バックアップ基盤を追加 | `pg_dump` 全 DB バックアップを取得し日次 GitHub Actions と 7 日保持を追加、`artifacts/` を削除
 - 2026-03-20 12:10 | done | 計画タスクを20件へ拡張 | `content_language`→日本語ソース→公開面調整→管理画面→ランキング調整まで分解
 - 2026-03-20 12:00 | done | `implementation-plan.md` / `imp-status.md` 更新 | `content_language` 先行導入と日本語ソース追加前提の 10 タスク分解を反映
@@ -49,3 +52,7 @@
 - 2026-03-18 02:35 | done | `l3-l4-screen-flow.md` 読込 | Home / Search / Trends / Actions の接続点を確認
 - 2026-03-18 02:34 | done | `implementation-plan.md` 読込 | 旧版が進捗メモ寄りで要更新と判断
 - 2026-03-18 02:33 | done | `implementation-wait.md` 読込 | ユーザー不在時はここへ論点を書く前提を確認
+- 2026-03-20 23:59 | done | Home action 再分割 | `useHomeActions` を `derived/article/share` に再分割、`useHomeActions.ts 216->104`、build/type-check OK
+- 2026-03-21 00:12 | done | Home page shell 分割 | `src/app/page.tsx 222->65`、左カラムを `HomePrimaryColumn` へ抽出、build/type-check OK
+- 2026-03-21 00:35 | done | hourly-publish 分割 | `hourly-publish.ts 553->88`、候補取得/source/tag/upsert/hide を `src/lib/publish/` に分離、build/type-check OK
+- 2026-03-21 01:12 | done | summarize/enrichment/daily-enrich/topic 分割 | `summarize.ts 129->35`、`enrichment.ts 757->24`、`daily-enrich.ts 800->92`、`/api/home?topic=` 追加、build/type-check OK
