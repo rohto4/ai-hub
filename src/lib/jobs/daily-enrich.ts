@@ -4,7 +4,6 @@ import {
 import { finishJobRun, startJobRun } from '@/lib/db/job-runs'
 import { listActiveTagReferences, listCollectionTagKeywords } from '@/lib/db/tags'
 import {
-  chunkItems,
   type DailyEnrichItemResult,
   type DailyEnrichOptions,
   type DailyEnrichResult,

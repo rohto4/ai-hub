@@ -1,5 +1,5 @@
 import { getSql } from '@/lib/db'
-import type { CollectedItem, Collector, SourceTarget } from '@/lib/collectors/types'
+import type { CollectedItem, Collector } from '@/lib/collectors/types'
 
 const HN_BASE = 'https://hacker-news.firebaseio.com/v0'
 const TOP_STORIES_LIMIT = 60   // 取得するトップストーリー数（フィルタ後に絞り込む）
@@ -55,7 +55,7 @@ function matchesKeywords(title: string, keywords: string[]): boolean {
 }
 
 export const hackerNewsCollector: Collector = {
-  async collect(_sourceTarget: SourceTarget): Promise<CollectedItem[]> {
+  async collect(): Promise<CollectedItem[]> {
     const keywords = await loadCollectionKeywords()
     const topIds = await fetchJson<number[]>(`${HN_BASE}/topstories.json`)
     const targetIds = topIds.slice(0, TOP_STORIES_LIMIT)
