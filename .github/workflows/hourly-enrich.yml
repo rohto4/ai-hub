@@ -1,15 +1,18 @@
-name: hourly-fetch
+name: hourly-enrich
 
 on:
   schedule:
-    - cron: '5 * * * *'
+    - cron: '12 * * * *'
+    - cron: '27 * * * *'
+    - cron: '42 * * * *'
+    - cron: '57 * * * *'
   workflow_dispatch:
 
 jobs:
-  hourly-fetch:
+  hourly-enrich:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Layer 1 fetch job
+      - name: Trigger Layer 2 enrich worker
         env:
           APP_URL: ${{ secrets.APP_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
@@ -17,4 +20,4 @@ jobs:
           curl --fail --show-error --silent \
             -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
-            "${APP_URL}/api/cron/hourly-fetch?limit=20"
+            "${APP_URL}/api/cron/daily-enrich?limit=10&summaryBatchSize=10&maxSummaryBatches=1"

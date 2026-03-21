@@ -1,5 +1,5 @@
 import {
-  listRawArticlesForEnrichment,
+  claimRawArticlesForEnrichment,
 } from '@/lib/db/enrichment'
 import { finishJobRun, startJobRun } from '@/lib/db/job-runs'
 import { listActiveTagReferences, listCollectionTagKeywords } from '@/lib/db/tags'
@@ -29,10 +29,10 @@ export async function runDailyEnrich(
 
   const jobRunId = await startJobRun({
     jobName: 'daily-enrich',
-    metadata: { limit, sourceKey, summaryBatchSize, maxSummaryBatches },
+    metadata: { limit, sourceKey, summaryBatchSize, maxSummaryBatches, claimMode: 'skip_locked' },
   })
 
-  const rawArticles = await listRawArticlesForEnrichment(limit, sourceKey)
+  const rawArticles = await claimRawArticlesForEnrichment(limit, sourceKey)
   const tagReferences = await listActiveTagReferences()
   const tagKeywords = await listCollectionTagKeywords()
   const items: DailyEnrichItemResult[] = []
