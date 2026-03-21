@@ -1,5 +1,5 @@
 import type { ArticleWithScore, Lanes, RankPeriod } from '@/lib/db/types'
-import { getSql, hasDatabaseColumn } from '@/lib/db'
+import { getSql } from '@/lib/db'
 import {
   PERIOD_INTERVAL,
   PUBLIC_DISPLAY_MAX_AGE,
@@ -12,61 +12,21 @@ import { listContentLaneArticles } from '@/lib/db/public-rankings'
 
 export async function listRandomPublicArticles(options: { limit: number; sourceCategory?: string | null }): Promise<ArticleWithScore[]> {
   const sql = getSql()
-  const hasContentLanguage = await hasDatabaseColumn('public_articles', 'content_language')
   const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
-  const rows = sourceCategory
-    ? ((hasContentLanguage ? await sql`
-        SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-               pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, pa.content_language,
-               COALESCE(pa.original_published_at, pa.created_at) AS published_at,
-               pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
-               pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
-               pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
-        FROM public_articles pa
-        WHERE pa.visibility_status = 'published'
-          AND pa.source_category = ${sourceCategory}
-          AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-        ORDER BY RANDOM()
-        LIMIT ${options.limit}
-      ` : await sql`
-        SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-               pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, NULL::varchar(2) AS content_language,
-               COALESCE(pa.original_published_at, pa.created_at) AS published_at,
-               pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
-               pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
-               pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
-        FROM public_articles pa
-        WHERE pa.visibility_status = 'published'
-          AND pa.source_category = ${sourceCategory}
-          AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-        ORDER BY RANDOM()
-        LIMIT ${options.limit}
-      `) as PublicArticleRow[])
-    : ((hasContentLanguage ? await sql`
-        SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-               pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, pa.content_language,
-               COALESCE(pa.original_published_at, pa.created_at) AS published_at,
-               pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
-               pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
-               pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
-        FROM public_articles pa
-        WHERE pa.visibility_status = 'published'
-          AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-        ORDER BY RANDOM()
-        LIMIT ${options.limit}
-      ` : await sql`
-        SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-               pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, NULL::varchar(2) AS content_language,
-               COALESCE(pa.original_published_at, pa.created_at) AS published_at,
-               pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
-               pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
-               pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
-        FROM public_articles pa
-        WHERE pa.visibility_status = 'published'
-          AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-        ORDER BY RANDOM()
-        LIMIT ${options.limit}
-      `) as PublicArticleRow[])
+  const rows = (await sql`
+    SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
+           pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, pa.content_language,
+           COALESCE(pa.original_published_at, pa.created_at) AS published_at,
+           pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
+           pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
+           pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
+    FROM public_articles pa
+    WHERE pa.visibility_status = 'published'
+      AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
+      AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
+    ORDER BY RANDOM()
+    LIMIT ${options.limit}
+  `) as PublicArticleRow[]
   return rows.map(toArticle)
 }
 
@@ -78,12 +38,11 @@ export async function listLatestPublicArticles(options: {
   period?: RankPeriod
 }): Promise<ArticleWithScore[]> {
   const sql = getSql()
-  const hasContentLanguage = await hasDatabaseColumn('public_articles', 'content_language')
   const offset = options.offset ?? 0
   const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
   const sourceType = buildSourceTypeFilter(options.sourceType)
   const interval = options.period ? PERIOD_INTERVAL[options.period] : null
-  const rows = ((hasContentLanguage ? await sql`
+  const rows = (await sql`
     SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
            pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, pa.content_language,
            COALESCE(pa.original_published_at, pa.created_at) AS published_at,
@@ -98,9 +57,16 @@ export async function listLatestPublicArticles(options: {
       AND (${interval}::text IS NULL OR COALESCE(pa.original_published_at, pa.created_at) >= now() - ${interval}::interval)
     ORDER BY COALESCE(pa.original_published_at, pa.created_at) DESC
     LIMIT ${options.limit} OFFSET ${offset}
-  ` : await sql`
+  `) as PublicArticleRow[]
+  return rows.map(toArticle)
+}
+
+export async function listUniquePublicArticles(options: { limit: number; sourceCategory?: string | null }): Promise<ArticleWithScore[]> {
+  const sql = getSql()
+  const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
+  const rows = (await sql`
     SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-           pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, NULL::varchar(2) AS content_language,
+           pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, pa.content_language,
            COALESCE(pa.original_published_at, pa.created_at) AS published_at,
            pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
            pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
@@ -108,72 +74,10 @@ export async function listLatestPublicArticles(options: {
     FROM public_articles pa
     WHERE pa.visibility_status = 'published'
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
-      AND (${sourceType}::text IS NULL OR pa.source_type = ${sourceType})
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-      AND (${interval}::text IS NULL OR COALESCE(pa.original_published_at, pa.created_at) >= now() - ${interval}::interval)
-    ORDER BY COALESCE(pa.original_published_at, pa.created_at) DESC
-    LIMIT ${options.limit} OFFSET ${offset}
-  `) as PublicArticleRow[])
-  return rows.map(toArticle)
-}
-
-export async function listUniquePublicArticles(options: { limit: number; sourceCategory?: string | null }): Promise<ArticleWithScore[]> {
-  const sql = getSql()
-  const hasContentLanguage = await hasDatabaseColumn('public_articles', 'content_language')
-  const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
-  const rows = sourceCategory
-    ? ((hasContentLanguage ? await sql`
-        SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-               pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, pa.content_language,
-               COALESCE(pa.original_published_at, pa.created_at) AS published_at,
-               pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
-               pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
-               pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
-        FROM public_articles pa
-        WHERE pa.visibility_status = 'published'
-          AND pa.source_category = ${sourceCategory}
-          AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-        ORDER BY pa.source_category, pa.content_score DESC
-        LIMIT ${options.limit}
-      ` : await sql`
-        SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-               pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, NULL::varchar(2) AS content_language,
-               COALESCE(pa.original_published_at, pa.created_at) AS published_at,
-               pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
-               pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
-               pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
-        FROM public_articles pa
-        WHERE pa.visibility_status = 'published'
-          AND pa.source_category = ${sourceCategory}
-          AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-        ORDER BY pa.source_category, pa.content_score DESC
-        LIMIT ${options.limit}
-      `) as PublicArticleRow[])
-    : ((hasContentLanguage ? await sql`
-        SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-               pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, pa.content_language,
-               COALESCE(pa.original_published_at, pa.created_at) AS published_at,
-               pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
-               pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
-               pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
-        FROM public_articles pa
-        WHERE pa.visibility_status = 'published'
-          AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-        ORDER BY pa.source_category, pa.content_score DESC
-        LIMIT ${options.limit}
-      ` : await sql`
-        SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-               pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, NULL::varchar(2) AS content_language,
-               COALESCE(pa.original_published_at, pa.created_at) AS published_at,
-               pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
-               pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,
-               pa.created_at, pa.updated_at, pa.content_score AS score, NULL::jsonb AS breakdown
-        FROM public_articles pa
-        WHERE pa.visibility_status = 'published'
-          AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
-        ORDER BY pa.source_category, pa.content_score DESC
-        LIMIT ${options.limit}
-      `) as PublicArticleRow[])
+    ORDER BY pa.source_category, pa.content_score DESC
+    LIMIT ${options.limit}
+  `) as PublicArticleRow[]
   return rows.map(toArticle)
 }
 
