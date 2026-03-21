@@ -332,3 +332,21 @@
 8. 管理画面基盤、`hide_article`、タグレビュー、source ON/OFF
 9. ranking マッピング正式反映と再計算
 10. docs 更新と最終検証
+## 2026-03-21 再開チェックリスト
+
+### 完了済み
+
+- [x] `content_language`
+- [x] `thumbnail_url`
+- [x] 日本語ソース 14 件投入
+- [x] warm-up fetch / enrich / publish
+- [x] cron 分離
+- [x] L4 月次アーカイブ
+
+### 次セッションで着手
+
+- [ ] `public_article_sources` の同期不備を直す
+- [ ] `compute-ranks` の実測と軽量化判断をする
+- [ ] admin Phase 3 を実装する
+- [ ] Topic Group 本実装に入る
+- [ ] OGP を実装する

@@ -1169,3 +1169,27 @@
   - `public_articles` の半年超過行を `public_articles_history` に退避
   - 関連する `public_article_sources` / `public_article_tags` / `public_rankings` は cascade delete
   - L4 を半年以内の公開集合として保つ
+## 2026-03-21 Cron / L4 archive update
+
+- cron を以下へ再設計
+  - `hourly-fetch`: `:00`
+  - `hourly-enrich`: `:10 / :20 / :30 / :40`
+  - `hourly-publish`: `:50`
+- `daily-enrich` は 10 件 worker 化
+  - `claimRawArticlesForEnrichment()`
+  - `FOR UPDATE SKIP LOCKED`
+  - `process_after = now() + 30 minutes` の予約ロック
+- `compute-ranks.maxDuration = 300`
+- migration `036_add_public_articles_history.sql` を適用
+- `monthly-public-archive` を追加
+  - 半年超 `public_articles` を `public_articles_history` に退避
+  - 初回実行で 1073 件を archive 済み
+  - `public_articles` は 1352 件まで減少
+
+### 現在の残課題
+
+1. `public_article_sources` 同期の不備
+2. `compute-ranks` 根本軽量化 or 分離要否判断
+3. admin Phase 3
+4. Topic Group
+5. OGP

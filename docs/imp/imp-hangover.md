@@ -451,3 +451,58 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 3. 日本語ソースの実 fetch
 4. `content_language` backfill 結果の DB 実確認
 5. `thumbnail_url` が実データへ入った状態の目視確認
+## 2026-03-21 handoff: GitHub Actions 直前までの実装まとめ
+
+### 実装済み
+
+1. `content_language`
+   - migration 035 適用済み
+   - `source_targets -> articles_enriched -> public_articles` 伝搬済み
+   - `ArticleCard` で `JP / EN` バッジ表示済み
+2. `thumbnail_url`
+   - 外部記事画像取得ではなく内部テンプレサムネイル方式
+   - `/api/thumb` で描画
+   - `public_articles.thumbnail_url` に保存
+3. 日本語ソース
+   - 14 件を seed 追加済み
+   - warm-up fetch/enrich/publish 実施済み
+4. cron 再設計
+   - `hourly-fetch` と `hourly-enrich` を分離
+   - enrich は 10 件 worker x 毎時 4 回
+   - `compute-ranks.maxDuration = 300` へ変更済み
+5. L4 月次アーカイブ
+   - migration 036 適用済み
+   - `public_articles_history` 追加済み
+   - 半年超 1073 件を履歴退避済み
+
+### 現在の本番前提
+
+1. `public_articles` は半年以内の公開集合として扱う
+2. `public_articles_history` は age-out 履歴を保持する
+3. `compute-ranks` は publish 後続 step のまま。ただし timeout 再発時は分離を検討する
+
+### 未解決
+
+1. `public_article_sources` の同期不足
+   - `articles_enriched_sources` はあるが `public_article_sources` が十分に増えていない
+2. `compute-ranks` の根本軽量化
+   - ひとまず 300 秒化しただけ
+3. admin Phase 3 一式
+   - `ADMIN_PATH_PREFIX`
+   - `ADMIN_SECRET`
+   - `hide_article`
+   - tag review UI
+   - `source_targets.is_active` ON/OFF
+4. Topic Group 本実装
+5. OGP 本実装
+
+### 次セッションの最初に確認すること
+
+1. `main` に merge 済みか
+2. Vercel の production が最新 commit を拾っているか
+3. GitHub Actions の最新 run で
+   - `hourly-fetch`
+   - `hourly-enrich`
+   - `hourly-publish`
+   - `compute-ranks`
+   をそれぞれ確認する
