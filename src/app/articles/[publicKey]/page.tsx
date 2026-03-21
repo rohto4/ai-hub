@@ -1,9 +1,42 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PublicArticleList } from '@/components/site/PublicArticleList'
 import { EmptyPanel, PublicScaffold } from '@/components/site/PublicScaffold'
 import { isDatabaseConfigured } from '@/lib/db'
 import { getPublicArticleDetail, listLatestPublicArticles } from '@/lib/db/public-feed'
+
+const APP_URL = process.env.APP_URL ?? process.env.VERCEL_URL ?? 'http://localhost:3000'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ publicKey: string }>
+}): Promise<Metadata> {
+  const { publicKey } = await params
+  if (!isDatabaseConfigured()) return {}
+
+  const article = await getPublicArticleDetail(publicKey)
+  if (!article) return {}
+
+  const ogImageUrl = `${APP_URL}/api/og?publicKey=${publicKey}`
+  return {
+    title: article.title,
+    description: article.summary_100 ?? article.title,
+    openGraph: {
+      title: article.title,
+      description: article.summary_100 ?? article.title,
+      images: [{ url: ogImageUrl, width: 1200, height: 630 }],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.summary_100 ?? article.title,
+      images: [ogImageUrl],
+    },
+  }
+}
 
 export default async function ArticleDetailPage({
   params,
