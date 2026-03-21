@@ -51,7 +51,7 @@ export default async function DigestPage() {
                         {article.sourceCategory}
                       </span>
                       <span className="text-muted">
-                        {article.published_at.toLocaleDateString('ja-JP')}
+                        {new Date(article.published_at).toLocaleDateString('ja-JP')}
                       </span>
                     </div>
                     <Link href={href} className="text-[16px] font-extrabold leading-tight hover:underline">

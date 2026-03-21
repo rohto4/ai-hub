@@ -47,7 +47,7 @@ export default function LikedPage() {
                   <div className="mb-1.5 flex flex-wrap gap-1.5 text-[10px]">
                     <span className="rounded-full bg-[#dbeafe] px-2 py-0.5 font-bold text-[#1d4ed8]">{article.source_type}</span>
                     <span className="rounded-full bg-[#f6f0ea] px-2 py-0.5 font-bold text-accent-darker">{article.sourceCategory}</span>
-                    <span className="text-muted">{article.published_at.toLocaleDateString('ja-JP')}</span>
+                    <span className="text-muted">{new Date(article.published_at).toLocaleDateString('ja-JP')}</span>
                   </div>
                   <Link href={`/articles/${article.publicKey ?? article.id}`} className="text-[15px] font-extrabold leading-tight hover:underline">
                     {article.title}
