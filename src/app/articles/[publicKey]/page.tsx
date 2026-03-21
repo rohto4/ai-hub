@@ -46,7 +46,7 @@ export default async function ArticleDetailPage({
 
   if (!isDatabaseConfigured()) {
     return (
-      <PublicScaffold title="記事詳細" description="L4 公開記事の詳細ビューです。">
+      <PublicScaffold title="記事詳細" description="記事が見つかりませんでした。">
         <EmptyPanel message="データベース未接続のため記事を表示できません。" />
       </PublicScaffold>
     )
@@ -64,7 +64,7 @@ export default async function ArticleDetailPage({
   })
 
   return (
-    <PublicScaffold title={article.title} description="public_articles を読む記事詳細ページの最小構成です。">
+    <PublicScaffold title={article.title} description={article.summary_100 ?? article.title}>
       <section className="grid gap-6 lg:grid-cols-[1.6fr_0.8fr]">
         <article className="rounded-3xl bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
           <div className="mb-4 flex items-start gap-4">

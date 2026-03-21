@@ -7,7 +7,7 @@ export default async function RankingPage() {
   const articles = isDatabaseConfigured() ? await listRankedPublicArticles({ period: '24h', sourceCategory: 'all', limit: 30 }) : []
 
   return (
-    <PublicScaffold title="ランキング" description="public_rankings と public_articles から 24 時間ランキングを表示します。">
+    <PublicScaffold title="ランキング" description="アクティビティと記事スコアに基づいた 24 時間のトレンドランキングです。">
       {articles.length > 0 ? <PublicArticleList articles={articles} showRank /> : <EmptyPanel message="公開ランキングを表示できませんでした。" />}
     </PublicScaffold>
   )

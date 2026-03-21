@@ -21,7 +21,7 @@ export default async function CategoryPage({
     : []
 
   return (
-    <PublicScaffold title={`カテゴリ: ${slug}`} description="source_type または source_category を slug として受けるカテゴリページです。">
+    <PublicScaffold title={slug} description={`「${slug}」カテゴリのAI記事一覧です。`}>
       {articles.length > 0 ? (
         <PublicArticleList articles={articles} showRank={!sourceType} />
       ) : (
