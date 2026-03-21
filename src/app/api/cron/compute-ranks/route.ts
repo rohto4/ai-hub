@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyCronSecret } from '@/lib/auth/admin'
 import { databaseUnavailableResponse } from '@/lib/api/responses'
 import { getSql, isDatabaseConfigured } from '@/lib/db'
+import { finishJobRun, startJobRun } from '@/lib/db/job-runs'
 import { computeScore, getWindowStart } from '@/lib/ranking/compute'
 import type { RankingWindow } from '@/lib/db/types'
 
@@ -38,6 +39,8 @@ export async function POST(request: NextRequest) {
   }
 
   const sql = getSql()
+  const jobRunId = await startJobRun({ jobName: 'compute-ranks', metadata: {} })
+  const lastError: string | null = null
 
   // 1回のクエリで全公開記事を取得
   const articles = (await sql`
@@ -48,6 +51,7 @@ export async function POST(request: NextRequest) {
   `) as ArticleRow[]
 
   if (articles.length === 0) {
+    await finishJobRun({ jobRunId, status: 'completed', processedCount: 0, successCount: 0, failedCount: 0, metadata: { updated: 0 }, lastError: null })
     return NextResponse.json({ updated: 0 })
   }
 
@@ -137,6 +141,16 @@ export async function POST(request: NextRequest) {
       SELECT public_article_id FROM public_articles WHERE visibility_status = 'published'
     )
   `
+
+  await finishJobRun({
+    jobRunId,
+    status: 'completed',
+    processedCount: articles.length,
+    successCount: totalUpdated,
+    failedCount: 0,
+    metadata: { updated: totalUpdated, articles: articles.length, windows: WINDOWS.length },
+    lastError,
+  })
 
   return NextResponse.json({ updated: totalUpdated })
 }
