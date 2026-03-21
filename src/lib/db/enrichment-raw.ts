@@ -23,7 +23,7 @@ type RawArticleRow = {
   domain_commercial_use_policy: 'permitted' | 'prohibited' | 'unknown' | null
 }
 
-const ENRICH_CLAIM_INTERVAL_SQL = "interval '30 minutes'"
+const ENRICH_CLAIM_MINUTES = 30
 
 export async function listRawArticlesForEnrichment(
   limit = 50,
@@ -140,7 +140,7 @@ export async function claimRawArticlesForEnrichment(
         claimed_rows AS (
           UPDATE articles_raw ar
           SET
-            process_after = now() + ${ENRICH_CLAIM_INTERVAL_SQL}::interval,
+            process_after = now() + make_interval(mins => ${ENRICH_CLAIM_MINUTES}),
             updated_at = now()
           FROM candidate_rows cr
           WHERE ar.raw_article_id = cr.raw_article_id
@@ -186,7 +186,7 @@ export async function claimRawArticlesForEnrichment(
         claimed_rows AS (
           UPDATE articles_raw ar
           SET
-            process_after = now() + ${ENRICH_CLAIM_INTERVAL_SQL}::interval,
+            process_after = now() + make_interval(mins => ${ENRICH_CLAIM_MINUTES}),
             updated_at = now()
           FROM candidate_rows cr
           WHERE ar.raw_article_id = cr.raw_article_id
