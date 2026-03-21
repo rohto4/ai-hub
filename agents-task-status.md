@@ -1,6 +1,6 @@
 # Agents Task Status
 
-最終更新: 2026-03-20 12:10 JST
+最終更新: 2026-03-21 夜（自律実装セッション）
 
 運用ルール:
 - 新しい行を上に積む
@@ -9,6 +9,10 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-21 夜 | done | admin Phase 3 一式を実装 | /admin UI (login/articles/tags/sources)・ADMIN_SECRET 認証・hide_article・タグ昇格・is_active ON/OFF・admin_operation_logs 記録、build OK
+- 2026-03-21 夜 | done | hasDatabaseColumn 二重クエリを廃止し content_language を常に取得 | public-search/tags/detail/listings/rankings の 5 ファイル簡略化、行数 -302
+- 2026-03-21 夜 | done | compute-ranks を全件1回読み込み + 4window 並列 upsert に最適化 | DELETE 廃止・ON CONFLICT DO UPDATE・stale 削除を1回化
+- 2026-03-21 夜 | done | public_article_sources bigint 型バグを修正・全件バックフィル | 2件→2504件 に回復、scripts/backfill-public-article-sources.ts 追加
 - 2026-03-21 15:10 | done | `content_language` / 内部サムネイル / 日本語ソース前準備を実装 | migration 035 追加、L2/L4 へ `content_language` 伝搬、`/api/thumb` ベースの `thumbnail_url` 実装、日本語ソース14件を seed 追加、build/type-check OK（DB migration/seed 実行は未実施）
 - 2026-03-21 13:31 | done | タグ昇格時の画像資産運用を計画化 | `thumbnail-tag-registry` と `icon_pending`、tag 昇格後の資産追加・再計算方針を `implementation-plan.md` / `implementation-checklist.md` に追記
 - 2026-03-21 13:22 | done | サムネイル合成方針を実装計画へ反映 | 固定優先順位なし・title/summary出現順 + ハッシュタイブレーク・内部テンプレート合成・日本語ソース投入後に GHA 有効化の順を `implementation-plan.md` / `implementation-checklist.md` に詳細化
@@ -54,7 +58,7 @@
 - 2026-03-18 02:38 | done | importer 軽量化 | tag count を記事単位更新から最後の 1 回へ変更
 - 2026-03-18 02:37 | done | manual import 高速化方針検証 | 既存 importer は重く、bulk SQL 併用が有効と確認
 - 2026-03-18 02:36 | done | `docs/guide/codex/AGENTS.md` 読込 | docs 更新ルールと UTF-8 読解ルールを再確認
-- 2026-03-18 02:35 | done | `l3-l4-screen-flow.md` 読込 | Home / Search / Trends / Actions の接続点を確認
+- 2026-03-18 02:35 | done | `screen-flow.md` / `data-flow.md` 相当資料の読込 | Home / Search / Trends / Actions の接続点を確認
 - 2026-03-18 02:34 | done | `implementation-plan.md` 読込 | 旧版が進捗メモ寄りで要更新と判断
 - 2026-03-18 02:33 | done | `implementation-wait.md` 読込 | ユーザー不在時はここへ論点を書く前提を確認
 - 2026-03-20 23:59 | done | Home action 再分割 | `useHomeActions` を `derived/article/share` に再分割、`useHomeActions.ts 216->104`、build/type-check OK
