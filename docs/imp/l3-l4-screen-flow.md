@@ -321,3 +321,72 @@ flowchart TD
 4. `activity_logs.action_type` の厳密な運用一覧（`share_open` / `return_focus` / `unsave` の扱い）
 
 それらは `implementation-wait.md` で管理する。
+## 2026-03-21 追記: Cron 分離後の関係図
+
+### A. データパイプライン
+
+```mermaid
+flowchart LR
+    ST[source_targets]
+    L1[articles_raw]
+    L2[articles_enriched]
+    L4[public_articles]
+    L4H[public_articles_history]
+    R[public_rankings]
+
+    Fetch[hourly-fetch<br/>:00]
+    Enrich1[hourly-enrich worker<br/>:10]
+    Enrich2[hourly-enrich worker<br/>:20]
+    Enrich3[hourly-enrich worker<br/>:30]
+    Enrich4[hourly-enrich worker<br/>:40]
+    Publish[hourly-publish<br/>:50]
+    Rank[compute-ranks]
+    Archive[monthly-public-archive]
+
+    ST --> Fetch
+    Fetch --> L1
+    L1 --> Enrich1
+    L1 --> Enrich2
+    L1 --> Enrich3
+    L1 --> Enrich4
+    Enrich1 --> L2
+    Enrich2 --> L2
+    Enrich3 --> L2
+    Enrich4 --> L2
+    L2 --> Publish
+    Publish --> L4
+    L4 --> Rank
+    Rank --> R
+    L4 --> Archive
+    Archive --> L4H
+```
+
+### B. 運用上の要点
+
+1. `hourly-layer12` の一括実行は timeout 対策のため実質廃止し、`fetch` と `enrich` を分離した。
+2. enrich は `daily-enrich` route を worker として使い、1 回 10 件だけ claim して処理する。
+3. claim は `articles_raw.process_after` を予約ロックとして使い、`FOR UPDATE SKIP LOCKED` で重複取得を避ける。
+4. `hourly-publish` は `public_articles` だけを更新し、`compute-ranks` は同 workflow 内の後続 step のまま。
+5. `public_articles` は半年以内の公開集合として保ち、半年超は `public_articles_history` に月次退避する。
+
+### C. 現在の定期実行スケジュール
+
+| ジョブ | 時刻 | 役割 |
+|---|---|---|
+| `hourly-fetch` | 毎時 `:00` | raw 収集 |
+| `hourly-enrich` | 毎時 `:10 / :20 / :30 / :40` | 10 件 worker |
+| `hourly-publish` | 毎時 `:50` | L2 -> L4 公開 |
+| `compute-ranks` | `hourly-publish` 後続 | `public_rankings` 再計算 |
+| `monthly-public-archive` | 手動実装済み・月次想定 | 半年超 L4 の履歴退避 |
+
+### D. 追加で見るべきテーブル
+
+1. `articles_raw`
+   - enrich worker の claim 対象
+   - `is_processed`, `process_after`, `last_error` を監視
+2. `public_articles`
+   - 公開集合本体
+3. `public_articles_history`
+   - 月次 age-out の退避先
+4. `public_rankings`
+   - `compute-ranks` 出力先

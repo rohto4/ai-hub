@@ -297,3 +297,30 @@ hourly-publish（毎時 :35）
 - 半年超過行は月次バッチで `public_articles_history` に退避して `public_articles` から削除する
 - 月次バッチは `monthly-public-archive` として実装し、初期値は `ageMonths=6`
 - これにより `compute-ranks` 側は ranking 対象の SQL を大きく変えずに母集団だけを減らせる
+## 2026-03-21 再開時の実装優先順
+
+### 直近で先に見るもの
+
+1. `public_article_sources` 同期不備の解消
+2. GitHub Actions / Vercel 本番 run の安定確認
+3. `compute-ranks` の実測
+   - 300 秒化で足りるか
+   - それでも重ければ workflow 分離 or 差分更新化
+
+### その後の大物
+
+1. admin Phase 3
+2. Topic Group 本実装
+3. OGP 画像実装
+4. ranking の action mapping 調整
+5. docs / monitoring の整備
+
+### スキップしてよいこと
+
+1. `content_language`
+2. `thumbnail_url`
+3. 日本語ソース seed
+4. cron 分離
+5. L4 月次アーカイブ
+
+上記は実装済み。再実装不要。

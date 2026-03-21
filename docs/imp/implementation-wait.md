@@ -271,3 +271,33 @@ CREATE TABLE topic_groups (
   - `articles_enriched_sources`: 日本語記事に対応する source 行あり (`source_rows=65`)
   - `public_article_sources`: 旧データ 2 行だけが残っている
 - [hourly-publish-sources.ts](/G:/devwork/ai-summary/src/lib/publish/hourly-publish-sources.ts) には部分修正を入れてありますが、追加調査が必要です。
+## 2026-03-21 次セッション向け待ちメモ
+
+### 1. 今すぐ再着手しなくてよいもの
+
+1. `content_language`
+2. `thumbnail_url`
+3. 日本語ソース 14 件
+4. cron の fetch / enrich 分離
+5. `public_articles_history` 導入と初回 age-out
+
+### 2. 再開後の最初の候補
+
+1. `public_article_sources` の同期不備
+2. `compute-ranks` の本格軽量化
+3. admin Phase 3
+
+### 3. すでに反映済みの運用前提
+
+1. `public_articles` は半年以内の公開集合
+2. 半年超は `public_articles_history` に退避
+3. `compute-ranks` は現時点で `maxDuration = 300`
+4. enrich worker は 10 件単位
+
+### 4. 本番確認で見る順
+
+1. GitHub Actions
+2. Vercel function logs
+3. `job_runs`
+4. `public_articles` / `public_articles_history`
+5. `public_rankings`

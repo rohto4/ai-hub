@@ -61,3 +61,8 @@
 - 2026-03-21 00:12 | done | Home page shell 分割 | `src/app/page.tsx 222->65`、左カラムを `HomePrimaryColumn` へ抽出、build/type-check OK
 - 2026-03-21 00:35 | done | hourly-publish 分割 | `hourly-publish.ts 553->88`、候補取得/source/tag/upsert/hide を `src/lib/publish/` に分離、build/type-check OK
 - 2026-03-21 01:12 | done | summarize/enrichment/daily-enrich/topic 分割 | `summarize.ts 129->35`、`enrichment.ts 757->24`、`daily-enrich.ts 800->92`、`/api/home?topic=` 追加、build/type-check OK
+## 2026-03-21 cron / archive / handoff update
+- `hourly-fetch` / `hourly-enrich` / `hourly-publish` の分離設計を docs に反映
+- `compute-ranks.maxDuration = 300` を反映
+- `public_articles_history` と `monthly-public-archive` を docs に反映
+- 次セッションの優先タスクを `public_article_sources` / `compute-ranks` / admin Phase 3 に整理
