@@ -123,6 +123,7 @@ export interface HomeResponse {
   random: ArticleWithScore[]
   latest: ArticleWithScore[]
   unique: ArticleWithScore[]
+  ranked: ArticleWithScore[]
   lanes: Lanes
   period: RankPeriod
   stats: HomeStats
