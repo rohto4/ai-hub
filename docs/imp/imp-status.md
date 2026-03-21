@@ -1160,3 +1160,12 @@
   - `npm run build` OK
   - `npx next typegen` OK
   - `npm run type-check` OK
+## 2026-03-21 L4 月次アーカイブ導入
+- `migrations/036_add_public_articles_history.sql` を追加
+- `src/lib/jobs/monthly-public-archive.ts` を追加
+- `src/app/api/cron/monthly-public-archive/route.ts` を追加
+- `scripts/run-monthly-public-archive.ts` を追加
+- 方針:
+  - `public_articles` の半年超過行を `public_articles_history` に退避
+  - 関連する `public_article_sources` / `public_article_tags` / `public_rankings` は cascade delete
+  - L4 を半年以内の公開集合として保つ

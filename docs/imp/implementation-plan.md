@@ -291,3 +291,9 @@ hourly-publish（毎時 :35）
 2. タグ固定優先順位は禁止
 3. title / summary の出現順を優先し、同点だけハッシュで崩す
 4. 画像が作れない記事は `thumbnail_emoji` へフォールバック
+## 2026-03-21 追加方針: L4 月次アーカイブ
+
+- `public_articles` は半年以内の公開集合として維持する
+- 半年超過行は月次バッチで `public_articles_history` に退避して `public_articles` から削除する
+- 月次バッチは `monthly-public-archive` として実装し、初期値は `ageMonths=6`
+- これにより `compute-ranks` 側は ranking 対象の SQL を大きく変えずに母集団だけを減らせる
