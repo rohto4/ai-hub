@@ -2,7 +2,7 @@ name: hourly-publish
 
 on:
   schedule:
-    - cron: '35 * * * *'  # 毎時 :35 実行（hourly-layer12 の :05 から30分後）
+    - cron: '50 * * * *'  # 毎時 :50 実行（fetch 00 / enrich 10,20,30,40 の後）
   workflow_dispatch:
 
 jobs:

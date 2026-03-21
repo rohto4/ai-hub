@@ -7,6 +7,7 @@ export type {
 } from '@/lib/db/enrichment-types'
 
 export {
+  claimRawArticlesForEnrichment,
   listRawArticlesForEnrichment,
   markRawError,
   markRawProcessed,
