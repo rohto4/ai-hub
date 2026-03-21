@@ -14,6 +14,7 @@
     "db:seed-keywords": "node scripts/seed-keywords.mjs",
     "db:backfill-article-tags": "node scripts/backfill-article-tags.mjs",
     "db:run-daily-enrich": "npx tsx scripts/run-daily-enrich.ts",
+    "db:run-monthly-public-archive": "npx tsx scripts/run-monthly-public-archive.ts",
     "db:run-hourly-publish": "npx tsx scripts/run-hourly-publish.ts",
     "db:check-layer12": "node scripts/check-layer12.mjs",
     "db:check-domain-policies": "node scripts/check-domain-policies.mjs",

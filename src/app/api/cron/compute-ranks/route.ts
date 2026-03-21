@@ -6,7 +6,7 @@ import { computeScore, getWindowStart } from '@/lib/ranking/compute'
 import type { RankingWindow } from '@/lib/db/types'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+export const maxDuration = 300
 
 const WINDOWS: RankingWindow[] = ['hourly', '24h', '7d', '30d']
 const PUBLIC_RANKINGS_MAX_AGE = '6 months'
