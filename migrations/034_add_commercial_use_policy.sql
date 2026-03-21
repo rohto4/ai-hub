@@ -32,19 +32,19 @@ INSERT INTO observed_article_domains (
 )
 VALUES
   -- 明示禁止確認済み
-  ('itmedia.co.jp',        'prohibited', 'blocked', 'blocked', now(), now()),
-  ('techcrunch.com',       'prohibited', 'blocked', 'blocked', now(), now()),
-  ('nikkei.com',           'prohibited', 'blocked', 'blocked', now(), now()),
-  ('xtech.nikkei.com',     'prohibited', 'blocked', 'blocked', now(), now()),
-  ('nikkei.co.jp',         'prohibited', 'blocked', 'blocked', now(), now()),
-  ('qiita.com',            'prohibited', 'blocked', 'blocked', now(), now()),
+  ('itmedia.co.jp',        'prohibited', 'blocked', 'summarize_snippet', now(), now()),
+  ('techcrunch.com',       'prohibited', 'blocked', 'summarize_snippet', now(), now()),
+  ('nikkei.com',           'prohibited', 'blocked', 'summarize_snippet', now(), now()),
+  ('xtech.nikkei.com',     'prohibited', 'blocked', 'summarize_snippet', now(), now()),
+  ('nikkei.co.jp',         'prohibited', 'blocked', 'summarize_snippet', now(), now()),
+  ('qiita.com',            'prohibited', 'blocked', 'summarize_snippet', now(), now()),
   -- 制限なし確認済み
-  ('sakana.ai',            'permitted',  'needs_review', 'needs_review', now(), now()),
-  ('tech.preferred.jp',    'permitted',  'needs_review', 'needs_review', now(), now()),
-  ('zenn.dev',             'permitted',  'needs_review', 'needs_review', now(), now()),
-  ('jdla.org',             'permitted',  'needs_review', 'needs_review', now(), now()),
-  ('ainow.ai',             'permitted',  'needs_review', 'needs_review', now(), now()),
-  ('publickey1.jp',        'permitted',  'needs_review', 'needs_review', now(), now())
+  ('sakana.ai',            'permitted',  'needs_review', 'domain_default', now(), now()),
+  ('tech.preferred.jp',    'permitted',  'needs_review', 'domain_default', now(), now()),
+  ('zenn.dev',             'permitted',  'needs_review', 'domain_default', now(), now()),
+  ('jdla.org',             'permitted',  'needs_review', 'domain_default', now(), now()),
+  ('ainow.ai',             'permitted',  'needs_review', 'domain_default', now(), now()),
+  ('publickey1.jp',        'permitted',  'needs_review', 'domain_default', now(), now())
 ON CONFLICT (domain) DO UPDATE SET
   commercial_use_policy = EXCLUDED.commercial_use_policy,
   last_seen_at = now();

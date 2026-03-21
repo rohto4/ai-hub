@@ -7,6 +7,7 @@ type SourceTargetRow = {
   display_name: string
   fetch_kind: SourceTarget['fetchKind']
   source_category: string
+  content_language: 'ja' | 'en' | null
   base_url: string | null
   content_access_policy: SourceTarget['contentAccessPolicy']
   fetch_interval_minutes: number
@@ -24,6 +25,7 @@ export async function listDueSourceTargets(limit = 20, sourceKey?: string | null
           st.display_name,
           st.fetch_kind,
           st.source_category,
+          st.content_language,
           st.base_url,
           st.content_access_policy,
           st.fetch_interval_minutes,
@@ -42,6 +44,7 @@ export async function listDueSourceTargets(limit = 20, sourceKey?: string | null
           st.display_name,
           st.fetch_kind,
           st.source_category,
+          st.content_language,
           st.base_url,
           st.content_access_policy,
           st.fetch_interval_minutes,
@@ -69,6 +72,7 @@ export async function listDueSourceTargets(limit = 20, sourceKey?: string | null
     displayName: row.display_name,
     fetchKind: row.fetch_kind,
     sourceCategory: row.source_category,
+    contentLanguage: row.content_language,
     baseUrl: row.base_url,
     contentAccessPolicy: row.content_access_policy,
     fetchIntervalMinutes: row.fetch_interval_minutes,

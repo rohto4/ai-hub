@@ -14,6 +14,7 @@ export async function listPublishCandidates(sql: SqlClient): Promise<PublishCand
       ae.publication_text,
       ae.source_category,
       ae.source_type,
+      ae.content_language,
       ae.dedupe_group_key,
       ae.summary_input_basis,
       ae.publication_basis,

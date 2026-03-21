@@ -7,6 +7,7 @@ export interface SourceTarget {
   displayName: string
   fetchKind: FetchKind
   sourceCategory: string
+  contentLanguage: 'ja' | 'en' | null
   baseUrl: string | null
   contentAccessPolicy: ContentAccessPolicy
   fetchIntervalMinutes: number

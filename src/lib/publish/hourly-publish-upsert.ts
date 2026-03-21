@@ -27,6 +27,7 @@ export async function bulkPublishBatch(
   const thumbnailEmojis: (string | null)[] = []
   const sourceCategories: string[] = []
   const sourceTypes: string[] = []
+  const contentLanguages: (string | null)[] = []
   const summaryInputBases: string[] = []
   const publicationBases: string[] = []
   const scores: number[] = []
@@ -53,6 +54,7 @@ export async function bulkPublishBatch(
     )
     sourceCategories.push(candidate.source_category)
     sourceTypes.push(candidate.source_type)
+    contentLanguages.push(candidate.content_language)
     summaryInputBases.push(candidate.summary_input_basis)
     publicationBases.push(candidate.publication_basis)
     scores.push(Number(candidate.score))
@@ -64,14 +66,14 @@ export async function bulkPublishBatch(
       enriched_article_id, primary_source_target_id, public_key, canonical_url,
       display_title, display_summary_100, display_summary_200,
       thumbnail_url, thumbnail_emoji,
-      source_category, source_type, summary_input_basis, publication_basis,
+      source_category, source_type, content_language, summary_input_basis, publication_basis,
       content_score, original_published_at, visibility_status, public_refreshed_at
     )
     SELECT
       enriched_article_id::bigint,
       NULLIF(source_target_id, '')::uuid,
       public_key, canonical_url, title, summary_100, summary_200, thumbnail_url, thumbnail_emoji,
-      source_category, source_type, summary_input_basis, publication_basis,
+      source_category, source_type, content_language, summary_input_basis, publication_basis,
       score::numeric, NULLIF(published_at, '')::timestamptz,
       'published', now()
     FROM unnest(
@@ -86,11 +88,12 @@ export async function bulkPublishBatch(
       ${thumbnailEmojis}::text[],
       ${sourceCategories}::text[],
       ${sourceTypes}::text[],
+      ${contentLanguages}::text[],
       ${summaryInputBases}::text[],
       ${publicationBases}::text[],
       ${scores}::numeric[],
       ${publishedAts}::text[]
-    ) AS t(enriched_article_id, source_target_id, public_key, canonical_url, title, summary_100, summary_200, thumbnail_url, thumbnail_emoji, source_category, source_type, summary_input_basis, publication_basis, score, published_at)
+    ) AS t(enriched_article_id, source_target_id, public_key, canonical_url, title, summary_100, summary_200, thumbnail_url, thumbnail_emoji, source_category, source_type, content_language, summary_input_basis, publication_basis, score, published_at)
     ON CONFLICT (canonical_url) DO UPDATE SET
       enriched_article_id      = EXCLUDED.enriched_article_id,
       primary_source_target_id = EXCLUDED.primary_source_target_id,
@@ -101,6 +104,7 @@ export async function bulkPublishBatch(
       thumbnail_emoji          = EXCLUDED.thumbnail_emoji,
       source_category          = EXCLUDED.source_category,
       source_type              = EXCLUDED.source_type,
+      content_language         = EXCLUDED.content_language,
       summary_input_basis      = EXCLUDED.summary_input_basis,
       publication_basis        = EXCLUDED.publication_basis,
       content_score            = EXCLUDED.content_score,
@@ -157,13 +161,13 @@ export async function publishOne(
       enriched_article_id, primary_source_target_id, public_key, canonical_url,
       display_title, display_summary_100, display_summary_200,
       thumbnail_url, thumbnail_emoji, source_category, source_type,
-      summary_input_basis, publication_basis, content_score,
+      content_language, summary_input_basis, publication_basis, content_score,
       original_published_at, visibility_status, public_refreshed_at
     )
     VALUES (
       ${candidate.enriched_article_id}, ${candidate.source_target_id}, ${publicKey}, ${candidate.canonical_url},
       ${candidate.title}, ${candidate.summary_100}, ${displaySummary}, ${candidate.thumbnail_url}, ${thumbnailEmoji},
-      ${candidate.source_category}, ${candidate.source_type}, ${candidate.summary_input_basis}, ${candidate.publication_basis},
+      ${candidate.source_category}, ${candidate.source_type}, ${candidate.content_language}, ${candidate.summary_input_basis}, ${candidate.publication_basis},
       ${Number(candidate.score)}, ${candidate.source_updated_at}, 'published', now()
     )
     ON CONFLICT (canonical_url) DO UPDATE SET
@@ -176,6 +180,7 @@ export async function publishOne(
       thumbnail_emoji          = EXCLUDED.thumbnail_emoji,
       source_category          = EXCLUDED.source_category,
       source_type              = EXCLUDED.source_type,
+      content_language         = EXCLUDED.content_language,
       summary_input_basis      = EXCLUDED.summary_input_basis,
       publication_basis        = EXCLUDED.publication_basis,
       content_score            = EXCLUDED.content_score,

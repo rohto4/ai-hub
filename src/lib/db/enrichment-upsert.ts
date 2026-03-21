@@ -8,6 +8,7 @@ type ExistingEnrichedRow = {
   enriched_article_id: number
   raw_article_id: number
   source_target_id: string
+  content_language: 'ja' | 'en' | null
   normalized_url: string
   cited_url: string | null
   canonical_url: string
@@ -29,12 +30,24 @@ type ExistingEnrichedRow = {
   score_reason: string | null
   ai_processing_state: 'completed' | 'manual_pending'
   source_updated_at: string | null
+  topic_group_id: string | null
   summary_embedding: string | null
   embedding_model: string | null
   embedding_updated_at: string | null
   processed_at: string
   created_at: string
   updated_at: string
+}
+
+type EnrichedSourceRow = {
+  source_target_id: string | null
+  source_key: string
+  source_display_name: string
+  source_category: string | null
+  source_type: string | null
+  selection_status: 'selected' | 'supporting' | 'rejected'
+  selection_reason: string | null
+  similarity_score: number | null
 }
 
 function toVectorLiteral(embedding: number[]): string {
@@ -71,6 +84,58 @@ async function upsertTagCandidates(
         updated_at = now()
     `
   }
+}
+
+async function syncEnrichedSources(
+  enrichedArticleId: number,
+  sourceRows: EnrichedSourceRow[],
+): Promise<void> {
+  const sql = getSql()
+  await sql`DELETE FROM articles_enriched_sources WHERE enriched_article_id = ${enrichedArticleId}`
+
+  if (sourceRows.length === 0) return
+
+  const enrichedIds = sourceRows.map(() => enrichedArticleId)
+  const sourceTargetIds = sourceRows.map((row) => row.source_target_id ?? null)
+  const sourceKeys = sourceRows.map((row) => row.source_key)
+  const sourceDisplayNames = sourceRows.map((row) => row.source_display_name)
+  const sourceCategories = sourceRows.map((row) => row.source_category ?? null)
+  const sourceTypes = sourceRows.map((row) => row.source_type ?? null)
+  const selectionStatuses = sourceRows.map((row) => row.selection_status)
+  const selectionReasons = sourceRows.map((row) => row.selection_reason ?? null)
+  const similarityScores = sourceRows.map((row) => row.similarity_score ?? null)
+
+  await sql`
+    INSERT INTO articles_enriched_sources (
+      enriched_article_id, source_target_id, source_key, source_display_name,
+      source_category, source_type, selection_status, selection_reason, similarity_score
+    )
+    SELECT
+      enriched_id::bigint, NULLIF(source_target_id, '')::uuid, source_key, source_display_name,
+      source_category, source_type, selection_status, selection_reason, similarity_score::numeric
+    FROM unnest(
+      ${enrichedIds}::bigint[],
+      ${sourceTargetIds}::text[],
+      ${sourceKeys}::text[],
+      ${sourceDisplayNames}::text[],
+      ${sourceCategories}::text[],
+      ${sourceTypes}::text[],
+      ${selectionStatuses}::text[],
+      ${selectionReasons}::text[],
+      ${similarityScores}::numeric[]
+    ) AS t(
+      enriched_id, source_target_id, source_key, source_display_name,
+      source_category, source_type, selection_status, selection_reason, similarity_score
+    )
+    ON CONFLICT (enriched_article_id, source_key, selection_status) DO UPDATE SET
+      source_target_id = EXCLUDED.source_target_id,
+      source_display_name = EXCLUDED.source_display_name,
+      source_category = EXCLUDED.source_category,
+      source_type = EXCLUDED.source_type,
+      selection_reason = EXCLUDED.selection_reason,
+      similarity_score = EXCLUDED.similarity_score,
+      updated_at = now()
+  `
 }
 
 export async function refreshTagArticleCounts(): Promise<void> {
@@ -114,7 +179,7 @@ export async function upsertEnrichedArticle(
   const existing = existingRows[0] ?? null
   const embeddingLiteral = input.summaryEmbedding ? toVectorLiteral(input.summaryEmbedding) : null
 
-  const sourceRows = (input.relatedSources?.length
+  const sourceRows: EnrichedSourceRow[] = (input.relatedSources?.length
     ? input.relatedSources
     : [
         {
@@ -128,13 +193,12 @@ export async function upsertEnrichedArticle(
           similarityScore: null,
         },
       ]).map((source) => ({
-    enriched_article_id: existing?.enriched_article_id,
     source_target_id: source.sourceTargetId,
     source_key: source.sourceKey,
     source_display_name: source.sourceDisplayName,
     source_category: source.sourceCategory,
     source_type: source.sourceType,
-    selection_status: source.selectionStatus,
+    selection_status: source.selectionStatus as EnrichedSourceRow['selection_status'],
     selection_reason: source.selectionReason,
     similarity_score: source.similarityScore ?? null,
   }))
@@ -143,18 +207,18 @@ export async function upsertEnrichedArticle(
     await sql`
       INSERT INTO articles_enriched_history (
         enriched_article_id, raw_article_id, source_target_id, normalized_url, cited_url, canonical_url,
-        title, thumbnail_url, summary_100, summary_200, summary_basis, content_path, is_provisional,
+        content_language, title, thumbnail_url, summary_100, summary_200, summary_basis, content_path, is_provisional,
         provisional_reason, dedupe_status, dedupe_group_key, publish_candidate, publication_basis,
-        publication_text, summary_input_basis, score, score_reason, ai_processing_state, source_updated_at,
+        publication_text, summary_input_basis, score, score_reason, ai_processing_state, source_updated_at, topic_group_id,
         summary_embedding, embedding_model, embedding_updated_at, processed_at, created_at, updated_at
       )
       VALUES (
         ${existing.enriched_article_id}, ${existing.raw_article_id}, ${existing.source_target_id}, ${existing.normalized_url},
-        ${existing.cited_url}, ${existing.canonical_url}, ${existing.title}, ${existing.thumbnail_url}, ${existing.summary_100},
+        ${existing.cited_url}, ${existing.canonical_url}, ${existing.content_language}, ${existing.title}, ${existing.thumbnail_url}, ${existing.summary_100},
         ${existing.summary_200}, ${existing.summary_basis}, ${existing.content_path}, ${existing.is_provisional},
         ${existing.provisional_reason}, ${existing.dedupe_status}, ${existing.dedupe_group_key}, ${existing.publish_candidate},
         ${existing.publication_basis}, ${existing.publication_text}, ${existing.summary_input_basis}, ${existing.score},
-        ${existing.score_reason}, ${existing.ai_processing_state}, ${existing.source_updated_at},
+        ${existing.score_reason}, ${existing.ai_processing_state}, ${existing.source_updated_at}, ${existing.topic_group_id},
         ${existing.summary_embedding ?? null}::vector, ${existing.embedding_model ?? null}, ${existing.embedding_updated_at ?? null},
         ${existing.processed_at}, ${existing.created_at}, ${existing.updated_at}
       )
@@ -167,9 +231,11 @@ export async function upsertEnrichedArticle(
         source_target_id = ${input.sourceTargetId},
         source_category = ${input.sourceCategory},
         source_type = ${input.sourceType},
+        content_language = ${input.contentLanguage},
         cited_url = ${input.citedUrl},
         canonical_url = ${input.canonicalUrl},
         title = ${input.title},
+        thumbnail_url = ${input.thumbnailUrl},
         summary_100 = ${input.summary100},
         summary_200 = ${input.summary200},
         summary_basis = ${input.summaryBasis},
@@ -187,6 +253,7 @@ export async function upsertEnrichedArticle(
         ai_processing_state = ${input.aiProcessingState ?? 'completed'},
         commercial_use_policy = ${input.commercialUsePolicy},
         source_updated_at = ${input.sourceUpdatedAt},
+        topic_group_id = NULL,
         summary_embedding = ${embeddingLiteral}::vector,
         embedding_model = ${input.embeddingModel ?? null},
         embedding_updated_at = CASE WHEN ${embeddingLiteral !== null} THEN now() ELSE embedding_updated_at END,
@@ -195,32 +262,7 @@ export async function upsertEnrichedArticle(
       WHERE enriched_article_id = ${existing.enriched_article_id}
     `
 
-    await sql`DELETE FROM articles_enriched_sources WHERE enriched_article_id = ${existing.enriched_article_id}`
-    if (sourceRows.length > 0) {
-      await sql`
-        INSERT INTO articles_enriched_sources ${// eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (sql as any)(
-          sourceRows.map((row) => ({ ...row, enriched_article_id: existing.enriched_article_id })),
-          'enriched_article_id',
-          'source_target_id',
-          'source_key',
-          'source_display_name',
-          'source_category',
-          'source_type',
-          'selection_status',
-          'selection_reason',
-          'similarity_score',
-        )}
-        ON CONFLICT (enriched_article_id, source_key, selection_status) DO UPDATE SET
-          source_target_id = EXCLUDED.source_target_id,
-          source_display_name = EXCLUDED.source_display_name,
-          source_category = EXCLUDED.source_category,
-          source_type = EXCLUDED.source_type,
-          selection_reason = EXCLUDED.selection_reason,
-          similarity_score = EXCLUDED.similarity_score,
-          updated_at = now()
-      `
-    }
+    await syncEnrichedSources(existing.enriched_article_id, sourceRows)
 
     await syncEnrichedTags(existing.enriched_article_id, input.matchedTagIds)
     await upsertTagCandidates(input.candidateTags, input.rawArticleId)
@@ -231,18 +273,19 @@ export async function upsertEnrichedArticle(
   const inserted = (await sql`
     INSERT INTO articles_enriched (
       raw_article_id, source_target_id, source_category, source_type, normalized_url, cited_url,
-      canonical_url, title, summary_100, summary_200, summary_basis, content_path, is_provisional,
+      canonical_url, title, thumbnail_url, summary_100, summary_200, summary_basis, content_path, is_provisional,
       provisional_reason, dedupe_status, dedupe_group_key, publish_candidate, publication_basis,
       publication_text, summary_input_basis, score, score_reason, ai_processing_state, source_updated_at,
-      summary_embedding, embedding_model, embedding_updated_at, commercial_use_policy
+      content_language, topic_group_id, summary_embedding, embedding_model, embedding_updated_at, commercial_use_policy
     )
     VALUES (
       ${input.rawArticleId}, ${input.sourceTargetId}, ${input.sourceCategory}, ${input.sourceType},
-      ${input.normalizedUrl}, ${input.citedUrl}, ${input.canonicalUrl}, ${input.title}, ${input.summary100},
+      ${input.normalizedUrl}, ${input.citedUrl}, ${input.canonicalUrl}, ${input.title}, ${input.thumbnailUrl}, ${input.summary100},
       ${input.summary200}, ${input.summaryBasis}, ${input.contentPath}, ${input.isProvisional},
       ${input.provisionalReason}, ${input.dedupeStatus}, ${input.dedupeGroupKey}, ${input.publishCandidate},
       ${input.publicationBasis}, ${input.publicationText}, ${input.summaryInputBasis}, ${input.score},
       ${input.scoreReason}, ${input.aiProcessingState ?? 'completed'}, ${input.sourceUpdatedAt},
+      ${input.contentLanguage}, NULL,
       ${embeddingLiteral}::vector, ${input.embeddingModel ?? null},
       CASE WHEN ${embeddingLiteral !== null} THEN now() ELSE null END,
       ${input.commercialUsePolicy}
@@ -251,31 +294,7 @@ export async function upsertEnrichedArticle(
   `) as Array<{ enriched_article_id: number }>
 
   const enrichedArticleId = inserted[0].enriched_article_id
-  if (sourceRows.length > 0) {
-    await sql`
-      INSERT INTO articles_enriched_sources ${// eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (sql as any)(
-        sourceRows.map((row) => ({ ...row, enriched_article_id: enrichedArticleId })),
-        'enriched_article_id',
-        'source_target_id',
-        'source_key',
-        'source_display_name',
-        'source_category',
-        'source_type',
-        'selection_status',
-        'selection_reason',
-        'similarity_score',
-      )}
-      ON CONFLICT (enriched_article_id, source_key, selection_status) DO UPDATE SET
-        source_target_id = EXCLUDED.source_target_id,
-        source_display_name = EXCLUDED.source_display_name,
-        source_category = EXCLUDED.source_category,
-        source_type = EXCLUDED.source_type,
-        selection_reason = EXCLUDED.selection_reason,
-        similarity_score = EXCLUDED.similarity_score,
-        updated_at = now()
-    `
-  }
+  await syncEnrichedSources(enrichedArticleId, sourceRows)
 
   await syncEnrichedTags(enrichedArticleId, input.matchedTagIds)
   await upsertTagCandidates(input.candidateTags, input.rawArticleId)

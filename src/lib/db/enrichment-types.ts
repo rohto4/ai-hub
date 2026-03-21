@@ -5,6 +5,7 @@ export interface RawArticleForEnrichment {
   sourceDisplayName: string
   sourceCategory: string
   sourceType: string
+  contentLanguage: 'ja' | 'en' | null
   contentAccessPolicy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
   observedDomain: string | null
   observedDomainFetchPolicy: 'needs_review' | 'fulltext_allowed' | 'snippet_only' | 'blocked' | null
@@ -31,10 +32,12 @@ export interface UpsertEnrichedInput {
   sourceTargetId: string
   sourceCategory: string
   sourceType: string
+  contentLanguage: 'ja' | 'en' | null
   normalizedUrl: string
   citedUrl: string | null
   canonicalUrl: string
   title: string
+  thumbnailUrl: string | null
   summary100: string
   summary200: string
   summaryBasis: 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet'
@@ -66,6 +69,7 @@ export interface UpsertEnrichedInput {
     sourceDisplayName: string
     sourceCategory: string | null
     sourceType: string | null
+    contentLanguage?: 'ja' | 'en' | null
     selectionStatus: 'selected' | 'supporting' | 'rejected'
     selectionReason: string | null
     similarityScore?: number | null

@@ -8,6 +8,7 @@ type RawArticleRow = {
   display_name: string
   source_category: string
   source_type: string
+  content_language: 'ja' | 'en' | null
   content_access_policy: 'feed_only' | 'fulltext_allowed' | 'blocked_snippet_only'
   observed_domain: string | null
   observed_domain_fetch_policy: 'needs_review' | 'fulltext_allowed' | 'snippet_only' | 'blocked' | null
@@ -36,6 +37,7 @@ export async function listRawArticlesForEnrichment(
           st.display_name,
           st.source_category,
           st.source_type,
+          st.content_language,
           st.content_access_policy,
           COALESCE(st.commercial_use_policy, 'permitted') AS source_commercial_use_policy,
           od.commercial_use_policy AS domain_commercial_use_policy,
@@ -66,6 +68,7 @@ export async function listRawArticlesForEnrichment(
           st.display_name,
           st.source_category,
           st.source_type,
+          st.content_language,
           st.content_access_policy,
           COALESCE(st.commercial_use_policy, 'permitted') AS source_commercial_use_policy,
           od.commercial_use_policy AS domain_commercial_use_policy,
@@ -95,6 +98,7 @@ export async function listRawArticlesForEnrichment(
     sourceDisplayName: row.display_name,
     sourceCategory: row.source_category,
     sourceType: row.source_type,
+    contentLanguage: row.content_language,
     contentAccessPolicy: row.content_access_policy,
     observedDomain: row.observed_domain,
     observedDomainFetchPolicy: row.observed_domain_fetch_policy,

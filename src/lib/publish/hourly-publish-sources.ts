@@ -45,7 +45,11 @@ export async function syncPublicArticleSources(
       END AS selection_status
     FROM representative_articles rep
     JOIN articles_enriched rel
-      ON rel.dedupe_group_key = rep.dedupe_group_key
+      ON rel.enriched_article_id = rep.enriched_article_id
+      OR (
+        rep.dedupe_group_key IS NOT NULL
+        AND rel.dedupe_group_key = rep.dedupe_group_key
+      )
     LEFT JOIN source_targets st
       ON st.source_target_id = rel.source_target_id
     LEFT JOIN source_priority_rules spr

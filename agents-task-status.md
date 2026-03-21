@@ -9,6 +9,10 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-21 15:10 | done | `content_language` / 内部サムネイル / 日本語ソース前準備を実装 | migration 035 追加、L2/L4 へ `content_language` 伝搬、`/api/thumb` ベースの `thumbnail_url` 実装、日本語ソース14件を seed 追加、build/type-check OK（DB migration/seed 実行は未実施）
+- 2026-03-21 13:31 | done | タグ昇格時の画像資産運用を計画化 | `thumbnail-tag-registry` と `icon_pending`、tag 昇格後の資産追加・再計算方針を `implementation-plan.md` / `implementation-checklist.md` に追記
+- 2026-03-21 13:22 | done | サムネイル合成方針を実装計画へ反映 | 固定優先順位なし・title/summary出現順 + ハッシュタイブレーク・内部テンプレート合成・日本語ソース投入後に GHA 有効化の順を `implementation-plan.md` / `implementation-checklist.md` に詳細化
+- 2026-03-21 13:05 | done | GHA前提の順序をチェックリストへ反映 | `content_language`・`thumbnail_url`・日本語ソース投入を GitHub Actions 登録前ゲートとして `implementation-checklist.md` に追記
 - 2026-03-21 12:08 | done | 実装着手順チェックリストを追加 | `docs/imp/implementation-checklist.md` を新設し、見た目改善を除く次フェーズ全体の実行順・完了条件・検証項目を整理
 - 2026-03-20 23:46 | done | 機能単位へ追加分割 | `public-articles` を rankings/listings/detail に再分割、Home 状態を shared/data/actions/state に分割、build/type-check OK
 - 2026-03-20 23:15 | done | T2-B public-feed 分割 | `public-feed` を 5 ファイル + barrel に分割、build/type-check OK、記事系 384 行は残課題

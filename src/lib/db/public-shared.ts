@@ -1,6 +1,7 @@
 import type {
   Article,
   ArticleWithScore,
+  ContentLanguage,
   HomeActivity,
   HomeStats,
   RankBreakdown,
@@ -16,6 +17,7 @@ export type PublicArticleRow = {
   source_type: Article['source_type']
   thumbnail_url: string | null
   thumbnail_emoji: string | null
+  content_language: ContentLanguage | null
   published_at: string
   summary_100: string | null
   summary_200: string | null
@@ -93,6 +95,8 @@ export const PERIOD_INTERVAL: Record<RankPeriod, string> = {
   '30d': '30 days',
 }
 
+export const PUBLIC_DISPLAY_MAX_AGE = '6 months'
+
 export function toArticle(row: PublicArticleRow): ArticleWithScore {
   return {
     id: row.id,
@@ -103,6 +107,7 @@ export function toArticle(row: PublicArticleRow): ArticleWithScore {
     source_type: row.source_type,
     thumbnail_url: row.thumbnail_url,
     thumbnail_emoji: row.thumbnail_emoji,
+    content_language: row.content_language,
     published_at: new Date(row.published_at),
     summary_100: row.summary_100,
     summary_200: row.summary_200,

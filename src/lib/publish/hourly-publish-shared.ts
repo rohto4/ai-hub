@@ -24,6 +24,7 @@ export type PublishCandidate = {
   publication_text: string | null
   source_category: string
   source_type: string
+  content_language: 'ja' | 'en' | null
   dedupe_group_key: string | null
   summary_input_basis: string
   publication_basis: string

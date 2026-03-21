@@ -7,6 +7,7 @@ import {
   upsertEnrichedArticle,
 } from '@/lib/db/enrichment'
 import { recordJobRunItem } from '@/lib/db/job-runs'
+import { buildInternalThumbnailUrl } from '@/lib/publish/thumbnail-template'
 import { matchTagsFromKeywords } from '@/lib/tags/match'
 import {
   chunkItems,
@@ -187,18 +188,36 @@ async function persistPreparedArticle(params: {
   )
   const adjustedScore = article.relevance.isRelevant ? score : Math.max(0, score - 25)
   const adjustedScoreReason = article.relevance.isRelevant ? scoreReason : `${scoreReason}; low source relevance`
+  const matchedTags = params.tagReferences
+    .filter((reference) => keywordMatchedTagIds.includes(reference.id))
+    .map((reference) => ({
+      tagKey: reference.tagKey,
+      displayName: reference.displayName,
+    }))
+  const thumbnailUrl = buildInternalThumbnailUrl({
+    canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
+    title: article.title,
+    summary100: summaryForArticle.summary100,
+    summary200: summaryForArticle.summary200,
+    sourceType: article.rawArticle.sourceType as 'official' | 'blog' | 'news' | 'video' | 'alerts' | 'paper',
+    sourceCategory: article.rawArticle.sourceCategory as 'llm' | 'agent' | 'voice' | 'policy' | 'safety' | 'search' | 'news',
+    contentLanguage: article.rawArticle.contentLanguage,
+    matchedTags,
+  })
 
   await upsertEnrichedArticle({
     rawArticleId: article.rawArticle.id,
     sourceTargetId: article.rawArticle.sourceTargetId,
     sourceCategory: article.rawArticle.sourceCategory,
     sourceType: article.rawArticle.sourceType,
+    contentLanguage: article.rawArticle.contentLanguage,
     sourceKey: article.rawArticle.sourceKey,
     sourceDisplayName: article.rawArticle.sourceDisplayName,
     normalizedUrl: article.rawArticle.normalizedUrl,
     citedUrl: article.rawArticle.citedUrl,
     canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
     title: article.title,
+    thumbnailUrl,
     summary100: summaryForArticle.summary100,
     summary200: summaryForArticle.summary200,
     summaryBasis: article.summaryBasis,
@@ -222,6 +241,7 @@ async function persistPreparedArticle(params: {
         sourceDisplayName: article.rawArticle.sourceDisplayName,
         sourceCategory: article.rawArticle.sourceCategory,
         sourceType: article.rawArticle.sourceType,
+        contentLanguage: article.rawArticle.contentLanguage,
         selectionStatus: finalDedupeStatus === 'unique' ? 'selected' : 'rejected',
         selectionReason: semanticDuplicate
           ? 'semantic duplicate candidate'

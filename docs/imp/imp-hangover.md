@@ -399,3 +399,55 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 4. `/api/home?topic=...` を追加し、Home の topic filter を server-side 化
 5. build / typegen / type-check は通過
 6. 大きい未完了は `scripts` 系の統一と、一部コメント整理
+
+## 15. 2026-03-21 追加進捗: content_language / thumbnail / 日本語ソース前準備
+
+### 15.1 今回完了したこと
+
+1. migration `035_add_content_language_and_topic_groups.sql` を追加した
+   - `source_targets.content_language`
+   - `articles_enriched.content_language`
+   - `articles_enriched_history.content_language`
+   - `public_articles.content_language`
+   - `articles_enriched.topic_group_id`
+   - `articles_enriched_history.topic_group_id`
+   - `public_articles.topic_group_id`
+   - `topic_groups` テーブル
+2. `daily-enrich` で `source_targets.content_language -> articles_enriched.content_language` を伝搬するコードを追加した
+3. `hourly-publish` で `articles_enriched.content_language -> public_articles.content_language` を転送するコードを追加した
+4. 公開 query / `Article` 型 / `ArticleCard` に `content_language` を通し、`JP / EN` バッジを表示できる状態にした
+5. `thumbnail_url` は外部記事画像取得ではなく、内部テンプレート SVG を返す `/api/thumb` 方式で実装した
+6. `src/lib/publish/thumbnail-template.ts` を追加し、tags + title/summary 出現順 + hash tie-break でサムネイル URL を決定するようにした
+7. `src/lib/publish/thumbnail-tag-registry.ts` を追加し、主要タグは registry、未登録タグは自動生成ラベルで扱えるようにした
+8. `daily-enrich` の upsert 時に `thumbnail_url` を L2 へ保存するようにした
+9. `scripts/seed.mjs` に日本語ソース 14 件を追加し、`contentLanguage` / `commercialUsePolicy` を投入できるようにした
+
+### 15.2 検証結果
+
+1. `npx next typegen` 通過
+2. `npm run type-check` 通過
+3. `npm run build` 通過
+
+### 15.3 重要な前提
+
+1. build 時に参照する DB は migration 035 未適用の可能性があるため、公開 query は `public_articles.content_language` がまだ無い場合でも `NULL::varchar(2)` へフォールバックするようにした
+2. 一方で `daily-enrich` / `hourly-publish` の write path は migration 035 適用前に実行すると失敗する
+3. したがって次の実行順は固定する
+   - 先に migration 035 を Neon へ適用
+   - 次に `node scripts/seed.mjs`
+   - その後に `fetch -> enrich -> publish`
+
+### 15.4 次にやること
+
+1. Human-in-the-Loop として migration 035 の Neon 本番適用可否を確認する
+2. `node scripts/seed.mjs` を実行して日本語ソース 14 件と `content_language` を source master に反映する
+3. 小さく `fetch -> enrich -> publish` を手動確認する
+4. その後に GitHub Actions を有効化する
+
+### 15.5 まだやっていないこと
+
+1. Neon 本番への migration 035 適用
+2. `scripts/seed.mjs` の実行
+3. 日本語ソースの実 fetch
+4. `content_language` backfill 結果の DB 実確認
+5. `thumbnail_url` が実データへ入った状態の目視確認

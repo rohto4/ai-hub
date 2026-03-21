@@ -69,6 +69,13 @@
 - [ ] 現在の `npm run build` を通す
 - [ ] 必要なら `npx next typegen` を通して現状基線を確認する
 
+### 4.4 GitHub Actions 登録前ゲート
+
+- [ ] `content_language` の L2/L4 伝搬が完了している
+- [ ] `thumbnail_url` の取得と L2/L4 伝搬が完了している
+- [ ] 日本語ソース投入と初回 `fetch -> enrich -> publish` 確認が完了している
+- [ ] 外部 cron が旧 `/api/cron/ingest-feeds` を叩いていないことを確認している
+
 ---
 
 ## 5. 実装順チェックリスト
@@ -121,7 +128,39 @@
 - バッジが表示される
 - 見た目改善ではなくデータ識別として成立している
 
-#### A-5. Phase A 検証
+#### A-5. `thumbnail_url` 実装
+
+- [ ] `thumbnail_url` は外部記事画像の取得ではなく、内部テンプレート画像の割当結果として扱う方針を守る
+- [ ] タグ固定優先順位を作らない
+- [ ] title 内のタグ出現順を最優先で採用する
+- [ ] title にない場合は summary_200 内のタグ出現順を使う
+- [ ] 同順位時だけ `canonical_url` または `public_key` のハッシュで決定論的に崩す
+- [ ] ベース背景テンプレを `source_type` / `source_category` ごとに定義する
+- [ ] タグ用アイコンまたはテキストチップを主要タグぶん用意する
+- [ ] 1タグ / 2タグ / 3タグ / 4件以上でレイアウトルールを分ける
+- [ ] `src/lib/publish/thumbnail-template.ts` 相当の合成ロジックを追加する
+- [ ] `src/lib/publish/thumbnail-tag-registry.ts` 相当の registry を追加する
+- [ ] registry 未登録タグを `icon_pending` として扱う運用を決める
+- [ ] 未登録タグが来ても publish を止めず、`+n` か `thumbnail_emoji` にフォールバックする
+- [ ] `hourly-publish` で `public_articles.thumbnail_url` を解決・保存する
+- [ ] 画像を解決できない記事は `thumbnail_emoji` に確実にフォールバックする
+
+完了条件:
+- 新規記事で `thumbnail_url` が内部テンプレート URL として入る経路ができている
+- 画像がない記事でも表示崩れがない
+- タグ固定優先順位なしで再現可能な割当ができる
+
+#### A-5.1 タグ昇格時の画像資産フロー
+
+- [ ] tag 昇格時に registry 登録有無を確認するフローを定義する
+- [ ] admin 昇格時または `daily-tag-promote` 実装時に `icon_pending` を残せるようにする
+- [ ] 後からアイコン追加したタグの `thumbnail_url` 再計算方針を決める
+
+完了条件:
+- 新規タグが増えてもサムネイル運用が破綻しない
+- 画像資産未整備のタグを安全に扱える
+
+#### A-6. Phase A 検証
 
 - [ ] migration 適用前後の差分確認手順をまとめる
 - [ ] backfill 後の `source_targets / articles_enriched / public_articles` 件数整合を確認する
@@ -161,9 +200,22 @@
 完了条件:
 - 日本語ソースの L1/L2/L4 流れが確認できている
 
-### Phase C. 公開面の言語軸対応
+### Phase C. GitHub Actions 登録前確認
 
-#### C-1. API / 集計の受け口
+#### C-1. 登録前の確認
+
+- [ ] `hourly-layer12` が現行実装の正規入口であることを再確認する
+- [ ] `hourly-publish` が現行実装の正規入口であることを再確認する
+- [ ] `daily-db-backup` が公開系ジョブと独立していることを確認する
+- [ ] 外部 cron 設定に旧 `/api/cron/ingest-feeds` がないことを確認する
+- [ ] `APP_URL` / `CRON_SECRET` / DB 環境変数の投入先を整理する
+
+完了条件:
+- GitHub Actions を登録してよい状態だと判断できる
+
+### Phase D. 公開面の言語軸対応
+
+#### D-1. API / 集計の受け口
 
 - [ ] `/api/home` に必要な `content_language` を通す
 - [ ] `/api/search` に必要な `content_language` を通す
@@ -174,7 +226,7 @@
 完了条件:
 - 公開 API が言語軸を欠落させない
 
-#### C-2. 非対象の明文化
+#### D-2. 非対象の明文化
 
 - [ ] 言語フィルタ UI をこのフェーズで実装しない場合は docs に明記する
 - [ ] 見た目微調整を今回スコープ外として明記する
@@ -182,9 +234,9 @@
 完了条件:
 - 実装対象と非対象が docs 上で曖昧でない
 
-### Phase D. 管理画面 Phase 3
+### Phase E. 管理画面 Phase 3
 
-#### D-1. 管理ルート基盤
+#### E-1. 管理ルート基盤
 
 - [ ] `ADMIN_PATH_PREFIX` を前提とした管理ルートを実装する
 - [ ] `ADMIN_SECRET` による認証を管理 API 全体へ適用する
@@ -193,7 +245,7 @@
 完了条件:
 - 管理系エンドポイントが公開面から分離されている
 
-#### D-2. `hide_article` 最小実装
+#### E-2. `hide_article` 最小実装
 
 - [ ] `POST /api/admin/articles/:id/hide` を実装する
 - [ ] `public_articles.visibility_status='hidden'` を直接更新する
@@ -203,7 +255,7 @@
 完了条件:
 - queue なしで hide が即時反映される
 
-#### D-3. タグレビュー UI
+#### E-3. タグレビュー UI
 
 - [ ] `tag_candidate_pool` の候補一覧を表示する
 - [ ] `tags_master` への昇格を実装する
@@ -213,7 +265,7 @@
 完了条件:
 - 最低限のタグ運用が UI から可能
 
-#### D-4. source 管理
+#### E-4. source 管理
 
 - [ ] `source_targets.is_active` ON/OFF スイッチを実装する
 - [ ] 変更を `admin_operation_logs` に記録する
@@ -221,9 +273,9 @@
 完了条件:
 - source の停止/再開が管理画面から可能
 
-### Phase E. ランキングと運用調整
+### Phase F. ランキングと運用調整
 
-#### E-1. action_type 正式反映
+#### F-1. action_type 正式反映
 
 - [ ] `view -> impression_count` を反映する
 - [ ] `expand_200 / topic_group_open / digest_click -> open_count` を反映する
@@ -236,7 +288,7 @@
 完了条件:
 - `implementation-plan.md` 記載の正式マッピングとコードが一致する
 
-#### E-2. `compute-ranks` 調整
+#### F-2. `compute-ranks` 調整
 
 - [ ] 係数を点検し必要なら調整する
 - [ ] `compute-ranks` を再実行する
@@ -272,9 +324,11 @@
 
 1. migration 035 設計と承認待ち
 2. `content_language` 導入、seed 更新、backfill、伝搬実装
-3. `ArticleCard` の言語バッジ追加
-4. 日本語ソース 14 件追加とパイプライン反映
-5. 公開 API の言語軸対応
-6. 管理画面基盤、`hide_article`、タグレビュー、source ON/OFF
-7. ranking マッピング正式反映と再計算
-8. docs 更新と最終検証
+3. `thumbnail_url` 取得と伝搬実装
+4. `ArticleCard` の言語バッジ追加
+5. 日本語ソース 14 件追加とパイプライン反映
+6. GitHub Actions 登録前確認
+7. 公開 API の言語軸対応
+8. 管理画面基盤、`hide_article`、タグレビュー、source ON/OFF
+9. ranking マッピング正式反映と再計算
+10. docs 更新と最終検証

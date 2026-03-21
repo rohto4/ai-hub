@@ -15,6 +15,8 @@ export type SourceType =
   | 'alerts'
   | 'paper'
 
+export type ContentLanguage = 'ja' | 'en'
+
 export type LaneKey = 'official' | 'paper' | 'news'
 export type Lanes = Record<LaneKey, ArticleWithScore[]>
 
@@ -54,6 +56,7 @@ export interface Article {
   source_type: SourceType
   thumbnail_url: string | null
   thumbnail_emoji: string | null
+  content_language: ContentLanguage | null
   published_at: Date
   summary_100: string | null
   summary_200: string | null

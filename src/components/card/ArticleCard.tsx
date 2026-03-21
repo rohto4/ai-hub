@@ -24,6 +24,11 @@ const sourceLabel: Record<Article['source_type'], string> = {
   video: 'Video',
 }
 
+const languageLabel: Record<NonNullable<Article['content_language']>, string> = {
+  ja: 'JP',
+  en: 'EN',
+}
+
 export function ArticleCard({
   article,
   summaryMode,
@@ -104,6 +109,20 @@ export function ArticleCard({
 
         {/* テキスト */}
         <div className="flex min-w-0 flex-1 flex-col gap-1 pr-6 pt-0.5">
+          <div className="flex items-center gap-1.5">
+            {article.content_language ? (
+              <span
+                className="inline-flex rounded-full border px-1.5 py-0.5 text-[9px] font-bold leading-none"
+                style={{
+                  borderColor: 'var(--color-second-orange)',
+                  color: 'var(--color-accent-darker)',
+                  backgroundColor: '#fff7ed',
+                }}
+              >
+                {languageLabel[article.content_language]}
+              </span>
+            ) : null}
+          </div>
           <p className="line-clamp-2 text-[13px] font-extrabold leading-[1.4] text-ink">
             {article.title}
           </p>
