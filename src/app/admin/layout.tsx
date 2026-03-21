@@ -11,6 +11,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <Link href="/admin/articles" className="text-gray-300 hover:text-white">記事管理</Link>
           <Link href="/admin/tags" className="text-gray-300 hover:text-white">タグレビュー</Link>
           <Link href="/admin/sources" className="text-gray-300 hover:text-white">ソース管理</Link>
+          <Link href="/admin/jobs" className="text-gray-300 hover:text-white">ジョブログ</Link>
         </nav>
       </header>
       <main className="p-6">{children}</main>

@@ -17,6 +17,10 @@ export default function AdminDashboard() {
           <h2 className="text-white font-semibold text-lg mb-1">ソース管理</h2>
           <p className="text-gray-400 text-sm">フィードの有効・無効切替</p>
         </Link>
+        <Link href="/admin/jobs" className="block p-6 bg-gray-900 rounded-lg hover:bg-gray-800 border border-gray-800">
+          <h2 className="text-white font-semibold text-lg mb-1">ジョブログ</h2>
+          <p className="text-gray-400 text-sm">fetch / enrich / publish / compute-ranks の実行履歴と失敗ログ</p>
+        </Link>
       </div>
     </div>
   )

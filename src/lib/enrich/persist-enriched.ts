@@ -79,6 +79,7 @@ async function runAiBatch(
       title: article.title,
       content: article.summaryInput.summaryInputText,
       summaryInputBasis: article.summaryInput.summaryInputBasis,
+      contentLanguage: article.rawArticle.contentLanguage,
     })),
     batchSizeHint,
   )
@@ -205,6 +206,12 @@ async function persistPreparedArticle(params: {
     matchedTags,
   })
 
+  // en ソースは AI が生成した日本語タイトルを使う。ja ソースは元タイトルのまま。
+  const storedTitle =
+    article.rawArticle.contentLanguage !== 'ja' && summaryForArticle.titleJa
+      ? summaryForArticle.titleJa
+      : article.title
+
   await upsertEnrichedArticle({
     rawArticleId: article.rawArticle.id,
     sourceTargetId: article.rawArticle.sourceTargetId,
@@ -216,7 +223,7 @@ async function persistPreparedArticle(params: {
     normalizedUrl: article.rawArticle.normalizedUrl,
     citedUrl: article.rawArticle.citedUrl,
     canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
-    title: article.title,
+    title: storedTitle,
     thumbnailUrl,
     summary100: summaryForArticle.summary100,
     summary200: summaryForArticle.summary200,
