@@ -6,8 +6,6 @@ import { EmptyPanel, PublicScaffold } from '@/components/site/PublicScaffold'
 import { isDatabaseConfigured } from '@/lib/db'
 import { getPublicArticleDetail, listLatestPublicArticles } from '@/lib/db/public-feed'
 
-const APP_URL = process.env.APP_URL ?? process.env.VERCEL_URL ?? 'http://localhost:3000'
-
 export async function generateMetadata({
   params,
 }: {
@@ -19,7 +17,8 @@ export async function generateMetadata({
   const article = await getPublicArticleDetail(publicKey)
   if (!article) return {}
 
-  const ogImageUrl = `${APP_URL}/api/og?publicKey=${publicKey}`
+  // metadataBase が設定済みなので相対パスで OK
+  const ogImageUrl = `/api/og?publicKey=${publicKey}`
   return {
     title: article.title,
     description: article.summary_100 ?? article.title,
