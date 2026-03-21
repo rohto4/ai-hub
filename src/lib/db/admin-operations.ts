@@ -57,21 +57,36 @@ export async function setSourceActive(sourceTargetId: string, isActive: boolean)
   return rows.length > 0
 }
 
-export async function listTagCandidates(limit = 100): Promise<Array<{
+export type TagCandidateStatus = 'candidate' | 'manual_review'
+
+export async function listTagCandidates(
+  limit = 100,
+  status: TagCandidateStatus = 'candidate',
+): Promise<Array<{
   tagKey: string
   displayName: string
   seenCount: number
   reviewStatus: string
   firstSeenAt: string
   lastSeenAt: string
+  originTitle: string | null
+  originSnippet: string | null
 }>> {
   const sql = getSql()
   const rows = (await sql`
-    SELECT candidate_key AS tag_key, display_name, seen_count, review_status,
-           first_seen_at, last_seen_at
-    FROM tag_candidate_pool
-    WHERE review_status = 'candidate'
-    ORDER BY seen_count DESC, last_seen_at DESC
+    SELECT
+      tcp.candidate_key AS tag_key,
+      tcp.display_name,
+      tcp.seen_count,
+      tcp.review_status,
+      tcp.first_seen_at,
+      tcp.last_seen_at,
+      ar.title AS origin_title,
+      ar.snippet AS origin_snippet
+    FROM tag_candidate_pool tcp
+    LEFT JOIN articles_raw ar ON ar.raw_article_id = tcp.latest_origin_raw_id
+    WHERE tcp.review_status = ${status}
+    ORDER BY tcp.seen_count DESC, tcp.last_seen_at DESC
     LIMIT ${limit}
   `) as Array<{
     tag_key: string
@@ -80,6 +95,8 @@ export async function listTagCandidates(limit = 100): Promise<Array<{
     review_status: string
     first_seen_at: string
     last_seen_at: string
+    origin_title: string | null
+    origin_snippet: string | null
   }>
   return rows.map((row) => ({
     tagKey: row.tag_key,
@@ -88,7 +105,21 @@ export async function listTagCandidates(limit = 100): Promise<Array<{
     reviewStatus: row.review_status,
     firstSeenAt: row.first_seen_at,
     lastSeenAt: row.last_seen_at,
+    originTitle: row.origin_title,
+    originSnippet: row.origin_snippet,
   }))
+}
+
+export async function setTagCandidateStatus(
+  tagKey: string,
+  status: 'candidate' | 'manual_review' | 'rejected',
+): Promise<void> {
+  const sql = getSql()
+  await sql`
+    UPDATE tag_candidate_pool
+    SET review_status = ${status}
+    WHERE candidate_key = ${tagKey}
+  `
 }
 
 export async function promoteTagToMaster(tagKey: string, displayName: string): Promise<string> {

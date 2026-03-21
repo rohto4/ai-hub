@@ -6,25 +6,23 @@ import {
   listTagCandidates,
   promoteTagToMaster,
   addTagKeyword,
+  setTagCandidateStatus,
   logAdminOperation,
 } from '@/lib/db/admin-operations'
 
 export const runtime = 'nodejs'
 
-// GET /api/admin/tags?type=candidates  - タグ候補一覧
+// GET /api/admin/tags?status=candidate|manual_review
 export async function GET(request: NextRequest) {
   if (!verifyAdminSecret(request.headers.get('authorization'))) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
   if (!isDatabaseConfigured()) return databaseUnavailableResponse()
 
-  const type = request.nextUrl.searchParams.get('type') ?? 'candidates'
-  if (type === 'candidates') {
-    const candidates = await listTagCandidates(200)
-    return NextResponse.json({ candidates })
-  }
-
-  return NextResponse.json({ error: 'unknown type' }, { status: 400 })
+  const statusParam = request.nextUrl.searchParams.get('status') ?? 'candidate'
+  const status = statusParam === 'manual_review' ? 'manual_review' : 'candidate'
+  const candidates = await listTagCandidates(200, status)
+  return NextResponse.json({ candidates, status })
 }
 
 // POST /api/admin/tags  - タグ昇格 or キーワード追加
@@ -56,6 +54,23 @@ export async function POST(request: NextRequest) {
       payload: { tagKey: body.tagKey, displayName: body.displayName, newTagId: tagId },
     })
     return NextResponse.json({ success: true, tagId, tagKey: body.tagKey })
+  }
+
+  if (body.action === 'hold' || body.action === 'reject' || body.action === 'restore') {
+    if (!body.tagKey) {
+      return NextResponse.json({ error: 'tagKey required' }, { status: 400 })
+    }
+    const newStatus = body.action === 'hold' ? 'manual_review'
+      : body.action === 'reject' ? 'rejected'
+      : 'candidate'
+    await setTagCandidateStatus(body.tagKey, newStatus as 'candidate' | 'manual_review' | 'rejected')
+    await logAdminOperation({
+      operationType: body.action === 'hold' ? 'hold_tag' : 'reject_tag',
+      targetKind: 'tag_candidate_pool',
+      targetId: body.tagKey,
+      payload: { tagKey: body.tagKey, newStatus },
+    })
+    return NextResponse.json({ success: true, tagKey: body.tagKey, status: newStatus })
   }
 
   if (body.action === 'add_keyword') {
