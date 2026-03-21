@@ -22,7 +22,9 @@ export async function getHomeStats(): Promise<HomeStats> {
       COUNT(*) FILTER (WHERE visibility_status = 'published' AND source_category = 'voice')::int AS voice_count,
       COUNT(*) FILTER (WHERE visibility_status = 'published' AND source_category = 'policy')::int AS policy_count,
       COUNT(*) FILTER (WHERE visibility_status = 'published' AND source_category = 'safety')::int AS safety_count,
-      COUNT(*) FILTER (WHERE visibility_status = 'published' AND source_category = 'search')::int AS search_count
+      COUNT(*) FILTER (WHERE visibility_status = 'published' AND source_category = 'search')::int AS search_count,
+      COUNT(*) FILTER (WHERE visibility_status = 'published' AND content_language = 'ja')::int AS ja_count,
+      COUNT(*) FILTER (WHERE visibility_status = 'published' AND content_language = 'en')::int AS en_count
     FROM public_articles
   `) as HomeStatsRow[]
 

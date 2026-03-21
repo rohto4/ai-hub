@@ -54,6 +54,8 @@ export const initialHomeStats: HomeStats = {
   policyCount: 0,
   safetyCount: 0,
   searchCount: 0,
+  jaCount: 0,
+  enCount: 0,
 }
 
 export const initialHomeActivity: HomeActivity = {
