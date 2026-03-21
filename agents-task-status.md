@@ -9,6 +9,7 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-21 12:08 | done | 実装着手順チェックリストを追加 | `docs/imp/implementation-checklist.md` を新設し、見た目改善を除く次フェーズ全体の実行順・完了条件・検証項目を整理
 - 2026-03-20 23:46 | done | 機能単位へ追加分割 | `public-articles` を rankings/listings/detail に再分割、Home 状態を shared/data/actions/state に分割、build/type-check OK
 - 2026-03-20 23:15 | done | T2-B public-feed 分割 | `public-feed` を 5 ファイル + barrel に分割、build/type-check OK、記事系 384 行は残課題
 - 2026-03-20 22:58 | done | Tier1 リファクタリングを先行実施 | `mock4` 削除、`SourceCategory/LaneKey` へ整理、Home 分割、`/feed.xml` へ分離、type-check/build OK
