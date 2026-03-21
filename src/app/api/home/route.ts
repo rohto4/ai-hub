@@ -7,6 +7,7 @@ import {
   listContentLanes,
   listLatestPublicArticles,
   listRandomPublicArticles,
+  listRankedPublicArticles,
   listUniquePublicArticles,
 } from '@/lib/db/public-feed'
 import { TrendsQuerySchema } from '@/lib/validation/schemas'
@@ -32,10 +33,11 @@ export async function GET(request: NextRequest) {
   const topic = HOME_TOPICS.has(topicParam) ? topicParam : 'all'
   const sourceCategory = topic === 'all' ? null : topic
 
-  const [random, latest, unique, lanes, stats, activity] = await Promise.all([
+  const [random, latest, unique, ranked, lanes, stats, activity] = await Promise.all([
     listRandomPublicArticles({ limit: 10, sourceCategory }),
     listLatestPublicArticles({ limit: 10, sourceCategory }),
     listUniquePublicArticles({ limit: 10, sourceCategory }),
+    listRankedPublicArticles({ period, sourceCategory, limit: 10 }),
     listContentLanes({ period, perLane: 8, sourceCategory }),
     getHomeStats(),
     getHomeActivity(),
@@ -45,6 +47,7 @@ export async function GET(request: NextRequest) {
     random,
     latest,
     unique,
+    ranked,
     lanes,
     period,
     stats,
