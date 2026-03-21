@@ -32,21 +32,40 @@ export function useHomeShare() {
     setShareStatus(null)
   }, [shareIncludeAiTrendHub, shareIncludeSummary, shareIncludeTitle, shareTarget])
 
+  async function copyToClipboard(text: string): Promise<boolean> {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+    // HTTP環境など clipboard API が使えない場合のフォールバック
+    const el = document.createElement('textarea')
+    el.value = text
+    el.style.position = 'fixed'
+    el.style.opacity = '0'
+    document.body.appendChild(el)
+    el.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(el)
+    return ok
+  }
+
   function handleShareCopyUrl() {
     if (!shareTarget || typeof window === 'undefined') return
 
     const articleUrl = `${window.location.origin}/articles/${shareTarget.publicKey ?? shareTarget.id}`
-    void navigator.clipboard.writeText(articleUrl)
-    setShareStatus('URLをコピーしました。')
-    void trackAction({ actionType: 'share_copy', articleId: shareTarget.id, source: 'direct' })
+    void copyToClipboard(articleUrl).then(() => {
+      setShareStatus('URLをコピーしました。')
+      void trackAction({ actionType: 'share_copy', articleId: shareTarget.id, source: 'direct' })
+    })
   }
 
   function handleShareCopyText() {
     if (!shareTarget) return
 
-    void navigator.clipboard.writeText(shareTextContent)
-    setShareStatus('投稿文をコピーしました。')
-    void trackAction({ actionType: 'share_copy', articleId: shareTarget.id, source: 'direct' })
+    void copyToClipboard(shareTextContent).then(() => {
+      setShareStatus('投稿文をコピーしました。')
+      void trackAction({ actionType: 'share_copy', articleId: shareTarget.id, source: 'direct' })
+    })
   }
 
   const share: ShareState = {

@@ -13,15 +13,21 @@ export async function syncPublicArticleSources(
   if (rows.length === 0) return
 
   const publicArticleIds = rows.map((row) => row.public_article_id)
+  // postgres.js は bigint を string で返すため Number() で正規化する
   const representativeEnrichedIds = rows
-    .map((row) => candidateByCanonical.get(row.canonical_url)?.enriched_article_id)
-    .filter((value): value is number => typeof value === 'number')
+    .map((row) => {
+      const id = candidateByCanonical.get(row.canonical_url)?.enriched_article_id
+      if (id === undefined || id === null) return null
+      const n = Number(id)
+      return Number.isNaN(n) ? null : n
+    })
+    .filter((value): value is number => value !== null)
 
   const representativeToPublic = new Map<number, string>()
   for (const row of rows) {
     const candidate = candidateByCanonical.get(row.canonical_url)
     if (!candidate) continue
-    representativeToPublic.set(candidate.enriched_article_id, row.public_article_id)
+    representativeToPublic.set(Number(candidate.enriched_article_id), row.public_article_id)
   }
 
   const relatedRows = (await sql`
@@ -76,7 +82,7 @@ export async function syncPublicArticleSources(
 
   const insertRows = relatedRows
     .map((row) => {
-      const publicArticleId = representativeToPublic.get(row.representative_enriched_article_id)
+      const publicArticleId = representativeToPublic.get(Number(row.representative_enriched_article_id))
       if (!publicArticleId || !row.source_key || !row.source_display_name) return null
       return {
         public_article_id: publicArticleId,

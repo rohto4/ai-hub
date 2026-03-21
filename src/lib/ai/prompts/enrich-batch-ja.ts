@@ -3,6 +3,7 @@ export interface BatchSummaryPromptItem {
   title: string
   content: string
   summaryInputBasis?: 'full_content' | 'source_snippet' | 'title_only'
+  contentLanguage?: 'ja' | 'en' | null
 }
 
 function toPromptItem(item: BatchSummaryPromptItem): {
@@ -10,12 +11,14 @@ function toPromptItem(item: BatchSummaryPromptItem): {
   title: string
   content: string
   summaryInputBasis: 'full_content' | 'source_snippet' | 'title_only'
+  needsTitleTranslation: boolean
 } {
   return {
     id: item.id,
     title: item.title,
     content: item.content.slice(0, 5000),
     summaryInputBasis: item.summaryInputBasis ?? 'full_content',
+    needsTitleTranslation: item.contentLanguage !== 'ja',
   }
 }
 
@@ -47,6 +50,8 @@ export function buildEnrichBatchPrompt(items: BatchSummaryPromptItem[]): string 
 14. summary200Ja は summary100Ja の言い換えではなく、確実に言える範囲で少しだけ情報を足す。
 15. summaryInputBasis が source_snippet または title_only のときは、入力にない会社名・製品名・数字・出来事を絶対に補わない。
 16. summaryInputBasis が source_snippet のときは、title と content の両方に整合する内容だけを書く。
+17. needsTitleTranslation が true の場合は titleJa に日本語タイトルを返す。固有名詞・製品名・企業名は原語のまま使い、その他の語を日本語に訳す。60文字以内を目安にする。
+18. needsTitleTranslation が false の場合は titleJa に元の title をそのまま返す。
 
 content の扱い:
 1. item.content が十分にある場合は、それを最優先の情報源にする。
@@ -58,6 +63,7 @@ content の扱い:
   "items": [
     {
       "id": "123",
+      "titleJa": "日本語タイトル（needsTitleTranslation=false のときは元タイトルをそのまま）",
       "summary100Ja": "100文字以内の日本語要約",
       "summary200Ja": "200文字以内の日本語要約"
     }

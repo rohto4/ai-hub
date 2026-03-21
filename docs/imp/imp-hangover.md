@@ -208,7 +208,8 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 1. `docs/imp/imp-hangover.md`（このファイル）
 2. `docs/imp/implementation-wait.md`（判断待ち）
 3. `docs/imp/implementation-plan.md`（全体方針）
-4. `docs/imp/l3-l4-screen-flow.md`（画面遷移と L3/L4 接続点）
+4. `docs/imp/screen-flow.md`（画面遷移）
+5. `docs/imp/data-flow.md`（cron / L1-L4 / ranking / archive）
 5. `docs/spec/04-data-model-and-sql.md`（スキーマ）
 
 ---
@@ -481,28 +482,29 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 2. `public_articles_history` は age-out 履歴を保持する
 3. `compute-ranks` は publish 後続 step のまま。ただし timeout 再発時は分離を検討する
 
-### 未解決
+### 解決済み（2026-03-21 夜 自律実装セッション）
 
-1. `public_article_sources` の同期不足
-   - `articles_enriched_sources` はあるが `public_article_sources` が十分に増えていない
-2. `compute-ranks` の根本軽量化
-   - ひとまず 300 秒化しただけ
-3. admin Phase 3 一式
-   - `ADMIN_PATH_PREFIX`
-   - `ADMIN_SECRET`
-   - `hide_article`
-   - tag review UI
-   - `source_targets.is_active` ON/OFF
-4. Topic Group 本実装
-5. OGP 本実装
+1. `public_article_sources` bigint 型バグ修正・全件バックフィル実施
+   - 2件 → 2504件 に回復
+   - `scripts/backfill-public-article-sources.ts` 追加済み
+2. `compute-ranks` 最適化（全件1回読み込み + 4window 並列 upsert）
+3. admin Phase 3 実装済み
+   - `/admin/login`, `/admin`, `/admin/articles`, `/admin/tags`, `/admin/sources`
+   - `ADMIN_SECRET` 認証（cookie + API header）
+   - `hide_article` / `unhide`, タグ昇格, `is_active` ON/OFF
+   - `admin_operation_logs` 記録
+4. `content_language` を全公開 API に通した（hasDatabaseColumn 二重クエリ廃止）
+5. action_type マッピングが正式仕様通りであることを確認済み
 
-### 次セッションの最初に確認すること
+### 残り未解決
 
-1. `main` に merge 済みか
+1. Topic Group 本実装（pgvector 前提）
+2. OGP 本実装（`/api/og` は実装済み、`summary_large_image` 設定のみ）
+
+### 次セッション（merge 後）の確認事項
+
+1. `dev-default` → `main` merge
 2. Vercel の production が最新 commit を拾っているか
-3. GitHub Actions の最新 run で
-   - `hourly-fetch`
-   - `hourly-enrich`
-   - `hourly-publish`
-   - `compute-ranks`
-   をそれぞれ確認する
+3. Vercel に `ADMIN_SECRET` env var を追加する
+4. GitHub Actions の最新 run で fetch / enrich / publish / compute-ranks を確認
+5. `/admin/login` で動作確認（ADMIN_SECRET でログイン）

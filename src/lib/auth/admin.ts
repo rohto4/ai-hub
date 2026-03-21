@@ -40,3 +40,13 @@ export function verifyCronSecret(authHeader: string | null): boolean {
   if (!process.env.CRON_SECRET) return false
   return authHeader === `Bearer ${process.env.CRON_SECRET}`
 }
+
+/**
+ * 管理 API の認証
+ * Authorization: Bearer <ADMIN_SECRET>
+ */
+export function verifyAdminSecret(authHeader: string | null): boolean {
+  const secret = process.env.ADMIN_SECRET
+  if (!secret) return false
+  return authHeader === `Bearer ${secret}`
+}

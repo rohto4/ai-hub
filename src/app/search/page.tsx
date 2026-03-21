@@ -13,7 +13,7 @@ export default async function SearchPage({
   const articles = isDatabaseConfigured() && q ? await searchPublicArticles({ query: q, limit: 30 }) : []
 
   return (
-    <PublicScaffold title="検索" description="L4 の公開記事を title / summary から検索します。">
+    <PublicScaffold title="検索" description="タイトル・要約からAI記事を全文検索します。">
       <form className="mb-6 rounded-3xl bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
         <div className="flex flex-col gap-3 md:flex-row">
           <input

@@ -7,7 +7,7 @@ export default async function TagsPage() {
   const tags = isDatabaseConfigured() ? await listTagSummaries(80) : []
 
   return (
-    <PublicScaffold title="タグ一覧" description="public_article_tags と tags_master から公開タグを集計表示します。">
+    <PublicScaffold title="タグ一覧" description="AI記事をテーマ別に整理したタグ一覧です。気になるトピックをクリックして記事を絞り込めます。">
       {tags.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {tags.map((tag) => (

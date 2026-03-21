@@ -109,6 +109,8 @@ export interface HomeStats {
   policyCount: number
   safetyCount: number
   searchCount: number
+  jaCount: number
+  enCount: number
 }
 
 export interface HomeActivity {
@@ -121,6 +123,7 @@ export interface HomeResponse {
   random: ArticleWithScore[]
   latest: ArticleWithScore[]
   unique: ArticleWithScore[]
+  ranked: ArticleWithScore[]
   lanes: Lanes
   period: RankPeriod
   stats: HomeStats

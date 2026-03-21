@@ -1,9 +1,41 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PublicArticleList } from '@/components/site/PublicArticleList'
 import { EmptyPanel, PublicScaffold } from '@/components/site/PublicScaffold'
 import { isDatabaseConfigured } from '@/lib/db'
 import { getPublicArticleDetail, listLatestPublicArticles } from '@/lib/db/public-feed'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ publicKey: string }>
+}): Promise<Metadata> {
+  const { publicKey } = await params
+  if (!isDatabaseConfigured()) return {}
+
+  const article = await getPublicArticleDetail(publicKey)
+  if (!article) return {}
+
+  // metadataBase が設定済みなので相対パスで OK
+  const ogImageUrl = `/api/og?publicKey=${publicKey}`
+  return {
+    title: article.title,
+    description: article.summary_100 ?? article.title,
+    openGraph: {
+      title: article.title,
+      description: article.summary_100 ?? article.title,
+      images: [{ url: ogImageUrl, width: 1200, height: 630 }],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.summary_100 ?? article.title,
+      images: [ogImageUrl],
+    },
+  }
+}
 
 export default async function ArticleDetailPage({
   params,
@@ -14,7 +46,7 @@ export default async function ArticleDetailPage({
 
   if (!isDatabaseConfigured()) {
     return (
-      <PublicScaffold title="記事詳細" description="L4 公開記事の詳細ビューです。">
+      <PublicScaffold title="記事詳細" description="記事が見つかりませんでした。">
         <EmptyPanel message="データベース未接続のため記事を表示できません。" />
       </PublicScaffold>
     )
@@ -32,7 +64,7 @@ export default async function ArticleDetailPage({
   })
 
   return (
-    <PublicScaffold title={article.title} description="public_articles を読む記事詳細ページの最小構成です。">
+    <PublicScaffold title={article.title} description={article.summary_100 ?? article.title}>
       <section className="grid gap-6 lg:grid-cols-[1.6fr_0.8fr]">
         <article className="rounded-3xl bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
           <div className="mb-4 flex items-start gap-4">

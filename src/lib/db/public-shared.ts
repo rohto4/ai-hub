@@ -44,6 +44,8 @@ export type HomeStatsRow = {
   policy_count: number | string
   safety_count: number | string
   search_count: number | string
+  ja_count: number | string
+  en_count: number | string
 }
 
 export type HomeActivityRow = {
@@ -146,6 +148,8 @@ export function mapHomeStats(row?: HomeStatsRow): HomeStats {
     policyCount: Number(row?.policy_count ?? 0),
     safetyCount: Number(row?.safety_count ?? 0),
     searchCount: Number(row?.search_count ?? 0),
+    jaCount: Number(row?.ja_count ?? 0),
+    enCount: Number(row?.en_count ?? 0),
   }
 }
 

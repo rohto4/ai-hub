@@ -82,20 +82,30 @@
 
 20. `activity_logs.action_type` 正式化、`compute-ranks` 再実行、結果監査を行う
 
-## いま残っている主要タスク
+## いま残っている主要タスク（2026-03-21 夜 更新）
 
-現フェイズ: **言語軸導入 → 日本語ソース追加 → Phase 3 管理機能**
+現フェイズ: **リリース前 UI 調整のみ**
 
-1. `content_language` の migration 035 / backfill / L2-L4 伝搬
-2. 日本語ソース 14 件の seed 追加
-3. `ArticleCard` の `JP / EN` バッジ表示
-4. 管理画面基盤（`ADMIN_PATH_PREFIX` + `ADMIN_SECRET`）
-5. `priority_processing_queue` 最小実装（`hide_article` のみ）
-6. タグレビュー UI
-7. `source_targets.is_active` ON/OFF スイッチ
-8. `activity_logs.action_type` 正式化
-9. `compute-ranks` 係数調整と再実行
-10. 日本語ソース投入後の分布監査と検索・ランキング影響確認
+### 完了済み（2026-03-21 夜 自律実装セッション）
+
+1. ✅ `content_language` migration / L2-L4 伝搬 / ArticleCard バッジ
+2. ✅ 日本語ソース 14 件 seed 追加 + warm-up
+3. ✅ 管理画面 Phase 3 全体（ADMIN_SECRET / hide_article / タグ昇格 / is_active）
+4. ✅ `activity_logs.action_type` 正式マッピング確認済み
+5. ✅ `compute-ranks` 最適化（並列 upsert / 1 DB scan）
+6. ✅ `public_article_sources` bigint バグ修正 + 全件バックフィル
+7. ✅ hasDatabaseColumn 二重クエリ廃止
+8. ✅ OGP 画像 API（/api/og）+ 記事詳細 generateMetadata
+9. ✅ sitemap.xml + robots.txt
+10. ✅ HomeStats に jaCount / enCount 追加
+11. ✅ /api/home に ranked セクション追加
+12. ✅ 全ページ dev-mode description を本番テキストに修正
+
+### 残りタスク
+
+1. **UI 調整のみ**（Home KPI ダッシュボードでの jaCount/enCount 表示など）
+2. Topic Group 本実装（pgvector 前提、後回し）
+3. 言語フィルタ UI（Phase D-2 明示済み非対象）
 
 ## 再開時の推奨確認順
 
@@ -1080,7 +1090,7 @@
   - topic chips と source lane を分離
   - カードは `thumbnail_emoji` 前提に統一
 - `mock4` を追加した。
-  - `l3-l4-screen-flow.md` の Home / Ranking / Search / Detail / Category / Tag / About / Feed / PWA / Share / Topic Group を一通り確認可能
+  - `screen-flow.md` と `data-flow.md` で Home / Ranking / Search / Detail と cron / L1-L4 / ranking / archive を分離して確認可能
   - live API が使えるときは `/api/home` / `/api/search` を読む
   - DB 未接続時は fixture に自動フォールバックする
 - `public-feed.ts` を拡張した。

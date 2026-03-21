@@ -15,6 +15,7 @@ const MANUAL_PENDING_SUMMARY_100 = '要約待ち'
 const MANUAL_PENDING_SUMMARY_200 = '要約待ち'
 
 export interface EnrichedSummary {
+  titleJa: string | null
   summary100: string
   summary200: string
   summarySource: 'gemini' | 'gemini2' | 'openai' | 'manual_pending'
@@ -25,10 +26,12 @@ export interface EnrichedSummaryInput {
   title: string
   content: string
   summaryInputBasis?: 'full_content' | 'source_snippet' | 'title_only'
+  contentLanguage?: 'ja' | 'en' | null
 }
 
 type ProviderSummaryItem = {
   id: string
+  titleJa?: string
   summary100Ja: string
   summary200Ja: string
 }
@@ -66,6 +69,7 @@ function truncateAtWordBoundary(value: string, maxLength: number): string {
 
 function buildManualPendingSummary(): EnrichedSummary {
   return {
+    titleJa: null,
     summary100: MANUAL_PENDING_SUMMARY_100,
     summary200: MANUAL_PENDING_SUMMARY_200,
     summarySource: 'manual_pending',
@@ -130,9 +134,11 @@ function parseProviderResponse(text: string, inputs: EnrichedSummaryInput[]): Ma
     inputs.map((input) => {
       const output = outputMap.get(input.id)
       const fallback = fallbackMap.get(input.id) ?? buildManualPendingSummary()
+      const titleJa = output?.titleJa?.trim() || null
       return [
         input.id,
         {
+          titleJa,
           summary100: truncateAtWordBoundary(output?.summary100Ja || fallback.summary100, 100),
           summary200: truncateAtWordBoundary(
             output?.summary200Ja || output?.summary100Ja || fallback.summary200,
@@ -166,6 +172,7 @@ function buildPromptItems(inputs: EnrichedSummaryInput[]): BatchSummaryPromptIte
     title: input.title,
     content: input.content,
     summaryInputBasis: input.summaryInputBasis,
+    contentLanguage: input.contentLanguage,
   }))
 }
 
