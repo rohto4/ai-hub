@@ -9,6 +9,7 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-21 夜 | done | 最終仕上げ（OGP/sitemap/robots/description/stats/ranked） | OGP API・sitemap.xml・robots.txt・About/各ページ description 修正・HomeStats 言語カウント追加・/api/home に ranked セクション追加、全 build OK
 - 2026-03-21 夜 | done | admin Phase 3 一式を実装 | /admin UI (login/articles/tags/sources)・ADMIN_SECRET 認証・hide_article・タグ昇格・is_active ON/OFF・admin_operation_logs 記録、build OK
 - 2026-03-21 夜 | done | hasDatabaseColumn 二重クエリを廃止し content_language を常に取得 | public-search/tags/detail/listings/rankings の 5 ファイル簡略化、行数 -302
 - 2026-03-21 夜 | done | compute-ranks を全件1回読み込み + 4window 並列 upsert に最適化 | DELETE 廃止・ON CONFLICT DO UPDATE・stale 削除を1回化
