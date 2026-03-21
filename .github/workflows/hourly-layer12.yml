@@ -17,4 +17,4 @@ jobs:
           curl --fail --show-error --silent \
             -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
-            "${APP_URL}/api/cron/hourly-layer12?fetchLimit=20&enrichBatchSize=25&maxEnrichBatches=4"
+            "${APP_URL}/api/cron/hourly-layer12?fetchLimit=5&enrichBatchSize=5&maxEnrichBatches=1&summaryBatchSize=5"

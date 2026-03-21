@@ -9,6 +9,7 @@ export const runtime = 'nodejs'
 export const maxDuration = 60
 
 const WINDOWS: RankingWindow[] = ['hourly', '24h', '7d', '30d']
+const PUBLIC_RANKINGS_MAX_AGE = '6 months'
 
 type AggregatedRow = {
   public_article_id: string
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
         ON am.public_article_id = pa.public_article_id
        AND am.hour_bucket >= ${since.toISOString()}
       WHERE pa.visibility_status = 'published'
+        AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_RANKINGS_MAX_AGE}::interval
       GROUP BY
         pa.public_article_id,
         pa.content_score,
@@ -84,29 +86,41 @@ export async function POST(request: NextRequest) {
       WHERE ranking_window = ${window}
     `
 
-    for (const [index, row] of scored.entries()) {
-      await sql`
-        INSERT INTO public_rankings (
-          public_article_id,
-          ranking_window,
-          score,
-          rank_position,
-          computed_at
-        )
-        VALUES (
-          ${row.publicArticleId},
-          ${window},
-          ${row.score},
-          ${index + 1},
-          now()
-        )
-        ON CONFLICT (public_article_id, ranking_window) DO UPDATE SET
-          score = EXCLUDED.score,
-          rank_position = EXCLUDED.rank_position,
-          computed_at = now()
-      `
-      updated++
+    if (scored.length === 0) {
+      continue
     }
+
+    const publicArticleIds = scored.map((row) => row.publicArticleId)
+    const rankingWindows = scored.map(() => window)
+    const scores = scored.map((row) => row.score)
+    const rankPositions = scored.map((_, index) => index + 1)
+
+    await sql`
+      INSERT INTO public_rankings (
+        public_article_id,
+        ranking_window,
+        score,
+        rank_position,
+        computed_at
+      )
+      SELECT
+        public_article_id::uuid,
+        ranking_window,
+        score::numeric,
+        rank_position::integer,
+        now()
+      FROM unnest(
+        ${publicArticleIds}::text[],
+        ${rankingWindows}::text[],
+        ${scores}::numeric[],
+        ${rankPositions}::integer[]
+      ) AS t(public_article_id, ranking_window, score, rank_position)
+      ON CONFLICT (public_article_id, ranking_window) DO UPDATE SET
+        score = EXCLUDED.score,
+        rank_position = EXCLUDED.rank_position,
+        computed_at = now()
+    `
+    updated += scored.length
   }
 
   return NextResponse.json({ updated })
