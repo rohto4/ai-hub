@@ -60,8 +60,13 @@ export function AdminTagsClient({ initialCandidates }: { initialCandidates: TagC
     setProcessing(candidate.tagKey)
     try {
       const res = await callTagApi({ action: 'promote', tagKey: candidate.tagKey, displayName })
-      if (res.ok) removeFromList(candidate.tagKey)
-      else alert('昇格に失敗しました')
+      if (res.ok) {
+        const data = (await res.json()) as { taggedEnrichedCount?: number; taggedPublicCount?: number }
+        removeFromList(candidate.tagKey)
+        alert(`昇格完了！\n関連記事にタグ付け: L2 ${data.taggedEnrichedCount ?? 0}件 / 公開 ${data.taggedPublicCount ?? 0}件`)
+      } else {
+        alert('昇格に失敗しました')
+      }
     } finally { setProcessing(null) }
   }, [editingName])
 

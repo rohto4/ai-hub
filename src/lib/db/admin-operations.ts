@@ -122,21 +122,78 @@ export async function setTagCandidateStatus(
   `
 }
 
-export async function promoteTagToMaster(tagKey: string, displayName: string): Promise<string> {
+export async function promoteTagToMaster(
+  tagKey: string,
+  displayName: string,
+): Promise<{ tagId: string; taggedEnrichedCount: number; taggedPublicCount: number }> {
   const sql = getSql()
+
+  // tags_master に昇格
   const rows = (await sql`
     INSERT INTO tags_master (tag_key, display_name)
     VALUES (${tagKey}, ${displayName})
     ON CONFLICT (tag_key) DO UPDATE SET display_name = EXCLUDED.display_name, updated_at = now()
     RETURNING tag_id::text
   `) as Array<{ tag_id: string }>
+  const tagId = rows[0]!.tag_id
+
+  // candidate_key を tag_keywords に自動登録（将来の enrich でも使われる）
+  await sql`
+    INSERT INTO tag_keywords (tag_id, keyword)
+    VALUES (${tagId}::uuid, ${tagKey})
+    ON CONFLICT (tag_id, keyword) DO NOTHING
+  `
+
   // tag_candidate_pool の status を promoted に更新
   await sql`
     UPDATE tag_candidate_pool
     SET review_status = 'promoted'
     WHERE candidate_key = ${tagKey}
   `
-  return rows[0]!.tag_id
+
+  // 根拠記事へのタグ付け: candidate_key を含む articles_enriched を対象
+  const keyword = `%${tagKey}%`
+  const enrichedResult = (await sql`
+    INSERT INTO articles_enriched_tags (enriched_article_id, tag_id, is_primary, tag_source)
+    SELECT ae.enriched_article_id, ${tagId}::uuid, false, 'candidate_promoted'
+    FROM articles_enriched ae
+    WHERE ae.ai_processing_state = 'completed'
+      AND (
+        ae.title       ILIKE ${keyword}
+        OR ae.summary_100  ILIKE ${keyword}
+        OR ae.summary_200  ILIKE ${keyword}
+      )
+    ON CONFLICT (enriched_article_id, tag_id) DO NOTHING
+    RETURNING enriched_article_id
+  `) as Array<{ enriched_article_id: string }>
+
+  // 公開記事の public_article_tags にも反映
+  const publicResult = (await sql`
+    INSERT INTO public_article_tags (public_article_id, tag_id, sort_order)
+    SELECT
+      pa.public_article_id,
+      ${tagId}::uuid,
+      COALESCE(
+        (SELECT MAX(sort_order) + 1 FROM public_article_tags WHERE public_article_id = pa.public_article_id),
+        0
+      )
+    FROM public_articles pa
+    JOIN articles_enriched ae ON ae.enriched_article_id = pa.enriched_article_id
+    WHERE pa.visibility_status = 'published'
+      AND (
+        ae.title       ILIKE ${keyword}
+        OR ae.summary_100  ILIKE ${keyword}
+        OR ae.summary_200  ILIKE ${keyword}
+      )
+    ON CONFLICT (public_article_id, tag_id) DO NOTHING
+    RETURNING public_article_id
+  `) as Array<{ public_article_id: string }>
+
+  return {
+    tagId,
+    taggedEnrichedCount: enrichedResult.length,
+    taggedPublicCount: publicResult.length,
+  }
 }
 
 export async function addTagKeyword(tagId: string, keyword: string): Promise<void> {

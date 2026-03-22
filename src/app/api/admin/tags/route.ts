@@ -46,14 +46,20 @@ export async function POST(request: NextRequest) {
     if (!body.tagKey || !body.displayName) {
       return NextResponse.json({ error: 'tagKey and displayName required' }, { status: 400 })
     }
-    const tagId = await promoteTagToMaster(body.tagKey, body.displayName)
+    const { tagId, taggedEnrichedCount, taggedPublicCount } = await promoteTagToMaster(body.tagKey, body.displayName)
     await logAdminOperation({
       operationType: 'promote_tag',
       targetKind: 'tag_candidate_pool',
       targetId: body.tagKey,
-      payload: { tagKey: body.tagKey, displayName: body.displayName, newTagId: tagId },
+      payload: {
+        tagKey: body.tagKey,
+        displayName: body.displayName,
+        newTagId: tagId,
+        taggedEnrichedCount,
+        taggedPublicCount,
+      },
     })
-    return NextResponse.json({ success: true, tagId, tagKey: body.tagKey })
+    return NextResponse.json({ success: true, tagId, tagKey: body.tagKey, taggedEnrichedCount, taggedPublicCount })
   }
 
   if (body.action === 'hold' || body.action === 'reject' || body.action === 'restore') {
