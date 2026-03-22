@@ -106,5 +106,9 @@
 | OGP カード種別 | `summary_large_image`（`/api/og` で実装済み） |
 | share tracking | `meta` フィールドに `{ type, includeTitle, includeSummary, includeHashtag }` を追加（未実装、優先度低） |
 | 管理画面パス | `/admin/*` 固定 + `ADMIN_SECRET` cookie 認証 |
-| thumbnail_url 方式 | 内部テンプレート（`/api/thumb`）。アイコン画像資産は後回し |
+| thumbnail_url 方式 | 内部テンプレート（`/api/thumb`）+ `public/thumbs/icons` の主要タグアイコン。未登録タグはラベル生成 fallback |
+| tag 昇格時の icon_pending | `/admin/tags` で normalized key と ready/pending を表示。昇格 API / admin_operation_logs に `hasThumbnailAsset` を残す |
+| thumbnail パーツ文字 | 不採用。tag 文字は UI 本体ですでに見えているため、thumbnail は icon-only / image-only を維持する |
+| thumbnail fallback 基準 | 登録済み icon が 0 件なら `thumbnail_url` を作らず、既存の `thumbnail_emoji` fallback を優先する |
+| 旧 thumbnail_url 互換 | 既存 DB に残る旧 `/api/thumb` URL は無効化せず、decoder 側で glyph fallback 描画して 400 を避ける |
 | Topic Group スキーマ | migration 035 で `topic_group_id`, `topic_groups` テーブル追加済み。値は NULL のまま |

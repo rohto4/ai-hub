@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 
 type TagCandidate = {
   tagKey: string
+  normalizedTagKey: string
   displayName: string
   seenCount: number
   reviewStatus: string
@@ -11,6 +12,7 @@ type TagCandidate = {
   lastSeenAt: string
   originTitle: string | null
   originSnippet: string | null
+  hasThumbnailAsset: boolean
 }
 
 type ViewTab = 'candidate' | 'manual_review'
@@ -61,9 +63,19 @@ export function AdminTagsClient({ initialCandidates }: { initialCandidates: TagC
     try {
       const res = await callTagApi({ action: 'promote', tagKey: candidate.tagKey, displayName })
       if (res.ok) {
-        const data = (await res.json()) as { taggedEnrichedCount?: number; taggedPublicCount?: number }
+        const data = (await res.json()) as {
+          taggedEnrichedCount?: number
+          taggedPublicCount?: number
+          normalizedTagKey?: string
+          hasThumbnailAsset?: boolean
+        }
         removeFromList(candidate.tagKey)
-        alert(`昇格完了！\n関連記事にタグ付け: L2 ${data.taggedEnrichedCount ?? 0}件 / 公開 ${data.taggedPublicCount ?? 0}件`)
+        const assetLine = data.hasThumbnailAsset
+          ? 'サムネイル資産: 登録済み'
+          : `サムネイル資産: icon_pending（${data.normalizedTagKey ?? candidate.normalizedTagKey}）`
+        alert(
+          `昇格完了！\n関連記事にタグ付け: L2 ${data.taggedEnrichedCount ?? 0}件 / 公開 ${data.taggedPublicCount ?? 0}件\n${assetLine}`,
+        )
       } else {
         alert('昇格に失敗しました')
       }
@@ -118,6 +130,20 @@ export function AdminTagsClient({ initialCandidates }: { initialCandidates: TagC
                 <p className="text-gray-500 text-xs mt-0.5">
                   出現 {candidate.seenCount} 回 · 初出 {new Date(candidate.firstSeenAt).toLocaleDateString('ja-JP')} · 最終 {new Date(candidate.lastSeenAt).toLocaleDateString('ja-JP')}
                 </p>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center rounded-full border border-gray-700 px-2 py-0.5 text-[11px] text-gray-300">
+                    正規化 key: {candidate.normalizedTagKey}
+                  </span>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] ${
+                      candidate.hasThumbnailAsset
+                        ? 'border border-emerald-800 bg-emerald-950/60 text-emerald-300'
+                        : 'border border-amber-800 bg-amber-950/60 text-amber-300'
+                    }`}
+                  >
+                    {candidate.hasThumbnailAsset ? 'thumbnail ready' : 'icon_pending'}
+                  </span>
+                </div>
               </div>
               {/* 表示名入力 */}
               <input

@@ -85,7 +85,11 @@
       "Bash(winget list:*)",
       "Bash(wc:*)",
       "Bash(grep -rn \"^[[:space:]]*//\" G:/devwork/ai-summary/src --include=\"*.ts\" --include=\"*.tsx\")",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(npx tsx:*)",
+      "Bash(grep -rn description= G:/devwork/ai-summary/src/app/ranking/page.tsx G:/devwork/ai-summary/src/app/search/page.tsx G:/devwork/ai-summary/src/app/tags/page.tsx G:/devwork/ai-summary/src/app/tags/[tagKey]/page.tsx G:/devwork/ai-summary/src/app/articles/[publicKey]/page.tsx G:/devwork/ai-summary/src/app/digest/page.tsx G:/devwork/ai-summary/src/app/category/[slug]/page.tsx)",
+      "Bash(grep -n \"topRated\\\\|注目\\\\|top_rated\" G:/devwork/ai-summary/src/app/page.tsx G:/devwork/ai-summary/src/components/home/*.tsx)",
+      "Bash(grep -rn \"searchDraft\\\\|setSearchDraft\\\\|handleSearchSubmit\\\\|SearchInput\\\\|search.*input\" G:/devwork/ai-summary/src/app/page.tsx G:/devwork/ai-summary/src/components/home/*.tsx)"
     ]
   }
 }

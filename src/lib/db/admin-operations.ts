@@ -1,4 +1,5 @@
 import { getSql } from '@/lib/db'
+import { hasThumbnailTagRegistryEntry } from '@/lib/publish/thumbnail-tag-registry'
 
 type LogOptions = {
   operatorId?: string
@@ -64,6 +65,7 @@ export async function listTagCandidates(
   status: TagCandidateStatus = 'candidate',
 ): Promise<Array<{
   tagKey: string
+  normalizedTagKey: string
   displayName: string
   seenCount: number
   reviewStatus: string
@@ -71,6 +73,7 @@ export async function listTagCandidates(
   lastSeenAt: string
   originTitle: string | null
   originSnippet: string | null
+  hasThumbnailAsset: boolean
 }>> {
   const sql = getSql()
   const rows = (await sql`
@@ -101,6 +104,7 @@ export async function listTagCandidates(
   }>
   return rows.map((row) => ({
     tagKey: row.tag_key,
+    normalizedTagKey: normalizeTagKey(row.tag_key),
     displayName: row.display_name,
     seenCount: Number(row.seen_count),
     reviewStatus: row.review_status,
@@ -108,6 +112,7 @@ export async function listTagCandidates(
     lastSeenAt: row.last_seen_at,
     originTitle: row.origin_title,
     originSnippet: row.origin_snippet,
+    hasThumbnailAsset: hasThumbnailTagRegistryEntry(normalizeTagKey(row.tag_key)),
   }))
 }
 
@@ -126,11 +131,17 @@ export async function setTagCandidateStatus(
 export async function promoteTagToMaster(
   tagKey: string,
   displayName: string,
-): Promise<{ tagId: string; taggedEnrichedCount: number; taggedPublicCount: number }> {
+): Promise<{
+  tagId: string
+  normalizedTagKey: string
+  taggedEnrichedCount: number
+  taggedPublicCount: number
+  hasThumbnailAsset: boolean
+}> {
   const sql = getSql()
 
   // スペースをハイフンに正規化（URL-safe な tag_key にする）
-  const normalizedKey = tagKey.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+  const normalizedKey = normalizeTagKey(tagKey)
 
   // tags_master に昇格
   const rows = (await sql`
@@ -195,9 +206,18 @@ export async function promoteTagToMaster(
 
   return {
     tagId,
+    normalizedTagKey: normalizedKey,
     taggedEnrichedCount: enrichedResult.length,
     taggedPublicCount: publicResult.length,
+    hasThumbnailAsset: hasThumbnailTagRegistryEntry(normalizedKey),
   }
+}
+
+function normalizeTagKey(tagKey: string): string {
+  return tagKey
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
 }
 
 export async function addTagKeyword(tagId: string, keyword: string): Promise<void> {

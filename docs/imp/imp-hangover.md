@@ -60,6 +60,11 @@
 21. `HomeStats` に jaCount / enCount 追加
 22. `/api/home` に ranked セクション追加
 23. 全ページの dev-mode description を本番テキストに修正
+24. `thumbnail_url` 用の主要タグアイコン資産を追加し、`/api/thumb` 描画へ反映
+25. `/admin/tags` に `icon_pending` 可視化を追加し、昇格レスポンスと操作ログへサムネイル資産有無を記録
+26. サムネイルのタグパーツを文字なしの icon-only 合成へ変更し、外部 SVG 参照をやめて inline data URL 描画へ変更
+27. `thumbnail_url` に version query を付けて immutable cache を切り、icon 未登録記事は robot emoji fallback へ戻す
+28. `db:backfill-thumbnail-urls` を追加し、既存 `thumbnail_url` を AI なしで再計算して `public_articles` まで再同期
 
 ### 16.4 稼働中バッチ（GitHub Actions）
 
@@ -82,8 +87,6 @@
 
 | タスク | 優先 | 備考 |
 |---|---|---|
-| `docs/spec/04-data-model-and-sql.md` に migration 035/036 を反映 | 低 | schema の記録のみ |
-| `thumbnail_url` のアイコン画像資産（SVG/PNG） | 低 | UI改善フェーズで |
 | `compute-ranks` 係数を実データで調整 | 低 | アクティビティ蓄積後 |
 | Topic Group 本実装 | 後回し | pgvector 前提 |
 

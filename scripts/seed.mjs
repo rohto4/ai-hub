@@ -30,7 +30,7 @@ const sourceTargets = [
     fetchKind: 'rss',
     sourceCategory: 'llm',
     sourceType: 'official',
-    baseUrl: 'https://blog.google/technology/ai/rss/',
+    baseUrl: 'https://blog.google/innovation-and-ai/technology/ai/rss/',
     contentAccessPolicy: 'fulltext_allowed',
   },
   {
@@ -42,6 +42,7 @@ const sourceTargets = [
     sourceType: 'official',
     baseUrl: 'https://www.anthropic.com/news/rss.xml',
     contentAccessPolicy: 'fulltext_allowed',
+    isActive: false,
   },
   {
     id: '6d6f7c02-1a1b-41d1-a111-000000000105',

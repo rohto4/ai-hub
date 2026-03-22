@@ -9,6 +9,14 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-23 | done | hourly-fetch の継続失敗 2 件を切り分けて修正 | google-ai-blog は RSS object 混在を collector 側で吸収し 20件取得確認、anthropic-news は feed 404 のため停止・seed も inactive 化
+- 2026-03-22 | done | thumbnail_url backfill を追加して実 DB へ再反映 | db:backfill-thumbnail-urls で articles_enriched 3424件更新、public_articles 1908件同期
+- 2026-03-22 | done | 旧 /api/thumb URL の 400 を解消 | icon 未登録タグだけの旧 query でも glyph fallback 描画にして後方互換を維持
+- 2026-03-22 | done | サムネイルの旧キャッシュ残留と弱い icon 合成を是正 | /api/thumb URL に version を追加、registered icon 0件は thumbnail_emoji fallback に戻す
+- 2026-03-22 | done | サムネイルを文字なし icon-only 合成へ変更 | /api/thumb を inline SVG アイコン描画へ切替、1/2/3/overflow レイアウトを四角内に再配置
+- 2026-03-22 | done | タグ昇格時の icon_pending 可視化を追加 | /admin/tags に normalized key と ready/pending を表示し、promote API / admin logs に hasThumbnailAsset を追加
+- 2026-03-22 | done | thumbnail 用の主要タグアイコン資産を追加 | public/thumbs/icons を追加し、thumbnail-tag-registry と /api/thumb 描画を更新
+- 2026-03-22 | done | spec に migration 035/036 の schema 反映を追記 | 04-data-model-and-sql.md と implementation-plan/checklist/hangover を同期更新
 - 2026-03-22 | done | 設計書類を最新化してコミット・プッシュ | data-flow.md / imp-hangover.md / agents-task-status.md を更新
 - 2026-03-22 | done | daily-tag-dedup にマージ時の遡及タグ付けを追加 | L2/L4 両方に ILIKE 遡及 INSERT を追加
 - 2026-03-22 | done | 日次タグ重複検出ジョブ（daily-tag-dedup）を追加 | Gemini で候補↔既存タグを照合・自動統合・遡及タグ付け・GHA 02:30 UTC

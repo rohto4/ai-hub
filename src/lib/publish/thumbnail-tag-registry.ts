@@ -1,27 +1,30 @@
-type ThumbnailTagRegistryEntry = {
-  shortLabel: string
+export type ThumbnailTagRegistryEntry = {
   accentColor: string
-  accentTextColor?: string
+  iconPath?: string
+  highQualityAssetPath?: string
 }
 
 const REGISTRY: Record<string, ThumbnailTagRegistryEntry> = {
-  'gpt-5': { shortLabel: 'GPT', accentColor: '#111827', accentTextColor: '#ffffff' },
-  chatgpt: { shortLabel: 'GPT', accentColor: '#111827', accentTextColor: '#ffffff' },
-  openai: { shortLabel: 'OPENAI', accentColor: '#0f766e', accentTextColor: '#ffffff' },
-  gemini: { shortLabel: 'GEMINI', accentColor: '#2563eb', accentTextColor: '#ffffff' },
-  claude: { shortLabel: 'CLAUDE', accentColor: '#b45309', accentTextColor: '#ffffff' },
-  anthropic: { shortLabel: 'ANTHROPIC', accentColor: '#92400e', accentTextColor: '#ffffff' },
-  google: { shortLabel: 'GOOGLE', accentColor: '#1d4ed8', accentTextColor: '#ffffff' },
-  'google-ai': { shortLabel: 'GOOGLE', accentColor: '#1d4ed8', accentTextColor: '#ffffff' },
-  llama: { shortLabel: 'LLAMA', accentColor: '#7c3aed', accentTextColor: '#ffffff' },
-  cursor: { shortLabel: 'CURSOR', accentColor: '#475569', accentTextColor: '#ffffff' },
-  rag: { shortLabel: 'RAG', accentColor: '#047857', accentTextColor: '#ffffff' },
-  agent: { shortLabel: 'AGENT', accentColor: '#dc2626', accentTextColor: '#ffffff' },
-  'coding-ai': { shortLabel: 'CODE', accentColor: '#7c2d12', accentTextColor: '#ffffff' },
-  safety: { shortLabel: 'SAFE', accentColor: '#1e3a8a', accentTextColor: '#ffffff' },
-  policy: { shortLabel: 'POLICY', accentColor: '#4338ca', accentTextColor: '#ffffff' },
-  'voice-ai': { shortLabel: 'VOICE', accentColor: '#be185d', accentTextColor: '#ffffff' },
-  paper: { shortLabel: 'PAPER', accentColor: '#0f172a', accentTextColor: '#ffffff' },
+  'gpt-5': { accentColor: '#111827', iconPath: '/thumbs/icons/gpt.svg', highQualityAssetPath: '/thumbs/assets/gpt-5.png' },
+  chatgpt: { accentColor: '#111827', iconPath: '/thumbs/icons/gpt.svg', highQualityAssetPath: '/thumbs/assets/chatgpt.png' },
+  openai: { accentColor: '#0f766e', iconPath: '/thumbs/icons/openai.svg', highQualityAssetPath: '/thumbs/assets/openai.png' },
+  gemini: { accentColor: '#2563eb', iconPath: '/thumbs/icons/gemini.svg', highQualityAssetPath: '/thumbs/assets/gemini.png' },
+  claude: { accentColor: '#b45309', iconPath: '/thumbs/icons/claude.svg', highQualityAssetPath: '/thumbs/assets/claude.png' },
+  anthropic: { accentColor: '#92400e', iconPath: '/thumbs/icons/anthropic.svg', highQualityAssetPath: '/thumbs/assets/anthropic.png' },
+  google: { accentColor: '#1d4ed8', iconPath: '/thumbs/icons/google.svg', highQualityAssetPath: '/thumbs/assets/google-ai.png' },
+  'google-ai': { accentColor: '#1d4ed8', iconPath: '/thumbs/icons/google.svg', highQualityAssetPath: '/thumbs/assets/google-ai.png' },
+  llama: { accentColor: '#7c3aed', iconPath: '/thumbs/icons/llama.svg', highQualityAssetPath: '/thumbs/assets/llama.png' },
+  cursor: { accentColor: '#475569', iconPath: '/thumbs/icons/cursor.svg' },
+  rag: { accentColor: '#047857', iconPath: '/thumbs/icons/rag.svg', highQualityAssetPath: '/thumbs/assets/rag.png' },
+  agent: { accentColor: '#dc2626', iconPath: '/thumbs/icons/agent.svg', highQualityAssetPath: '/thumbs/assets/agent.png' },
+  'coding-ai': { accentColor: '#7c2d12', iconPath: '/thumbs/icons/code.svg', highQualityAssetPath: '/thumbs/assets/coding-ai.png' },
+  safety: { accentColor: '#1e3a8a', iconPath: '/thumbs/icons/safety.svg', highQualityAssetPath: '/thumbs/assets/safety.png' },
+  policy: { accentColor: '#4338ca', iconPath: '/thumbs/icons/policy.svg' },
+  'voice-ai': { accentColor: '#be185d', iconPath: '/thumbs/icons/voice.svg' },
+  paper: { accentColor: '#0f172a', iconPath: '/thumbs/icons/paper.svg', highQualityAssetPath: '/thumbs/assets/paper.png' },
+  llm: { accentColor: '#0369a1', highQualityAssetPath: '/thumbs/assets/llm.png' },
+  huggingface: { accentColor: '#d97706', highQualityAssetPath: '/thumbs/assets/huggingface.png' },
+  nvidia: { accentColor: '#15803d', highQualityAssetPath: '/thumbs/assets/nvidia.png' },
 }
 
 function normalizeTagKey(tagKey: string): string {
@@ -37,16 +40,6 @@ function hashString(value: string): number {
   return hash >>> 0
 }
 
-function makeShortLabel(tagKey: string): string {
-  const tokens = tagKey
-    .split(/[^a-zA-Z0-9]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((token) => token.slice(0, token.length <= 4 ? token.length : 3).toUpperCase())
-
-  return tokens.join(' ').slice(0, 10) || tagKey.slice(0, 6).toUpperCase()
-}
-
 export function resolveThumbnailTagRegistryEntry(tagKey: string): ThumbnailTagRegistryEntry | null {
   const normalized = normalizeTagKey(tagKey)
   if (REGISTRY[normalized]) {
@@ -55,9 +48,7 @@ export function resolveThumbnailTagRegistryEntry(tagKey: string): ThumbnailTagRe
 
   const hue = hashString(normalized) % 360
   return {
-    shortLabel: makeShortLabel(normalized),
     accentColor: `hsl(${hue} 60% 42%)`,
-    accentTextColor: '#ffffff',
   }
 }
 
@@ -67,4 +58,8 @@ export function hasThumbnailTagRegistryEntry(tagKey: string): boolean {
 
 export function listThumbnailTagRegistryKeys(): string[] {
   return Object.keys(REGISTRY)
+}
+
+export function listThumbnailPendingTagKeys(tagKeys: string[]): string[] {
+  return [...new Set(tagKeys.map(normalizeTagKey).filter((tagKey) => REGISTRY[tagKey] === undefined))]
 }

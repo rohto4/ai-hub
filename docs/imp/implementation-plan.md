@@ -157,6 +157,18 @@ monthly-public-archive（月次）
    - 未登録なら `icon_pending` として記録
    - 後続の資産追加対象として残す
 
+現行実装:
+
+1. `/admin/tags` 一覧に `normalizedTagKey` と `icon_pending` / `thumbnail ready` を表示する
+2. tag 昇格 API は `hasThumbnailAsset` をレスポンスと `admin_operation_logs` に含める
+3. 未登録タグでも昇格は止めず、`thumbnail-tag-registry.ts` の抽象 glyph fallback で publish 継続する
+4. 主要タグは文字チップではなく icon-only パーツとして描画する
+5. `/api/thumb` の SVG は外部画像参照ではなく、インライン data URL でアイコンを埋め込む
+6. 既存 URL の immutable cache に引っかからないよう、テンプレ更新時は `thumbnail_url` に version query を含める
+7. 登録済み icon が 1 つも無い記事は、無理に glyph を並べず `thumbnail_emoji` fallback を優先する
+8. ただし既存 DB に残る旧 `/api/thumb` URL は 400 にせず、decoder 側で glyph fallback 描画して後方互換を維持する
+9. 既存記事の見た目を変えるときは `npm run db:backfill-thumbnail-urls` で `articles_enriched` / `public_articles` を再同期する
+
 将来の自動化:
 
 1. `daily-tag-promote` 実装時に、昇格タグを `thumbnail asset review queue` に積む
@@ -168,7 +180,7 @@ monthly-public-archive（月次）
 #### B-5. 初期実装の割り切り
 
 1. まずは主要タグだけアイコンを用意する
-2. アイコンがないタグはテキストチップ化、または `thumbnail_emoji` にフォールバックする
+2. アイコンがないタグは抽象 glyph、または `thumbnail_emoji` にフォールバックする
 3. 外部画像取得は後回し
 4. 画像欠落時でも一覧崩れしないことを優先する
 5. タグ昇格時に即画像が無くても publish を止めない
@@ -262,6 +274,13 @@ monthly-public-archive（月次）
 
 ### 次フェーズで実装するもの
 
+- **高品質サムネイル（Gemini 生成アセット）の導入**
+  - **背景**: 現状の SVG 合成サムネイルを、Gemini で生成した高品質な 3D 風アセットベースの「映える」デザインへ昇華させる。
+  - **アセット管理**: `tags_master` に `icon_asset_path` を追加し、タグごとの高品質透過画像を管理する。
+  - **レイヤー合成**: 背景テクスチャ + 高品質アイコン + グラスモーフィズム等のエフェクトを重ね合わせたリッチな合成ロジック（`thumbnail-template.ts`）を実装する。
+  - **生成運用**: Gemini CLI を活用し、タグに基づいた画像生成プロンプトを自動作成して週次でアセットを拡充する運用フローを構築する。
+  - **パフォーマンス**: 実行時は静的アセットの単純な重ね合わせ（またはインライン data URL 埋め込み）に限定し、ブラウザでの描画速度を維持する。
+
 - **Topic Group（`/topics/:id`）**
   - pgvector embedding 生成バッチ → 既存記事への backfill（$0.02 程度）
   - HNSW インデックス（migration）
@@ -278,8 +297,11 @@ monthly-public-archive（月次）
   - `/api/actions` の meta は `Record<string, unknown>` で受け取り済み、フロント側の送信のみ追加
 
 - **thumbnail アイコン画像資産**
-  - 主要タグ用 SVG/PNG を `public/thumbs/icons/` に追加
-  - `thumbnail-tag-registry.ts` を更新して実際の画像を参照する
+  - 主要タグ用 SVG を `public/thumbs/icons/` に追加済み
+  - `thumbnail-tag-registry.ts` は実画像参照へ更新済み
+  - 未登録タグは registry fallback のラベル生成で継続運用
+  - `/admin/tags` で `icon_pending` を可視化済み
+  - `db:backfill-thumbnail-urls` で既存 `thumbnail_url` を AI なしで再計算・再反映できる
 
 - **critique UI の有効化**
   - `daily-enrich` 側で critique 生成を有効化（コスト・品質確認後）
@@ -322,6 +344,25 @@ monthly-public-archive（月次）
    - 何件統合されたかを Slack や管理画面ダッシュボードに出す
    - 現状: `/admin/jobs` で確認できるが、まとめ数字がない
 
+## 4.2 2026-03-22 Deep Search 参照元
+
+サムネイルの icon-only 化に着手する前に、以下を参考元として固定した。
+
+1. Apple WWDC25 `Say hello to the new look of app icons`
+   - layered / translucency / breathing room / rounder corners / bold line weight を採用
+   - https://developer.apple.com/videos/play/wwdc2025/220/
+2. Apple WWDC20 `Design great widgets`
+   - small surface では情報量を絞る、ロゴや word mark を増やしすぎない、concentric な余白を保つ
+   - https://developer.apple.com/kr/videos/play/wwdc2020/10103/
+3. MDN `SVG as an image`
+   - SVG を image context で使う場合、外部 resource 参照に制約があるため data URL / inline 化を優先
+   - https://developer.mozilla.org/en-US/docs/Web/SVG/Guides/SVG_as_an_image
+4. elementary HIG `Iconography`
+   - 過度に複雑にしない、transparent element を使う、thin すぎる icon を避ける
+   - https://docs.elementary.io/hig/reference/iconography
+5. Linear / Dribbble の card / icon-stack 表現
+   - 小面積の中では文字より layered icon composition の方が情報が濁りにくい、という参考として扱う
+
 ---
 
 ## 5. 変更しないもの
@@ -360,14 +401,13 @@ monthly-public-archive（月次）
 
 ### 未着手・後回し
 
-1. `thumbnail_url` のアイコン画像資産（主要タグ SVG/PNG）を用意する
-2. `compute-ranks` 係数を実アクティビティデータで点検・調整する
-3. Topic Group 本実装（pgvector 前提、別フェーズ）
-4. `docs/spec/04-data-model-and-sql.md` に migration 035/036 分を反映する
+1. `compute-ranks` 係数を実アクティビティデータで点検・調整する
+2. Topic Group 本実装（pgvector 前提、別フェーズ）
 
 ### 完了済み（再実装不要）
 
 - `content_language`・`thumbnail_url`・日本語ソース seed
+- `thumbnail_url` の主要タグアイコン資産（`public/thumbs/icons` + registry 参照）
 - cron 分離・L4 月次アーカイブ
 - `public_article_sources` バグ修正
 - admin Phase 3・OGP・sitemap・robots

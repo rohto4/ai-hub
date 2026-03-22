@@ -104,13 +104,21 @@
 - [x] 未登録タグが来ても publish を止めず、`thumbnail_emoji` にフォールバックする
 - [x] `hourly-publish` で `public_articles.thumbnail_url` を解決・保存する
 - [x] 画像を解決できない記事は `thumbnail_emoji` に確実にフォールバックする
-- [ ] タグ用アイコン SVG/PNG 画像資産を主要タグ分用意する（後回し）
+- [x] タグ用アイコン SVG を主要タグ分用意する（`public/thumbs/icons`）
 - [ ] 1タグ / 2タグ / 3タグ / 4件以上でレイアウトルールを実画像で実装する（後回し）
 
-#### A-5.1 タグ昇格時の画像資産フロー（未着手）
+#### A-5.1 タグ昇格時の画像資産フロー（部分完了）
 
-- [ ] tag 昇格時に registry 登録有無を確認するフローを定義する
+- [x] tag 昇格時に registry 登録有無を確認するフローを定義する
+- [x] 管理画面で `icon_pending` を見えるようにする
 - [ ] 後からアイコン追加したタグの `thumbnail_url` 再計算方針を決める
+
+#### A-5.2 `thumbnail_url` 再反映運用（完了）
+
+- [x] AI を使わずに `thumbnail_url` を再計算できる backfill スクリプトを追加する
+- [x] `articles_enriched.thumbnail_url` を既存タグと本文情報から再計算する
+- [x] `public_articles.thumbnail_url` を `articles_enriched` から再同期する
+- [x] `db:backfill-thumbnail-urls` 実行手順を package script に追加する
 
 #### A-6. Phase A 検証（完了）
 
@@ -232,7 +240,7 @@
 - [x] `docs/imp/imp-status.md` を更新する
 - [x] `docs/imp/imp-hangover.md` に未解決項目と再開点を残す
 - [x] `docs/imp/data-flow.md` を最新化する
-- [ ] `docs/spec/04-data-model-and-sql.md` に追加カラムの反映を行う（migration 035/036 分）
+- [x] `docs/spec/04-data-model-and-sql.md` に追加カラムの反映を行う（migration 035/036 分）
 
 ---
 
@@ -250,8 +258,8 @@
 
 ## 8. 残タスク（次フェーズ）
 
-- [ ] `docs/spec/04-data-model-and-sql.md` に migration 035/036 分の追加カラムを反映する
-- [ ] `thumbnail_url` のアイコン画像資産を主要タグ分用意する（UI改善フェーズで）
+- [x] `docs/spec/04-data-model-and-sql.md` に migration 035/036 分の追加カラムを反映する
+- [x] `thumbnail_url` のアイコン画像資産を主要タグ分用意する（`public/thumbs/icons`）
 - [ ] `compute-ranks` 係数を実アクティビティデータで点検・調整する
 - [ ] Topic Group 本実装（pgvector 前提、別フェーズ）
 - [ ] `push_subscriptions.genres` カラム名変更（Human-in-the-Loop 対象）

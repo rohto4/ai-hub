@@ -11,14 +11,14 @@ const parser = new Parser({
 type RssItem = {
   guid?: string
   id?: string
-  link?: string
-  title?: string
-  creator?: string
-  author?: string
+  link?: unknown
+  title?: unknown
+  creator?: unknown
+  author?: unknown
   pubDate?: string
   isoDate?: string
-  contentSnippet?: string
-  content?: string
+  contentSnippet?: unknown
+  content?: unknown
   categories?: string[]
 }
 
@@ -31,12 +31,27 @@ function parseDate(value: string | undefined): string | null {
   return Number.isNaN(date.getTime()) ? null : date.toISOString()
 }
 
-function normalizeText(value: string | undefined): string | null {
-  if (!value) {
+function normalizeText(value: unknown): string | null {
+  if (value == null) {
     return null
   }
 
-  const normalized = decodeAndNormalizeText(value)
+  const raw =
+    typeof value === 'string'
+      ? value
+      : typeof value === 'number' || typeof value === 'boolean'
+        ? String(value)
+        : Array.isArray(value)
+          ? value.filter((entry) => typeof entry === 'string').join(' ')
+          : typeof value === 'object' && '#' in value && typeof value['#'] === 'string'
+            ? value['#']
+            : null
+
+  if (!raw) {
+    return null
+  }
+
+  const normalized = decodeAndNormalizeText(raw)
   return normalized ? normalized : null
 }
 
@@ -46,7 +61,17 @@ export const rssCollector: Collector = {
       throw new Error(`base_url is required for RSS collector: ${sourceTarget.sourceKey}`)
     }
 
-    const feed = await parser.parseURL(sourceTarget.baseUrl)
+    const response = await fetch(sourceTarget.baseUrl, {
+      headers: { 'User-Agent': 'AITrendHub/1.0 (+https://aitrend.hub)' },
+      redirect: 'follow',
+    })
+
+    if (!response.ok) {
+      throw new Error(`Status code ${response.status}`)
+    }
+
+    const feedXml = await response.text()
+    const feed = await parser.parseString(feedXml)
 
     const items = (feed.items as RssItem[]).flatMap((item) => {
         const sourceUrl = normalizeText(item.link ?? item.guid ?? item.id)
@@ -71,7 +96,7 @@ export const rssCollector: Collector = {
           sourceAuthor: normalizeText(item.creator ?? item.author),
           sourceMeta: {
             feedTitle: feed.title ?? null,
-            feedLink: feed.link ?? sourceTarget.baseUrl,
+            feedLink: feed.link ?? response.url ?? sourceTarget.baseUrl,
             feedOriginalLink: item.link ?? item.guid ?? item.id ?? null,
             categories: item.categories ?? [],
           },
