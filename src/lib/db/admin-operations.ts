@@ -86,6 +86,7 @@ export async function listTagCandidates(
     FROM tag_candidate_pool tcp
     LEFT JOIN articles_raw ar ON ar.raw_article_id = tcp.latest_origin_raw_id
     WHERE tcp.review_status = ${status}
+      AND tcp.seen_count > 10
     ORDER BY tcp.seen_count DESC, tcp.last_seen_at DESC
     LIMIT ${limit}
   `) as Array<{
