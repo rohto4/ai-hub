@@ -1,6 +1,6 @@
 # Agents Task Status
 
-最終更新: 2026-03-21 夜（自律実装セッション）
+最終更新: 2026-03-22
 
 運用ルール:
 - 新しい行を上に積む
@@ -9,6 +9,16 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-22 | done | 設計書類を最新化してコミット・プッシュ | data-flow.md / imp-hangover.md / agents-task-status.md を更新
+- 2026-03-22 | done | daily-tag-dedup にマージ時の遡及タグ付けを追加 | L2/L4 両方に ILIKE 遡及 INSERT を追加
+- 2026-03-22 | done | 日次タグ重複検出ジョブ（daily-tag-dedup）を追加 | Gemini で候補↔既存タグを照合・自動統合・遡及タグ付け・GHA 02:30 UTC
+- 2026-03-22 | done | タグ候補を固有名詞限定・閾値 >= 4・STOPWORDS 拡充 | 5304件から 2500超を棄却、system/context/hugging 等を除去
+- 2026-03-22 | done | タグ昇格を AI 固有名詞抽出に切り替え | enrich プロンプトに properNounTags を追加、cleanup-tag-candidates.ts で既存洗い直し
+- 2026-03-22 | done | タグ昇格時の tag_key を URL-safe に正規化（スペース→ハイフン） | nano banana → nano-banana
+- 2026-03-22 | done | タグレビュー文脈表示・保留・棄却・候補に戻す を追加 | AdminTagsClient 全面改善、origin 記事タイトル+スニペット表示
+- 2026-03-22 | done | タグ昇格時に根拠記事へ自動タグ付け | L2/L4 への ILIKE 遡及 INSERT、tag_keywords 自動登録
+- 2026-03-22 | done | ジョブログ管理画面（/admin/jobs）を追加 | 失敗 item 詳細・metadata 展開、compute-ranks を job_runs に追加
+- 2026-03-22 | done | en 記事タイトルの日本語翻訳修正 + 1622 件バックフィル | enrich プロンプトに titleJa 追加、backfill-ja-titles.ts で更新
 - 2026-03-21 夜 | done | 最終仕上げ（OGP/sitemap/robots/description/stats/ranked） | OGP API・sitemap.xml・robots.txt・About/各ページ description 修正・HomeStats 言語カウント追加・/api/home に ranked セクション追加、全 build OK
 - 2026-03-21 夜 | done | admin Phase 3 一式を実装 | /admin UI (login/articles/tags/sources)・ADMIN_SECRET 認証・hide_article・タグ昇格・is_active ON/OFF・admin_operation_logs 記録、build OK
 - 2026-03-21 夜 | done | hasDatabaseColumn 二重クエリを廃止し content_language を常に取得 | public-search/tags/detail/listings/rankings の 5 ファイル簡略化、行数 -302

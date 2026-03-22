@@ -482,29 +482,39 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 2. `public_articles_history` は age-out 履歴を保持する
 3. `compute-ranks` は publish 後続 step のまま。ただし timeout 再発時は分離を検討する
 
-### 解決済み（2026-03-21 夜 自律実装セッション）
+### 解決済み（2026-03-21〜22 セッション）
 
-1. `public_article_sources` bigint 型バグ修正・全件バックフィル実施
-   - 2件 → 2504件 に回復
-   - `scripts/backfill-public-article-sources.ts` 追加済み
-2. `compute-ranks` 最適化（全件1回読み込み + 4window 並列 upsert）
-3. admin Phase 3 実装済み
-   - `/admin/login`, `/admin`, `/admin/articles`, `/admin/tags`, `/admin/sources`
-   - `ADMIN_SECRET` 認証（cookie + API header）
-   - `hide_article` / `unhide`, タグ昇格, `is_active` ON/OFF
-   - `admin_operation_logs` 記録
-4. `content_language` を全公開 API に通した（hasDatabaseColumn 二重クエリ廃止）
-5. action_type マッピングが正式仕様通りであることを確認済み
+1. `public_article_sources` bigint 型バグ修正・全件バックフィル（2件→2504件）
+2. `compute-ranks` 最適化（1回読み込み + 4window 並列 upsert）
+3. admin Phase 3 全体
+   - `/admin/login`, `/admin`, `/admin/articles`, `/admin/tags`, `/admin/sources`, `/admin/jobs`
+   - `ADMIN_SECRET` 認証・`hide_article`・タグ昇格・`is_active` ON/OFF
+   - ジョブログ画面（`/admin/jobs`）: 失敗 item の詳細・metadata を展開表示
+4. `content_language` を全公開 API に通した（hasDatabaseColumn 廃止）
+5. en ソース記事タイトルの日本語翻訳修正
+   - enrich プロンプトに `titleJa` / `properNounTags` を追加
+   - 既存 1622 件を `backfill-ja-titles.ts` で翻訳・更新済み
+6. OGP 画像 API（`/api/og`）+ 記事詳細 `generateMetadata` 追加
+7. sitemap.xml + robots.txt 追加
+8. タグシステム全面改善
+   - タグ候補を固有名詞（CamelCase・全大文字・非文頭大文字）に限定
+   - enrich の properNounTags で AI 抽出に切り替え
+   - `daily-tag-dedup` 日次バッチ追加（Gemini で候補と既存タグを照合 → 自動統合 + 遡及タグ付け）
+   - 昇格時に `tag_key` をハイフン正規化（URL-safe）
+   - タグレビュー UI: 文脈表示・保留・棄却・候補に戻す
+   - 昇格時の遡及タグ付け（L2/L4 両方）
+   - 既存候補 5304件から 2500件超を棄却（STOPWORDS 拡充）
+9. `HomeStats` に jaCount / enCount 追加
+10. `/api/home` に ranked セクション追加
+11. 各ページの dev-mode description を本番テキストに修正
 
 ### 残り未解決
 
-1. Topic Group 本実装（pgvector 前提）
-2. OGP 本実装（`/api/og` は実装済み、`summary_large_image` 設定のみ）
+1. Topic Group 本実装（pgvector 前提、後回し）
+2. `tags_master` のエイリアス追加 UI（現状 SQL 直接）
 
-### 次セッション（merge 後）の確認事項
+### 次セッションの確認事項
 
-1. `dev-default` → `main` merge
-2. Vercel の production が最新 commit を拾っているか
-3. Vercel に `ADMIN_SECRET` env var を追加する
-4. GitHub Actions の最新 run で fetch / enrich / publish / compute-ranks を確認
-5. `/admin/login` で動作確認（ADMIN_SECRET でログイン）
+1. `daily-tag-dedup` の初回 Actions 実行結果を `/admin/jobs` で確認
+2. タグ候補の AI 抽出（properNounTags）が正常に機能しているか enrich ログで確認
+3. `push_subscriptions.genres` カラム名変更（未対応・Human-in-the-Loop 対象）
