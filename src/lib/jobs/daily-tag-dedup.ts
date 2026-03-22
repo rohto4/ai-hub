@@ -68,12 +68,50 @@ export async function runDailyTagDedup(): Promise<TagDedupResult> {
 
         for (const result of results) {
           if (result.matchedTagId && result.confidence === 'high') {
-            // 既存タグに candidate_key をキーワードとして登録
+            const keyword = `%${result.candidateKey}%`
+
+            // 既存タグに candidate_key をキーワードとして登録（将来の enrich 用）
             await sql`
               INSERT INTO tag_keywords (tag_id, keyword)
               VALUES (${result.matchedTagId}::uuid, ${result.candidateKey})
               ON CONFLICT (tag_id, keyword) DO NOTHING
             `
+
+            // 既存 articles_enriched への遡及タグ付け
+            await sql`
+              INSERT INTO articles_enriched_tags (enriched_article_id, tag_id, is_primary, tag_source)
+              SELECT ae.enriched_article_id, ${result.matchedTagId}::uuid, false, 'candidate_promoted'
+              FROM articles_enriched ae
+              WHERE ae.ai_processing_state = 'completed'
+                AND (
+                  ae.title        ILIKE ${keyword}
+                  OR ae.summary_100 ILIKE ${keyword}
+                  OR ae.summary_200 ILIKE ${keyword}
+                )
+              ON CONFLICT (enriched_article_id, tag_id) DO NOTHING
+            `
+
+            // 公開済み public_articles への遡及タグ付け
+            await sql`
+              INSERT INTO public_article_tags (public_article_id, tag_id, sort_order)
+              SELECT
+                pa.public_article_id,
+                ${result.matchedTagId}::uuid,
+                COALESCE(
+                  (SELECT MAX(sort_order) + 1 FROM public_article_tags WHERE public_article_id = pa.public_article_id),
+                  0
+                )
+              FROM public_articles pa
+              JOIN articles_enriched ae ON ae.enriched_article_id = pa.enriched_article_id
+              WHERE pa.visibility_status = 'published'
+                AND (
+                  ae.title        ILIKE ${keyword}
+                  OR ae.summary_100 ILIKE ${keyword}
+                  OR ae.summary_200 ILIKE ${keyword}
+                )
+              ON CONFLICT (public_article_id, tag_id) DO NOTHING
+            `
+
             // 候補を promoted に
             await sql`
               UPDATE tag_candidate_pool
@@ -81,7 +119,7 @@ export async function runDailyTagDedup(): Promise<TagDedupResult> {
               WHERE candidate_key = ${result.candidateKey}
             `
             merged++
-            console.log(`[tag-dedup] "${result.candidateKey}" → "${result.matchedTagKey}" にマージ`)
+            console.log(`[tag-dedup] "${result.candidateKey}" → "${result.matchedTagKey}" にマージ（遡及タグ付け済み）`)
           } else {
             noMatch++
           }
