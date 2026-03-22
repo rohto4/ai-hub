@@ -18,6 +18,23 @@ const STOPWORDS = new Set([
   'player', 'players', 'bills', 'china', 'chinas', 'buffet', 'lobster',
   'accused', 'murdering',
   'introducing', 'amazon', 'offline', 'chatbots',
+  // 英語タイトルケースで誤検出される一般的な技術用語・普通名詞
+  'system', 'context', 'inference', 'efficient', 'efficiency',
+  'security', 'framework', 'scale', 'multi', 'flash',
+  'multimodal', 'semantic', 'generative', 'vision', 'reasoning',
+  'enterprise', 'tuning', 'hugging', 'agentic', 'spatial', 'temporal',
+  'precision', 'consistency', 'referential', 'foundation', 'frontier',
+  'benchmark', 'performance', 'understanding', 'alignment', 'deployment',
+  'optimization', 'generation', 'training', 'learning', 'research',
+  'open', 'source', 'state', 'memory', 'language', 'large', 'long',
+  'fast', 'faster', 'better', 'powerful', 'advanced', 'next',
+  'card', 'face', 'cloud', 'edge', 'layer', 'stack', 'pipeline',
+  'based', 'built', 'intelligence', 'leaderboard', 'autonomous',
+  'approach', 'evaluation', 'science', 'local', 'community',
+  'privacy', 'single', 'unified', 'government', 'feature',
+  'human', 'chain', 'physics', 'first', 'last', 'real', 'full',
+  'data', 'model', 'task', 'work', 'time', 'high', 'low', 'key',
+  'open', 'free', 'small', 'large', 'deep', 'wide', 'cross',
 ])
 
 const GENERIC_PHRASES = new Set([
