@@ -256,14 +256,71 @@ monthly-public-archive（月次）
 
 ## 4. Phase 3 完了後に回すもの
 
-- **Topic Group（`/topics/:id`）**: pgvector embedding 生成 → backfill → HNSW インデックス → グループ化バッチ → UI、の順で実装。スキーマ（`topic_group_id`, `topic_groups` テーブル）は migration 035 で先行追加済み。
-- **OGP 強化**: `summary_large_image` を X カード種別として設定する（`/api/og` は実装済みなので追加実装ゼロ）
-- **share tracking 詳細化**: `share_copy` アクションの `meta` フィールドに `{ type, includeTitle, includeSummary, includeHashtag }` を追加する（`/api/actions` の meta は `Record<string, unknown>` で受け取り済み）
-- **タグ昇格後の画像資産自動化**: `daily-tag-promote` または admin 昇格時に `thumbnail asset review queue` を更新し、registry 未登録タグを補完する
-- `retag` / `republish` / `rebuild_rank` の queue 実装
-- `critique` UI の有効化（`daily-enrich` 側で生成を有効化してから）
-- 通知機能（週次人気記事通知・更新通知）
-- SNS シェアボタン再追加（共有モーダルの「詳細オプション」以下に格納）
+### 実装済み（参照のみ）
+- **OGP**: `/api/og` 実装済み。`summary_large_image` で記事詳細ページに設定済み。
+- **Admin Phase 3**: 全体実装済み（articles / tags / sources / jobs）。
+
+### 次フェーズで実装するもの
+
+- **Topic Group（`/topics/:id`）**
+  - pgvector embedding 生成バッチ → 既存記事への backfill（$0.02 程度）
+  - HNSW インデックス（migration）
+  - グループ化バッチ（類似度 0.92 以上を同 `topic_group_id` に集約）
+  - UI: `/topics/:id` = 同テーマの複数視点記事を並べるページ
+  - スキーマ（`topic_group_id`, `topic_groups`）は migration 035 で先行追加済み
+
+- **`compute-ranks` 係数チューニング**
+  - アクティビティデータが蓄積したら `impression` / `open` / `share` / `save` / `sourceOpen` のウェイトを見直す
+  - 時間減衰（1週間で 1/5）が実態と合っているか確認する
+
+- **share tracking 詳細化**
+  - `share_copy` の `meta` に `{ type, includeTitle, includeSummary, includeHashtag }` を追加
+  - `/api/actions` の meta は `Record<string, unknown>` で受け取り済み、フロント側の送信のみ追加
+
+- **thumbnail アイコン画像資産**
+  - 主要タグ用 SVG/PNG を `public/thumbs/icons/` に追加
+  - `thumbnail-tag-registry.ts` を更新して実際の画像を参照する
+
+- **critique UI の有効化**
+  - `daily-enrich` 側で critique 生成を有効化（コスト・品質確認後）
+  - UI に critique 展開セクションを追加
+
+- **`push_subscriptions.genres` カラム rename**
+  - `genres` → `source_categories` に変更（Human-in-the-Loop 対象）
+  - migration 037 で対応
+
+- **tag alias 管理 UI**
+  - `/admin/tags/aliases` で tag_aliases を管理できるようにする（運用頻度次第）
+
+- **retag / republish / rebuild_rank の queue 実装**
+  - `priority_processing_queue` を活用（hide_article 以外の用途）
+
+- **通知機能**（週次人気記事通知・更新通知）
+
+## 4.1 2026-03-22 セッションで出たアイデア
+
+このセッション中に浮かんだ中長期的なアイデアを記録しておく。
+
+1. **タグ候補の自動評価スコア表示**
+   - 管理画面のタグレビューに「このタグを昇格した場合、過去記事で何件にタグ付けされるか」を昇格前にプレビューする機能
+   - 実装: `/api/admin/tags/preview?tagKey=xxx` で ILIKE 件数を返すだけ
+
+2. **タグ重複検出の信頼度フィードバック**
+   - `daily-tag-dedup` が low confidence でスキップしたものを別タブで表示し、人間が「統合する/しない」を判断できる
+   - 現状 low confidence はサイレントスキップ、管理画面では見えない
+
+3. **記事の言語フィルタ UI**
+   - Home / Search に JP / EN フィルタを追加
+   - `content_language` は全 API に通し済みなので、URL パラメータと UI 追加のみ
+
+4. **ソース停止時の記事の扱い**
+   - `source_targets.is_active = false` にしたとき、既存 L4 記事をどうするか未確定
+   - 現状: 公開されたまま（非表示にしない）
+   - 案: is_active=false にした日以降の新規取得を止め、既存は残す（現状維持で確定してよいかも）
+
+5. **`daily-tag-dedup` の実行結果サマリーを通知**
+   - 何件統合されたかを Slack や管理画面ダッシュボードに出す
+   - 現状: `/admin/jobs` で確認できるが、まとめ数字がない
 
 ---
 
