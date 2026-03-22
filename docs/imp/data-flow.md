@@ -31,25 +31,43 @@ flowchart LR
         LB ~~~ LD ~~~ LT
     end
 
-    ST["source_targets\n取得元マスタ"]:::db
-    L1["articles_raw\n生記事"]:::db
-    L2["articles_enriched\n整形済み記事"]:::db
-    L4["public_articles\n公開記事"]:::db
-    L4H["public_articles_history\n公開記事履歴"]:::db
-    R["public_rankings\nランキング"]:::db
-    TCP["tag_candidate_pool\nタグ候補"]:::tag
-    TM["tags_master\nタグマスタ"]:::tag
-    TK["tag_keywords\nタグキーワード"]:::tag
+    ST["source_targets
+    取得元マスタ"]:::db
+    L1["articles_raw
+    生記事"]:::db
+    L2["articles_enriched
+    整形済み記事"]:::db
+    L4["public_articles
+    公開記事"]:::db
+    L4H["public_articles_history
+    公開記事履歴"]:::db
+    R["public_rankings
+    ランキング"]:::db
+    TCP["tag_candidate_pool
+    タグ候補"]:::tag
+    TM["tags_master
+    タグマスタ"]:::tag
+    TK["tag_keywords
+    タグキーワード"]:::tag
 
-    Fetch["hourly-fetch :00\n記事収集"]:::batch
-    Enrich10["hourly-enrich :10\nAI要約・タグ付け"]:::batch
-    Enrich20["hourly-enrich :20\nAI要約・タグ付け"]:::batch
-    Enrich30["hourly-enrich :30\nAI要約・タグ付け"]:::batch
-    Enrich40["hourly-enrich :40\nAI要約・タグ付け"]:::batch
-    Publish["hourly-publish :50\n公開反映"]:::batch
-    Rank["compute-ranks\nランキング計算"]:::batch
-    Archive["monthly-public-archive\n月次アーカイブ"]:::batch
-    Dedup["daily-tag-dedup 02:30 UTC\nタグ重複検出・統合"]:::batch
+    Fetch["hourly-fetch :00
+    記事収集"]:::batch
+    Enrich10["hourly-enrich :10
+    AI要約・タグ付け"]:::batch
+    Enrich20["hourly-enrich :20
+    AI要約・タグ付け"]:::batch
+    Enrich30["hourly-enrich :30
+    AI要約・タグ付け"]:::batch
+    Enrich40["hourly-enrich :40
+    AI要約・タグ付け"]:::batch
+    Publish["hourly-publish :50
+    公開反映"]:::batch
+    Rank["compute-ranks
+    ランキング計算"]:::batch
+    Archive["monthly-public-archive
+    月次アーカイブ"]:::batch
+    Dedup["daily-tag-dedup 02:30 UTC
+    タグ重複検出・統合"]:::batch
 
     ST --> Fetch
     Fetch --> L1

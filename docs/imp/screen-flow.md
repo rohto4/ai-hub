@@ -45,38 +45,55 @@ flowchart TD
         LS ~~~ LA ~~~ LD
     end
 
-    Home["Home /\nホーム"]:::screen --> ArticleCard["ArticleCard\n記事カード"]:::screen
-    Home --> Ranking["Ranking /ranking\nランキング"]:::screen
-    Home --> Search["Search /search\n検索"]:::screen
-    Home --> Tags["Tags /tags\nタグ一覧"]:::screen
-    Home --> Digest["Digest /digest\nダイジェスト"]:::screen
+    Home["Home /
+    ホーム"]:::screen --> ArticleCard["ArticleCard
+    記事カード"]:::screen
+    Home --> Ranking["Ranking /ranking
+    ランキング"]:::screen
+    Home --> Search["Search /search
+    検索"]:::screen
+    Home --> Tags["Tags /tags
+    タグ一覧"]:::screen
+    Home --> Digest["Digest /digest
+    ダイジェスト"]:::screen
 
-    ArticleCard --> Detail["Article Detail\n/articles/:publicKey"]:::screen
-    ArticleCard --> Source["Source Site\n元記事サイト"]:::screen
-    ArticleCard --> Share["Share Modal\n共有モーダル"]:::screen
-    ArticleCard --> SavedPage["Saved /saved\n保存済み"]:::screen
+    ArticleCard --> Detail["Article Detail
+    /articles/:publicKey"]:::screen
+    ArticleCard --> Source["Source Site
+    元記事サイト"]:::screen
+    ArticleCard --> Share["Share Modal
+    共有モーダル"]:::screen
+    ArticleCard --> SavedPage["Saved /saved
+    保存済み"]:::screen
 
     Detail --> Source
-    Detail --> TagDetail["Tag Detail\n/tags/:tagKey"]:::screen
-    Detail --> Category["Category\n/category/:slug"]:::screen
+    Detail --> TagDetail["Tag Detail
+    /tags/:tagKey"]:::screen
+    Detail --> Category["Category
+    /category/:slug"]:::screen
 
     Home --> HomeApi["/api/home"]:::api
     Home --> TrendsApi["/api/trends"]:::api
     Search --> SearchApi["/api/search"]:::api
     Ranking --> TrendsApi
 
-    HomeApi --> PublicArticles["public_articles\n公開記事"]:::db
-    HomeApi --> PublicRankings["public_rankings\nランキング"]:::db
-    HomeApi --> ActivityMetrics["activity_metrics_hourly\nアクティビティ集計"]:::db
+    HomeApi --> PublicArticles["public_articles
+    公開記事"]:::db
+    HomeApi --> PublicRankings["public_rankings
+    ランキング"]:::db
+    HomeApi --> ActivityMetrics["activity_metrics_hourly
+    アクティビティ集計"]:::db
     SearchApi --> PublicArticles
     TrendsApi --> PublicArticles
     TrendsApi --> PublicRankings
 
     Detail --> DetailApi["/api/articles/:id"]:::api
-    Detail --> OgApi["/api/og?publicKey=...\nOGP画像生成"]:::api
+    Detail --> OgApi["/api/og?publicKey=...
+    OGP画像生成"]:::api
     DetailApi --> PublicArticles
 
-    ArticleCard --> Actions["/api/actions\n行動ログ"]:::api
+    ArticleCard --> Actions["/api/actions
+    行動ログ"]:::api
     Detail --> Actions
     Source --> Actions
     Share --> Actions
@@ -100,28 +117,47 @@ flowchart TD
         LS ~~~ LA ~~~ LM ~~~ LD
     end
 
-    Login["Admin Login\n/admin/login"]:::screen -->|ADMIN_SECRET 認証| Dashboard["Admin Dashboard\n/admin"]:::screen
-    Dashboard --> Articles["記事管理\n/admin/articles"]:::screen
-    Dashboard --> TagsAdmin["タグレビュー\n/admin/tags"]:::screen
-    Dashboard --> Sources["ソース管理\n/admin/sources"]:::screen
-    Dashboard --> Jobs["ジョブログ\n/admin/jobs"]:::screen
+    Login["Admin Login
+    /admin/login"]:::screen -->|ADMIN_SECRET 認証| Dashboard["Admin Dashboard
+    /admin"]:::screen
+    Dashboard --> Articles["記事管理
+    /admin/articles"]:::screen
+    Dashboard --> TagsAdmin["タグレビュー
+    /admin/tags"]:::screen
+    Dashboard --> Sources["ソース管理
+    /admin/sources"]:::screen
+    Dashboard --> Jobs["ジョブログ
+    /admin/jobs"]:::screen
 
-    Articles --> ArticlesApi["PATCH /api/admin/articles/:id\n記事 hide/unhide"]:::api
-    ArticlesApi --> PublicArticles["public_articles\n公開記事"]:::db
-    ArticlesApi --> AdminLogs["admin_operation_logs\n管理操作ログ"]:::admin
+    Articles --> ArticlesApi["PATCH /api/admin/articles/:id
+    記事 hide/unhide"]:::api
+    ArticlesApi --> PublicArticles["public_articles
+    公開記事"]:::db
+    ArticlesApi --> AdminLogs["admin_operation_logs
+    管理操作ログ"]:::admin
 
-    TagsAdmin --> TagsApi["GET|POST /api/admin/tags\nタグ昇格・照合"]:::api
-    TagsApi --> TagPool["tag_candidate_pool\nタグ候補"]:::db
-    TagsApi --> TagsMaster["tags_master\nタグマスタ"]:::db
-    TagsApi --> TagKeywords["tag_keywords\nタグキーワード"]:::db
+    TagsAdmin --> TagsApi["GET|POST /api/admin/tags
+    タグ昇格・照合"]:::api
+    TagsApi --> TagPool["tag_candidate_pool
+    タグ候補"]:::db
+    TagsApi --> TagsMaster["tags_master
+    タグマスタ"]:::db
+    TagsApi --> TagKeywords["tag_keywords
+    タグキーワード"]:::db
 
-    Sources --> SourcesApi["GET|PATCH /api/admin/sources\nソース ON/OFF"]:::api
-    SourcesApi --> SourceTargets["source_targets\n取得元マスタ"]:::db
+    Sources --> SourcesApi["GET|PATCH /api/admin/sources
+    ソース ON/OFF"]:::api
+    SourcesApi --> SourceTargets["source_targets
+    取得元マスタ"]:::db
 
-    Jobs --> JobsApi["GET /api/admin/jobs\nジョブ一覧"]:::api
-    JobsApi --> JobRuns["job_runs\nジョブ実行ログ"]:::db
-    Jobs --> JobDetailApi["GET /api/admin/jobs/:id\n失敗 items 詳細"]:::api
-    JobDetailApi --> JobRunItems["job_run_items\n実行 item ログ"]:::db
+    Jobs --> JobsApi["GET /api/admin/jobs
+    ジョブ一覧"]:::api
+    JobsApi --> JobRuns["job_runs
+    ジョブ実行ログ"]:::db
+    Jobs --> JobDetailApi["GET /api/admin/jobs/:id
+    失敗 items 詳細"]:::api
+    JobDetailApi --> JobRunItems["job_run_items
+    実行 item ログ"]:::db
 ```
 
 ## 5. 統合図（データパイプライン + 公開面 + 管理面）
@@ -145,19 +181,32 @@ flowchart TD
 
     subgraph pipeline["📦 データパイプライン（自動）"]
         direction LR
-        ST["source_targets\n取得元マスタ"]:::db
-        Fetch["hourly-fetch :00\n記事収集"]:::batch
-        L1["articles_raw\n生記事"]:::db
-        Enrich["hourly-enrich :10〜:40\nAI要約・タグ付け"]:::batch
-        L2["articles_enriched\n整形済み記事"]:::db
-        Publish["hourly-publish :50\n公開反映"]:::batch
-        Rank["compute-ranks\nランキング計算"]:::batch
-        L4["public_articles\n公開記事"]:::db
-        R["public_rankings\nランキング"]:::db
-        TCP["tag_candidate_pool\nタグ候補"]:::tag
-        Dedup["daily-tag-dedup\nタグ重複検出"]:::batch
-        TM["tags_master\nタグマスタ"]:::tag
-        TK["tag_keywords\nタグキーワード"]:::tag
+        ST["source_targets
+        取得元マスタ"]:::db
+        Fetch["hourly-fetch :00
+        記事収集"]:::batch
+        L1["articles_raw
+        生記事"]:::db
+        Enrich["hourly-enrich :10〜:40
+        AI要約・タグ付け"]:::batch
+        L2["articles_enriched
+        整形済み記事"]:::db
+        Publish["hourly-publish :50
+        公開反映"]:::batch
+        Rank["compute-ranks
+        ランキング計算"]:::batch
+        L4["public_articles
+        公開記事"]:::db
+        R["public_rankings
+        ランキング"]:::db
+        TCP["tag_candidate_pool
+        タグ候補"]:::tag
+        Dedup["daily-tag-dedup
+        タグ重複検出"]:::batch
+        TM["tags_master
+        タグマスタ"]:::tag
+        TK["tag_keywords
+        タグキーワード"]:::tag
 
         ST --> Fetch --> L1 --> Enrich --> L2 --> Publish --> L4
         L4 --> Rank --> R
@@ -170,18 +219,27 @@ flowchart TD
     end
 
     subgraph public["🌐 公開画面"]
-        Home["Home /\nホーム"]:::screen
-        Detail["記事詳細\n/articles/:id"]:::screen
-        Search["検索\n/search"]:::screen
-        RankPage["ランキング\n/ranking"]:::screen
-        TagPage["タグ\n/tags"]:::screen
+        Home["Home /
+        ホーム"]:::screen
+        Detail["記事詳細
+        /articles/:id"]:::screen
+        Search["検索
+        /search"]:::screen
+        RankPage["ランキング
+        /ranking"]:::screen
+        TagPage["タグ
+        /tags"]:::screen
     end
 
     subgraph admin["🔧 管理画面"]
-        AdminDash["ダッシュボード\n/admin"]:::screen
-        AdminArt["記事管理\n/admin/articles"]:::screen
-        AdminTag["タグレビュー\n/admin/tags"]:::screen
-        AdminJob["ジョブログ\n/admin/jobs"]:::screen
+        AdminDash["ダッシュボード
+        /admin"]:::screen
+        AdminArt["記事管理
+        /admin/articles"]:::screen
+        AdminTag["タグレビュー
+        /admin/tags"]:::screen
+        AdminJob["ジョブログ
+        /admin/jobs"]:::screen
     end
 
     L4 --> Home & Detail & Search & RankPage
