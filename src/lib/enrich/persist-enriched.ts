@@ -261,7 +261,13 @@ async function persistPreparedArticle(params: {
     summaryEmbedding: params.embeddingResult.embedding,
     embeddingModel: params.embeddingResult.model,
     matchedTagIds: keywordMatchedTagIds,
-    candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
+    // AI が抽出した固有名詞を候補タグとして保存（rule-based 候補より高精度）
+    candidateTags: article.shouldPersistCandidateTags
+      ? summaryForArticle.properNounTags.map((key) => ({
+          candidateKey: key,
+          displayName: key.charAt(0).toUpperCase() + key.slice(1),
+        }))
+      : [],
     commercialUsePolicy: article.rawArticle.commercialUsePolicy,
   })
 

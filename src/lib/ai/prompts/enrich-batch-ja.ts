@@ -52,6 +52,7 @@ export function buildEnrichBatchPrompt(items: BatchSummaryPromptItem[]): string 
 16. summaryInputBasis が source_snippet のときは、title と content の両方に整合する内容だけを書く。
 17. needsTitleTranslation が true の場合は titleJa に日本語タイトルを返す。固有名詞・製品名・企業名は原語のまま使い、その他の語を日本語に訳す。60文字以内を目安にする。
 18. needsTitleTranslation が false の場合は titleJa に元の title をそのまま返す。
+19. properNounTags に、記事中に登場する固有名詞（製品名・企業名・技術名・サービス名・モデル名・ライブラリ名）を最大 5 件、英語のまま小文字で返す。一般的な英単語・形容詞・動詞は含めない。例: ["langchain", "nvidia", "gemma", "gpt-4"]。該当なければ空配列。
 
 content の扱い:
 1. item.content が十分にある場合は、それを最優先の情報源にする。
@@ -65,7 +66,8 @@ content の扱い:
       "id": "123",
       "titleJa": "日本語タイトル（needsTitleTranslation=false のときは元タイトルをそのまま）",
       "summary100Ja": "100文字以内の日本語要約",
-      "summary200Ja": "200文字以内の日本語要約"
+      "summary200Ja": "200文字以内の日本語要約",
+      "properNounTags": ["langchain", "nvidia"]
     }
   ]
 }

@@ -19,6 +19,7 @@ export interface EnrichedSummary {
   summary100: string
   summary200: string
   summarySource: 'gemini' | 'gemini2' | 'openai' | 'manual_pending'
+  properNounTags: string[]
 }
 
 export interface EnrichedSummaryInput {
@@ -34,6 +35,7 @@ type ProviderSummaryItem = {
   titleJa?: string
   summary100Ja: string
   summary200Ja: string
+  properNounTags?: string[]
 }
 
 type ProviderSummaryResponse = {
@@ -73,6 +75,7 @@ function buildManualPendingSummary(): EnrichedSummary {
     summary100: MANUAL_PENDING_SUMMARY_100,
     summary200: MANUAL_PENDING_SUMMARY_200,
     summarySource: 'manual_pending',
+    properNounTags: [],
   }
 }
 
@@ -135,6 +138,9 @@ function parseProviderResponse(text: string, inputs: EnrichedSummaryInput[]): Ma
       const output = outputMap.get(input.id)
       const fallback = fallbackMap.get(input.id) ?? buildManualPendingSummary()
       const titleJa = output?.titleJa?.trim() || null
+      const properNounTags = Array.isArray(output?.properNounTags)
+        ? (output.properNounTags as unknown[]).filter((t): t is string => typeof t === 'string').map((t) => t.toLowerCase().trim()).filter((t) => t.length >= 2)
+        : []
       return [
         input.id,
         {
@@ -145,6 +151,7 @@ function parseProviderResponse(text: string, inputs: EnrichedSummaryInput[]): Ma
             200,
           ),
           summarySource: fallback.summarySource,
+          properNounTags,
         } satisfies EnrichedSummary,
       ]
     }),
