@@ -33,38 +33,42 @@
 
 ```mermaid
 flowchart TD
-    Home["Home /"] --> ArticleCard["ArticleCard"]
-    Home --> Ranking["Ranking /ranking"]
-    Home --> Search["Search /search"]
-    Home --> Tags["Tags /tags"]
-    Home --> Digest["Digest /digest"]
+    classDef screen fill:#ffe5b4,stroke:#f90,color:#333
+    classDef api    fill:#c8f7c5,stroke:#27ae60,color:#333
+    classDef db     fill:#e8d5ff,stroke:#8e44ad,color:#333
 
-    ArticleCard --> Detail["Article Detail<br/>/articles/:publicKey"]
-    ArticleCard --> Source["Source Site (canonical_url)"]
-    ArticleCard --> Share["Share Modal"]
-    ArticleCard --> SavedPage["Saved /saved"]
+    Home["Home /"]:::screen --> ArticleCard["ArticleCard"]:::screen
+    Home:::screen --> Ranking["Ranking /ranking"]:::screen
+    Home --> Search["Search /search"]:::screen
+    Home --> Tags["Tags /tags"]:::screen
+    Home --> Digest["Digest /digest"]:::screen
+
+    ArticleCard --> Detail["Article Detail<br/>/articles/:publicKey"]:::screen
+    ArticleCard --> Source["Source Site (canonical_url)"]:::screen
+    ArticleCard --> Share["Share Modal"]:::screen
+    ArticleCard --> SavedPage["Saved /saved"]:::screen
 
     Detail --> Source
-    Detail --> TagDetail["Tag Detail /tags/:tagKey"]
-    Detail --> Category["Category /category/:slug"]
+    Detail --> TagDetail["Tag Detail /tags/:tagKey"]:::screen
+    Detail --> Category["Category /category/:slug"]:::screen
 
-    Home --> HomeApi["/api/home"]
-    Home --> TrendsApi["/api/trends"]
-    Search --> SearchApi["/api/search"]
+    Home --> HomeApi["/api/home"]:::api
+    Home --> TrendsApi["/api/trends"]:::api
+    Search --> SearchApi["/api/search"]:::api
     Ranking --> TrendsApi
 
-    HomeApi --> PublicArticles["public_articles"]
-    HomeApi --> PublicRankings["public_rankings"]
-    HomeApi --> ActivityMetrics["activity_metrics_hourly"]
+    HomeApi --> PublicArticles["public_articles"]:::db
+    HomeApi --> PublicRankings["public_rankings"]:::db
+    HomeApi --> ActivityMetrics["activity_metrics_hourly"]:::db
     SearchApi --> PublicArticles
     TrendsApi --> PublicArticles
     TrendsApi --> PublicRankings
 
-    Detail --> DetailApi["/api/articles/:id"]
-    Detail --> OgApi["/api/og?publicKey=..."]
+    Detail --> DetailApi["/api/articles/:id"]:::api
+    Detail --> OgApi["/api/og?publicKey=..."]:::api
     DetailApi --> PublicArticles
 
-    ArticleCard --> Actions["/api/actions"]
+    ArticleCard --> Actions["/api/actions"]:::api
     Detail --> Actions
     Source --> Actions
     Share --> Actions
@@ -74,28 +78,33 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Login["Admin Login /admin/login"] -->|ADMIN_SECRET 認証| Dashboard["Admin Dashboard /admin"]
-    Dashboard --> Articles["Articles /admin/articles"]
-    Dashboard --> Tags["Tags /admin/tags"]
-    Dashboard --> Sources["Sources /admin/sources"]
-    Dashboard --> Jobs["Jobs /admin/jobs"]
+    classDef screen fill:#ffe5b4,stroke:#f90,color:#333
+    classDef api    fill:#c8f7c5,stroke:#27ae60,color:#333
+    classDef admin  fill:#ffd6d6,stroke:#e74c3c,color:#333
+    classDef db     fill:#e8d5ff,stroke:#8e44ad,color:#333
 
-    Articles --> ArticlesApi["PATCH /api/admin/articles/:id"]
-    ArticlesApi --> PublicArticles["public_articles"]
-    ArticlesApi --> AdminLogs["admin_operation_logs"]
+    Login["Admin Login /admin/login"]:::screen -->|ADMIN_SECRET 認証| Dashboard["Admin Dashboard /admin"]:::screen
+    Dashboard --> Articles["Articles /admin/articles"]:::screen
+    Dashboard --> Tags["Tags /admin/tags"]:::screen
+    Dashboard --> Sources["Sources /admin/sources"]:::screen
+    Dashboard --> Jobs["Jobs /admin/jobs"]:::screen
 
-    Tags --> TagsApi["GET|POST /api/admin/tags"]
-    TagsApi --> TagPool["tag_candidate_pool"]
-    TagsApi --> TagsMaster["tags_master"]
-    TagsApi --> TagKeywords["tag_keywords"]
+    Articles --> ArticlesApi["PATCH /api/admin/articles/:id"]:::api
+    ArticlesApi --> PublicArticles["public_articles"]:::db
+    ArticlesApi --> AdminLogs["admin_operation_logs"]:::admin
 
-    Sources --> SourcesApi["GET|PATCH /api/admin/sources"]
-    SourcesApi --> SourceTargets["source_targets"]
+    Tags --> TagsApi["GET|POST /api/admin/tags"]:::api
+    TagsApi --> TagPool["tag_candidate_pool"]:::db
+    TagsApi --> TagsMaster["tags_master"]:::db
+    TagsApi --> TagKeywords["tag_keywords"]:::db
 
-    Jobs --> JobsApi["GET /api/admin/jobs"]
-    JobsApi --> JobRuns["job_runs"]
-    Jobs --> JobDetailApi["GET /api/admin/jobs/:id"]
-    JobDetailApi --> JobRunItems["job_run_items"]
+    Sources --> SourcesApi["GET|PATCH /api/admin/sources"]:::api
+    SourcesApi --> SourceTargets["source_targets"]:::db
+
+    Jobs --> JobsApi["GET /api/admin/jobs"]:::api
+    JobsApi --> JobRuns["job_runs"]:::db
+    Jobs --> JobDetailApi["GET /api/admin/jobs/:id"]:::api
+    JobDetailApi --> JobRunItems["job_run_items"]:::db
 ```
 
 ## 5. 画面別の読み先
