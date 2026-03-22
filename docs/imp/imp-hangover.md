@@ -1,10 +1,97 @@
 # AI Trend Hub Implementation Hangover
 
-最終更新: 2026-03-17（Gemini 100件試験・backlog 1882件 manual export 反映）
+最終更新: 2026-03-22（大規模実装セッション完了）
 
 ## 1. このファイルの役割
 
 セッションが切れても、ここから再開できるように現状を短く固定する。
+
+---
+
+## 16. 2026-03-22 引継ぎ（最新）
+
+### 16.1 ブランチ状態
+
+- ブランチ: `dev-default`（37 commits ahead of `main`、push 済み）
+- **main への merge はユーザーが手動で実施**
+- merge 後に Vercel が自動デプロイする
+
+### 16.2 DB 現況（2026-03-22 時点）
+
+| 指標 | 値 |
+|---|---|
+| `public_articles` published | 2,741件 |
+| `articles_raw` 未処理 | 0件（全処理済み） |
+| publish 候補（L2） | 2,742件 |
+| アクティブソース | 46件（日本語 14件含む） |
+| タグ候補（seen_count≥4, candidate） | 95件 |
+
+### 16.3 今セッションで実装したもの（全37 commits）
+
+**バグ修正:**
+1. `public_article_sources` bigint 型バグ → 2件→2504件に回復
+2. en ソース記事タイトルが英語のまま → `titleJa` プロンプト追加 + 1622件バックフィル
+3. `published_at.toLocaleeDateString` エラー → `new Date()` ラップ
+4. clipboard API が HTTP で undefined → フォールバック追加
+
+**インフラ・パイプライン:**
+5. `compute-ranks` 最適化（1回読み込み + 4window 並列）
+6. `compute-ranks` を `job_runs` に追加
+7. `hasDatabaseColumn` 二重クエリを全廃（5ファイル）
+
+**Admin Phase 3（全体）:**
+8. `/admin/login` + cookie 認証
+9. `/admin/articles` 記事管理（hide/unhide）
+10. `/admin/tags` タグレビュー（文脈表示・昇格・保留・棄却）
+11. `/admin/sources` ソース管理（is_active ON/OFF）
+12. `/admin/jobs` ジョブログ（失敗 items 詳細・metadata 展開）
+
+**タグシステム:**
+13. 候補生成を AI 固有名詞抽出（`properNounTags`）に切り替え
+14. `daily-tag-dedup` 日次バッチ追加（Gemini で候補↔既存タグ照合・自動統合・遡及タグ付け）
+15. タグ昇格時の遡及タグ付け（L2/L4）+ `tag_keywords` 自動登録
+16. `tag_key` を URL-safe に正規化（スペース→ハイフン）
+17. 既存候補 5304件から 2500件超を棄却（STOPWORDS 拡充）
+18. 表示閾値を `seen_count >= 4` に設定
+
+**公開面・SEO:**
+19. OGP 画像 API（`/api/og`）+ 記事詳細 `generateMetadata`
+20. `sitemap.xml` + `robots.txt`
+21. `HomeStats` に jaCount / enCount 追加
+22. `/api/home` に ranked セクション追加
+23. 全ページの dev-mode description を本番テキストに修正
+
+### 16.4 稼働中バッチ（GitHub Actions）
+
+| workflow | スケジュール | 処理 |
+|---|---|---|
+| `hourly-fetch` | 毎時 :00 | L1 収集 |
+| `hourly-enrich` | 毎時 :10/:20/:30/:40 | L2 enrich（10件×4回） |
+| `hourly-publish` | 毎時 :50 | L4 公開 + compute-ranks |
+| `daily-db-backup` | 毎日 18:15 UTC | DB バックアップ |
+| `daily-tag-dedup` | 毎日 02:30 UTC | タグ重複検出・自動統合 |
+| `monthly-public-archive` | 月次 | 半年超記事を history に退避 |
+
+### 16.5 merge 後に必要なユーザー操作
+
+1. Vercel に `ADMIN_SECRET` 環境変数を追加（任意の英数字文字列）
+2. `/admin/login` で動作確認
+3. GitHub Actions の `daily-tag-dedup` 初回実行を `/admin/jobs` で確認
+
+### 16.6 残タスク（次セッション向け）
+
+| タスク | 優先 | 備考 |
+|---|---|---|
+| `docs/spec/04-data-model-and-sql.md` に migration 035/036 を反映 | 低 | schema の記録のみ |
+| `thumbnail_url` のアイコン画像資産（SVG/PNG） | 低 | UI改善フェーズで |
+| `compute-ranks` 係数を実データで調整 | 低 | アクティビティ蓄積後 |
+| Topic Group 本実装 | 後回し | pgvector 前提 |
+
+### 16.7 次セッション開始時の推奨読み込み順
+
+1. `docs/imp/imp-hangover.md`（このファイル §16）
+2. `docs/imp/implementation-checklist.md`（残タスク §8 を確認）
+3. `docs/imp/data-flow.md`（バッチ全体像）
 
 ---
 
