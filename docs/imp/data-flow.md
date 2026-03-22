@@ -23,25 +23,33 @@ flowchart LR
     classDef db    fill:#e8d5ff,stroke:#8e44ad,color:#333
     classDef tag   fill:#a0f4ff,stroke:#00b4d8,color:#333
 
-    ST[source_targets]:::db
-    L1[articles_raw]:::db
-    L2[articles_enriched]:::db
-    L4[public_articles]:::db
-    L4H[public_articles_history]:::db
-    R[public_rankings]:::db
-    TCP[tag_candidate_pool]:::tag
-    TM[tags_master]:::tag
-    TK[tag_keywords]:::tag
+    subgraph 凡例["📋 凡例"]
+        direction TB
+        LB["バッチ / cron"]:::batch
+        LD["DB / 永続データ"]:::db
+        LT["タグ系"]:::tag
+        LB ~~~ LD ~~~ LT
+    end
 
-    Fetch[hourly-fetch<br/>:00]:::batch
-    Enrich10[hourly-enrich<br/>:10]:::batch
-    Enrich20[hourly-enrich<br/>:20]:::batch
-    Enrich30[hourly-enrich<br/>:30]:::batch
-    Enrich40[hourly-enrich<br/>:40]:::batch
-    Publish[hourly-publish<br/>:50]:::batch
-    Rank[compute-ranks]:::batch
-    Archive[monthly-public-archive]:::batch
-    Dedup[daily-tag-dedup<br/>02:30 UTC]:::batch
+    ST["source_targets\n取得元マスタ"]:::db
+    L1["articles_raw\n生記事"]:::db
+    L2["articles_enriched\n整形済み記事"]:::db
+    L4["public_articles\n公開記事"]:::db
+    L4H["public_articles_history\n公開記事履歴"]:::db
+    R["public_rankings\nランキング"]:::db
+    TCP["tag_candidate_pool\nタグ候補"]:::tag
+    TM["tags_master\nタグマスタ"]:::tag
+    TK["tag_keywords\nタグキーワード"]:::tag
+
+    Fetch["hourly-fetch :00\n記事収集"]:::batch
+    Enrich10["hourly-enrich :10\nAI要約・タグ付け"]:::batch
+    Enrich20["hourly-enrich :20\nAI要約・タグ付け"]:::batch
+    Enrich30["hourly-enrich :30\nAI要約・タグ付け"]:::batch
+    Enrich40["hourly-enrich :40\nAI要約・タグ付け"]:::batch
+    Publish["hourly-publish :50\n公開反映"]:::batch
+    Rank["compute-ranks\nランキング計算"]:::batch
+    Archive["monthly-public-archive\n月次アーカイブ"]:::batch
+    Dedup["daily-tag-dedup 02:30 UTC\nタグ重複検出・統合"]:::batch
 
     ST --> Fetch
     Fetch --> L1
