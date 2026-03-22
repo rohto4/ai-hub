@@ -1,41 +1,43 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-03-21
+最終更新: 2026-03-22
 
 ---
 
 ## 1. 現在のフェーズ
 
-**Layer 4 稼働済み・リファクタリング完了・次は `content_language` + 小型サムネイル導入。その後に日本語ソース投入と GitHub Actions 有効化**
+**Phase A〜F 完了。UI調整・係数チューニング・Topic Group が残タスク。**
 
-### 1.1 完了済み（2026-03-21 時点）
+### 1.1 完了済み（2026-03-22 時点）
 
 - Layer 1 → 2 → 4 の自動パイプライン稼働中
-- `public_articles` 公開済み: 2371 件
-- `hourly-publish` の bulk upsert 化完了（unnest ベース）
-- `commercial_use_policy` 実装・ToS 調査反映済み
-- Phase 0 / Phase 1 / Phase 2 完了
-- リファクタリング: `page.tsx` 65行・`public-feed.ts` 15行（re-exportのみ）等、全ファイル 324行以内
+- `content_language` 導入・日本語ソース 14件・タイトル日本語翻訳（en→ja）完了
+- `thumbnail_url` 内部テンプレート方式で実装済み
+- admin Phase 3 全体（記事管理・タグレビュー・ソース管理・ジョブログ）
+- `daily-tag-dedup` 日次自動タグ統合バッチ追加
+- OGP画像（/api/og）・sitemap.xml・robots.txt 追加
+- `public_article_sources` バグ修正・compute-ranks 最適化
+- Phase A / B / C / D / E / F-1 完了、F-2 部分完了
 
-### 1.2 データ現況（2026-03-21）
+### 1.2 データ現況（2026-03-22）
 
 | 指標 | 値 |
 |---|---|
-| `articles_raw` | 2863件（全処理済み） |
-| `articles_enriched` | 2861件 |
-| `public_articles` published | 2371件 |
-| アクティブソース | 32件 |
-| `tag_keywords` | 368件 |
+| `public_articles` published | ~2600件 |
+| アクティブソース | 46件（日本語ソース 14件追加後） |
+| `tag_keywords` | 368件 + 昇格時自動追加分 |
+| `tag_candidate_pool` (candidate) | ~3000件 |
 
 ### 1.3 稼働中バッチ
 
 ```
-hourly-layer12（毎時 :05）
-  └── hourly-fetch → articles_raw
-  └── daily-enrich → articles_enriched
-
-hourly-publish（毎時 :35）
-  └── articles_enriched → public_articles
+hourly-fetch（毎時 :00）
+hourly-enrich（毎時 :10/:20/:30/:40）← 10件 × 4回
+hourly-publish（毎時 :50）
+  └── compute-ranks も後続で実行
+daily-db-backup（毎日 18:15 UTC）
+daily-tag-dedup（毎日 02:30 UTC）← 新規追加
+monthly-public-archive（月次）
 ```
 
 ---
@@ -297,30 +299,19 @@ hourly-publish（毎時 :35）
 - 半年超過行は月次バッチで `public_articles_history` に退避して `public_articles` から削除する
 - 月次バッチは `monthly-public-archive` として実装し、初期値は `ageMonths=6`
 - これにより `compute-ranks` 側は ranking 対象の SQL を大きく変えずに母集団だけを減らせる
-## 2026-03-21 再開時の実装優先順
+## 2026-03-22 残タスク
 
-### 直近で先に見るもの
+### 未着手・後回し
 
-1. `public_article_sources` 同期不備の解消
-2. GitHub Actions / Vercel 本番 run の安定確認
-3. `compute-ranks` の実測
-   - 300 秒化で足りるか
-   - それでも重ければ workflow 分離 or 差分更新化
+1. `thumbnail_url` のアイコン画像資産（主要タグ SVG/PNG）を用意する
+2. `compute-ranks` 係数を実アクティビティデータで点検・調整する
+3. Topic Group 本実装（pgvector 前提、別フェーズ）
+4. `docs/spec/04-data-model-and-sql.md` に migration 035/036 分を反映する
 
-### その後の大物
+### 完了済み（再実装不要）
 
-1. admin Phase 3
-2. Topic Group 本実装
-3. OGP 画像実装
-4. ranking の action mapping 調整
-5. docs / monitoring の整備
-
-### スキップしてよいこと
-
-1. `content_language`
-2. `thumbnail_url`
-3. 日本語ソース seed
-4. cron 分離
-5. L4 月次アーカイブ
-
-上記は実装済み。再実装不要。
+- `content_language`・`thumbnail_url`・日本語ソース seed
+- cron 分離・L4 月次アーカイブ
+- `public_article_sources` バグ修正
+- admin Phase 3・OGP・sitemap・robots
+- `daily-tag-dedup`・タグ固有名詞抽出・遡及タグ付け
