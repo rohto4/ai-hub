@@ -129,16 +129,19 @@ export async function promoteTagToMaster(
 ): Promise<{ tagId: string; taggedEnrichedCount: number; taggedPublicCount: number }> {
   const sql = getSql()
 
+  // スペースをハイフンに正規化（URL-safe な tag_key にする）
+  const normalizedKey = tagKey.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+
   // tags_master に昇格
   const rows = (await sql`
     INSERT INTO tags_master (tag_key, display_name)
-    VALUES (${tagKey}, ${displayName})
+    VALUES (${normalizedKey}, ${displayName})
     ON CONFLICT (tag_key) DO UPDATE SET display_name = EXCLUDED.display_name, updated_at = now()
     RETURNING tag_id::text
   `) as Array<{ tag_id: string }>
   const tagId = rows[0]!.tag_id
 
-  // candidate_key を tag_keywords に自動登録（将来の enrich でも使われる）
+  // candidate_key（元の表記、スペースあり）を tag_keywords に登録（テキストマッチ用）
   await sql`
     INSERT INTO tag_keywords (tag_id, keyword)
     VALUES (${tagId}::uuid, ${tagKey})
@@ -153,7 +156,7 @@ export async function promoteTagToMaster(
   `
 
   // 根拠記事へのタグ付け: candidate_key を含む articles_enriched を対象
-  const keyword = `%${tagKey}%`
+  const keyword = `%${tagKey}%`  // candidate_key（スペースあり）でマッチング
   const enrichedResult = (await sql`
     INSERT INTO articles_enriched_tags (enriched_article_id, tag_id, is_primary, tag_source)
     SELECT ae.enriched_article_id, ${tagId}::uuid, false, 'candidate_promoted'
