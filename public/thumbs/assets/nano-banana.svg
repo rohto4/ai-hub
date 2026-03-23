@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#542bab" />
-      <stop offset="100%" stop-color="#2c0383" />
+      <stop offset="0%" stop-color="#5522c3" />
+      <stop offset="100%" stop-color="#2d009b" />
     </linearGradient>
     <linearGradient id="border" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="white" stop-opacity="0.6" />
@@ -17,7 +17,11 @@
   <!-- Glass Reflection -->
   <path d="M 1 7 Q 1 1 7 1 L 17 1 Q 23 1 23 7 L 23 12 Q 12 10 1 12 Z" fill="white" fill-opacity="0.15" />
   <!-- Inner Content -->
-  <text x="12" y="18" fill="white" font-family="system-ui, sans-serif" font-weight="900" font-size="14" text-anchor="middle">N</text>
+  <g><rect x="8" y="8" width="8" height="8" rx="2" fill="none" stroke="white" stroke-width="2" transform="rotate(45 12 12)" />
+  <circle cx="12" cy="12" r="1.5" fill="white" />
+  <circle cx="10.282719041611099" cy="3.1653553489710244" r="1.5" fill="white" fill-opacity="0.7" />
+  <circle cx="3.655345308898914" cy="15.371459340743211" r="1.5" fill="white" fill-opacity="0.7" />
+  <path d="M12 4 L12 8 M12 16 L12 20" stroke="white" stroke-width="1.5" stroke-opacity="0.4" stroke-linecap="round" /></g>
   <!-- Border -->
   <rect x="1" y="1" width="22" height="22" rx="6" fill="none" stroke="url(#border)" stroke-width="0.5" />
 </svg>
