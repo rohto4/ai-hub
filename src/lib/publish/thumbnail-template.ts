@@ -265,30 +265,29 @@ function renderFallbackGlyph(tag: RenderTag, size: number): string {
 }
 
 function renderIconTile(x: number, y: number, size: number, tag: RenderTag, tilt = 0): string {
+  if (tag.highQualityAssetHref) {
+    // Bleeding out large SVG rendering
+    return `
+      <g transform="translate(${x} ${y}) rotate(${tilt} ${size / 2} ${size / 2})" style="filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4))">
+        <image x="0" y="0" width="${size}" height="${size}" href="${tag.highQualityAssetHref}" preserveAspectRatio="xMidYMid meet" />
+      </g>
+    `
+  }
+
+  // Fallback for missing assets
   const iconInset = size * 0.15
   const iconSize = size - iconInset * 2
-  
-  // 高品質アセットがあればそちらを優先、なければ従来のアイコン
-  const mainImage = tag.highQualityAssetHref 
-    ? `<image x="${iconInset}" y="${iconInset}" width="${iconSize}" height="${iconSize}" href="${tag.highQualityAssetHref}" preserveAspectRatio="xMidYMid meet" />`
-    : tag.iconHref
-      ? `<image x="${iconInset}" y="${iconInset}" width="${iconSize}" height="${iconSize}" href="${tag.iconHref}" preserveAspectRatio="xMidYMid meet" />`
-      : renderFallbackGlyph(tag, size)
+  const mainImage = tag.iconHref
+    ? `<image x="${iconInset}" y="${iconInset}" width="${iconSize}" height="${iconSize}" href="${tag.iconHref}" preserveAspectRatio="xMidYMid meet" />`
+    : renderFallbackGlyph(tag, size)
 
   return `
     <g transform="translate(${x} ${y}) rotate(${tilt} ${size / 2} ${size / 2})">
-      <!-- Shadow -->
       <rect x="2" y="${size * 0.12}" width="${size}" height="${size}" rx="${Math.max(8, size * 0.35)}" fill="rgba(0,0,0,0.2)" />
-      
-      <!-- Base Plate (Glass) -->
       <rect width="${size}" height="${size}" rx="${Math.max(8, size * 0.35)}" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" />
-      
-      <!-- Inner Glow -->
       <rect x="2" y="2" width="${size - 4}" height="${size * 0.45}" rx="${Math.max(6, size * 0.25)}" fill="rgba(255,255,255,0.18)" />
-      
       <g>
-        <!-- Accent Background if no HQ asset -->
-        ${!tag.highQualityAssetHref ? `<rect x="${size * 0.18}" y="${size * 0.18}" width="${size * 0.64}" height="${size * 0.64}" rx="${Math.max(5, size * 0.22)}" fill="${tag.fill}" opacity="0.8" />` : ''}
+        <rect x="${size * 0.18}" y="${size * 0.18}" width="${size * 0.64}" height="${size * 0.64}" rx="${Math.max(5, size * 0.22)}" fill="${tag.fill}" opacity="0.8" />
         ${mainImage}
       </g>
     </g>
@@ -312,10 +311,10 @@ export function renderThumbnailSvg(payload: RenderPayload): string {
 
   const chipMarkup =
     payload.layout === 'single'
-      ? renderIconTile(8, 16, 40, chips[0]!, -4)
+      ? renderIconTile(4, 14, 48, chips[0]!, -4) // Bleed
       : payload.layout === 'dual'
-        ? `${renderIconTile(2, 12, 30, chips[0]!, -8)}${renderIconTile(24, 30, 30, chips[1]!, 6)}`
-        : `${renderIconTile(16, 10, 24, chips[0]!, -3)}${renderIconTile(4, 34, 24, chips[1]!, -10)}${chips[2] ? renderIconTile(28, 35, 24, chips[2], 8) : ''}`
+        ? `${renderIconTile(-6, 8, 38, chips[0]!, -10)}${renderIconTile(20, 24, 38, chips[1]!, 8)}` // Heavy overlap & bleed
+        : `${renderIconTile(14, 4, 30, chips[0]!, -5)}${renderIconTile(-6, 28, 32, chips[1]!, -12)}${chips[2] ? renderIconTile(26, 32, 30, chips[2], 12) : ''}`
 
   const overflowMarkup =
     payload.overflowCount > 0

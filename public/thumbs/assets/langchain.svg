@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7FC8FF" />
+      <stop offset="100%" stop-color="#57a0d7" />
+    </linearGradient>
+    <linearGradient id="border" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="white" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="white" stop-opacity="0.1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="black" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <!-- Base Shape -->
+  <rect x="1" y="1" width="22" height="22" rx="6" fill="url(#bg)" filter="url(#shadow)" />
+  <!-- Glass Reflection -->
+  <path d="M 1 7 Q 1 1 7 1 L 17 1 Q 23 1 23 7 L 23 12 Q 12 10 1 12 Z" fill="white" fill-opacity="0.15" />
+  <!-- Inner Content -->
+  <path d="M7.53 15.975a7.53 7.53 0 0 0 2.206-5.325A7.54 7.54 0 0 0 7.53 5.325L2.205 0A7.54 7.54 0 0 0 0 5.325a7.54 7.54 0 0 0 2.205 5.325zm11.144.493a7.54 7.54 0 0 0-5.325-2.206 7.54 7.54 0 0 0-5.325 2.206l5.325 5.325a7.54 7.54 0 0 0 5.325 2.205A7.54 7.54 0 0 0 24 21.793zM2.219 21.78a7.54 7.54 0 0 0 5.325 2.205v-7.53H.014a7.54 7.54 0 0 0 2.205 5.325M20.73 8.595a7.53 7.53 0 0 0-5.327-2.206 7.53 7.53 0 0 0-5.325 2.207l5.325 5.325z" fill="white" transform="scale(0.55) translate(9 9)" />
+  <!-- Border -->
+  <rect x="1" y="1" width="22" height="22" rx="6" fill="none" stroke="url(#border)" stroke-width="0.5" />
+</svg>

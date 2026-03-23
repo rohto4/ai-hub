@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2b85ab" />
+      <stop offset="100%" stop-color="#035d83" />
+    </linearGradient>
+    <linearGradient id="border" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="white" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="white" stop-opacity="0.1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="black" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <!-- Base Shape -->
+  <rect x="1" y="1" width="22" height="22" rx="6" fill="url(#bg)" filter="url(#shadow)" />
+  <!-- Glass Reflection -->
+  <path d="M 1 7 Q 1 1 7 1 L 17 1 Q 23 1 23 7 L 23 12 Q 12 10 1 12 Z" fill="white" fill-opacity="0.15" />
+  <!-- Inner Content -->
+  <text x="12" y="18" fill="white" font-family="system-ui, sans-serif" font-weight="900" font-size="14" text-anchor="middle">Q</text>
+  <!-- Border -->
+  <rect x="1" y="1" width="22" height="22" rx="6" fill="none" stroke="url(#border)" stroke-width="0.5" />
+</svg>
