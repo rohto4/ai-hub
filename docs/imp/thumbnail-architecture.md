@@ -2,6 +2,46 @@
 
 このドキュメントでは、AI Trend Hub における「記事の左側に表示されるサムネイル・アイコン」が、どの情報に依存し、どのような流れで生成・表示されているかを整理します。
 
+## 0. 全体アーキテクチャ図
+
+以下の図は、入力データから最終的なSVG画像がブラウザに返されるまでのデータの流れを示しています。
+
+```mermaid
+graph TD
+    %% 入力データ (DB / コード)
+    subgraph Data Sources [入力データ (Layer 2 / 4)]
+        TM[(tags_master)] --> |tag_key, display_name| SG[generate-tag-icons.ts]
+        SI[simple-icons / CUSTOM_ICONS] --> |ベクターパス, 公式カラー| SG
+        
+        AE[(articles_enriched)] --> |title, summary, category| U[URL 生成バッチ]
+        PAT[(public_article_tags)] --> |記事に紐づくタグ| U
+        PA[(public_articles)] --> |言語バッジ| U
+    end
+
+    %% 処理1: アセット生成
+    subgraph Asset Generation [アイコン素材の準備 (ビルド/運用時)]
+        SG --> |生成 (公式 or 幾何学)| FS[public/thumbs/assets/*.svg]
+    end
+
+    %% 処理2: URL生成
+    subgraph URL Generation [サムネイルURL生成 (バッチ処理時)]
+        U --> |ランキング & フィルタ| URL[thumbnail_url: /api/thumb?tags=a,b&bg=...]
+        URL --> |保存| PA
+    end
+
+    %% 処理3: 描画
+    subgraph Rendering [リアルタイム描画 (アクセス時)]
+        REQ[Browser Request] --> |GET| API[/api/thumb/route.ts]
+        API --> |クエリ解析| TMPL[thumbnail-template.ts]
+        FS --> |Data URL変換| TMPL
+        TMPL --> |レイアウト計算 (グラスモーフィズム合成)| SVG((最終的な SVG 画像))
+    end
+
+    %% 依存関係の接続
+    PA -.-> |表示時にURLを参照| REQ
+    SVG -.-> |レスポンス| REQ
+```
+
 ## 1. 依存するデータソース (情報の源泉)
 
 サムネイルの表示内容は、以下のデータに依存して決定されます。
