@@ -309,12 +309,14 @@ export function renderThumbnailSvg(payload: RenderPayload): string {
   const chips = payload.tags.slice(0, 3)
   const badge = renderBadgeText(payload)
 
-  const chipMarkup =
-    payload.layout === 'single'
-      ? renderIconTile(4, 14, 48, chips[0]!, -4) // Bleed
-      : payload.layout === 'dual'
-        ? `${renderIconTile(-6, 8, 38, chips[0]!, -10)}${renderIconTile(20, 24, 38, chips[1]!, 8)}` // Heavy overlap & bleed
-        : `${renderIconTile(14, 4, 30, chips[0]!, -5)}${renderIconTile(-6, 28, 32, chips[1]!, -12)}${chips[2] ? renderIconTile(26, 32, 30, chips[2], 12) : ''}`
+  let chipMarkup = ''
+  if (chips.length === 1) {
+    chipMarkup = renderIconTile(4, 14, 48, chips[0]!, -4)
+  } else if (chips.length === 2) {
+    chipMarkup = `${renderIconTile(-6, 8, 38, chips[0]!, -10)}${renderIconTile(20, 24, 38, chips[1]!, 8)}`
+  } else if (chips.length >= 3) {
+    chipMarkup = `${renderIconTile(14, 4, 30, chips[0]!, -5)}${renderIconTile(-6, 28, 32, chips[1]!, -12)}${renderIconTile(26, 32, 30, chips[2]!, 12)}`
+  }
 
   const overflowMarkup =
     payload.overflowCount > 0
