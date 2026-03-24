@@ -1,5 +1,10 @@
 import { getSql } from '@/lib/db'
 import type { RawArticleForEnrichment } from '@/lib/db/enrichment-types'
+import {
+  ARXIV_AI_ENRICH_MAX_ARTICLE_AGE_MONTHS,
+  ARXIV_AI_SOURCE_KEY,
+  DEFAULT_ENRICH_MAX_ARTICLE_AGE_MONTHS,
+} from '@/lib/source-retention'
 
 type RawArticleRow = {
   raw_article_id: number
@@ -17,6 +22,7 @@ type RawArticleRow = {
   title: string | null
   snippet: string | null
   source_url: string
+  source_published_at: string | null
   source_updated_at: string | null
   has_source_update: boolean
   source_commercial_use_policy: 'permitted' | 'prohibited' | 'unknown'
@@ -50,6 +56,7 @@ export async function listRawArticlesForEnrichment(
           ar.title,
           ar.snippet,
           ar.source_url,
+          ar.source_published_at,
           ar.source_updated_at,
           ar.has_source_update
         FROM articles_raw ar
@@ -81,6 +88,7 @@ export async function listRawArticlesForEnrichment(
           ar.title,
           ar.snippet,
           ar.source_url,
+          ar.source_published_at,
           ar.source_updated_at,
           ar.has_source_update
         FROM articles_raw ar
@@ -109,6 +117,7 @@ export async function listRawArticlesForEnrichment(
     title: row.title,
     snippet: row.snippet,
     sourceUrl: row.source_url,
+    sourcePublishedAt: row.source_published_at,
     sourceUpdatedAt: row.source_updated_at,
     hasSourceUpdate: row.has_source_update,
     commercialUsePolicy:
@@ -164,6 +173,7 @@ export async function claimRawArticlesForEnrichment(
           ar.title,
           ar.snippet,
           ar.source_url,
+          ar.source_published_at,
           ar.source_updated_at,
           ar.has_source_update
         FROM claimed_rows cl
@@ -210,6 +220,7 @@ export async function claimRawArticlesForEnrichment(
           ar.title,
           ar.snippet,
           ar.source_url,
+          ar.source_published_at,
           ar.source_updated_at,
           ar.has_source_update
         FROM claimed_rows cl
@@ -236,6 +247,7 @@ export async function claimRawArticlesForEnrichment(
     title: row.title,
     snippet: row.snippet,
     sourceUrl: row.source_url,
+    sourcePublishedAt: row.source_published_at,
     sourceUpdatedAt: row.source_updated_at,
     hasSourceUpdate: row.has_source_update,
     commercialUsePolicy:
@@ -258,6 +270,55 @@ export async function markRawProcessed(rawArticleId: number): Promise<void> {
       updated_at = now()
     WHERE raw_article_id = ${rawArticleId}
   `
+}
+
+export async function skipExpiredRawArticlesForEnrichment(sourceKey?: string | null): Promise<number> {
+  const sql = getSql()
+  const rows = (sourceKey
+    ? await sql`
+        UPDATE articles_raw ar
+        SET
+          is_processed = true,
+          has_source_update = false,
+          process_after = now(),
+          last_error = null,
+          updated_at = now()
+        FROM source_targets st
+        WHERE st.source_target_id = ar.source_target_id
+          AND st.source_key = ${sourceKey}
+          AND ar.is_processed = false
+          AND ar.source_published_at IS NOT NULL
+          AND ar.source_published_at < now() - make_interval(
+            months => ${
+              sourceKey === ARXIV_AI_SOURCE_KEY
+                ? ARXIV_AI_ENRICH_MAX_ARTICLE_AGE_MONTHS
+                : DEFAULT_ENRICH_MAX_ARTICLE_AGE_MONTHS
+            }
+          )
+        RETURNING ar.raw_article_id
+      `
+    : await sql`
+        UPDATE articles_raw ar
+        SET
+          is_processed = true,
+          has_source_update = false,
+          process_after = now(),
+          last_error = null,
+          updated_at = now()
+        FROM source_targets st
+        WHERE st.source_target_id = ar.source_target_id
+          AND ar.is_processed = false
+          AND ar.source_published_at IS NOT NULL
+          AND ar.source_published_at < now() - make_interval(
+            months => CASE
+              WHEN st.source_key = ${ARXIV_AI_SOURCE_KEY} THEN ${ARXIV_AI_ENRICH_MAX_ARTICLE_AGE_MONTHS}
+              ELSE ${DEFAULT_ENRICH_MAX_ARTICLE_AGE_MONTHS}
+            END
+          )
+        RETURNING ar.raw_article_id
+      `) as Array<{ raw_article_id: number }>
+
+  return rows.length
 }
 
 export async function markRawError(rawArticleId: number, errorMessage: string): Promise<void> {

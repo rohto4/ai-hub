@@ -12,7 +12,7 @@
 1. P0 ではジョブを責務単位で分割する
 2. 時間粒度と責務粒度は一致させない
 3. enrich は現行実装名が `daily-enrich` でも、運用上は毎時実行前提で扱う
-4. 要約 API 呼び出しは 1 記事ずつではなく、`summaryBatchSize=10` を基本とする
+4. 要約 API 呼び出しは 1 記事ずつではなく、`summaryBatchSize=20` を基本とする
 5. Gemini / OpenAI へ渡す要約指示は固定テンプレートファイルを使い、毎回同じルールを明示する
 4. 毎時運用は `fetch -> enrich` を直列にし、enrich は小分けで回す
 5. 即時反映は定期バッチに混ぜず、優先キュー経由で処理する
@@ -75,6 +75,7 @@
 
 - 主処理
   - 未処理または再整形対象の raw を小分けで取得する
+  - 定時実行の基本設定は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1` とする
   - まず `source_targets.content_access_policy` を見る
   - `fulltext_allowed` source に限って本文取得を試みる
   - `feed_only` source は snippet ベースで継続する
@@ -190,3 +191,4 @@
 1. 現行実装名は `daily-enrich` だが、運用上は毎時 `hourly-fetch` の後に小分けで直列実行する
 2. 実装入口は `/api/cron/hourly-layer12` とし、内部で `fetch -> enrich` を直列に回す
 3. GitHub Actions では `hourly-layer12.yml` から `APP_URL/api/cron/hourly-layer12` を叩く
+4. `hourly-enrich.yml` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40` の 8 回実行する
