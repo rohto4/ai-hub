@@ -19,6 +19,7 @@ type RankedTag = MatchedTagReference & {
 
 type ThumbnailLayout = 'single' | 'dual' | 'trio' | 'overflow'
 const THUMBNAIL_TEMPLATE_VERSION = '3'
+const EXCLUDED_THUMBNAIL_TAGS = new Set(['llm'])
 
 export type ThumbnailTemplateInput = {
   canonicalUrl: string
@@ -100,6 +101,7 @@ function rankTags(input: ThumbnailTemplateInput): RankedTag[] {
 
 function selectDisplayTags(input: ThumbnailTemplateInput): { tags: RankedTag[]; overflowCount: number } {
   const ranked = rankTags(input)
+    .filter((tag) => !EXCLUDED_THUMBNAIL_TAGS.has(tag.tagKey))
     .sort((left, right) => {
       if (left.rank !== right.rank) return left.rank - right.rank
       return left.seed - right.seed

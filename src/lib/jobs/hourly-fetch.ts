@@ -1,8 +1,8 @@
 import { getCollector } from '@/lib/collectors'
 import type { SourceTarget } from '@/lib/collectors/types'
 import { markLatestRawError, persistCollectedItem } from '@/lib/db/articles-raw'
-import { finishJobRun, recordJobRunItem, startJobRun } from '@/lib/db/job-runs'
-import { listDueSourceTargets } from '@/lib/db/source-targets'
+import { countConsecutiveFailedJobRunItems, finishJobRun, recordJobRunItem, startJobRun } from '@/lib/db/job-runs'
+import { listDueSourceTargets, setSourceTargetActive } from '@/lib/db/source-targets'
 import { normalizeUrl } from '@/lib/rss/normalize'
 
 export interface HourlyFetchTargetResult {
@@ -23,6 +23,7 @@ export interface HourlyFetchResult {
   updated: number
   skipped: number
   failedItems: number
+  autoDisabledTargets: number
   targets: HourlyFetchTargetResult[]
 }
 
@@ -109,6 +110,22 @@ export async function runHourlyFetch(options: number | HourlyFetchOptions = 20):
     })
   }
 
+  let autoDisabledTargets = 0
+  for (const target of targets) {
+    if (!target.error) {
+      continue
+    }
+
+    const consecutiveFailures = await countConsecutiveFailedJobRunItems('hourly-fetch', target.sourceKey, 3)
+    if (consecutiveFailures < 3) {
+      continue
+    }
+
+    await setSourceTargetActive(target.sourceTargetId, false)
+    autoDisabledTargets += 1
+    target.error = `${target.error} [auto-disabled after 3 consecutive failures]`
+  }
+
   const result = {
     processedTargets: sourceTargets.length,
     succeededTargets: settled.filter((entry) => entry.status === 'fulfilled').length,
@@ -117,6 +134,7 @@ export async function runHourlyFetch(options: number | HourlyFetchOptions = 20):
     updated: targets.reduce((sum, item) => sum + item.updated, 0),
     skipped: targets.reduce((sum, item) => sum + item.skipped, 0),
     failedItems: targets.reduce((sum, item) => sum + item.failed, 0),
+    autoDisabledTargets,
     targets,
   }
 
@@ -131,6 +149,7 @@ export async function runHourlyFetch(options: number | HourlyFetchOptions = 20):
       updated: result.updated,
       skipped: result.skipped,
       failedItems: result.failedItems,
+      autoDisabledTargets: result.autoDisabledTargets,
     },
     lastError: targets.find((target) => target.error)?.error ?? null,
   })

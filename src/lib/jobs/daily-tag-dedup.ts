@@ -5,6 +5,7 @@
  * - マッチしなかった候補 → status='candidate' のまま（管理画面レビュー待ち）
  */
 import { getSql } from '@/lib/db'
+import { refreshThumbnailUrlsForTagId } from '@/lib/db/admin-operations'
 import { finishJobRun, startJobRun } from '@/lib/db/job-runs'
 import { detectTagDuplicates, type ExistingTag, type TagDedupCandidate } from '@/lib/tags/dedup'
 
@@ -15,6 +16,8 @@ export type TagDedupResult = {
   checked: number
   merged: number
   noMatch: number
+  refreshedEnriched: number
+  refreshedPublic: number
 }
 
 export async function runDailyTagDedup(): Promise<TagDedupResult> {
@@ -23,6 +26,8 @@ export async function runDailyTagDedup(): Promise<TagDedupResult> {
 
   let merged = 0
   let noMatch = 0
+  let refreshedEnriched = 0
+  let refreshedPublic = 0
   let lastError: string | null = null
 
   try {
@@ -45,8 +50,8 @@ export async function runDailyTagDedup(): Promise<TagDedupResult> {
     `) as Array<{ tag_id: string; tag_key: string; display_name: string }>
 
     if (candidates.length === 0 || existingTags.length === 0) {
-      await finishJobRun({ jobRunId, status: 'completed', processedCount: 0, successCount: 0, failedCount: 0, metadata: { checked: 0, merged: 0, noMatch: 0 }, lastError: null })
-      return { checked: 0, merged: 0, noMatch: 0 }
+      await finishJobRun({ jobRunId, status: 'completed', processedCount: 0, successCount: 0, failedCount: 0, metadata: { checked: 0, merged: 0, noMatch: 0, refreshedEnriched: 0, refreshedPublic: 0 }, lastError: null })
+      return { checked: 0, merged: 0, noMatch: 0, refreshedEnriched: 0, refreshedPublic: 0 }
     }
 
     const dedupCandidates: TagDedupCandidate[] = candidates.map((c) => ({
@@ -118,8 +123,11 @@ export async function runDailyTagDedup(): Promise<TagDedupResult> {
               SET review_status = 'promoted'
               WHERE candidate_key = ${result.candidateKey}
             `
+            const refreshed = await refreshThumbnailUrlsForTagId(result.matchedTagId)
+            refreshedEnriched += refreshed.refreshedEnrichedCount
+            refreshedPublic += refreshed.refreshedPublicCount
             merged++
-            console.log(`[tag-dedup] "${result.candidateKey}" → "${result.matchedTagKey}" にマージ（遡及タグ付け済み）`)
+            console.log(`[tag-dedup] "${result.candidateKey}" → "${result.matchedTagKey}" にマージ（遡及タグ付け + thumbnail再計算済み）`)
           } else {
             noMatch++
           }
@@ -141,9 +149,9 @@ export async function runDailyTagDedup(): Promise<TagDedupResult> {
     processedCount: checked,
     successCount: merged,
     failedCount: 0,
-    metadata: { checked, merged, noMatch },
+    metadata: { checked, merged, noMatch, refreshedEnriched, refreshedPublic },
     lastError,
   })
 
-  return { checked, merged, noMatch }
+  return { checked, merged, noMatch, refreshedEnriched, refreshedPublic }
 }

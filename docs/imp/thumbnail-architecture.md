@@ -1,107 +1,258 @@
 # サムネイル・アイコン生成アーキテクチャ
 
-このドキュメントでは、AI Trend Hub における「記事の左側に表示されるサムネイル・アイコン」が、どの情報に依存し、どのような流れで生成・表示されているかを整理します。
+このドキュメントは、記事カード左側の小型サムネイルが何に依存して、どこで生成され、どこでフォールバックするかを現行実装ベースで整理したものです。
 
-## 0. 全体アーキテクチャ図
+## 1. 結論
 
-以下の図は、入力データから最終的なSVG画像がブラウザに返されるまでのデータの流れを示しています。
+現在のサムネイル表示は次の 5 つに依存しています。
+
+1. `articles_enriched` / `public_articles`
+   - `thumbnail_url`
+   - `thumbnail_emoji`
+   - `title` または表示用 `title`
+   - `summary_100`, `summary_200` または表示用 summary
+   - `source_type`, `source_category`
+   - `content_language`
+2. `articles_enriched_tags` / `public_article_tags`
+   - 記事に紐づくタグ一覧
+3. `tags_master`
+   - `tag_key`
+   - `display_name`
+4. [`src/lib/publish/thumbnail-tag-registry.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-tag-registry.ts)
+   - タグごとの `accentColor`
+   - `iconPath`
+   - `highQualityAssetPath`
+   - registry 未登録タグの fallback ルール
+5. `public/thumbs/icons/` と `public/thumbs/assets/`
+   - 実際に描画で読み込まれる SVG / 画像アセット
+
+## 2. 全体フロー
 
 ```mermaid
-graph TD
-    %% 入力データ (DB / コード)
-    subgraph Data Sources [入力データ (Layer 2 / 4)]
-        TM[(tags_master)] --> |tag_key, display_name| SG[generate-tag-icons.ts]
-        SI[simple-icons / CUSTOM_ICONS] --> |ベクターパス, 公式カラー| SG
-        
-        AE[(articles_enriched)] --> |title, summary, category| U[URL 生成バッチ]
-        PAT[(public_article_tags)] --> |記事に紐づくタグ| U
-        PA[(public_articles)] --> |言語バッジ| U
-    end
+flowchart TD
+    classDef db fill:#fff3e0,stroke:#fb8c00,color:#4e342e
+    classDef code fill:#e3f2fd,stroke:#1e88e5,color:#0d47a1
+    classDef batch fill:#ede7f6,stroke:#5e35b1,color:#311b92
+    classDef api fill:#e0f7fa,stroke:#00838f,color:#004d40
+    classDef ui fill:#fce4ec,stroke:#d81b60,color:#880e4f
+    classDef asset fill:#e8f5e9,stroke:#43a047,color:#1b5e20
+    classDef legendBox fill:#ffffff,stroke:#9e9e9e,color:#424242
 
-    %% 処理1: アセット生成
-    subgraph Asset Generation [アイコン素材の準備 (ビルド/運用時)]
-        SG --> |生成 (公式 or 幾何学)| FS[public/thumbs/assets/*.svg]
-    end
+    ST["source_type / source_category / content_language"]:::db
+    AE["articles_enriched<br/>title / summary / thumbnail_url"]:::db
+    AET["articles_enriched_tags"]:::db
+    TM["tags_master<br/>tag_key / display_name"]:::db
+    REG["thumbnail-tag-registry.ts"]:::code
+    ASSET["public/thumbs/icons<br/>public/thumbs/assets"]:::asset
+    BUILD["buildInternalThumbnailUrl()"]:::code
+    BACKFILL["scripts/backfill-thumbnail-urls.ts<br/>既存 thumbnail_url 再計算"]:::batch
+    PERSIST["persist-enriched.ts / hourly-publish<br/>保存時 thumbnail_url 反映"]:::batch
+    PA["public_articles<br/>thumbnail_url / thumbnail_emoji"]:::db
+    API["GET /api/thumb<br/>サムネイル SVG 返却"]:::api
+    DECODE["decodeThumbnailPayload()<br/>クエリ解釈"]:::code
+    RENDER["renderThumbnailSvg()<br/>SVG 合成"]:::code
+    CARD["ArticleCard img"]:::ui
+    EMOJI["thumbnail_emoji fallback"]:::ui
 
-    %% 処理2: URL生成
-    subgraph URL Generation [サムネイルURL生成 (バッチ処理時)]
-        U --> |ランキング & フィルタ| URL[thumbnail_url: /api/thumb?tags=a,b&bg=...]
-        URL --> |保存| PA
+    subgraph LEGEND["凡例"]
+        direction TB
+        LEGEND_DB["DB"]:::db
+        LEGEND_CODE["Code"]:::code
+        LEGEND_BATCH["Batch"]:::batch
+        LEGEND_API["API"]:::api
+        LEGEND_UI["UI"]:::ui
+        LEGEND_ASSET["Asset"]:::asset
     end
+    class LEGEND legendBox
 
-    %% 処理3: 描画
-    subgraph Rendering [リアルタイム描画 (アクセス時)]
-        REQ[Browser Request] --> |GET| API[/api/thumb/route.ts]
-        API --> |クエリ解析| TMPL[thumbnail-template.ts]
-        FS --> |Data URL変換| TMPL
-        TMPL --> |レイアウト計算 (グラスモーフィズム合成)| SVG((最終的な SVG 画像))
-    end
+    AE --> BUILD
+    AET --> BUILD
+    TM --> BUILD
+    ST --> BUILD
+    REG --> BUILD
 
-    %% 依存関係の接続
-    PA -.-> |表示時にURLを参照| REQ
-    SVG -.-> |レスポンス| REQ
+    BUILD --> PERSIST
+    BUILD --> BACKFILL
+    BACKFILL --> AE
+    PERSIST --> PA
+    AE --> PA
+
+    PA --> CARD
+    CARD --> API
+    API --> DECODE
+    DECODE --> REG
+    REG --> RENDER
+    ASSET --> RENDER
+    RENDER --> CARD
+
+    PA --> EMOJI
 ```
 
-## 1. 依存するデータソース (情報の源泉)
+## 3. 保存時の依存関係
 
-サムネイルの表示内容は、以下のデータに依存して決定されます。
+`thumbnail_url` は外部画像 URL を保存しているのではなく、内部の `/api/thumb?...` URL を保存しています。
 
-1.  **`tags_master` テーブル (タグの定義)**
-    *   `tag_key`: タグの一意な識別子 (例: `openai`, `agent`)。
-    *   `display_name`: アイコン生成時に公式ロゴがない場合のフォールバック（文字やパターンのシード値）として間接的に使用されます。
-    *   ※ 現在は `icon_asset_path` などのカラムを追加していますが、表示そのものはローカルのSVGファイルを正としています。
+生成箇所:
 
-2.  **`public_article_tags` テーブル (記事へのタグ紐付け)**
-    *   記事にどのタグが紐づいているか。このタグ群がサムネイルに表示されるアイコンの「パーツ」になります。
+- [`src/lib/publish/thumbnail-template.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-template.ts)
+  - `buildInternalThumbnailUrl()`
+- [`src/lib/enrich/persist-enriched.ts`](/G:/devwork/ai-summary/src/lib/enrich/persist-enriched.ts)
+  - Layer 2 保存時に `articles_enriched.thumbnail_url` へ反映
+- [`src/lib/publish/hourly-publish-upsert.ts`](/G:/devwork/ai-summary/src/lib/publish/hourly-publish-upsert.ts)
+  - Layer 4 へ `public_articles.thumbnail_url` を反映
+- [`scripts/backfill-thumbnail-urls.ts`](/G:/devwork/ai-summary/scripts/backfill-thumbnail-urls.ts)
+  - 既存データの再計算と再同期
 
-3.  **`public_articles` テーブル (記事のメタデータ)**
-    *   `content_language`: サムネイル左上の言語バッジ (`EN` / `JP`) を決定。
-    *   `thumbnail_url`: 最終的な描画先URL (`/api/thumb?...`) が保持されます。このURLクエリに、背景色、レイアウト、対象タグなどの描画指示が含まれています。
+`buildInternalThumbnailUrl()` が見ている情報:
 
-4.  **`articles_enriched` テーブル (記事の本文)**
-    *   `title`, `summary_100`, `summary_200`: 記事に紐づく複数のタグのうち、「どれを一番手前に表示するか」の**優先順位付け（ランキング）**に使用されます。（タイトルや要約に早く出現するタグほど優先度が高くなります）
-    *   `source_type`, `source_category`: サムネイル全体の**背景グラデーション色**（例: `blog-llm` なら緑系、`alerts` なら紫系など）を決定します。
+1. `matchedTags`
+   - 記事に紐づくタグ一覧
+2. `title`, `summary100`, `summary200`
+   - タグをどの順で優先表示するかのランキング材料
+3. `sourceType`, `sourceCategory`
+   - 背景バリエーションの決定
+4. `contentLanguage`
+   - `JP` / `EN` バッジ
+5. registry に icon があるか
+   - icon が 0 件なら `thumbnail_url` を返さず `null`
 
-## 2. アセットの管理 (パーツの準備)
+つまり、Gemini が改善した「見た目」は最終レンダリングに効きますが、そもそもそのタグが選ばれるか、`thumbnail_url` が作られるかは DB のタグ情報と `thumbnail-template.ts` のロジックに依存しています。
 
-アイコンそのもののベクター画像（SVG）は、以下の仕組みで管理・生成されています。
+## 4. レンダリング時の依存関係
 
-*   **生成スクリプト**: `scripts/generate-tag-icons.ts`
-*   **アセットの保存先**: `public/thumbs/assets/*.svg`
-*   **マッピング定義**: `src/lib/publish/thumbnail-tag-registry.ts`
+ブラウザ表示時は、保存済みの `thumbnail_url` を使って都度 SVG を返します。
 
-### 2.1 アイコンの生成ロジック (`generate-tag-icons.ts`)
-1.  **カスタム指定 (`CUSTOM_ICONS`)**: OpenAI や Gemini, ChatGPT, Microsoft Copilot など、商標の都合等で汎用ライブラリにないものは、スクリプト内にベクターパスをハードコードして使用します。
-2.  **公式ロゴ (`simple-icons`)**: 上記以外のタグ（Anthropic, Google, GitHub など）は、npm パッケージ `simple-icons` から完全な公式ロゴのパスとブランドカラーを取得します。
-3.  **幾何学パターン (Fallback)**: 公式ロゴが存在しないマイナーなタグに対しては、アルファベットの羅列ではなく、`tag_key` の文字列からハッシュ値（Seed）を計算し、**「固有のブランドカラーを持つ、近未来的な幾何学パターン」**を動的に生成します。
+```mermaid
+sequenceDiagram
+    %% UI / API / Code / Asset color cue is expressed in labels to keep Mermaid stable
+    participant Card as ArticleCard
+    participant Thumb as /api/thumb\nサムネイル SVG 返却
+    participant Template as thumbnail-template.ts\nSVG 合成
+    participant Registry as thumbnail-tag-registry.ts
+    participant Assets as public/thumbs/*
 
-生成されたこれらはすべて、半透明のガラスベース（グラスモーフィズム）とドロップシャドウを合成した**1つの完全なSVGファイル**として `public/thumbs/assets/` に保存されます。
+    Card->>Thumb: GET /api/thumb?bg=...&layout=...&tags=...&lang=...&v=3
+    Thumb->>Template: decodeThumbnailPayload(searchParams)
+    Template->>Registry: resolveThumbnailTagRegistryEntry(tagKey)
+    Registry-->>Template: accentColor / iconPath / highQualityAssetPath
+    Template->>Assets: loadAssetDataUri(assetPath)
+    Template->>Template: renderThumbnailSvg(payload)
+    Template-->>Thumb: SVG string
+    Thumb-->>Card: image/svg+xml
+```
 
-## 3. URLの生成 (バッチ処理)
+実装箇所:
 
-記事が収集・公開される際（または `npm run db:backfill-thumbnail-urls` 実行時）、以下の流れで `thumbnail_url` が生成されます。
+- [`src/app/api/thumb/route.ts`](/G:/devwork/ai-summary/src/app/api/thumb/route.ts)
+  - `GET`
+  - `decodeThumbnailPayload()` と `renderThumbnailSvg()` の呼び出し
+- [`src/lib/publish/thumbnail-template.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-template.ts)
+  - クエリ decode
+  - asset 読み込み
+  - SVG 合成
+- [`src/lib/publish/thumbnail-tag-registry.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-tag-registry.ts)
+  - タグごとの asset 解決
 
-*   **担当コード**: `src/lib/publish/thumbnail-template.ts` の `buildInternalThumbnailUrl` 関数
+## 5. どこを変えると見た目が変わるか
 
-1.  **タグの絞り込み**: 記事に紐づくタグの中から、レジストリ（`thumbnail-tag-registry.ts`）に登録されているタグのみを抽出します。
-2.  **タグの順位付け (`rankTags`)**: タイトルや要約内での「出現位置の早さ」をスコア化し、上位最大3つのタグを選定します。
-3.  **URLクエリの組み立て**:
-    *   `bg`: `source_type` と `source_category` から決定。
-    *   `tags`: 選定された最大3つのタグ（カンマ区切り）。
-    *   `lang`: `content_language`。
-    *   `overflow`: 選ばれなかったタグの数（右下の「...」の描画判定用）。
-4.  完成したURL（例: `/api/thumb?bg=alerts&tags=openai,agent&lang=ja...`）をDBに保存します。
+### 5.1 アイコンの見た目
 
-## 4. ブラウザでの描画 (実行時)
+依存箇所:
 
-ブラウザが画像をリクエストすると、Next.js の API Route が動的にSVGを合成して返します。
+- [`public/thumbs/icons/`](/G:/devwork/ai-summary/public/thumbs/icons)
+- [`public/thumbs/assets/`](/G:/devwork/ai-summary/public/thumbs/assets)
+- [`src/lib/publish/thumbnail-tag-registry.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-tag-registry.ts)
 
-*   **担当コード**: `src/app/api/thumb/route.ts` -> `renderThumbnailSvg`
+変化内容:
 
-1.  URLクエリの解析。
-2.  **アセットの読み込み**: `public/thumbs/assets/` から該当するSVGファイルを読み込み、**Data URL (`data:image/svg+xml;base64,...`) に変換**します。これにより、外部へのHTTPリクエストなしに高速に画像をインライン展開できます。
-3.  **レイアウトの計算**:
-    *   タグが1つの場合: 中央に巨大なアイコンを配置（枠からはみ出す演出）。
-    *   タグが2つの場合: 左上と右下に大きく重なり合うように配置。
-    *   タグが3つの場合: トライアングル状にダイナミックに配置。
-4.  **最終合成**: 背景グラデーション、装飾（円や多角形）、ガラスのメインカード、バッジ、そしてインライン化されたアイコンをすべて統合し、1つの `<svg>` タグとしてブラウザに返却（長期間キャッシュ）します。
+- アイコン SVG を差し替える
+- 特定タグの `highQualityAssetPath` を追加する
+- `accentColor` を調整する
+
+### 5.2 レイアウトと質感
+
+依存箇所:
+
+- [`src/lib/publish/thumbnail-template.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-template.ts)
+
+主な変更ポイント:
+
+- `renderIconTile()`
+- `renderThumbnailSvg()`
+- `BACKGROUNDS`
+- `resolveLayout()`
+
+ここが、今回の「ギリ良い感じ」の改善を継続していく本丸です。
+
+### 5.3 どのタグが選ばれるか
+
+依存箇所:
+
+- [`src/lib/publish/thumbnail-template.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-template.ts)
+  - `rankTags()`
+  - `selectDisplayTags()`
+- `articles_enriched_tags`
+- `public_article_tags`
+
+主な変更ポイント:
+
+- title 内の出現順をどれだけ強く優先するか
+- summary 側の重み
+- overflow の扱い
+- registry 未登録タグを表示対象に含めるか
+
+## 6. フォールバックの境界
+
+現在のフォールバックは次の順です。
+
+1. `thumbnail_url` が生成できる
+   - `/api/thumb` で SVG 表示
+2. `thumbnail_url` はあるが、tag asset が弱い
+   - registry / asset fallback で描画
+3. `thumbnail_url` を生成できない
+   - `thumbnail_emoji` を使う
+
+補足:
+
+- `buildInternalThumbnailUrl()` は registry 上で icon が 1 件も無い場合 `null` を返します
+- `ArticleCard` は `thumbnail_url` を優先し、空なら `thumbnail_emoji` を表示します
+
+## 7. いまのドキュメント上の注意
+
+以前の説明にあった以下は、現行実装とはズレています。
+
+- `generate-tag-icons.ts` が主導する説明
+- `public/thumbs/assets/*.svg` だけに依存する説明
+- `/api/thumb` が query だけで完結していて DB に依存しないように見える説明
+
+正しくは、
+
+- 保存時は DB と tag 紐付けに依存
+- 表示時は `thumbnail_url` と registry / asset に依存
+- `thumbnail_emoji` が最後の保険
+
+です。
+
+## 8. 検証メモ
+
+2026-03-23 時点で、以下の実装と突き合わせて内容を確認済みです。
+
+- [`src/lib/publish/thumbnail-template.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-template.ts)
+  - `buildInternalThumbnailUrl()`
+  - `decodeThumbnailPayload()`
+  - `renderThumbnailSvg()`
+- [`src/lib/publish/thumbnail-tag-registry.ts`](/G:/devwork/ai-summary/src/lib/publish/thumbnail-tag-registry.ts)
+- [`src/app/api/thumb/route.ts`](/G:/devwork/ai-summary/src/app/api/thumb/route.ts)
+- [`src/lib/enrich/persist-enriched.ts`](/G:/devwork/ai-summary/src/lib/enrich/persist-enriched.ts)
+- [`src/lib/publish/hourly-publish-upsert.ts`](/G:/devwork/ai-summary/src/lib/publish/hourly-publish-upsert.ts)
+- [`scripts/backfill-thumbnail-urls.ts`](/G:/devwork/ai-summary/scripts/backfill-thumbnail-urls.ts)
+- [`src/components/card/ArticleCard.tsx`](/G:/devwork/ai-summary/src/components/card/ArticleCard.tsx)
+- [`src/lib/db/public-shared.ts`](/G:/devwork/ai-summary/src/lib/db/public-shared.ts)
+
+確認結果:
+
+- 図の主フローは現行ソースと一致
+- `thumbnail_url` の生成元、保存先、表示時 API は一致
+- `thumbnail_emoji` fallback の説明は一致
+- registry / asset 依存の説明は一致
+- 文言だけ 2 箇所修正し、`public_articles` 側の表示用 title/summary と route の責務表現をソース準拠に寄せた

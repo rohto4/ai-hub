@@ -22,6 +22,8 @@ type RssItem = {
   categories?: string[]
 }
 
+type TextLikeRecord = Record<string, unknown>
+
 function parseDate(value: string | undefined): string | null {
   if (!value) {
     return null
@@ -36,16 +38,8 @@ function normalizeText(value: unknown): string | null {
     return null
   }
 
-  const raw =
-    typeof value === 'string'
-      ? value
-      : typeof value === 'number' || typeof value === 'boolean'
-        ? String(value)
-        : Array.isArray(value)
-          ? value.filter((entry) => typeof entry === 'string').join(' ')
-          : typeof value === 'object' && '#' in value && typeof value['#'] === 'string'
-            ? value['#']
-            : null
+  const rawParts = collectTextParts(value)
+  const raw = rawParts.length > 0 ? rawParts.join(' ') : null
 
   if (!raw) {
     return null
@@ -53,6 +47,37 @@ function normalizeText(value: unknown): string | null {
 
   const normalized = decodeAndNormalizeText(raw)
   return normalized ? normalized : null
+}
+
+function collectTextParts(value: unknown, depth = 0): string[] {
+  if (value == null || depth > 4) {
+    return []
+  }
+
+  if (typeof value === 'string') {
+    return [value]
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return [String(value)]
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => collectTextParts(entry, depth + 1))
+  }
+
+  if (typeof value === 'object') {
+    const record = value as TextLikeRecord
+    const preferredKeys = ['#', '_', 'name', 'title', 'department', 'company']
+    const preferred = preferredKeys.flatMap((key) => collectTextParts(record[key], depth + 1))
+    if (preferred.length > 0) {
+      return preferred
+    }
+
+    return Object.values(record).flatMap((entry) => collectTextParts(entry, depth + 1))
+  }
+
+  return []
 }
 
 export const rssCollector: Collector = {
@@ -72,11 +97,13 @@ export const rssCollector: Collector = {
 
     const feedXml = await response.text()
     const feed = await parser.parseString(feedXml)
+    const items: CollectedItem[] = []
 
-    const items = (feed.items as RssItem[]).flatMap((item) => {
+    for (const item of feed.items as RssItem[]) {
+      try {
         const sourceUrl = normalizeText(item.link ?? item.guid ?? item.id)
         if (!sourceUrl) {
-          return []
+          continue
         }
 
         const citedUrl = normalizeText(unwrapGoogleRedirectUrl(sourceUrl))
@@ -85,7 +112,7 @@ export const rssCollector: Collector = {
         const snippet = normalizeText(item.contentSnippet ?? item.content)
         const sourcePublishedAt = parseDate(item.isoDate ?? item.pubDate)
 
-        return [{
+        items.push({
           sourceItemId: normalizeText(item.guid ?? item.id ?? sourceUrl),
           sourceUrl,
           citedUrl: citedUrl ?? sourceUrl,
@@ -95,13 +122,16 @@ export const rssCollector: Collector = {
           sourceUpdatedAt: sourcePublishedAt,
           sourceAuthor: normalizeText(item.creator ?? item.author),
           sourceMeta: {
-            feedTitle: feed.title ?? null,
-            feedLink: feed.link ?? response.url ?? sourceTarget.baseUrl,
-            feedOriginalLink: item.link ?? item.guid ?? item.id ?? null,
-            categories: item.categories ?? [],
+            feedTitle: normalizeText(feed.title) ?? null,
+            feedLink: normalizeText(feed.link) ?? response.url ?? sourceTarget.baseUrl,
+            feedOriginalLink: normalizeText(item.link ?? item.guid ?? item.id) ?? null,
+            categories: (item.categories ?? []).map((category) => normalizeText(category)).filter((category): category is string => Boolean(category)),
           },
-        } satisfies CollectedItem]
-      })
+        } satisfies CollectedItem)
+      } catch (error) {
+        console.error(`[rssCollector] Skipping malformed item for ${sourceTarget.sourceKey}:`, error)
+      }
+    }
 
     return items
   },

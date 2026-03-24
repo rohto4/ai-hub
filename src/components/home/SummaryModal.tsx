@@ -1,5 +1,5 @@
 import type { UiArticle } from '@/components/home/home-state-shared'
-import { resolveThumbnailEmoji } from '@/lib/publish/thumbnail-emoji'
+import { ArticleThumbnail } from '@/components/shared/ArticleThumbnail'
 
 export function SummaryModal({
   article,
@@ -33,16 +33,14 @@ export function SummaryModal({
 
         <div className="p-5">
           <div className="flex items-start gap-4">
-            <div
-              className="flex h-16 w-14 shrink-0 items-center justify-center rounded-xl text-[30px]"
-              style={{ background: 'linear-gradient(145deg, #ffe8d6, #ffd8bd)' }}
-            >
-              {resolveThumbnailEmoji({
-                id: article.id,
-                sourceType: article.source_type,
-                thumbnailEmoji: article.thumbnail_emoji,
-              })}
-            </div>
+            <ArticleThumbnail
+              articleId={article.id}
+              sourceType={article.source_type}
+              thumbnailUrl={article.thumbnail_url}
+              thumbnailEmoji={article.thumbnail_emoji}
+              className="h-16 w-14 shrink-0 rounded-xl"
+              emojiClassName="text-[30px]"
+            />
             <div className="min-w-0 flex-1 pr-6">
               <div className="mb-1.5 flex flex-wrap gap-1.5 text-[10px]">
                 <span className="rounded-full bg-[#dbeafe] px-2 py-0.5 font-bold text-[#1d4ed8]">{article.source_type}</span>

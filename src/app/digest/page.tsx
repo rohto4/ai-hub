@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ArticleThumbnail } from '@/components/shared/ArticleThumbnail'
 import { EmptyPanel, PublicScaffold } from '@/components/site/PublicScaffold'
 import { isDatabaseConfigured } from '@/lib/db'
 import { listDigestArticles } from '@/lib/db/public-feed'
@@ -9,15 +10,14 @@ export default async function DigestPage() {
 
   return (
     <PublicScaffold
-      title={`AIダイジェスト — ${today}`}
-      description="今日のトップ記事をまとめて確認できます。通知からも同じページに繋がります。"
+      title={`AIダイジェスト | ${today}`}
+      description="本日の注目記事をまとめて確認できます。気になる記事から詳細ページへ移動できます。"
     >
       {articles.length === 0 ? (
-        <EmptyPanel message="ダイジェスト記事を取得できませんでした。" />
+        <EmptyPanel message="ダイジェスト記事を準備中です。" />
       ) : (
         <div className="grid gap-5">
           {articles.map((article, index) => {
-            const emoji = article.thumbnail_emoji ?? '📝'
             const href = `/articles/${article.publicKey ?? article.id}`
             return (
               <article
@@ -25,7 +25,6 @@ export default async function DigestPage() {
                 className="overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.06)]"
               >
                 <div className="flex items-start gap-4 p-5">
-                  {/* ランク + 絵文字 */}
                   <div className="flex shrink-0 flex-col items-center gap-1">
                     <span
                       className="flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-extrabold text-white"
@@ -33,15 +32,16 @@ export default async function DigestPage() {
                     >
                       {index + 1}
                     </span>
-                    <div
-                      className="flex h-14 w-14 items-center justify-center rounded-2xl text-[28px]"
-                      style={{ background: 'linear-gradient(145deg, #ffe8d6, #ffd8bd)' }}
-                    >
-                      {emoji}
-                    </div>
+                    <ArticleThumbnail
+                      articleId={article.id}
+                      sourceType={article.source_type}
+                      thumbnailUrl={article.thumbnail_url}
+                      thumbnailEmoji={article.thumbnail_emoji}
+                      className="h-14 w-14 rounded-2xl"
+                      emojiClassName="text-[28px]"
+                    />
                   </div>
 
-                  {/* テキスト */}
                   <div className="min-w-0 flex-1">
                     <div className="mb-1.5 flex flex-wrap gap-1.5 text-[10px]">
                       <span className="rounded-full bg-[#dbeafe] px-2 py-0.5 font-bold text-[#1d4ed8]">
@@ -58,18 +58,17 @@ export default async function DigestPage() {
                       {article.title}
                     </Link>
                     <p className="mt-2 text-[13px] leading-[1.7] text-[#4f5969]">
-                      {article.summary_200 ?? article.summary_100 ?? '要約は準備中です。'}
+                      {article.summary_200 ?? article.summary_100 ?? '要約を準備中です。'}
                     </p>
                   </div>
                 </div>
 
-                {/* フッター：記事へのリンク（目立つ配置） */}
                 <div className="flex items-center justify-between border-t border-black/5 px-5 py-3">
                   <Link
                     href={href}
                     className="text-[12px] font-bold text-accent-darker hover:underline"
                   >
-                    詳細を読む →
+                    詳細を読む
                   </Link>
                   <a
                     href={article.url}
@@ -78,7 +77,7 @@ export default async function DigestPage() {
                     className="rounded-xl px-4 py-2 text-[12px] font-bold text-white"
                     style={{ background: 'var(--color-orange)' }}
                   >
-                    元記事を開く ↗
+                    元記事を開く
                   </a>
                 </div>
               </article>

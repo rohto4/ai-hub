@@ -99,14 +99,14 @@ export async function POST(request: NextRequest) {
     if (!body.tagId || !body.keyword) {
       return NextResponse.json({ error: 'tagId and keyword required' }, { status: 400 })
     }
-    await addTagKeyword(body.tagId, body.keyword)
+    const result = await addTagKeyword(body.tagId, body.keyword)
     await logAdminOperation({
       operationType: 'add_tag_keyword',
       targetKind: 'tags_master',
       targetId: body.tagId,
-      payload: { keyword: body.keyword },
+      payload: { keyword: body.keyword, ...result },
     })
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, ...result })
   }
 
   return NextResponse.json({ error: 'unknown action' }, { status: 400 })

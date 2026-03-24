@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ArticleThumbnail } from '@/components/shared/ArticleThumbnail'
 import { PublicArticleList } from '@/components/site/PublicArticleList'
 import { EmptyPanel, PublicScaffold } from '@/components/site/PublicScaffold'
 import { isDatabaseConfigured } from '@/lib/db'
@@ -17,7 +18,6 @@ export async function generateMetadata({
   const article = await getPublicArticleDetail(publicKey)
   if (!article) return {}
 
-  // metadataBase が設定済みなので相対パスで OK
   const ogImageUrl = `/api/og?publicKey=${publicKey}`
   return {
     title: article.title,
@@ -68,9 +68,14 @@ export default async function ArticleDetailPage({
       <section className="grid gap-6 lg:grid-cols-[1.6fr_0.8fr]">
         <article className="rounded-3xl bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
           <div className="mb-4 flex items-start gap-4">
-            <div className="flex h-28 w-24 items-center justify-center rounded-3xl bg-accent-lighter text-5xl">
-              {article.thumbnail_emoji ?? '📝'}
-            </div>
+            <ArticleThumbnail
+              articleId={article.id}
+              sourceType={article.source_type}
+              thumbnailUrl={article.thumbnail_url}
+              thumbnailEmoji={article.thumbnail_emoji}
+              className="h-28 w-24 rounded-3xl"
+              emojiClassName="text-5xl"
+            />
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex flex-wrap gap-2 text-xs">
                 <span className="rounded-full bg-[#dbeafe] px-2 py-1 font-bold text-[#1d4ed8]">{article.source_type}</span>
@@ -78,7 +83,7 @@ export default async function ArticleDetailPage({
                 <span className="text-muted">{article.published_at.toLocaleString('ja-JP')}</span>
               </div>
               <h2 className="text-2xl font-extrabold leading-tight">{article.title}</h2>
-              <p className="mt-3 text-sm leading-7 text-[#4f5969]">{article.summary_200 ?? article.summary_100 ?? '要約は準備中です。'}</p>
+              <p className="mt-3 text-sm leading-7 text-[#4f5969]">{article.summary_200 ?? article.summary_100 ?? '要約を準備中です。'}</p>
             </div>
           </div>
 
@@ -114,7 +119,7 @@ export default async function ArticleDetailPage({
       </section>
 
       <section className="mt-8">
-        <h3 className="mb-4 text-xl font-extrabold">近いレーンの公開記事</h3>
+        <h3 className="mb-4 text-xl font-extrabold">関連する公開記事</h3>
         <PublicArticleList articles={related.filter((item) => item.id !== article.id).slice(0, 4)} />
       </section>
     </PublicScaffold>

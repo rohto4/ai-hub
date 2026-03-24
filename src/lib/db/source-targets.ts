@@ -80,3 +80,12 @@ export async function listDueSourceTargets(limit = 20, sourceKey?: string | null
     requiresAuth: row.requires_auth,
   }))
 }
+
+export async function setSourceTargetActive(sourceTargetId: string, isActive: boolean): Promise<void> {
+  const sql = getSql()
+  await sql`
+    UPDATE source_targets
+    SET is_active = ${isActive}, updated_at = now()
+    WHERE source_target_id = ${sourceTargetId}::uuid
+  `
+}
