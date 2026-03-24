@@ -19,7 +19,7 @@ export default function AboutPage() {
           <h2 className="text-lg font-extrabold">更新の仕組み</h2>
           <ul className="mt-4 grid gap-3 text-sm leading-7 text-[#4f5969]">
             <li>毎時 :00 に各ソースから新着記事を収集します。</li>
-            <li>:10〜:40 に AI 要約・タグ付けを自動実行します。</li>
+            <li>:05〜:40 の 5 分刻みで AI 要約・タグ付けを 8 回自動実行します。</li>
             <li>:50 に公開面へ反映し、ランキングを再計算します。</li>
           </ul>
         </section>

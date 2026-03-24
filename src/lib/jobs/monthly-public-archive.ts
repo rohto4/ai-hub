@@ -1,5 +1,10 @@
 import { getSql } from '@/lib/db'
 import { finishJobRun, startJobRun } from '@/lib/db/job-runs'
+import {
+  ARXIV_AI_PUBLIC_RETENTION_MONTHS,
+  ARXIV_AI_SOURCE_KEY,
+  DEFAULT_PUBLIC_RETENTION_MONTHS,
+} from '@/lib/source-retention'
 
 export interface MonthlyPublicArchiveOptions {
   limit?: number
@@ -10,6 +15,7 @@ export interface MonthlyPublicArchiveResult {
   archived: number
   limit: number
   ageMonths: number
+  arxivAiAgeMonths: number
   oldestArchivedAt: string | null
   newestArchivedAt: string | null
 }
@@ -25,11 +31,16 @@ export async function runMonthlyPublicArchive(
 ): Promise<MonthlyPublicArchiveResult> {
   const sql = getSql()
   const limit = Math.max(1, Math.min(10000, options.limit ?? 5000))
-  const ageMonths = Math.max(1, Math.min(24, options.ageMonths ?? 6))
+  const ageMonths = Math.max(1, Math.min(24, options.ageMonths ?? DEFAULT_PUBLIC_RETENTION_MONTHS))
 
   const jobRunId = await startJobRun({
     jobName: 'monthly-public-archive',
-    metadata: { limit, ageMonths, archiveReason: 'age_out' },
+    metadata: {
+      limit,
+      ageMonths,
+      arxivAiAgeMonths: ARXIV_AI_PUBLIC_RETENTION_MONTHS,
+      archiveReason: 'age_out',
+    },
   })
 
   try {
@@ -61,10 +72,17 @@ export async function runMonthlyPublicArchive(
           pa.public_refreshed_at,
           pa.created_at,
           pa.updated_at,
+          st.source_key,
           COALESCE(pa.original_published_at, pa.created_at) AS archive_basis_at
         FROM public_articles pa
-        WHERE COALESCE(pa.original_published_at, pa.created_at)
-          < now() - make_interval(months => ${ageMonths})
+        LEFT JOIN source_targets st
+          ON st.source_target_id = pa.primary_source_target_id
+        WHERE COALESCE(pa.original_published_at, pa.created_at) < now() - make_interval(
+          months => CASE
+            WHEN st.source_key = ${ARXIV_AI_SOURCE_KEY} THEN ${ARXIV_AI_PUBLIC_RETENTION_MONTHS}
+            ELSE ${ageMonths}
+          END
+        )
         ORDER BY COALESCE(pa.original_published_at, pa.created_at) ASC, pa.public_article_id ASC
         LIMIT ${limit}
       ),
@@ -145,6 +163,7 @@ export async function runMonthlyPublicArchive(
       archived: Number(summary?.archived_count ?? 0),
       limit,
       ageMonths,
+      arxivAiAgeMonths: ARXIV_AI_PUBLIC_RETENTION_MONTHS,
       oldestArchivedAt: summary?.oldest_archived_at ?? null,
       newestArchivedAt: summary?.newest_archived_at ?? null,
     }
@@ -159,6 +178,7 @@ export async function runMonthlyPublicArchive(
         archived: result.archived,
         limit: result.limit,
         ageMonths: result.ageMonths,
+        arxivAiAgeMonths: result.arxivAiAgeMonths,
         oldestArchivedAt: result.oldestArchivedAt,
         newestArchivedAt: result.newestArchivedAt,
       },
@@ -175,7 +195,7 @@ export async function runMonthlyPublicArchive(
       processedCount: 0,
       successCount: 0,
       failedCount: 1,
-      metadata: { limit, ageMonths },
+      metadata: { limit, ageMonths, arxivAiAgeMonths: ARXIV_AI_PUBLIC_RETENTION_MONTHS },
       lastError: message,
     })
     throw error

@@ -7,6 +7,9 @@ import { runDailyEnrich } from '@/lib/jobs/daily-enrich'
 export const runtime = 'nodejs'
 export const maxDuration = 300
 
+const DEFAULT_SUMMARY_BATCH_SIZE = 20
+const MAX_SUMMARY_BATCH_SIZE = 20
+
 export async function POST(request: NextRequest) {
   if (!verifyCronSecret(request.headers.get('authorization'))) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
@@ -21,12 +24,12 @@ export async function POST(request: NextRequest) {
   const summaryBatchSizeParam = request.nextUrl.searchParams.get('summaryBatchSize')
   const maxSummaryBatchesParam = request.nextUrl.searchParams.get('maxSummaryBatches')
   const parsedLimit = limitParam ? Number(limitParam) : 50
-  const parsedSummaryBatchSize = summaryBatchSizeParam ? Number(summaryBatchSizeParam) : 10
+  const parsedSummaryBatchSize = summaryBatchSizeParam ? Number(summaryBatchSizeParam) : DEFAULT_SUMMARY_BATCH_SIZE
   const parsedMaxSummaryBatches = maxSummaryBatchesParam ? Number(maxSummaryBatchesParam) : Number.POSITIVE_INFINITY
   const limit = Number.isFinite(parsedLimit) ? Math.max(1, Math.min(100, parsedLimit)) : 50
   const summaryBatchSize = Number.isFinite(parsedSummaryBatchSize)
-    ? Math.max(1, Math.min(10, parsedSummaryBatchSize))
-    : 10
+    ? Math.max(1, Math.min(MAX_SUMMARY_BATCH_SIZE, parsedSummaryBatchSize))
+    : DEFAULT_SUMMARY_BATCH_SIZE
   const maxSummaryBatches = Number.isFinite(parsedMaxSummaryBatches)
     ? Math.max(1, Math.min(100, parsedMaxSummaryBatches))
     : undefined

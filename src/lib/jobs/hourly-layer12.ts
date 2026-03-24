@@ -23,8 +23,8 @@ export interface HourlyLayer12Result {
 
 const DEFAULT_FETCH_LIMIT = 20
 const DEFAULT_ENRICH_BATCH_SIZE = 25
-const DEFAULT_MAX_ENRICH_BATCHES = 4
-const DEFAULT_SUMMARY_BATCH_SIZE = 10
+const DEFAULT_MAX_ENRICH_BATCHES = 8
+const DEFAULT_SUMMARY_BATCH_SIZE = 20
 
 export async function runHourlyLayer12(
   options: HourlyLayer12Options = {},
@@ -34,7 +34,7 @@ export async function runHourlyLayer12(
   const maxEnrichBatches = Math.max(1, Math.min(12, options.maxEnrichBatches ?? DEFAULT_MAX_ENRICH_BATCHES))
   const summaryBatchSize = Math.max(
     1,
-    Math.min(10, options.summaryBatchSize ?? DEFAULT_SUMMARY_BATCH_SIZE),
+    Math.min(20, options.summaryBatchSize ?? DEFAULT_SUMMARY_BATCH_SIZE),
   )
 
   const fetch = await runHourlyFetch(fetchLimit)

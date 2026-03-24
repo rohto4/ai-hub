@@ -1,14 +1,19 @@
 # Agents Task Status
 
-最終更新: 2026-03-22
+最終更新: 2026-03-25
 
 運用ルール:
+- 最新 50 件を目安に残し、古い行は下から削る
 - 新しい行を上に積む
 - 1 行 1 タスクで、`日時 | 状態 | 要約 | 結果/次` を短く書く
-- 全体はおおむね 40 行前後に保ち、古い行は下から間引く
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-25 | done | 定時 enrich を 20件 x 8回/時 に拡張 | `daily-enrich` の基本設定を 20 件へ、scheduler を `:05〜:40` の 8 回に変更し build/type-check を確認
+- 2026-03-25 | done | `arxiv-ai` の現況件数を確認 | `articles_raw total=1870 / unprocessed=1840`、5か月超 raw 0 件、L4 の 2か月超 0 件を確認
+- 2026-03-25 | done | `arxiv-ai` の source 別保持ロジックを実装 | 5か月超 raw を enrich skip、L4 は 2か月保持になるよう `source-retention` と enrich/archive を更新
+- 2026-03-25 | done | `arxiv-ai` 保持方針を docs に反映 | 5か月超 raw は enrich 対象外、L4 は 2か月保持上限で運用する方針を plan/status/hangover/checklist/data-flow に反映
+- 2026-03-25 | done | init docs の圧縮方針を整理 | `docs/initfile-refactoring.md` を追加し、初期読込 docs の削減余地を整理
 - 2026-03-23 | done | hourly-fetch の継続失敗 2 件を切り分けて修正 | google-ai-blog は RSS object 混在を collector 側で吸収し 20件取得確認、anthropic-news は feed 404 のため停止・seed も inactive 化
 - 2026-03-22 | done | thumbnail_url backfill を追加して実 DB へ再反映 | db:backfill-thumbnail-urls で articles_enriched 3424件更新、public_articles 1908件同期
 - 2026-03-22 | done | 旧 /api/thumb URL の 400 を解消 | icon 未登録タグだけの旧 query でも glyph fallback 描画にして後方互換を維持
@@ -19,73 +24,49 @@
 - 2026-03-22 | done | spec に migration 035/036 の schema 反映を追記 | 04-data-model-and-sql.md と implementation-plan/checklist/hangover を同期更新
 - 2026-03-22 | done | 設計書類を最新化してコミット・プッシュ | data-flow.md / imp-hangover.md / agents-task-status.md を更新
 - 2026-03-22 | done | daily-tag-dedup にマージ時の遡及タグ付けを追加 | L2/L4 両方に ILIKE 遡及 INSERT を追加
-- 2026-03-22 | done | 日次タグ重複検出ジョブ（daily-tag-dedup）を追加 | Gemini で候補↔既存タグを照合・自動統合・遡及タグ付け・GHA 02:30 UTC
-- 2026-03-22 | done | タグ候補を固有名詞限定・閾値 >= 4・STOPWORDS 拡充 | 5304件から 2500超を棄却、system/context/hugging 等を除去
-- 2026-03-22 | done | タグ昇格を AI 固有名詞抽出に切り替え | enrich プロンプトに properNounTags を追加、cleanup-tag-candidates.ts で既存洗い直し
-- 2026-03-22 | done | タグ昇格時の tag_key を URL-safe に正規化（スペース→ハイフン） | nano banana → nano-banana
-- 2026-03-22 | done | タグレビュー文脈表示・保留・棄却・候補に戻す を追加 | AdminTagsClient 全面改善、origin 記事タイトル+スニペット表示
-- 2026-03-22 | done | タグ昇格時に根拠記事へ自動タグ付け | L2/L4 への ILIKE 遡及 INSERT、tag_keywords 自動登録
-- 2026-03-22 | done | ジョブログ管理画面（/admin/jobs）を追加 | 失敗 item 詳細・metadata 展開、compute-ranks を job_runs に追加
-- 2026-03-22 | done | en 記事タイトルの日本語翻訳修正 + 1622 件バックフィル | enrich プロンプトに titleJa 追加、backfill-ja-titles.ts で更新
-- 2026-03-21 夜 | done | 最終仕上げ（OGP/sitemap/robots/description/stats/ranked） | OGP API・sitemap.xml・robots.txt・About/各ページ description 修正・HomeStats 言語カウント追加・/api/home に ranked セクション追加、全 build OK
-- 2026-03-21 夜 | done | admin Phase 3 一式を実装 | /admin UI (login/articles/tags/sources)・ADMIN_SECRET 認証・hide_article・タグ昇格・is_active ON/OFF・admin_operation_logs 記録、build OK
-- 2026-03-21 夜 | done | hasDatabaseColumn 二重クエリを廃止し content_language を常に取得 | public-search/tags/detail/listings/rankings の 5 ファイル簡略化、行数 -302
-- 2026-03-21 夜 | done | compute-ranks を全件1回読み込み + 4window 並列 upsert に最適化 | DELETE 廃止・ON CONFLICT DO UPDATE・stale 削除を1回化
-- 2026-03-21 夜 | done | public_article_sources bigint 型バグを修正・全件バックフィル | 2件→2504件 に回復、scripts/backfill-public-article-sources.ts 追加
-- 2026-03-21 15:10 | done | `content_language` / 内部サムネイル / 日本語ソース前準備を実装 | migration 035 追加、L2/L4 へ `content_language` 伝搬、`/api/thumb` ベースの `thumbnail_url` 実装、日本語ソース14件を seed 追加、build/type-check OK（DB migration/seed 実行は未実施）
-- 2026-03-21 13:31 | done | タグ昇格時の画像資産運用を計画化 | `thumbnail-tag-registry` と `icon_pending`、tag 昇格後の資産追加・再計算方針を `implementation-plan.md` / `implementation-checklist.md` に追記
-- 2026-03-21 13:22 | done | サムネイル合成方針を実装計画へ反映 | 固定優先順位なし・title/summary出現順 + ハッシュタイブレーク・内部テンプレート合成・日本語ソース投入後に GHA 有効化の順を `implementation-plan.md` / `implementation-checklist.md` に詳細化
-- 2026-03-21 13:05 | done | GHA前提の順序をチェックリストへ反映 | `content_language`・`thumbnail_url`・日本語ソース投入を GitHub Actions 登録前ゲートとして `implementation-checklist.md` に追記
-- 2026-03-21 12:08 | done | 実装着手順チェックリストを追加 | `docs/imp/implementation-checklist.md` を新設し、見た目改善を除く次フェーズ全体の実行順・完了条件・検証項目を整理
-- 2026-03-20 23:46 | done | 機能単位へ追加分割 | `public-articles` を rankings/listings/detail に再分割、Home 状態を shared/data/actions/state に分割、build/type-check OK
-- 2026-03-20 23:15 | done | T2-B public-feed 分割 | `public-feed` を 5 ファイル + barrel に分割、build/type-check OK、記事系 384 行は残課題
-- 2026-03-20 22:58 | done | Tier1 リファクタリングを先行実施 | `mock4` 削除、`SourceCategory/LaneKey` へ整理、Home 分割、`/feed.xml` へ分離、type-check/build OK
-- 2026-03-20 15:05 | done | DB バックアップ基盤を追加 | `pg_dump` 全 DB バックアップを取得し日次 GitHub Actions と 7 日保持を追加、`artifacts/` を削除
-- 2026-03-20 12:10 | done | 計画タスクを20件へ拡張 | `content_language`→日本語ソース→公開面調整→管理画面→ランキング調整まで分解
-- 2026-03-20 12:00 | done | `implementation-plan.md` / `imp-status.md` 更新 | `content_language` 先行導入と日本語ソース追加前提の 10 タスク分解を反映
-- 2026-03-18 10:15 | done | L4 公開ページ群を実装 | ranking/search/detail/category/tags/about/feed を Layer4 読み取りで追加
-- 2026-03-18 10:12 | done | mock4 を作成 | Home/Ranking/Search/Detail/Category/Tag/About/Feed/PWA/Share/Topic Group を一通り確認可能
-- 2026-03-18 10:08 | done | Home 導線を再整理 | source lane を `official/alerts/blog/paper/news` に統一し topic chips と分離
+- 2026-03-22 | done | 日次タグ重複検出ジョブを追加 | Gemini で候補↔既存タグを照合・自動統合・遡及タグ付け
+- 2026-03-22 | done | タグ候補を固有名詞限定・閾値 >= 4・STOPWORDS 拡充 | 5304件から 2500超を棄却
+- 2026-03-22 | done | タグ昇格を AI 固有名詞抽出に切り替え | enrich プロンプトに properNounTags を追加
+- 2026-03-22 | done | タグ昇格時の tag_key を URL-safe に正規化 | スペースをハイフンへ変換
+- 2026-03-22 | done | タグレビュー文脈表示・保留・棄却・候補戻しを追加 | AdminTagsClient を改善
+- 2026-03-22 | done | タグ昇格時に根拠記事へ自動タグ付け | L2/L4 へ ILIKE 遡及 INSERT
+- 2026-03-22 | done | ジョブログ管理画面を追加 | `/admin/jobs` と `compute-ranks` の job_runs 記録を追加
+- 2026-03-22 | done | en 記事タイトルの日本語翻訳修正 + 1622 件バックフィル | `titleJa` と backfill スクリプトを追加
+- 2026-03-21 夜 | done | 最終仕上げを実施 | OGP API・sitemap.xml・robots.txt・description 修正・HomeStats 言語カウント追加
+- 2026-03-21 夜 | done | admin Phase 3 一式を実装 | login/articles/tags/sources/jobs・認証・hide_article・tag 昇格・is_active
+- 2026-03-21 夜 | done | hasDatabaseColumn 二重クエリを廃止 | `content_language` を常時取得
+- 2026-03-21 夜 | done | compute-ranks を全件1回読み込み + 4window 並列 upsert に最適化 | DELETE 廃止・ON CONFLICT DO UPDATE
+- 2026-03-21 夜 | done | public_article_sources bigint 型バグを修正・全件バックフィル | 2件→2504件 に回復
+- 2026-03-21 15:10 | done | `content_language` / 内部サムネイル / 日本語ソース前準備を実装 | migration 035、`thumbnail_url`、seed 追加
+- 2026-03-21 13:31 | done | タグ昇格時の画像資産運用を計画化 | registry / icon_pending / 再計算方針を docs に追記
+- 2026-03-21 13:22 | done | サムネイル合成方針を実装計画へ反映 | 固定優先順位なし・title/summary 出現順を採用
+- 2026-03-21 13:05 | done | GHA 前提の順序をチェックリストへ反映 | `content_language`・`thumbnail_url`・日本語ソース投入をゲート化
+- 2026-03-21 12:08 | done | 実装着手順チェックリストを追加 | `implementation-checklist.md` を新設
+- 2026-03-20 23:59 | done | Home action 再分割 | `useHomeActions` を `derived/article/share` に分割
+- 2026-03-20 23:46 | done | 機能単位へ追加分割 | `public-articles` を rankings/listings/detail に再分割
+- 2026-03-20 23:15 | done | T2-B public-feed 分割 | `public-feed` を 5 ファイル + barrel に分割
+- 2026-03-20 22:58 | done | Tier1 リファクタリングを先行実施 | `mock4` 削除、Home 分割、`/feed.xml` 分離
+- 2026-03-20 15:05 | done | DB バックアップ基盤を追加 | 全 DB バックアップと日次 GitHub Actions を追加
+- 2026-03-20 12:10 | done | 計画タスクを20件へ拡張 | `content_language`→日本語ソース→公開面→管理画面→ランキング調整へ分解
+- 2026-03-20 12:00 | done | `implementation-plan.md` / `imp-status.md` 更新 | `content_language` 先行導入前提の計画に更新
+- 2026-03-18 10:15 | done | L4 公開ページ群を実装 | ranking/search/detail/category/tags/about/feed を追加
+- 2026-03-18 10:12 | done | mock4 を作成 | Home/Ranking/Search/Detail/Category/Tag/About/Feed/PWA/Share/Topic Group を確認可能にした
+- 2026-03-18 10:08 | done | Home 導線を再整理 | source lane を `official/alerts/blog/paper/news` に統一
 - 2026-03-18 10:05 | done | `public-feed.ts` 拡張 | tag/detail/feed query と `public_key` 導線を追加
-- 2026-03-18 07:30 | done | 絵文字サムネイル backfill | `public_articles 911` 件に `thumbnail_emoji` を反映
-- 2026-03-18 07:24 | done | paper タグ制限を DB 反映 | `source_type='paper'` は `paper` タグのみ `437` 件
+- 2026-03-18 07:30 | done | 絵文字サムネイル backfill | `public_articles` に `thumbnail_emoji` を反映
+- 2026-03-18 07:24 | done | paper タグ制限を DB 反映 | `source_type='paper'` は `paper` タグのみへ固定
 - 2026-03-18 07:22 | done | migration 031/032 適用 | `thumbnail_emoji` 列と `paper` タグを追加
-- 2026-03-18 07:18 | done | snippet 整合強化を実装 | prompt 制約 + 軽い整合チェックを `daily-enrich` に追加
-- 2026-03-18 03:12 | done | 公開候補 10 件を抜き取り監査 | title は良好、summary 切れ・snippet ずれ・paper タグ誤付与を確認
+- 2026-03-18 07:18 | done | snippet 整合強化を実装 | prompt 制約 + 軽い整合チェックを追加
+- 2026-03-18 03:12 | done | 公開候補 10 件を抜き取り監査 | summary 切れ・snippet ずれ・paper タグ誤付与を確認
 - 2026-03-18 03:10 | done | 非日本語 title 一括補正 | `articles_enriched` / `public_articles` とも残件 0
 - 2026-03-18 03:08 | done | 翻訳 artifact 保存 | `artifacts/title-translations-non-ja-20260318.json` 出力
-- 2026-03-18 03:00 | done | backlog 1882 件の title 漏れ確認 | backlog 分の非日本語 title は 0 件
-- 2026-03-18 02:58 | done | `implementation-plan.md` 再構成 | L2->L4 要件定義中心の計画へ更新
-- 2026-03-18 02:56 | done | `implementation-wait.md` 更新 | 分類方針、publish 高速化、残 211 title を判断待ちへ整理
+- 2026-03-18 03:00 | done | backlog 1882 件の title 漏れ確認 | backlog 分の非日本語 title は 0
+- 2026-03-18 02:58 | done | `implementation-plan.md` 再構成 | L2→L4 要件定義中心に更新
+- 2026-03-18 02:56 | done | `implementation-wait.md` 更新 | 分類方針、publish 高速化、残 title を整理
 - 2026-03-18 02:55 | done | `imp-status.md` 更新 | import・分類再同期・publish 試行結果を追記
 - 2026-03-18 02:54 | done | `imp-hangover.md` 更新 | 次セッション向け引き継ぎを追加
 - 2026-03-18 02:53 | done | `docs/spec/04-data-model-and-sql.md` 補強 | 表示分類は L4 派生概念と明記
-- 2026-03-18 02:52 | done | L2/L4 是正 SQL 保存 | `docs/imp/sql/2026-03-18-l2-l4-data-realign.sql` 作成
+- 2026-03-18 02:52 | done | L2/L4 是正 SQL 保存 | `docs/imp/sql/2026-03-18-l2-l4-data-realign.sql` を作成
 - 2026-03-18 02:51 | done | `articles_enriched.source_type` 再同期 | 1866 行修正、不一致 0
 - 2026-03-18 02:50 | done | title 補正 13 件反映 | Neon の `articles_enriched.title` を更新
 - 2026-03-18 02:49 | done | `public_articles` 分布確認 | published 911、official 736、alerts 145、blog 30
-- 2026-03-18 02:48 | done | `hourly-publish` 再試行 | 長時間化のため停止、`job_run_id=93` を failed 化
-- 2026-03-18 02:47 | done | publish 途中反映確認 | `public_articles` は 745 -> 911 に増加
-- 2026-03-18 02:46 | done | L2/L4 分類整合調査 | source_category は一致、source_type だけドリフトと確定
-- 2026-03-18 02:45 | done | Web 実装と DB 軸の差分確認 | UI が `source_type` と `source_category` を混在利用
-- 2026-03-18 02:44 | done | `docs/dim2_memo` 再確認 | dim2 は表示分類の参考資料として扱うと整理
-- 2026-03-18 02:43 | done | `source_targets` / `public_articles` 分布取得 | Home の空タブ要因を数値で確認
-- 2026-03-18 02:42 | done | `tags_master` / `tag_keywords` 実カラム確認 | tags は横断軸として成立、tier 列は未採用
-- 2026-03-18 02:41 | done | backlog import 後の title 候補抽出 | 13 件を補正対象として確定
-- 2026-03-18 02:40 | done | backlog 1882 件 import 完了確認 | `articles_enriched=1882/1882`, `raw_processed=1882/1882`
-- 2026-03-18 02:39 | done | `artifacts/` の Git 追跡解除 | `.gitignore` 追加、index から除外
-- 2026-03-18 02:38 | done | importer 軽量化 | tag count を記事単位更新から最後の 1 回へ変更
-- 2026-03-18 02:37 | done | manual import 高速化方針検証 | 既存 importer は重く、bulk SQL 併用が有効と確認
-- 2026-03-18 02:36 | done | `docs/guide/codex/AGENTS.md` 読込 | docs 更新ルールと UTF-8 読解ルールを再確認
-- 2026-03-18 02:35 | done | `screen-flow.md` / `data-flow.md` 相当資料の読込 | Home / Search / Trends / Actions の接続点を確認
-- 2026-03-18 02:34 | done | `implementation-plan.md` 読込 | 旧版が進捗メモ寄りで要更新と判断
-- 2026-03-18 02:33 | done | `implementation-wait.md` 読込 | ユーザー不在時はここへ論点を書く前提を確認
-- 2026-03-20 23:59 | done | Home action 再分割 | `useHomeActions` を `derived/article/share` に再分割、`useHomeActions.ts 216->104`、build/type-check OK
-- 2026-03-21 00:12 | done | Home page shell 分割 | `src/app/page.tsx 222->65`、左カラムを `HomePrimaryColumn` へ抽出、build/type-check OK
-- 2026-03-21 00:35 | done | hourly-publish 分割 | `hourly-publish.ts 553->88`、候補取得/source/tag/upsert/hide を `src/lib/publish/` に分離、build/type-check OK
-- 2026-03-21 01:12 | done | summarize/enrichment/daily-enrich/topic 分割 | `summarize.ts 129->35`、`enrichment.ts 757->24`、`daily-enrich.ts 800->92`、`/api/home?topic=` 追加、build/type-check OK
-## 2026-03-21 cron / archive / handoff update
-- `hourly-fetch` / `hourly-enrich` / `hourly-publish` の分離設計を docs に反映
-- `compute-ranks.maxDuration = 300` を反映
-- `public_articles_history` と `monthly-public-archive` を docs に反映
-- 次セッションの優先タスクを `public_article_sources` / `compute-ranks` / admin Phase 3 に整理

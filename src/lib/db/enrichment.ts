@@ -11,6 +11,7 @@ export {
   listRawArticlesForEnrichment,
   markRawError,
   markRawProcessed,
+  skipExpiredRawArticlesForEnrichment,
 } from '@/lib/db/enrichment-raw'
 
 export {
