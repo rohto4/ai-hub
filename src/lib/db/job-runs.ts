@@ -26,6 +26,32 @@ export interface JobRunItemInput {
   errorMessage?: string | null
 }
 
+export async function countConsecutiveFailedJobRunItems(
+  jobName: string,
+  itemKey: string,
+  limit = 3,
+): Promise<number> {
+  const sql = getSql()
+  const rows = (await sql`
+    SELECT jri.item_status
+    FROM job_run_items jri
+    JOIN job_runs jr ON jr.job_run_id = jri.job_run_id
+    WHERE jr.job_name = ${jobName}
+      AND jri.item_key = ${itemKey}
+    ORDER BY jri.created_at DESC
+    LIMIT ${limit}
+  `) as Array<{ item_status: JobRunItemStatus }>
+
+  let count = 0
+  for (const row of rows) {
+    if (row.item_status !== 'failed') {
+      break
+    }
+    count += 1
+  }
+  return count
+}
+
 export async function startJobRun(input: StartJobRunInput): Promise<number> {
   const sql = getSql()
   const rows = (await sql`

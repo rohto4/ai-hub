@@ -1,7 +1,7 @@
 'use client'
 
+import { ArticleThumbnail } from '@/components/shared/ArticleThumbnail'
 import type { ActionType, Article } from '@/lib/db/types'
-import { resolveThumbnailEmoji } from '@/lib/publish/thumbnail-emoji'
 
 interface Props {
   article: Article & { score?: number }
@@ -86,26 +86,14 @@ export function ArticleCard({
         onClick={() => onCardClick(article.id)}
       >
         {/* サムネイル (小型) */}
-        <div
-          className="relative mt-0.5 h-[72px] w-[56px] shrink-0 overflow-hidden rounded-lg"
-          style={{ background: 'linear-gradient(145deg, #ffe8d6, #ffd8bd)' }}
-        >
-          {article.thumbnail_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={article.thumbnail_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-[28px]">
-              {resolveThumbnailEmoji({
-                id: article.id,
-                sourceType: article.source_type,
-                thumbnailEmoji: article.thumbnail_emoji,
-              })}
-            </div>
-          )}
-          <span className="absolute bottom-1 right-1 rounded-sm bg-black/30 px-0.5 text-[7px] font-semibold text-white">
-            {sourceLabel[article.source_type]}
-          </span>
-        </div>
+        <ArticleThumbnail
+          articleId={article.id}
+          sourceType={article.source_type}
+          thumbnailUrl={article.thumbnail_url}
+          thumbnailEmoji={article.thumbnail_emoji}
+          className="mt-0.5 h-[72px] w-[56px] shrink-0 rounded-lg"
+          badgeLabel={sourceLabel[article.source_type]}
+        />
 
         {/* テキスト */}
         <div className="flex min-w-0 flex-1 flex-col gap-1 pr-6 pt-0.5">

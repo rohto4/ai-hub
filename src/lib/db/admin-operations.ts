@@ -1,5 +1,6 @@
 import { getSql } from '@/lib/db'
 import { hasThumbnailTagRegistryEntry } from '@/lib/publish/thumbnail-tag-registry'
+import { buildInternalThumbnailUrl } from '@/lib/publish/thumbnail-template'
 
 type LogOptions = {
   operatorId?: string
@@ -203,6 +204,7 @@ export async function promoteTagToMaster(
     ON CONFLICT (public_article_id, tag_id) DO NOTHING
     RETURNING public_article_id
   `) as Array<{ public_article_id: string }>
+  await refreshThumbnailUrlsForTagId(tagId)
 
   return {
     tagId,
@@ -220,13 +222,187 @@ function normalizeTagKey(tagKey: string): string {
     .replace(/[^a-z0-9-]/g, '')
 }
 
-export async function addTagKeyword(tagId: string, keyword: string): Promise<void> {
+export async function addTagKeyword(tagId: string, keyword: string): Promise<{
+  taggedEnrichedCount: number
+  taggedPublicCount: number
+  refreshedEnrichedCount: number
+  refreshedPublicCount: number
+}> {
   const sql = getSql()
+  const normalizedKeyword = keyword.trim()
+
   await sql`
     INSERT INTO tag_keywords (tag_id, keyword)
-    VALUES (${tagId}, ${keyword})
+    VALUES (${tagId}, ${normalizedKeyword})
     ON CONFLICT (tag_id, keyword) DO NOTHING
   `
+
+  const keywordPattern = `%${normalizedKeyword}%`
+  const enrichedResult = (await sql`
+    INSERT INTO articles_enriched_tags (enriched_article_id, tag_id, is_primary, tag_source)
+    SELECT ae.enriched_article_id, ${tagId}::uuid, false, 'keyword_added'
+    FROM articles_enriched ae
+    WHERE ae.ai_processing_state = 'completed'
+      AND (
+        ae.title ILIKE ${keywordPattern}
+        OR ae.summary_100 ILIKE ${keywordPattern}
+        OR ae.summary_200 ILIKE ${keywordPattern}
+      )
+    ON CONFLICT (enriched_article_id, tag_id) DO NOTHING
+    RETURNING enriched_article_id
+  `) as Array<{ enriched_article_id: string }>
+
+  const publicResult = (await sql`
+    INSERT INTO public_article_tags (public_article_id, tag_id, sort_order)
+    SELECT
+      pa.public_article_id,
+      ${tagId}::uuid,
+      COALESCE(
+        (SELECT MAX(sort_order) + 1 FROM public_article_tags WHERE public_article_id = pa.public_article_id),
+        0
+      )
+    FROM public_articles pa
+    JOIN articles_enriched ae ON ae.enriched_article_id = pa.enriched_article_id
+    WHERE pa.visibility_status = 'published'
+      AND (
+        ae.title ILIKE ${keywordPattern}
+        OR ae.summary_100 ILIKE ${keywordPattern}
+        OR ae.summary_200 ILIKE ${keywordPattern}
+      )
+    ON CONFLICT (public_article_id, tag_id) DO NOTHING
+    RETURNING public_article_id
+  `) as Array<{ public_article_id: string }>
+
+  const refreshed = await refreshThumbnailUrlsForTagId(tagId)
+
+  return {
+    taggedEnrichedCount: enrichedResult.length,
+    taggedPublicCount: publicResult.length,
+    refreshedEnrichedCount: refreshed.refreshedEnrichedCount,
+    refreshedPublicCount: refreshed.refreshedPublicCount,
+  }
+}
+
+type ThumbnailRefreshRow = {
+  enriched_article_id: string | number
+  canonical_url: string
+  title: string
+  summary_100: string
+  summary_200: string | null
+  source_type: 'official' | 'blog' | 'news' | 'video' | 'alerts' | 'paper'
+  source_category: 'llm' | 'agent' | 'voice' | 'policy' | 'safety' | 'search' | 'news'
+  content_language: 'ja' | 'en' | null
+  tag_key: string | null
+  display_name: string | null
+}
+
+function groupThumbnailRefreshRows(rows: ThumbnailRefreshRow[]) {
+  const grouped = new Map<number, {
+    enrichedArticleId: number
+    canonicalUrl: string
+    title: string
+    summary100: string
+    summary200: string | null
+    sourceType: ThumbnailRefreshRow['source_type']
+    sourceCategory: ThumbnailRefreshRow['source_category']
+    contentLanguage: ThumbnailRefreshRow['content_language']
+    matchedTags: Array<{ tagKey: string; displayName: string }>
+  }>()
+
+  for (const row of rows) {
+    const enrichedArticleId = Number(row.enriched_article_id)
+    const existing = grouped.get(enrichedArticleId)
+    if (existing) {
+      if (row.tag_key && row.display_name) {
+        existing.matchedTags.push({ tagKey: row.tag_key, displayName: row.display_name })
+      }
+      continue
+    }
+
+    grouped.set(enrichedArticleId, {
+      enrichedArticleId,
+      canonicalUrl: row.canonical_url,
+      title: row.title,
+      summary100: row.summary_100,
+      summary200: row.summary_200,
+      sourceType: row.source_type,
+      sourceCategory: row.source_category,
+      contentLanguage: row.content_language,
+      matchedTags: row.tag_key && row.display_name
+        ? [{ tagKey: row.tag_key, displayName: row.display_name }]
+        : [],
+    })
+  }
+
+  return [...grouped.values()]
+}
+
+export async function refreshThumbnailUrlsForTagId(tagId: string): Promise<{
+  refreshedEnrichedCount: number
+  refreshedPublicCount: number
+}> {
+  const sql = getSql()
+  const rows = (await sql`
+    SELECT
+      ae.enriched_article_id,
+      ae.canonical_url,
+      ae.title,
+      ae.summary_100,
+      ae.summary_200,
+      ae.source_type,
+      ae.source_category,
+      ae.content_language,
+      tm.tag_key,
+      tm.display_name
+    FROM articles_enriched ae
+    JOIN articles_enriched_tags aet_filter ON aet_filter.enriched_article_id = ae.enriched_article_id
+      AND aet_filter.tag_id = ${tagId}::uuid
+    LEFT JOIN articles_enriched_tags aet ON aet.enriched_article_id = ae.enriched_article_id
+    LEFT JOIN tags_master tm ON tm.tag_id = aet.tag_id
+    WHERE ae.ai_processing_state = 'completed'
+      AND ae.dedupe_status = 'unique'
+    ORDER BY ae.enriched_article_id ASC, aet.is_primary DESC, tm.display_name ASC
+  `) as ThumbnailRefreshRow[]
+
+  const articles = groupThumbnailRefreshRows(rows)
+  for (const article of articles) {
+    const thumbnailUrl = buildInternalThumbnailUrl({
+      canonicalUrl: article.canonicalUrl,
+      title: article.title,
+      summary100: article.summary100,
+      summary200: article.summary200,
+      sourceType: article.sourceType,
+      sourceCategory: article.sourceCategory,
+      contentLanguage: article.contentLanguage,
+      matchedTags: article.matchedTags,
+    })
+
+    await sql`
+      UPDATE articles_enriched
+      SET thumbnail_url = ${thumbnailUrl}, updated_at = now()
+      WHERE enriched_article_id = ${article.enrichedArticleId}
+    `
+  }
+
+  const enrichedArticleIds = articles.map((article) => article.enrichedArticleId)
+  if (enrichedArticleIds.length === 0) {
+    return { refreshedEnrichedCount: 0, refreshedPublicCount: 0 }
+  }
+
+  const synced = (await sql`
+    UPDATE public_articles pa
+    SET thumbnail_url = ae.thumbnail_url, updated_at = now()
+    FROM articles_enriched ae
+    WHERE ae.enriched_article_id = pa.enriched_article_id
+      AND pa.enriched_article_id = ANY(${enrichedArticleIds}::bigint[])
+      AND pa.thumbnail_url IS DISTINCT FROM ae.thumbnail_url
+    RETURNING pa.public_article_id
+  `) as Array<{ public_article_id: string }>
+
+  return {
+    refreshedEnrichedCount: articles.length,
+    refreshedPublicCount: synced.length,
+  }
 }
 
 export async function listAdminSources(): Promise<Array<{

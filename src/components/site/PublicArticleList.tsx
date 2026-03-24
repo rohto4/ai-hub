@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ArticleThumbnail } from '@/components/shared/ArticleThumbnail'
 import type { Article, ArticleWithScore } from '@/lib/db/types'
 
 function sourceTone(sourceType: ArticleWithScore['source_type']): string {
@@ -30,9 +31,14 @@ export function PublicArticleList({
       {articles.map((article, index) => (
         <article key={article.id} className="rounded-3xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
           <div className="flex gap-4">
-            <div className="flex h-24 w-20 shrink-0 items-center justify-center rounded-2xl bg-accent-lighter text-4xl">
-              {article.thumbnail_emoji ?? '📝'}
-            </div>
+            <ArticleThumbnail
+              articleId={article.id}
+              sourceType={article.source_type}
+              thumbnailUrl={article.thumbnail_url}
+              thumbnailEmoji={article.thumbnail_emoji}
+              className="h-24 w-20 shrink-0 rounded-2xl"
+              emojiClassName="text-4xl"
+            />
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
                 {showRank ? <span className="font-extrabold text-accent-dark">#{index + 1}</span> : null}
@@ -43,7 +49,7 @@ export function PublicArticleList({
               <Link href={`/articles/${article.publicKey ?? article.id}`} className="text-lg font-extrabold leading-tight hover:underline">
                 {article.title}
               </Link>
-              <p className="mt-2 text-sm leading-7 text-[#4f5969]">{article.summary_100 ?? '要約は準備中です。'}</p>
+              <p className="mt-2 text-sm leading-7 text-[#4f5969]">{article.summary_100 ?? '要約を準備中です。'}</p>
             </div>
           </div>
         </article>
