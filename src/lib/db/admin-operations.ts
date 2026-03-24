@@ -1,4 +1,5 @@
 import { getSql } from '@/lib/db'
+import { hasThumbnailTagRegistryEntry } from '@/lib/publish/thumbnail-tag-registry'
 
 type LogOptions = {
   operatorId?: string
@@ -64,6 +65,7 @@ export async function listTagCandidates(
   status: TagCandidateStatus = 'candidate',
 ): Promise<Array<{
   tagKey: string
+  normalizedTagKey: string
   displayName: string
   seenCount: number
   reviewStatus: string
@@ -71,6 +73,7 @@ export async function listTagCandidates(
   lastSeenAt: string
   originTitle: string | null
   originSnippet: string | null
+  hasThumbnailAsset: boolean
 }>> {
   const sql = getSql()
   const rows = (await sql`
@@ -86,6 +89,7 @@ export async function listTagCandidates(
     FROM tag_candidate_pool tcp
     LEFT JOIN articles_raw ar ON ar.raw_article_id = tcp.latest_origin_raw_id
     WHERE tcp.review_status = ${status}
+      AND tcp.seen_count >= 4
     ORDER BY tcp.seen_count DESC, tcp.last_seen_at DESC
     LIMIT ${limit}
   `) as Array<{
@@ -100,6 +104,7 @@ export async function listTagCandidates(
   }>
   return rows.map((row) => ({
     tagKey: row.tag_key,
+    normalizedTagKey: normalizeTagKey(row.tag_key),
     displayName: row.display_name,
     seenCount: Number(row.seen_count),
     reviewStatus: row.review_status,
@@ -107,6 +112,7 @@ export async function listTagCandidates(
     lastSeenAt: row.last_seen_at,
     originTitle: row.origin_title,
     originSnippet: row.origin_snippet,
+    hasThumbnailAsset: hasThumbnailTagRegistryEntry(normalizeTagKey(row.tag_key)),
   }))
 }
 
@@ -122,21 +128,96 @@ export async function setTagCandidateStatus(
   `
 }
 
-export async function promoteTagToMaster(tagKey: string, displayName: string): Promise<string> {
+export async function promoteTagToMaster(
+  tagKey: string,
+  displayName: string,
+): Promise<{
+  tagId: string
+  normalizedTagKey: string
+  taggedEnrichedCount: number
+  taggedPublicCount: number
+  hasThumbnailAsset: boolean
+}> {
   const sql = getSql()
+
+  // スペースをハイフンに正規化（URL-safe な tag_key にする）
+  const normalizedKey = normalizeTagKey(tagKey)
+
+  // tags_master に昇格
   const rows = (await sql`
     INSERT INTO tags_master (tag_key, display_name)
-    VALUES (${tagKey}, ${displayName})
+    VALUES (${normalizedKey}, ${displayName})
     ON CONFLICT (tag_key) DO UPDATE SET display_name = EXCLUDED.display_name, updated_at = now()
     RETURNING tag_id::text
   `) as Array<{ tag_id: string }>
+  const tagId = rows[0]!.tag_id
+
+  // candidate_key（元の表記、スペースあり）を tag_keywords に登録（テキストマッチ用）
+  await sql`
+    INSERT INTO tag_keywords (tag_id, keyword)
+    VALUES (${tagId}::uuid, ${tagKey})
+    ON CONFLICT (tag_id, keyword) DO NOTHING
+  `
+
   // tag_candidate_pool の status を promoted に更新
   await sql`
     UPDATE tag_candidate_pool
     SET review_status = 'promoted'
     WHERE candidate_key = ${tagKey}
   `
-  return rows[0]!.tag_id
+
+  // 根拠記事へのタグ付け: candidate_key を含む articles_enriched を対象
+  const keyword = `%${tagKey}%`  // candidate_key（スペースあり）でマッチング
+  const enrichedResult = (await sql`
+    INSERT INTO articles_enriched_tags (enriched_article_id, tag_id, is_primary, tag_source)
+    SELECT ae.enriched_article_id, ${tagId}::uuid, false, 'candidate_promoted'
+    FROM articles_enriched ae
+    WHERE ae.ai_processing_state = 'completed'
+      AND (
+        ae.title       ILIKE ${keyword}
+        OR ae.summary_100  ILIKE ${keyword}
+        OR ae.summary_200  ILIKE ${keyword}
+      )
+    ON CONFLICT (enriched_article_id, tag_id) DO NOTHING
+    RETURNING enriched_article_id
+  `) as Array<{ enriched_article_id: string }>
+
+  // 公開記事の public_article_tags にも反映
+  const publicResult = (await sql`
+    INSERT INTO public_article_tags (public_article_id, tag_id, sort_order)
+    SELECT
+      pa.public_article_id,
+      ${tagId}::uuid,
+      COALESCE(
+        (SELECT MAX(sort_order) + 1 FROM public_article_tags WHERE public_article_id = pa.public_article_id),
+        0
+      )
+    FROM public_articles pa
+    JOIN articles_enriched ae ON ae.enriched_article_id = pa.enriched_article_id
+    WHERE pa.visibility_status = 'published'
+      AND (
+        ae.title       ILIKE ${keyword}
+        OR ae.summary_100  ILIKE ${keyword}
+        OR ae.summary_200  ILIKE ${keyword}
+      )
+    ON CONFLICT (public_article_id, tag_id) DO NOTHING
+    RETURNING public_article_id
+  `) as Array<{ public_article_id: string }>
+
+  return {
+    tagId,
+    normalizedTagKey: normalizedKey,
+    taggedEnrichedCount: enrichedResult.length,
+    taggedPublicCount: publicResult.length,
+    hasThumbnailAsset: hasThumbnailTagRegistryEntry(normalizedKey),
+  }
+}
+
+function normalizeTagKey(tagKey: string): string {
+  return tagKey
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
 }
 
 export async function addTagKeyword(tagId: string, keyword: string): Promise<void> {

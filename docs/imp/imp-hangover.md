@@ -1,10 +1,100 @@
 # AI Trend Hub Implementation Hangover
 
-最終更新: 2026-03-17（Gemini 100件試験・backlog 1882件 manual export 反映）
+最終更新: 2026-03-22（大規模実装セッション完了）
 
 ## 1. このファイルの役割
 
 セッションが切れても、ここから再開できるように現状を短く固定する。
+
+---
+
+## 16. 2026-03-22 引継ぎ（最新）
+
+### 16.1 ブランチ状態
+
+- ブランチ: `dev-default`（37 commits ahead of `main`、push 済み）
+- **main への merge はユーザーが手動で実施**
+- merge 後に Vercel が自動デプロイする
+
+### 16.2 DB 現況（2026-03-22 時点）
+
+| 指標 | 値 |
+|---|---|
+| `public_articles` published | 2,741件 |
+| `articles_raw` 未処理 | 0件（全処理済み） |
+| publish 候補（L2） | 2,742件 |
+| アクティブソース | 46件（日本語 14件含む） |
+| タグ候補（seen_count≥4, candidate） | 95件 |
+
+### 16.3 今セッションで実装したもの（全37 commits）
+
+**バグ修正:**
+1. `public_article_sources` bigint 型バグ → 2件→2504件に回復
+2. en ソース記事タイトルが英語のまま → `titleJa` プロンプト追加 + 1622件バックフィル
+3. `published_at.toLocaleeDateString` エラー → `new Date()` ラップ
+4. clipboard API が HTTP で undefined → フォールバック追加
+
+**インフラ・パイプライン:**
+5. `compute-ranks` 最適化（1回読み込み + 4window 並列）
+6. `compute-ranks` を `job_runs` に追加
+7. `hasDatabaseColumn` 二重クエリを全廃（5ファイル）
+
+**Admin Phase 3（全体）:**
+8. `/admin/login` + cookie 認証
+9. `/admin/articles` 記事管理（hide/unhide）
+10. `/admin/tags` タグレビュー（文脈表示・昇格・保留・棄却）
+11. `/admin/sources` ソース管理（is_active ON/OFF）
+12. `/admin/jobs` ジョブログ（失敗 items 詳細・metadata 展開）
+
+**タグシステム:**
+13. 候補生成を AI 固有名詞抽出（`properNounTags`）に切り替え
+14. `daily-tag-dedup` 日次バッチ追加（Gemini で候補↔既存タグ照合・自動統合・遡及タグ付け）
+15. タグ昇格時の遡及タグ付け（L2/L4）+ `tag_keywords` 自動登録
+16. `tag_key` を URL-safe に正規化（スペース→ハイフン）
+17. 既存候補 5304件から 2500件超を棄却（STOPWORDS 拡充）
+18. 表示閾値を `seen_count >= 4` に設定
+
+**公開面・SEO:**
+19. OGP 画像 API（`/api/og`）+ 記事詳細 `generateMetadata`
+20. `sitemap.xml` + `robots.txt`
+21. `HomeStats` に jaCount / enCount 追加
+22. `/api/home` に ranked セクション追加
+23. 全ページの dev-mode description を本番テキストに修正
+24. `thumbnail_url` 用の主要タグアイコン資産を追加し、`/api/thumb` 描画へ反映
+25. `/admin/tags` に `icon_pending` 可視化を追加し、昇格レスポンスと操作ログへサムネイル資産有無を記録
+26. サムネイルのタグパーツを文字なしの icon-only 合成へ変更し、外部 SVG 参照をやめて inline data URL 描画へ変更
+27. `thumbnail_url` に version query を付けて immutable cache を切り、icon 未登録記事は robot emoji fallback へ戻す
+28. `db:backfill-thumbnail-urls` を追加し、既存 `thumbnail_url` を AI なしで再計算して `public_articles` まで再同期
+
+### 16.4 稼働中バッチ（GitHub Actions）
+
+| workflow | スケジュール | 処理 |
+|---|---|---|
+| `hourly-fetch` | 毎時 :00 | L1 収集 |
+| `hourly-enrich` | 毎時 :10/:20/:30/:40 | L2 enrich（10件×4回） |
+| `hourly-publish` | 毎時 :50 | L4 公開 + compute-ranks |
+| `daily-db-backup` | 毎日 18:15 UTC | DB バックアップ |
+| `daily-tag-dedup` | 毎日 02:30 UTC | タグ重複検出・自動統合 |
+| `monthly-public-archive` | 月次 | 半年超記事を history に退避 |
+
+### 16.5 merge 後に必要なユーザー操作
+
+1. Vercel に `ADMIN_SECRET` 環境変数を追加（任意の英数字文字列）
+2. `/admin/login` で動作確認
+3. GitHub Actions の `daily-tag-dedup` 初回実行を `/admin/jobs` で確認
+
+### 16.6 残タスク（次セッション向け）
+
+| タスク | 優先 | 備考 |
+|---|---|---|
+| `compute-ranks` 係数を実データで調整 | 低 | アクティビティ蓄積後 |
+| Topic Group 本実装 | 後回し | pgvector 前提 |
+
+### 16.7 次セッション開始時の推奨読み込み順
+
+1. `docs/imp/imp-hangover.md`（このファイル §16）
+2. `docs/imp/implementation-checklist.md`（残タスク §8 を確認）
+3. `docs/imp/data-flow.md`（バッチ全体像）
 
 ---
 
@@ -482,29 +572,39 @@ SELECT tag_key, article_count FROM tags_master ORDER BY article_count DESC LIMIT
 2. `public_articles_history` は age-out 履歴を保持する
 3. `compute-ranks` は publish 後続 step のまま。ただし timeout 再発時は分離を検討する
 
-### 解決済み（2026-03-21 夜 自律実装セッション）
+### 解決済み（2026-03-21〜22 セッション）
 
-1. `public_article_sources` bigint 型バグ修正・全件バックフィル実施
-   - 2件 → 2504件 に回復
-   - `scripts/backfill-public-article-sources.ts` 追加済み
-2. `compute-ranks` 最適化（全件1回読み込み + 4window 並列 upsert）
-3. admin Phase 3 実装済み
-   - `/admin/login`, `/admin`, `/admin/articles`, `/admin/tags`, `/admin/sources`
-   - `ADMIN_SECRET` 認証（cookie + API header）
-   - `hide_article` / `unhide`, タグ昇格, `is_active` ON/OFF
-   - `admin_operation_logs` 記録
-4. `content_language` を全公開 API に通した（hasDatabaseColumn 二重クエリ廃止）
-5. action_type マッピングが正式仕様通りであることを確認済み
+1. `public_article_sources` bigint 型バグ修正・全件バックフィル（2件→2504件）
+2. `compute-ranks` 最適化（1回読み込み + 4window 並列 upsert）
+3. admin Phase 3 全体
+   - `/admin/login`, `/admin`, `/admin/articles`, `/admin/tags`, `/admin/sources`, `/admin/jobs`
+   - `ADMIN_SECRET` 認証・`hide_article`・タグ昇格・`is_active` ON/OFF
+   - ジョブログ画面（`/admin/jobs`）: 失敗 item の詳細・metadata を展開表示
+4. `content_language` を全公開 API に通した（hasDatabaseColumn 廃止）
+5. en ソース記事タイトルの日本語翻訳修正
+   - enrich プロンプトに `titleJa` / `properNounTags` を追加
+   - 既存 1622 件を `backfill-ja-titles.ts` で翻訳・更新済み
+6. OGP 画像 API（`/api/og`）+ 記事詳細 `generateMetadata` 追加
+7. sitemap.xml + robots.txt 追加
+8. タグシステム全面改善
+   - タグ候補を固有名詞（CamelCase・全大文字・非文頭大文字）に限定
+   - enrich の properNounTags で AI 抽出に切り替え
+   - `daily-tag-dedup` 日次バッチ追加（Gemini で候補と既存タグを照合 → 自動統合 + 遡及タグ付け）
+   - 昇格時に `tag_key` をハイフン正規化（URL-safe）
+   - タグレビュー UI: 文脈表示・保留・棄却・候補に戻す
+   - 昇格時の遡及タグ付け（L2/L4 両方）
+   - 既存候補 5304件から 2500件超を棄却（STOPWORDS 拡充）
+9. `HomeStats` に jaCount / enCount 追加
+10. `/api/home` に ranked セクション追加
+11. 各ページの dev-mode description を本番テキストに修正
 
 ### 残り未解決
 
-1. Topic Group 本実装（pgvector 前提）
-2. OGP 本実装（`/api/og` は実装済み、`summary_large_image` 設定のみ）
+1. Topic Group 本実装（pgvector 前提、後回し）
+2. `tags_master` のエイリアス追加 UI（現状 SQL 直接）
 
-### 次セッション（merge 後）の確認事項
+### 次セッションの確認事項
 
-1. `dev-default` → `main` merge
-2. Vercel の production が最新 commit を拾っているか
-3. Vercel に `ADMIN_SECRET` env var を追加する
-4. GitHub Actions の最新 run で fetch / enrich / publish / compute-ranks を確認
-5. `/admin/login` で動作確認（ADMIN_SECRET でログイン）
+1. `daily-tag-dedup` の初回 Actions 実行結果を `/admin/jobs` で確認
+2. タグ候補の AI 抽出（properNounTags）が正常に機能しているか enrich ログで確認
+3. `push_subscriptions.genres` カラム名変更（未対応・Human-in-the-Loop 対象）

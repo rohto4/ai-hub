@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="Llama">
+  <rect width="16" height="16" rx="4" fill="#ffffff" fill-opacity="0.16"/>
+  <path d="M6 4.1l1-.9h2l1 .9v4.6l-1.1 2.1H7.1L6 8.7V4.1z" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
+  <circle cx="7" cy="6.5" r=".6" fill="#ffffff"/>
+  <circle cx="9" cy="6.5" r=".6" fill="#ffffff"/>
+</svg>

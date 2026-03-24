@@ -18,6 +18,23 @@ const STOPWORDS = new Set([
   'player', 'players', 'bills', 'china', 'chinas', 'buffet', 'lobster',
   'accused', 'murdering',
   'introducing', 'amazon', 'offline', 'chatbots',
+  // 英語タイトルケースで誤検出される一般的な技術用語・普通名詞
+  'system', 'context', 'inference', 'efficient', 'efficiency',
+  'security', 'framework', 'scale', 'multi', 'flash',
+  'multimodal', 'semantic', 'generative', 'vision', 'reasoning',
+  'enterprise', 'tuning', 'hugging', 'agentic', 'spatial', 'temporal',
+  'precision', 'consistency', 'referential', 'foundation', 'frontier',
+  'benchmark', 'performance', 'understanding', 'alignment', 'deployment',
+  'optimization', 'generation', 'training', 'learning', 'research',
+  'open', 'source', 'state', 'memory', 'language', 'large', 'long',
+  'fast', 'faster', 'better', 'powerful', 'advanced', 'next',
+  'card', 'face', 'cloud', 'edge', 'layer', 'stack', 'pipeline',
+  'based', 'built', 'intelligence', 'leaderboard', 'autonomous',
+  'approach', 'evaluation', 'science', 'local', 'community',
+  'privacy', 'single', 'unified', 'government', 'feature',
+  'human', 'chain', 'physics', 'first', 'last', 'real', 'full',
+  'data', 'model', 'task', 'work', 'time', 'high', 'low', 'key',
+  'open', 'free', 'small', 'large', 'deep', 'wide', 'cross',
 ])
 
 const GENERIC_PHRASES = new Set([
@@ -86,23 +103,6 @@ function normalizeText(value: string): string {
   return value.toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, ' ').replace(/\s+/g, ' ').trim()
 }
 
-function tokenize(value: string): string[] {
-  return normalizeText(value)
-    .split(/[\s-]+/)
-    .map((token) => token.trim())
-    .filter((token) => token.length >= 3 && !STOPWORDS.has(token))
-}
-
-function buildNgrams(tokens: string[]): string[] {
-  const ngrams = new Set<string>()
-  for (let index = 0; index < tokens.length; index += 1) {
-    ngrams.add(tokens[index])
-    if (index < tokens.length - 1) {
-      ngrams.add(`${tokens[index]} ${tokens[index + 1]}`)
-    }
-  }
-  return Array.from(ngrams)
-}
 
 function isCandidateTokenValid(token: string): boolean {
   return token.length >= 3 && !STOPWORDS.has(token)
@@ -126,6 +126,74 @@ function isCandidatePhraseValid(phrase: string): boolean {
     return false
   }
   return true
+}
+
+/**
+ * タイトルから固有名詞候補を抽出する。
+ * 固有名詞の判定基準（OR）:
+ *   - 全大文字 (NVIDIA, RAG, LLM)
+ *   - CamelCase (ChatGPT, LangChain, OpenAI)
+ *   - 文頭・副題開始でない位置で大文字始まり (... uses Gemini ...)
+ * 文頭とみなす位置: タイトル先頭、または ": " / " - " の直後
+ */
+function extractProperNounCandidates(title: string): string[] {
+  // 文頭インデックスを収集（先頭 + ": " / " – " / " - " 直後）
+  const sentenceStartIndices = new Set<number>([0])
+  for (const pattern of [':', ' -', ' –', ' —']) {
+    let pos = title.indexOf(pattern)
+    while (pos !== -1) {
+      const afterSep = pos + pattern.length
+      // セパレータ後の空白をスキップ
+      let wordStart = afterSep
+      while (wordStart < title.length && title[wordStart] === ' ') wordStart++
+      sentenceStartIndices.add(wordStart)
+      pos = title.indexOf(pattern, pos + 1)
+    }
+  }
+
+  // トークン分割（元の大文字情報を保持）
+  const rawTokens: Array<{ original: string; startIndex: number }> = []
+  const tokenRegex = /[A-Za-z][A-Za-z0-9-]*/g
+  let match: RegExpExecArray | null
+  while ((match = tokenRegex.exec(title)) !== null) {
+    rawTokens.push({ original: match[0], startIndex: match.index })
+  }
+
+  const properNounIndices = new Set<number>()
+
+  for (let i = 0; i < rawTokens.length; i++) {
+    const { original, startIndex } = rawTokens[i]
+    const lower = original.toLowerCase()
+
+    if (lower.length < 3 || STOPWORDS.has(lower)) continue
+
+    const isAllCaps = /^[A-Z]{2,}[A-Z0-9-]*$/.test(original)             // NVIDIA, GPT-4
+    const isCamelCase = /[a-z][A-Z]|[A-Z]{2,}[a-z]/.test(original)       // ChatGPT, LangChain
+    const isNonSentenceStart = !sentenceStartIndices.has(startIndex) && /^[A-Z]/.test(original)
+
+    if (isAllCaps || isCamelCase || isNonSentenceStart) {
+      properNounIndices.add(i)
+    }
+  }
+
+  // 単語 ngram（1-gram + 連続する固有名詞の 2-gram）
+  const results = new Set<string>()
+
+  for (const i of properNounIndices) {
+    const key = rawTokens[i].original.toLowerCase().replace(/-/g, ' ').trim()
+    if (isCandidatePhraseValid(key) || key.length >= 3) {
+      results.add(key)
+    }
+    // 隣接する固有名詞との 2-gram
+    if (properNounIndices.has(i + 1)) {
+      const bigram = `${rawTokens[i].original.toLowerCase()} ${rawTokens[i + 1].original.toLowerCase()}`
+      if (isCandidatePhraseValid(bigram)) {
+        results.add(bigram)
+      }
+    }
+  }
+
+  return Array.from(results).filter((k) => !GENERIC_PHRASES.has(k))
 }
 
 function titleCase(value: string): string {
@@ -181,12 +249,9 @@ export function matchTags(
   )
 
   const candidateTags = shouldGenerateCandidateTags(title)
-    ? buildNgrams(tokenize(title))
-        .filter((token) => token.length >= 4)
-        .filter(isCandidatePhraseValid)
+    ? extractProperNounCandidates(title)
         .filter((token) => !matchedTerms.has(token))
         .filter((token) => !STOPWORDS.has(token))
-        .filter((token, index, array) => array.indexOf(token) === index)
         .slice(0, 6)
         .map((token) => ({
           candidateKey: token,

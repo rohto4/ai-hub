@@ -1,41 +1,43 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-03-21
+最終更新: 2026-03-22
 
 ---
 
 ## 1. 現在のフェーズ
 
-**Layer 4 稼働済み・リファクタリング完了・次は `content_language` + 小型サムネイル導入。その後に日本語ソース投入と GitHub Actions 有効化**
+**Phase A〜F 完了。UI調整・係数チューニング・Topic Group が残タスク。**
 
-### 1.1 完了済み（2026-03-21 時点）
+### 1.1 完了済み（2026-03-22 時点）
 
 - Layer 1 → 2 → 4 の自動パイプライン稼働中
-- `public_articles` 公開済み: 2371 件
-- `hourly-publish` の bulk upsert 化完了（unnest ベース）
-- `commercial_use_policy` 実装・ToS 調査反映済み
-- Phase 0 / Phase 1 / Phase 2 完了
-- リファクタリング: `page.tsx` 65行・`public-feed.ts` 15行（re-exportのみ）等、全ファイル 324行以内
+- `content_language` 導入・日本語ソース 14件・タイトル日本語翻訳（en→ja）完了
+- `thumbnail_url` 内部テンプレート方式で実装済み
+- admin Phase 3 全体（記事管理・タグレビュー・ソース管理・ジョブログ）
+- `daily-tag-dedup` 日次自動タグ統合バッチ追加
+- OGP画像（/api/og）・sitemap.xml・robots.txt 追加
+- `public_article_sources` バグ修正・compute-ranks 最適化
+- Phase A / B / C / D / E / F-1 完了、F-2 部分完了
 
-### 1.2 データ現況（2026-03-21）
+### 1.2 データ現況（2026-03-22）
 
 | 指標 | 値 |
 |---|---|
-| `articles_raw` | 2863件（全処理済み） |
-| `articles_enriched` | 2861件 |
-| `public_articles` published | 2371件 |
-| アクティブソース | 32件 |
-| `tag_keywords` | 368件 |
+| `public_articles` published | ~2600件 |
+| アクティブソース | 46件（日本語ソース 14件追加後） |
+| `tag_keywords` | 368件 + 昇格時自動追加分 |
+| `tag_candidate_pool` (candidate) | ~3000件 |
 
 ### 1.3 稼働中バッチ
 
 ```
-hourly-layer12（毎時 :05）
-  └── hourly-fetch → articles_raw
-  └── daily-enrich → articles_enriched
-
-hourly-publish（毎時 :35）
-  └── articles_enriched → public_articles
+hourly-fetch（毎時 :00）
+hourly-enrich（毎時 :10/:20/:30/:40）← 10件 × 4回
+hourly-publish（毎時 :50）
+  └── compute-ranks も後続で実行
+daily-db-backup（毎日 18:15 UTC）
+daily-tag-dedup（毎日 02:30 UTC）← 新規追加
+monthly-public-archive（月次）
 ```
 
 ---
@@ -155,6 +157,18 @@ hourly-publish（毎時 :35）
    - 未登録なら `icon_pending` として記録
    - 後続の資産追加対象として残す
 
+現行実装:
+
+1. `/admin/tags` 一覧に `normalizedTagKey` と `icon_pending` / `thumbnail ready` を表示する
+2. tag 昇格 API は `hasThumbnailAsset` をレスポンスと `admin_operation_logs` に含める
+3. 未登録タグでも昇格は止めず、`thumbnail-tag-registry.ts` の抽象 glyph fallback で publish 継続する
+4. 主要タグは文字チップではなく icon-only パーツとして描画する
+5. `/api/thumb` の SVG は外部画像参照ではなく、インライン data URL でアイコンを埋め込む
+6. 既存 URL の immutable cache に引っかからないよう、テンプレ更新時は `thumbnail_url` に version query を含める
+7. 登録済み icon が 1 つも無い記事は、無理に glyph を並べず `thumbnail_emoji` fallback を優先する
+8. ただし既存 DB に残る旧 `/api/thumb` URL は 400 にせず、decoder 側で glyph fallback 描画して後方互換を維持する
+9. 既存記事の見た目を変えるときは `npm run db:backfill-thumbnail-urls` で `articles_enriched` / `public_articles` を再同期する
+
 将来の自動化:
 
 1. `daily-tag-promote` 実装時に、昇格タグを `thumbnail asset review queue` に積む
@@ -166,7 +180,7 @@ hourly-publish（毎時 :35）
 #### B-5. 初期実装の割り切り
 
 1. まずは主要タグだけアイコンを用意する
-2. アイコンがないタグはテキストチップ化、または `thumbnail_emoji` にフォールバックする
+2. アイコンがないタグは抽象 glyph、または `thumbnail_emoji` にフォールバックする
 3. 外部画像取得は後回し
 4. 画像欠落時でも一覧崩れしないことを優先する
 5. タグ昇格時に即画像が無くても publish を止めない
@@ -254,14 +268,100 @@ hourly-publish（毎時 :35）
 
 ## 4. Phase 3 完了後に回すもの
 
-- **Topic Group（`/topics/:id`）**: pgvector embedding 生成 → backfill → HNSW インデックス → グループ化バッチ → UI、の順で実装。スキーマ（`topic_group_id`, `topic_groups` テーブル）は migration 035 で先行追加済み。
-- **OGP 強化**: `summary_large_image` を X カード種別として設定する（`/api/og` は実装済みなので追加実装ゼロ）
-- **share tracking 詳細化**: `share_copy` アクションの `meta` フィールドに `{ type, includeTitle, includeSummary, includeHashtag }` を追加する（`/api/actions` の meta は `Record<string, unknown>` で受け取り済み）
-- **タグ昇格後の画像資産自動化**: `daily-tag-promote` または admin 昇格時に `thumbnail asset review queue` を更新し、registry 未登録タグを補完する
-- `retag` / `republish` / `rebuild_rank` の queue 実装
-- `critique` UI の有効化（`daily-enrich` 側で生成を有効化してから）
-- 通知機能（週次人気記事通知・更新通知）
-- SNS シェアボタン再追加（共有モーダルの「詳細オプション」以下に格納）
+### 実装済み（参照のみ）
+- **OGP**: `/api/og` 実装済み。`summary_large_image` で記事詳細ページに設定済み。
+- **Admin Phase 3**: 全体実装済み（articles / tags / sources / jobs）。
+
+### 次フェーズで実装するもの
+
+- **高品質サムネイル（Gemini 生成アセット）の導入**
+  - **背景**: 現状の SVG 合成サムネイルを、Gemini で生成した高品質な 3D 風アセットベースの「映える」デザインへ昇華させる。
+  - **アセット管理**: `tags_master` に `icon_asset_path` を追加し、タグごとの高品質透過画像を管理する。
+  - **レイヤー合成**: 背景テクスチャ + 高品質アイコン + グラスモーフィズム等のエフェクトを重ね合わせたリッチな合成ロジック（`thumbnail-template.ts`）を実装する。
+  - **生成運用**: Gemini CLI を活用し、タグに基づいた画像生成プロンプトを自動作成して週次でアセットを拡充する運用フローを構築する。
+  - **パフォーマンス**: 実行時は静的アセットの単純な重ね合わせ（またはインライン data URL 埋め込み）に限定し、ブラウザでの描画速度を維持する。
+
+- **Topic Group（`/topics/:id`）**
+  - pgvector embedding 生成バッチ → 既存記事への backfill（$0.02 程度）
+  - HNSW インデックス（migration）
+  - グループ化バッチ（類似度 0.92 以上を同 `topic_group_id` に集約）
+  - UI: `/topics/:id` = 同テーマの複数視点記事を並べるページ
+  - スキーマ（`topic_group_id`, `topic_groups`）は migration 035 で先行追加済み
+
+- **`compute-ranks` 係数チューニング**
+  - アクティビティデータが蓄積したら `impression` / `open` / `share` / `save` / `sourceOpen` のウェイトを見直す
+  - 時間減衰（1週間で 1/5）が実態と合っているか確認する
+
+- **share tracking 詳細化**
+  - `share_copy` の `meta` に `{ type, includeTitle, includeSummary, includeHashtag }` を追加
+  - `/api/actions` の meta は `Record<string, unknown>` で受け取り済み、フロント側の送信のみ追加
+
+- **thumbnail アイコン画像資産**
+  - 主要タグ用 SVG を `public/thumbs/icons/` に追加済み
+  - `thumbnail-tag-registry.ts` は実画像参照へ更新済み
+  - 未登録タグは registry fallback のラベル生成で継続運用
+  - `/admin/tags` で `icon_pending` を可視化済み
+  - `db:backfill-thumbnail-urls` で既存 `thumbnail_url` を AI なしで再計算・再反映できる
+
+- **critique UI の有効化**
+  - `daily-enrich` 側で critique 生成を有効化（コスト・品質確認後）
+  - UI に critique 展開セクションを追加
+
+- **`push_subscriptions.genres` カラム rename**
+  - `genres` → `source_categories` に変更（Human-in-the-Loop 対象）
+  - migration 037 で対応
+
+- **tag alias 管理 UI**
+  - `/admin/tags/aliases` で tag_aliases を管理できるようにする（運用頻度次第）
+
+- **retag / republish / rebuild_rank の queue 実装**
+  - `priority_processing_queue` を活用（hide_article 以外の用途）
+
+- **通知機能**（週次人気記事通知・更新通知）
+
+## 4.1 2026-03-22 セッションで出たアイデア
+
+このセッション中に浮かんだ中長期的なアイデアを記録しておく。
+
+1. **タグ候補の自動評価スコア表示**
+   - 管理画面のタグレビューに「このタグを昇格した場合、過去記事で何件にタグ付けされるか」を昇格前にプレビューする機能
+   - 実装: `/api/admin/tags/preview?tagKey=xxx` で ILIKE 件数を返すだけ
+
+2. **タグ重複検出の信頼度フィードバック**
+   - `daily-tag-dedup` が low confidence でスキップしたものを別タブで表示し、人間が「統合する/しない」を判断できる
+   - 現状 low confidence はサイレントスキップ、管理画面では見えない
+
+3. **記事の言語フィルタ UI**
+   - Home / Search に JP / EN フィルタを追加
+   - `content_language` は全 API に通し済みなので、URL パラメータと UI 追加のみ
+
+4. **ソース停止時の記事の扱い**
+   - `source_targets.is_active = false` にしたとき、既存 L4 記事をどうするか未確定
+   - 現状: 公開されたまま（非表示にしない）
+   - 案: is_active=false にした日以降の新規取得を止め、既存は残す（現状維持で確定してよいかも）
+
+5. **`daily-tag-dedup` の実行結果サマリーを通知**
+   - 何件統合されたかを Slack や管理画面ダッシュボードに出す
+   - 現状: `/admin/jobs` で確認できるが、まとめ数字がない
+
+## 4.2 2026-03-22 Deep Search 参照元
+
+サムネイルの icon-only 化に着手する前に、以下を参考元として固定した。
+
+1. Apple WWDC25 `Say hello to the new look of app icons`
+   - layered / translucency / breathing room / rounder corners / bold line weight を採用
+   - https://developer.apple.com/videos/play/wwdc2025/220/
+2. Apple WWDC20 `Design great widgets`
+   - small surface では情報量を絞る、ロゴや word mark を増やしすぎない、concentric な余白を保つ
+   - https://developer.apple.com/kr/videos/play/wwdc2020/10103/
+3. MDN `SVG as an image`
+   - SVG を image context で使う場合、外部 resource 参照に制約があるため data URL / inline 化を優先
+   - https://developer.mozilla.org/en-US/docs/Web/SVG/Guides/SVG_as_an_image
+4. elementary HIG `Iconography`
+   - 過度に複雑にしない、transparent element を使う、thin すぎる icon を避ける
+   - https://docs.elementary.io/hig/reference/iconography
+5. Linear / Dribbble の card / icon-stack 表現
+   - 小面積の中では文字より layered icon composition の方が情報が濁りにくい、という参考として扱う
 
 ---
 
@@ -297,30 +397,18 @@ hourly-publish（毎時 :35）
 - 半年超過行は月次バッチで `public_articles_history` に退避して `public_articles` から削除する
 - 月次バッチは `monthly-public-archive` として実装し、初期値は `ageMonths=6`
 - これにより `compute-ranks` 側は ranking 対象の SQL を大きく変えずに母集団だけを減らせる
-## 2026-03-21 再開時の実装優先順
+## 2026-03-22 残タスク
 
-### 直近で先に見るもの
+### 未着手・後回し
 
-1. `public_article_sources` 同期不備の解消
-2. GitHub Actions / Vercel 本番 run の安定確認
-3. `compute-ranks` の実測
-   - 300 秒化で足りるか
-   - それでも重ければ workflow 分離 or 差分更新化
+1. `compute-ranks` 係数を実アクティビティデータで点検・調整する
+2. Topic Group 本実装（pgvector 前提、別フェーズ）
 
-### その後の大物
+### 完了済み（再実装不要）
 
-1. admin Phase 3
-2. Topic Group 本実装
-3. OGP 画像実装
-4. ranking の action mapping 調整
-5. docs / monitoring の整備
-
-### スキップしてよいこと
-
-1. `content_language`
-2. `thumbnail_url`
-3. 日本語ソース seed
-4. cron 分離
-5. L4 月次アーカイブ
-
-上記は実装済み。再実装不要。
+- `content_language`・`thumbnail_url`・日本語ソース seed
+- `thumbnail_url` の主要タグアイコン資産（`public/thumbs/icons` + registry 参照）
+- cron 分離・L4 月次アーカイブ
+- `public_article_sources` バグ修正
+- admin Phase 3・OGP・sitemap・robots
+- `daily-tag-dedup`・タグ固有名詞抽出・遡及タグ付け

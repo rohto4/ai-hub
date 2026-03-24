@@ -1,4 +1,6 @@
 import type { ContentLanguage, SourceType } from '@/lib/db/types'
+import { existsSync, readFileSync } from 'node:fs'
+import path from 'node:path'
 import {
   resolveThumbnailTagRegistryEntry,
 } from '@/lib/publish/thumbnail-tag-registry'
@@ -16,6 +18,7 @@ type RankedTag = MatchedTagReference & {
 }
 
 type ThumbnailLayout = 'single' | 'dual' | 'trio' | 'overflow'
+const THUMBNAIL_TEMPLATE_VERSION = '3'
 
 export type ThumbnailTemplateInput = {
   canonicalUrl: string
@@ -131,29 +134,40 @@ export function buildInternalThumbnailUrl(input: ThumbnailTemplateInput): string
     return null
   }
 
+  const registeredTags = tags.filter((tag) => {
+    const entry = resolveThumbnailTagRegistryEntry(tag.tagKey)
+    return Boolean(entry?.iconPath)
+  })
+  if (registeredTags.length === 0) {
+    return null
+  }
+
   const background = resolveBackground(input.sourceType, input.sourceCategory)
-  const layout = resolveLayout(tags.length, overflowCount)
+  const layout = resolveLayout(registeredTags.length, overflowCount)
   const variant = ['a', 'b', 'c'][hashString(input.canonicalUrl) % 3] ?? 'a'
-  const encodedTags = tags.map((tag) => slugifyTag(tag.tagKey)).join(',')
+  const encodedTags = registeredTags.map((tag) => slugifyTag(tag.tagKey)).join(',')
   const params = new URLSearchParams({
     bg: background,
     layout,
     variant,
     tags: encodedTags,
     lang: input.contentLanguage ?? 'en',
+    v: THUMBNAIL_TEMPLATE_VERSION,
   })
 
-  if (overflowCount > 0) {
-    params.set('overflow', String(overflowCount))
+  const adjustedOverflowCount = Math.max(0, input.matchedTags.length - registeredTags.length)
+  if (adjustedOverflowCount > 0) {
+    params.set('overflow', String(adjustedOverflowCount))
   }
 
   return `/api/thumb?${params.toString()}`
 }
 
 type RenderTag = {
-  label: string
   fill: string
-  color: string
+  iconHref?: string
+  highQualityAssetHref?: string
+  fallbackShape: 'ring' | 'diamond' | 'triangle' | 'orb'
 }
 
 type RenderPayload = {
@@ -165,7 +179,7 @@ type RenderPayload = {
   overflowCount: number
 }
 
-const BACKGROUNDS: Record<string, { start: string; end: string; accent: string }> = {
+const BACKGROUNDS: Record<string, { start: string; end: string; accent: string; texture?: string }> = {
   paper: { start: '#f8fafc', end: '#cbd5e1', accent: '#0f172a' },
   news: { start: '#fef3c7', end: '#fb7185', accent: '#7c2d12' },
   alerts: { start: '#dbeafe', end: '#a78bfa', accent: '#312e81' },
@@ -175,13 +189,34 @@ const BACKGROUNDS: Record<string, { start: string; end: string; accent: string }
   'official-llm': { start: '#cffafe', end: '#60a5fa', accent: '#0c4a6e' },
 }
 
+const assetDataUriCache = new Map<string, string>()
+
+function loadAssetDataUri(assetPath: string, mimeType = 'image/svg+xml'): string | null {
+  const cached = assetDataUriCache.get(assetPath)
+  if (cached) return cached
+
+  const absolutePath = path.join(process.cwd(), 'public', assetPath.replace(/^\//, ''))
+  if (!existsSync(absolutePath)) return null
+
+  const buffer = readFileSync(absolutePath)
+  const isSvg = assetPath.endsWith('.svg')
+  const actualMime = isSvg ? 'image/svg+xml;charset=utf-8' : assetPath.endsWith('.webp') ? 'image/webp' : 'image/png'
+  const base64 = buffer.toString('base64')
+  const dataUri = `data:${actualMime};base64,${base64}`
+  assetDataUriCache.set(assetPath, dataUri)
+  return dataUri
+}
+
 function renderTag(tagKey: string): RenderTag | null {
   const entry = resolveThumbnailTagRegistryEntry(tagKey)
   if (!entry) return null
+  const shapes: RenderTag['fallbackShape'][] = ['ring', 'diamond', 'triangle', 'orb']
+  const fallbackShape = shapes[hashString(tagKey) % shapes.length] ?? 'orb'
   return {
-    label: entry.shortLabel,
     fill: entry.accentColor,
-    color: entry.accentTextColor ?? '#ffffff',
+    iconHref: entry.iconPath ? loadAssetDataUri(entry.iconPath) ?? undefined : undefined,
+    highQualityAssetHref: entry.highQualityAssetPath ? loadAssetDataUri(entry.highQualityAssetPath) ?? undefined : undefined,
+    fallbackShape,
   }
 }
 
@@ -209,24 +244,62 @@ export function decodeThumbnailPayload(searchParams: URLSearchParams): RenderPay
   return { background, layout, variant, tags, language, overflowCount }
 }
 
-function escapeXml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
-}
-
 function renderBadgeText(payload: RenderPayload): string {
   return payload.language === 'ja' ? 'JP' : 'EN'
 }
 
-function renderChip(x: number, y: number, width: number, tag: RenderTag): string {
+function renderFallbackGlyph(tag: RenderTag, size: number): string {
+  if (tag.fallbackShape === 'ring') {
+    return `
+      <circle cx="${size / 2}" cy="${size / 2}" r="${size * 0.22}" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="${Math.max(1.5, size * 0.1)}" />
+      <circle cx="${size / 2}" cy="${size / 2}" r="${size * 0.08}" fill="rgba(255,255,255,0.92)" />
+    `
+  }
+  if (tag.fallbackShape === 'diamond') {
+    return `<rect x="${size * 0.28}" y="${size * 0.28}" width="${size * 0.44}" height="${size * 0.44}" rx="${size * 0.08}" transform="rotate(45 ${size / 2} ${size / 2})" fill="rgba(255,255,255,0.92)" />`
+  }
+  if (tag.fallbackShape === 'triangle') {
+    return `<path d="M ${size / 2} ${size * 0.22} L ${size * 0.76} ${size * 0.72} L ${size * 0.24} ${size * 0.72} Z" fill="rgba(255,255,255,0.92)" />`
+  }
+  return `<circle cx="${size / 2}" cy="${size / 2}" r="${size * 0.24}" fill="rgba(255,255,255,0.92)" />`
+}
+
+function renderIconTile(x: number, y: number, size: number, tag: RenderTag, tilt = 0): string {
+  if (tag.highQualityAssetHref) {
+    // Bleeding out large SVG rendering
+    return `
+      <g transform="translate(${x} ${y}) rotate(${tilt} ${size / 2} ${size / 2})" style="filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4))">
+        <image x="0" y="0" width="${size}" height="${size}" href="${tag.highQualityAssetHref}" preserveAspectRatio="xMidYMid meet" />
+      </g>
+    `
+  }
+
+  // Fallback for missing assets
+  const iconInset = size * 0.15
+  const iconSize = size - iconInset * 2
+  const mainImage = tag.iconHref
+    ? `<image x="${iconInset}" y="${iconInset}" width="${iconSize}" height="${iconSize}" href="${tag.iconHref}" preserveAspectRatio="xMidYMid meet" />`
+    : renderFallbackGlyph(tag, size)
+
+  return `
+    <g transform="translate(${x} ${y}) rotate(${tilt} ${size / 2} ${size / 2})">
+      <rect x="2" y="${size * 0.12}" width="${size}" height="${size}" rx="${Math.max(8, size * 0.35)}" fill="rgba(0,0,0,0.2)" />
+      <rect width="${size}" height="${size}" rx="${Math.max(8, size * 0.35)}" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" />
+      <rect x="2" y="2" width="${size - 4}" height="${size * 0.45}" rx="${Math.max(6, size * 0.25)}" fill="rgba(255,255,255,0.18)" />
+      <g>
+        <rect x="${size * 0.18}" y="${size * 0.18}" width="${size * 0.64}" height="${size * 0.64}" rx="${Math.max(5, size * 0.22)}" fill="${tag.fill}" opacity="0.8" />
+        ${mainImage}
+      </g>
+    </g>
+  `
+}
+
+function renderOverflowDots(x: number, y: number): string {
   return `
     <g transform="translate(${x} ${y})">
-      <rect rx="9" ry="9" width="${width}" height="20" fill="${tag.fill}" />
-      <text x="${width / 2}" y="13.5" fill="${tag.color}" font-size="8.5" font-family="Arial, sans-serif" font-weight="700" text-anchor="middle">${escapeXml(tag.label)}</text>
+      <circle cx="4" cy="4" r="2.5" fill="white" />
+      <circle cx="12" cy="4" r="2" fill="rgba(255,255,255,0.7)" />
+      <circle cx="18" cy="4" r="1.5" fill="rgba(255,255,255,0.45)" />
     </g>
   `
 }
@@ -234,27 +307,38 @@ function renderChip(x: number, y: number, width: number, tag: RenderTag): string
 export function renderThumbnailSvg(payload: RenderPayload): string {
   const background = BACKGROUNDS[payload.background] ?? BACKGROUNDS['official-llm']
   const chips = payload.tags.slice(0, 3)
-  const chipWidths = chips.map((tag) => Math.max(34, Math.min(56, 18 + tag.label.length * 5)))
   const badge = renderBadgeText(payload)
 
-  const chipMarkup =
-    payload.layout === 'single'
-      ? renderChip(13, 29, chipWidths[0] ?? 40, chips[0]!)
-      : payload.layout === 'dual'
-        ? `${renderChip(8, 22, chipWidths[0] ?? 40, chips[0]!)}${renderChip(22, 42, chipWidths[1] ?? 40, chips[1]!)}`
-        : `${renderChip(6, 16, chipWidths[0] ?? 40, chips[0]!)}${renderChip(14, 37, chipWidths[1] ?? 40, chips[1]!)}${chips[2] ? renderChip(28, 56, chipWidths[2] ?? 40, chips[2]) : ''}`
+  let chipMarkup = ''
+  if (chips.length === 1) {
+    chipMarkup = renderIconTile(4, 14, 48, chips[0]!, -4)
+  } else if (chips.length === 2) {
+    chipMarkup = `${renderIconTile(-6, 8, 38, chips[0]!, -10)}${renderIconTile(20, 24, 38, chips[1]!, 8)}`
+  } else if (chips.length >= 3) {
+    chipMarkup = `${renderIconTile(14, 4, 30, chips[0]!, -5)}${renderIconTile(-6, 28, 32, chips[1]!, -12)}${renderIconTile(26, 32, 30, chips[2]!, 12)}`
+  }
 
   const overflowMarkup =
     payload.overflowCount > 0
-      ? `<text x="48" y="68" fill="${background.accent}" font-size="10" font-family="Arial, sans-serif" font-weight="700" text-anchor="end">+${payload.overflowCount}</text>`
+      ? renderOverflowDots(32, 62)
       : ''
 
-  const accentCircle =
-    payload.variant === 'a'
-      ? '<circle cx="12" cy="12" r="10" fill="rgba(255,255,255,0.22)" />'
-      : payload.variant === 'b'
-        ? '<rect x="31" y="6" width="12" height="12" rx="6" fill="rgba(255,255,255,0.18)" />'
-        : '<path d="M44 10 L54 22 L36 26 Z" fill="rgba(255,255,255,0.16)" />'
+  // Dynamic Overlay Lighting & Glass Effects
+  const overlayEffects = `
+    <!-- Top Shine -->
+    <path d="M 10 10 L 46 10 Q 51 10 51 15 L 51 25 Q 30 20 10 30 Z" fill="white" fill-opacity="0.15" />
+    
+    <!-- Border Glow -->
+    <rect x="0.5" y="0.5" width="55" height="71" rx="9.5" fill="none" stroke="url(#borderGradient)" stroke-width="1" />
+    <linearGradient id="borderGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="white" stop-opacity="0.5" />
+      <stop offset="50%" stop-color="white" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="white" stop-opacity="0.4" />
+    </linearGradient>
+
+    <!-- Overall Soft Light -->
+    <rect width="56" height="72" rx="10" fill="url(#lighting)" style="mix-blend-mode: soft-light" />
+  `
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="56" height="72" viewBox="0 0 56 72" role="img" aria-label="AI Trend Hub thumbnail">
@@ -263,14 +347,58 @@ export function renderThumbnailSvg(payload: RenderPayload): string {
           <stop offset="0%" stop-color="${background.start}" />
           <stop offset="100%" stop-color="${background.end}" />
         </linearGradient>
+        
+        <linearGradient id="lighting" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="white" stop-opacity="0.3" />
+          <stop offset="100%" stop-color="black" stop-opacity="0.15" />
+        </linearGradient>
+
+        <filter id="blurFilter">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" />
+        </filter>
       </defs>
+      
+      <!-- Base Layer -->
       <rect width="56" height="72" rx="10" fill="url(#bg)" />
-      ${accentCircle}
-      <rect x="6" y="6" width="18" height="12" rx="6" fill="rgba(255,255,255,0.82)" />
-      <text x="15" y="14.2" fill="${background.accent}" font-size="8" font-family="Arial, sans-serif" font-weight="700" text-anchor="middle">${badge}</text>
-      ${chipMarkup}
+      
+      <!-- Decorative Background Elements (Aesthetic Polish) -->
+      <g opacity="0.15">
+        ${payload.variant === 'a' 
+          ? `
+            <circle cx="50" cy="10" r="20" fill="white" />
+            <circle cx="5" cy="65" r="15" fill="white" />
+          ` 
+          : payload.variant === 'b' 
+            ? `
+              <rect x="-10" y="40" width="40" height="40" rx="20" transform="rotate(-20)" fill="white" />
+              <rect x="40" y="-10" width="30" height="30" rx="15" fill="white" />
+            ` 
+            : `
+              <polygon points="0,0 40,0 0,40" fill="white" />
+              <circle cx="50" cy="60" r="12" fill="white" />
+            `}
+      </g>
+      
+      <!-- Glass Main Card Body -->
+      <rect x="3" y="10" width="50" height="54" rx="15" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />
+      
+      <!-- Badge Section -->
+      <rect x="5" y="5" width="22" height="13" rx="6.5" fill="white" fill-opacity="0.9" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1))" />
+      <text x="16" y="14.5" fill="${background.accent}" font-size="9" font-family="Inter, system-ui, sans-serif" font-weight="900" text-anchor="middle" letter-spacing="-0.5">${badge}</text>
+      
+      <!-- Tags Layer -->
+      <g>
+        ${chipMarkup}
+      </g>
+      
+      <!-- Overflow Indicators -->
       ${overflowMarkup}
-      <rect x="0" y="58" width="56" height="14" fill="rgba(255,255,255,0.2)" />
+      
+      <!-- Finishing Touches -->
+      ${overlayEffects}
+      
+      <!-- Bottom Decorative Bar -->
+      <path d="M 0 62 L 56 62 L 56 72 Q 56 72 56 72 L 0 72 Q 0 72 0 72 Z" fill="rgba(0,0,0,0.08)" />
     </svg>
   `.trim()
 }

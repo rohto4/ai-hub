@@ -25,6 +25,12 @@
 19. Home / digest / saved / liked / `/api/articles/[id]` を追加し、ArticleCard の 200 字モーダルと共有 UI を更新した
 20. Neon 向け `pg_dump` バックアップ基盤を追加した
 21. GitHub Actions に日次 DB バックアップ workflow を追加した（artifact 保持 7 日）
+22. 高品質サムネイル（Gemini生成アセット）システムを導入した
+    - `tags_master` を拡張し、高品質アイコンアセットのパスを管理可能にした（migration 037）
+    - `thumbnail-tag-registry.ts` を拡張し、WebP アセットへの紐付けを追加した
+    - `thumbnail-template.ts` を大幅に強化し、グラスモーフィズム、ライティング、高品質アセットの重ね合わせによるリッチな合成ロジックを実装した
+    - `scripts/export-thumbnail-prompts.ts` を追加し、タグに基づいた画像生成プロンプトの自動作成フローを構築した
+    - `docs/imp/imp-icon.md` を作成し、運用フローと設計詳細をドキュメント化した
 
 ## 2026-03-20 バックアップ運用追加
 
