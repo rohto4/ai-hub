@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { databaseUnavailableResponse } from '@/lib/api/responses'
 import { verifyCronSecret } from '@/lib/auth/admin'
 import { isDatabaseConfigured } from '@/lib/db'
-import { runDailyEnrich } from '@/lib/jobs/daily-enrich'
+import { runDailyEnrich } from '@/lib/jobs/enrich-worker'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300

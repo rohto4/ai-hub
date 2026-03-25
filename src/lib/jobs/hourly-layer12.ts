@@ -1,4 +1,4 @@
-import { runDailyEnrich, type DailyEnrichResult } from '@/lib/jobs/daily-enrich'
+import { runDailyEnrich, type DailyEnrichResult } from '@/lib/jobs/enrich-worker'
 import { runHourlyFetch, type HourlyFetchResult } from '@/lib/jobs/hourly-fetch'
 
 export interface HourlyLayer12Options {

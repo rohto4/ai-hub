@@ -9,7 +9,7 @@
 
 ## 1. 判断待ち一覧
 
-### 1.1 `compute-ranks` 係数調整のタイミング
+### 1.1 `hourly-compute-ranks` 係数調整のタイミング
 
 現在の実装（`src/lib/ranking/compute.ts`）:
 - activity ウェイト: impression=0.5, open=1.0, share=1.0, save=1.0, sourceOpen=2.0
@@ -67,7 +67,7 @@
 ### 1.5 `critique` UI の有効化タイミング（保留）
 
 `public_articles.critique` カラムは実装済みだが UI から非表示。
-`daily-enrich` で critique 生成を有効化してから UI に追加する。
+`enrich-worker` で critique 生成を有効化してから UI に追加する。
 
 未確定: いつ critique 生成を有効化するか（API コスト・品質の兼ね合い）
 
@@ -97,7 +97,7 @@
 | tag_key 命名規則 | lowercase, hyphen-separated（URL-safe）|
 | public_rankings 時間減衰 | 1週間でスコアが 1/5 になる |
 | source_type=paper のタグ | `paper` タグのみ付与 |
-| publication_basis=source_snippet | Home に含める（明白な不整合のみ daily-enrich で止める） |
+| publication_basis=source_snippet | Home に含める（明白な不整合のみ enrich-worker で止める） |
 | action_type マッピング | view→impression, expand_200/topic_group_open/digest_click→open, article_open→source_open, share_copy→share, save→save。share_open / return_focus は集計外。unsave は無視 |
 | hide_article 実装方式 | 管理 API が直接 DB UPDATE（queue 経由なし）。即時反映・同一トランザクション内で admin_operation_logs に記録 |
 | priority_processing_queue | hide_article には使わない。retag / republish 等の将来実装用に予約 |

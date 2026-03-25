@@ -138,13 +138,19 @@ export async function runHourlyFetch(options: number | HourlyFetchOptions = 20):
     targets,
   }
 
+  const processedRecords = result.inserted + result.updated + result.skipped + result.failedItems
+  const succeededRecords = result.inserted + result.updated + result.skipped
+
   await finishJobRun({
     jobRunId,
     status: result.failedTargets > 0 ? 'failed' : 'completed',
-    processedCount: result.processedTargets,
-    successCount: result.succeededTargets,
-    failedCount: result.failedTargets,
+    processedCount: processedRecords,
+    successCount: succeededRecords,
+    failedCount: result.failedItems,
     metadata: {
+      processedTargets: result.processedTargets,
+      succeededTargets: result.succeededTargets,
+      failedTargets: result.failedTargets,
       inserted: result.inserted,
       updated: result.updated,
       skipped: result.skipped,

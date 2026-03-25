@@ -182,7 +182,7 @@
 3. `public_articles` は半年以内の公開集合
 4. ただし `arxiv-ai` だけは 2 か月保持上限とし、それ以外は半年超で `public_articles_history` に退避する
 5. `public_article_tags` / `public_article_sources` / `public_rankings` は age-out 時に cascade delete
-6. `daily-enrich` の前処理では `arxiv-ai` の 5 か月超 raw を skip して Gemini API の無駄打ちを防ぐ
+6. `enrich-worker` の前処理では `arxiv-ai` の 5 か月超 raw を skip して Gemini API の無駄打ちを防ぐ
 
 ## 7. 変更時の注意
 

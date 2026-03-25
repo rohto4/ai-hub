@@ -76,7 +76,7 @@ export interface TagKeywordReference {
 
 /**
  * tag_keywords テーブルのキーワードで title + summary_200 をマッチングする。
- * daily-enrich の AI 要約生成後に呼び出すことで summary_200 ベースの高精度マッチを実現する。
+ * enrich-worker の AI 要約生成後に呼び出すことで summary_200 ベースの高精度マッチを実現する。
  * 全文照合より遥かに高速（〜250文字 vs 数千文字）。
  */
 export function matchTagsFromKeywords(

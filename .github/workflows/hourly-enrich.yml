@@ -24,4 +24,4 @@ jobs:
           curl --fail --show-error --silent \
             -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
-            "${APP_URL}/api/cron/daily-enrich?limit=20&summaryBatchSize=20&maxSummaryBatches=1"
+            "${APP_URL}/api/cron/enrich-worker?limit=20&summaryBatchSize=20&maxSummaryBatches=1"

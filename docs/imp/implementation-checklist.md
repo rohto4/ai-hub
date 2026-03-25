@@ -26,8 +26,8 @@
 
 ### 後続
 
-- [ ] `compute-ranks` 係数を実データで点検・調整する
-- [ ] `compute-ranks` 上位結果を抜き取り監査する
+- [ ] `hourly-compute-ranks` 係数を実データで点検・調整する
+- [ ] `hourly-compute-ranks` 上位結果を抜き取り監査する
 - [ ] Topic Group 本実装の着手条件を整理する
 - [ ] `ADMIN_PATH_PREFIX` を env var 化するか確定する
 - [ ] 後からアイコン追加したタグの `thumbnail_url` 再計算方針を確定する

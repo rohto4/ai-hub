@@ -9,6 +9,7 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-25 | done | ジョブログ件数の意味をレコード単位へ整理 | `daily-enrich` / `hourly-fetch` / `compute-ranks` の processed/success/failed を揃え、オールサクセス時に `n:n` になりやすく修正
 - 2026-03-25 | done | 定時 enrich を 20件 x 8回/時 に拡張 | `daily-enrich` の基本設定を 20 件へ、scheduler を `:05〜:40` の 8 回に変更し build/type-check を確認
 - 2026-03-25 | done | `arxiv-ai` の現況件数を確認 | `articles_raw total=1870 / unprocessed=1840`、5か月超 raw 0 件、L4 の 2か月超 0 件を確認
 - 2026-03-25 | done | `arxiv-ai` の source 別保持ロジックを実装 | 5か月超 raw を enrich skip、L4 は 2か月保持になるよう `source-retention` と enrich/archive を更新
@@ -70,3 +71,4 @@
 - 2026-03-18 02:51 | done | `articles_enriched.source_type` 再同期 | 1866 行修正、不一致 0
 - 2026-03-18 02:50 | done | title 補正 13 件反映 | Neon の `articles_enriched.title` を更新
 - 2026-03-18 02:49 | done | `public_articles` 分布確認 | published 911、official 736、alerts 145、blog 30
+- 2026-03-25 | done | batch 名称を `enrich-worker` / `hourly-compute-ranks` に統一 | route・job_name・admin 表示・主要 docs の命名を実運用に合わせて整理

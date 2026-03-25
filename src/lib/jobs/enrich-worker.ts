@@ -10,11 +10,11 @@ import {
   type DailyEnrichResult,
   type ManualPendingExportItem,
   writeManualPendingExport,
-} from '@/lib/enrich/daily-enrich-shared'
+} from '@/lib/enrich/enrich-worker-shared'
 import { prepareEnrichArticles } from '@/lib/enrich/prepare-articles'
 import { processSummaryBatches } from '@/lib/enrich/persist-enriched'
 
-export type { DailyEnrichItemResult, DailyEnrichOptions, DailyEnrichResult } from '@/lib/enrich/daily-enrich-shared'
+export type { DailyEnrichItemResult, DailyEnrichOptions, DailyEnrichResult } from '@/lib/enrich/enrich-worker-shared'
 
 const DEFAULT_SUMMARY_BATCH_SIZE = 20
 const MAX_SUMMARY_BATCH_SIZE = 20
@@ -34,7 +34,7 @@ export async function runDailyEnrich(
       : Math.max(1, options.maxSummaryBatches ?? Number.POSITIVE_INFINITY)
 
   const jobRunId = await startJobRun({
-    jobName: 'daily-enrich',
+    jobName: 'enrich-worker',
     metadata: { limit, sourceKey, summaryBatchSize, maxSummaryBatches, claimMode: 'skip_locked' },
   })
 
@@ -79,7 +79,7 @@ export async function runDailyEnrich(
   await finishJobRun({
     jobRunId,
     status: result.failed > 0 ? 'failed' : 'completed',
-    processedCount: rawArticles.length + skippedExpired,
+    processedCount: rawArticles.length,
     successCount: result.processed,
     failedCount: result.failed,
     metadata: {

@@ -19,7 +19,7 @@
 
 ### 未完了
 
-1. `compute-ranks` 係数調整
+1. `hourly-compute-ranks` 係数調整
 2. Topic Group 本実装
 3. 必要なら言語フィルタ UI
 4. 必要なら tag alias 管理 UI
@@ -29,7 +29,7 @@
 1. `arxiv-ai` backlog の現状確認
 2. `job_run_id=563` の fetch 停滞有無確認
 3. enrich 実行可否の判断材料整理
-4. `compute-ranks` 係数調整に入る前の運用データ蓄積確認
+4. `hourly-compute-ranks` 係数調整に入る前の運用データ蓄積確認
 
 ## 3. 現在の固定方針
 
@@ -61,7 +61,7 @@
 ### 3.5 定時 enrich の基本設定
 
 - `hourly-enrich` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40` の 8 回実行にする
-- 各回の `daily-enrich` は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1` を基本設定とする
+- 各回の `enrich-worker` は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1` を基本設定とする
 - `hourly-publish` は引き続き毎時 `:50` に実行する
 
 ## 4. 後回しでよいもの

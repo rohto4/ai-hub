@@ -16,7 +16,7 @@ import {
   isSnippetPublicationEligible,
   type DailyEnrichItemResult,
   type PreparedEnrichArticle,
-} from '@/lib/enrich/daily-enrich-shared'
+} from '@/lib/enrich/enrich-worker-shared'
 
 export async function prepareEnrichArticles(params: {
   rawArticles: RawArticleForEnrichment[]
