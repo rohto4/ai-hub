@@ -139,3 +139,24 @@
 | thumbnail fallback 基準 | 登録済み icon が 0 件なら `thumbnail_url` を作らず、既存の `thumbnail_emoji` fallback を優先する |
 | 旧 thumbnail_url 互換 | 既存 DB に残る旧 `/api/thumb` URL は無効化せず、decoder 側で glyph fallback 描画して 400 を避ける |
 | Topic Group スキーマ | migration 035 で `topic_group_id`, `topic_groups` テーブル追加済み。値は NULL のまま |
+
+## 1.8 隣接分野タグ + 背景テーマ（運用待ち）
+
+背景:
+- 既存 AI タグ（3〜5件）に加えて、隣接分野タグ（1〜2件）を追加する方針
+- 隣接分野タグは公開面の文脈補助と `thumbnail_bg_theme` 決定に使う
+
+運用開始前の確認:
+- 隣接分野タグマスタを既存タグ系と分離できていること
+- title + summary_200 から 1〜2件に安定付与できること
+- 背景テーマ合成（emoji + background）の優先順位が固定されていること
+
+運用中の監視項目:
+- 隣接分野タグ付与率（0件 / 1件 / 2件）
+- 汎用タグ偏重記事の公開順位（ノイズ抑制が効いているか）
+- 背景テーマ未設定率（fallback依存率）
+
+再判断条件:
+- 2週間運用して隣接分野タグ0件が高止まりする
+- 背景テーマが実質同色に偏る
+- tag増加で公開順位の妥当性が悪化する

@@ -5,7 +5,7 @@ import { isDatabaseConfigured } from '@/lib/db'
 import { runDailyEnrich } from '@/lib/jobs/enrich-worker'
 
 export const runtime = 'nodejs'
-export const maxDuration = 600
+export const maxDuration = 300
 
 const DEFAULT_SUMMARY_BATCH_SIZE = 20
 const MAX_SUMMARY_BATCH_SIZE = 20

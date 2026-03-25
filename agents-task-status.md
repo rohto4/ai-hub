@@ -1,6 +1,6 @@
-# Agents Task Status
+﻿# Agents Task Status
 
-最終更新: 2026-03-25
+最終更新: 2026-03-26
 
 運用ルール:
 - 最新 50 件を目安に残し、古い行は下から削る
@@ -9,6 +9,11 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-26 | done | Gemini enrich part-008 を Codex実行で生成 | `output-templates/ai-enrich-outputs-part-008.json` と `outputs/ai-enrich-outputs-part-008.json` を 100件で生成し、件数・ID順・文字数・タグ整合の検証を通過
+- 2026-03-26 | done | Gemini enrich part-002 を新フォーマットで全件再生成 | `outputs/ai-enrich-outputs-part-002.json` を 200 件で再出力し、`matchedTagKeys/proposedTags`・文字数・ID順の検証を通過
+- 2026-03-26 | done | Gemini CLI backlog 1500件の artifact を生成 | `prepare-gemini-cli-enrich-artifacts.ts` を追加し、`artifact/gemini-cli-enrich-backlog-1500/` に 8 chunk の input / prompt / manifest を出力
+- 2026-03-26 | done | Gemini prompt を title/summary 分離 + 既存タグ優先へ調整 | `prompt-part001.md` を主 prompt に整理し、`matchedTagKeys` 最大5・`proposedTags` 最大2・`tag-master.json` 参照へ更新
+- 2026-03-26 | done | part-001 の初回 Gemini 出力をざっくり監査 | 内容方向は概ね妥当だが `summary100/200` の文字数超過が多く、prompt を再調整した
 - 2026-03-25 | done | enrich 20件実効化と scheduled 一時停止 | AI 要約バッチの 10 件 clamp を外して `maxDuration=600` へ延長、手動 backlog 吸収のため GitHub Actions scheduled を外して `workflow_dispatch` のみにした
 - 2026-03-25 | done | `arxiv-ai` の監視項目と再判断条件を判断待ちへ追加 | backlog・24h流入・enrich処理量・公開面露出を継続監視し、2週間〜1か月で再評価する条件を `implementation-wait.md` に固定
 - 2026-03-25 | done | ジョブログ件数の意味をレコード単位へ整理 | `daily-enrich` / `hourly-fetch` / `compute-ranks` の processed/success/failed を揃え、オールサクセス時に `n:n` になりやすく修正
@@ -74,3 +79,6 @@
 - 2026-03-18 02:50 | done | title 補正 13 件反映 | Neon の `articles_enriched.title` を更新
 - 2026-03-18 02:49 | done | `public_articles` 分布確認 | published 911、official 736、alerts 145、blog 30
 - 2026-03-25 | done | batch 名称を `enrich-worker` / `hourly-compute-ranks` に統一 | route・job_name・admin 表示・主要 docs の命名を実運用に合わせて整理
+
+- 2026-03-26 | done | Gemini enrich part-005 を Codex実行で生成 | `artifact/gemini-cli-enrich-backlog-1500/outputs/ai-enrich-outputs-part-005.json` を 200件で生成し、`matchedTagKeys/proposedTags`・文字数制約・ID重複なしを検証
+

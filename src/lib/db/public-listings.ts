@@ -1,6 +1,7 @@
 import type { ArticleWithScore, Lanes, RankPeriod } from '@/lib/db/types'
 import { getSql } from '@/lib/db'
 import {
+  applyDomainDiversity,
   PERIOD_INTERVAL,
   PUBLIC_DISPLAY_MAX_AGE,
   PublicArticleRow,
@@ -25,9 +26,9 @@ export async function listRandomPublicArticles(options: { limit: number; sourceC
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
     ORDER BY RANDOM()
-    LIMIT ${options.limit}
+    LIMIT ${Math.max(options.limit * 4, options.limit + 20)}
   `) as PublicArticleRow[]
-  return rows.map(toArticle)
+  return applyDomainDiversity(rows.map(toArticle), options.limit)
 }
 
 export async function listLatestPublicArticles(options: {
@@ -56,9 +57,9 @@ export async function listLatestPublicArticles(options: {
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
       AND (${interval}::text IS NULL OR COALESCE(pa.original_published_at, pa.created_at) >= now() - ${interval}::interval)
     ORDER BY COALESCE(pa.original_published_at, pa.created_at) DESC
-    LIMIT ${options.limit} OFFSET ${offset}
+    LIMIT ${Math.max(options.limit * 4, options.limit + offset + 20)}
   `) as PublicArticleRow[]
-  return rows.map(toArticle)
+  return applyDomainDiversity(rows.map(toArticle), options.limit)
 }
 
 export async function listUniquePublicArticles(options: { limit: number; sourceCategory?: string | null }): Promise<ArticleWithScore[]> {
@@ -76,9 +77,9 @@ export async function listUniquePublicArticles(options: { limit: number; sourceC
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
     ORDER BY pa.source_category, pa.content_score DESC
-    LIMIT ${options.limit}
+    LIMIT ${Math.max(options.limit * 4, options.limit + 20)}
   `) as PublicArticleRow[]
-  return rows.map(toArticle)
+  return applyDomainDiversity(rows.map(toArticle), options.limit)
 }
 
 export async function listContentLanes(options: {

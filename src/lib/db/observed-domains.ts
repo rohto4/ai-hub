@@ -22,6 +22,7 @@ const OFFICIAL_DOMAIN_ALLOWLIST_BY_SOURCE_KEY: Record<string, string[]> = {
   'huggingface-blog': ['huggingface.co'],
   'nvidia-developer-blog': ['developer.nvidia.com'],
   'meta-ai-news': ['about.fb.com'],
+  'arxiv-ai': ['arxiv.org', 'alphaxiv.org'],
 }
 
 function normalizeObservedDomain(url: string | null): string | null {

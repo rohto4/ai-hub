@@ -24,6 +24,7 @@
     "db:check-source-policies": "node scripts/check-source-policies.mjs",
     "db:check-snippet-domains": "node scripts/check-snippet-domains.mjs",
     "db:export-ai-enrich-inputs": "npx tsx scripts/export-ai-enrich-inputs.ts",
+    "db:prepare-gemini-cli-enrich": "npx tsx scripts/prepare-gemini-cli-enrich-artifacts.ts",
     "db:import-ai-enrich-outputs": "npx tsx scripts/import-ai-enrich-outputs.ts",
     "db:prune-tag-candidates": "node scripts/prune-tag-candidates.mjs",
     "db:promote-domain-policy": "node scripts/promote-domain-policy.mjs",

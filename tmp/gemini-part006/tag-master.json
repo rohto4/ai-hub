@@ -1,0 +1,616 @@
+{
+  "generatedAt": "2026-03-25T15:00:53.215Z",
+  "totalTags": 79,
+  "tags": [
+    {
+      "id": "393b5298-84a9-4d32-8dc8-593eab460b33",
+      "tagKey": "adobe-firefly",
+      "displayName": "Adobe Firefly",
+      "aliases": [
+        "Adobe Firefly"
+      ]
+    },
+    {
+      "id": "723cd9aa-f49f-493c-bdbb-a66d77ac6c16",
+      "tagKey": "agent",
+      "displayName": "Agent",
+      "aliases": [
+        "AI agent"
+      ]
+    },
+    {
+      "id": "90a05457-5f7d-4774-8da4-d127ea2210be",
+      "tagKey": "amazon-q",
+      "displayName": "Amazon Q",
+      "aliases": [
+        "Amazon Q Developer"
+      ]
+    },
+    {
+      "id": "7dc141cf-4bea-48ae-9e05-9954941bc96b",
+      "tagKey": "anthropic",
+      "displayName": "Anthropic",
+      "aliases": [
+        "Anthropic"
+      ]
+    },
+    {
+      "id": "669fff39-f173-4c50-a365-2686f30b154e",
+      "tagKey": "antigravity",
+      "displayName": "Antigravity",
+      "aliases": [
+        "Google Antigravity"
+      ]
+    },
+    {
+      "id": "982ac26c-d99b-4edf-a3f2-6c20198948b0",
+      "tagKey": "autogen",
+      "displayName": "AutoGen",
+      "aliases": [
+        "Microsoft AutoGen"
+      ]
+    },
+    {
+      "id": "d91d29f6-e9f9-404f-b4e8-aed8008bd168",
+      "tagKey": "chatgpt",
+      "displayName": "ChatGPT",
+      "aliases": [
+        "ChatGPT"
+      ]
+    },
+    {
+      "id": "2e0df9c9-7006-4427-8dbe-14ee6b79c6e5",
+      "tagKey": "claude",
+      "displayName": "Claude",
+      "aliases": [
+        "Anthropic Claude"
+      ]
+    },
+    {
+      "id": "cfca6663-8903-4caf-ae2c-4a20f394cea6",
+      "tagKey": "claude-code",
+      "displayName": "Claude Code",
+      "aliases": [
+        "Claude Code Anthropic"
+      ]
+    },
+    {
+      "id": "2cf1b0af-f3cc-4284-bd9e-8087e4b5dfb5",
+      "tagKey": "cline",
+      "displayName": "Cline",
+      "aliases": [
+        "Cline VS Code"
+      ]
+    },
+    {
+      "id": "f5c0c43c-b9cb-42a7-aa6b-45795a49f92e",
+      "tagKey": "codex",
+      "displayName": "Codex",
+      "aliases": []
+    },
+    {
+      "id": "f68bea61-a773-4817-9130-894402049064",
+      "tagKey": "coding-ai",
+      "displayName": "Coding AI",
+      "aliases": [
+        "coding assistant"
+      ]
+    },
+    {
+      "id": "42c933b1-a938-4da2-be6a-4ca957fb9b73",
+      "tagKey": "cohere",
+      "displayName": "Cohere",
+      "aliases": [
+        "Cohere AI"
+      ]
+    },
+    {
+      "id": "f48005e7-c7ff-4f2f-aef6-5a07757b319b",
+      "tagKey": "crewai",
+      "displayName": "CrewAI",
+      "aliases": [
+        "CrewAI agents"
+      ]
+    },
+    {
+      "id": "6fff759b-a5d1-4690-99a1-938a32c1515f",
+      "tagKey": "cursor",
+      "displayName": "Cursor",
+      "aliases": [
+        "Cursor IDE"
+      ]
+    },
+    {
+      "id": "14233fc7-93d7-43d1-a764-0b322121a262",
+      "tagKey": "dall-e",
+      "displayName": "DALL-E",
+      "aliases": [
+        "DALL-E OpenAI"
+      ]
+    },
+    {
+      "id": "7daebfc4-b0ae-491c-86a1-318314783f44",
+      "tagKey": "deepseek",
+      "displayName": "DeepSeek",
+      "aliases": [
+        "DeepSeek AI"
+      ]
+    },
+    {
+      "id": "c4c8a4d5-2269-4380-bfa2-88103887aa54",
+      "tagKey": "devin",
+      "displayName": "Devin",
+      "aliases": [
+        "Devin AI coding"
+      ]
+    },
+    {
+      "id": "bf225ebb-8fa6-42e5-be74-fd051d8e303c",
+      "tagKey": "dify",
+      "displayName": "Dify",
+      "aliases": [
+        "Dify AI platform"
+      ]
+    },
+    {
+      "id": "1a53eec6-ef53-493e-aac1-76dbf0f22c07",
+      "tagKey": "elevenlabs",
+      "displayName": "ElevenLabs",
+      "aliases": [
+        "ElevenLabs voice"
+      ]
+    },
+    {
+      "id": "6bd88ea8-5ba5-4e04-8f6a-9d75517f7712",
+      "tagKey": "enterprise-ai",
+      "displayName": "Enterprise AI",
+      "aliases": [
+        "enterprise AI"
+      ]
+    },
+    {
+      "id": "42eb1686-05cf-46b3-a853-9ee7cc81250c",
+      "tagKey": "flux",
+      "displayName": "Flux",
+      "aliases": [
+        "Flux image AI"
+      ]
+    },
+    {
+      "id": "16490df3-fcf7-44c6-a00c-470e714981a4",
+      "tagKey": "gpt-5",
+      "displayName": "GPT-5",
+      "aliases": [
+        "GPT-5 OpenAI"
+      ]
+    },
+    {
+      "id": "76a25671-5834-4e30-86e1-fc11e4777cde",
+      "tagKey": "gemini",
+      "displayName": "Gemini",
+      "aliases": [
+        "Google Gemini"
+      ]
+    },
+    {
+      "id": "84046b57-549f-4f21-9f26-e5d036dd798e",
+      "tagKey": "gemma",
+      "displayName": "Gemma",
+      "aliases": [
+        "Google Gemma"
+      ]
+    },
+    {
+      "id": "5a7aa9b6-9f97-41ad-903e-704d9adc3e83",
+      "tagKey": "generative-ai",
+      "displayName": "Generative AI",
+      "aliases": [
+        "generative AI"
+      ]
+    },
+    {
+      "id": "e0f626ee-485a-4c61-ad1d-578a2a4d370a",
+      "tagKey": "github-copilot",
+      "displayName": "GitHub Copilot",
+      "aliases": [
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "id": "bc0029ae-6e81-4f7c-bbd7-a5ef15a68cd3",
+      "tagKey": "google-ai",
+      "displayName": "Google AI",
+      "aliases": [
+        "google ai"
+      ]
+    },
+    {
+      "id": "e143d7d6-c8f8-423a-b70d-8bb26176f9f7",
+      "tagKey": "google-deepmind",
+      "displayName": "Google DeepMind",
+      "aliases": [
+        "Google DeepMind"
+      ]
+    },
+    {
+      "id": "fef64732-b640-4eac-866b-25e78bcfd61b",
+      "tagKey": "gradio",
+      "displayName": "Gradio",
+      "aliases": []
+    },
+    {
+      "id": "07a549a4-4fef-46e9-a4fd-d2fbd66f4d3a",
+      "tagKey": "grok",
+      "displayName": "Grok",
+      "aliases": [
+        "xAI Grok"
+      ]
+    },
+    {
+      "id": "3ca5fbae-c05d-4160-8613-2ac194e52ea5",
+      "tagKey": "groundsource",
+      "displayName": "Groundsource",
+      "aliases": []
+    },
+    {
+      "id": "0da976f1-ee1f-47cb-8e27-8a8b872f5d42",
+      "tagKey": "heygen",
+      "displayName": "HeyGen",
+      "aliases": [
+        "HeyGen avatar"
+      ]
+    },
+    {
+      "id": "dd77c666-df54-4f03-a540-e1bbe74564ea",
+      "tagKey": "hugging face",
+      "displayName": "Hugging Face",
+      "aliases": []
+    },
+    {
+      "id": "00505394-c0d1-423d-aa2f-a94c7da7368e",
+      "tagKey": "huggingface",
+      "displayName": "Hugging Face",
+      "aliases": [
+        "HuggingFace"
+      ]
+    },
+    {
+      "id": "b2e24d14-8dfe-4d2d-9998-33f82419787d",
+      "tagKey": "imagen",
+      "displayName": "Imagen",
+      "aliases": [
+        "Google Imagen"
+      ]
+    },
+    {
+      "id": "b5acffda-7561-44cb-9e7c-9296a8479e52",
+      "tagKey": "kling",
+      "displayName": "Kling",
+      "aliases": [
+        "Kling AI video"
+      ]
+    },
+    {
+      "id": "6c8110d8-89b4-4116-b8ab-24acbd9b2f79",
+      "tagKey": "llm",
+      "displayName": "LLM",
+      "aliases": [
+        "large language model"
+      ]
+    },
+    {
+      "id": "c4b28d3f-b972-4988-b916-31a179001ccd",
+      "tagKey": "langchain",
+      "displayName": "LangChain",
+      "aliases": [
+        "LangChain"
+      ]
+    },
+    {
+      "id": "5ee5b08b-ed52-4796-ae19-356499d762d4",
+      "tagKey": "llama",
+      "displayName": "Llama",
+      "aliases": [
+        "Meta Llama"
+      ]
+    },
+    {
+      "id": "155e01c5-64bf-4515-89ca-a1c29fc1bbda",
+      "tagKey": "llamaindex",
+      "displayName": "LlamaIndex",
+      "aliases": [
+        "LlamaIndex RAG"
+      ]
+    },
+    {
+      "id": "a78cf3d3-b5d3-4984-b91f-e88860415294",
+      "tagKey": "manus",
+      "displayName": "Manus",
+      "aliases": [
+        "Manus AI agent"
+      ]
+    },
+    {
+      "id": "ea99143e-62d1-40a2-9f85-da204f2c6083",
+      "tagKey": "meta-ai",
+      "displayName": "Meta AI",
+      "aliases": [
+        "Meta AI"
+      ]
+    },
+    {
+      "id": "b1bd89f8-af59-49e8-83ba-dc2463e010c1",
+      "tagKey": "microsoft-copilot",
+      "displayName": "Microsoft Copilot",
+      "aliases": [
+        "Microsoft 365 Copilot"
+      ]
+    },
+    {
+      "id": "44b249e3-0ccf-4966-ad98-7abcbf56110c",
+      "tagKey": "midjourney",
+      "displayName": "Midjourney",
+      "aliases": [
+        "Midjourney"
+      ]
+    },
+    {
+      "id": "74ea13e6-3b24-49e8-aa7d-981a487e356d",
+      "tagKey": "mistral",
+      "displayName": "Mistral",
+      "aliases": [
+        "Mistral model"
+      ]
+    },
+    {
+      "id": "1208596f-943a-46d4-8567-6b56696eb05e",
+      "tagKey": "mistral-ai",
+      "displayName": "Mistral AI",
+      "aliases": [
+        "Mistral AI"
+      ]
+    },
+    {
+      "id": "4ba945ba-75b5-46fe-811f-578cd8da5121",
+      "tagKey": "banana",
+      "displayName": "Nano Banana",
+      "aliases": []
+    },
+    {
+      "id": "6dc01bef-db8b-4b6d-baf9-46ed8606cc73",
+      "tagKey": "nano-banana",
+      "displayName": "Nano Banana",
+      "aliases": []
+    },
+    {
+      "id": "5db5c111-8ced-4832-9c57-f0e802c0cf73",
+      "tagKey": "nemotron",
+      "displayName": "Nemotron",
+      "aliases": []
+    },
+    {
+      "id": "f5c049cb-8bd0-4a41-ac62-958896a2cb24",
+      "tagKey": "notebooklm",
+      "displayName": "NotebookLM",
+      "aliases": [
+        "Google NotebookLM"
+      ]
+    },
+    {
+      "id": "7459c208-259a-4a7b-a280-8dc135c47860",
+      "tagKey": "notion-ai",
+      "displayName": "Notion AI",
+      "aliases": [
+        "Notion AI"
+      ]
+    },
+    {
+      "id": "06435380-5193-4f23-a9b4-1ed1011be461",
+      "tagKey": "nvidia",
+      "displayName": "Nvidia",
+      "aliases": []
+    },
+    {
+      "id": "b48c3f42-a789-4160-9637-0cc6c4db1559",
+      "tagKey": "nvidia-inception",
+      "displayName": "Nvidia Inception",
+      "aliases": []
+    },
+    {
+      "id": "cec00295-20b7-4bae-ad3b-a34a2cb0fb19",
+      "tagKey": "openai",
+      "displayName": "OpenAI",
+      "aliases": [
+        "OpenAI"
+      ]
+    },
+    {
+      "id": "b1b30060-8b3d-420a-827c-7664b85eda07",
+      "tagKey": "paper",
+      "displayName": "Paper",
+      "aliases": [
+        "research paper"
+      ]
+    },
+    {
+      "id": "5e92400f-ff0e-4ca9-9ec3-c999da85a89b",
+      "tagKey": "perplexity",
+      "displayName": "Perplexity",
+      "aliases": [
+        "Perplexity AI"
+      ]
+    },
+    {
+      "id": "5e43f06d-74ea-41b1-a4a9-758b236aad88",
+      "tagKey": "phi",
+      "displayName": "Phi",
+      "aliases": [
+        "Microsoft Phi"
+      ]
+    },
+    {
+      "id": "81cb8adc-c711-444f-82bc-58548d7f7ea6",
+      "tagKey": "pika",
+      "displayName": "Pika",
+      "aliases": [
+        "Pika video AI"
+      ]
+    },
+    {
+      "id": "b4a497ae-48c9-4d85-968e-7ae9b98c58ef",
+      "tagKey": "policy",
+      "displayName": "Policy",
+      "aliases": [
+        "AI policy"
+      ]
+    },
+    {
+      "id": "8d54a8a7-5637-4f7a-9bf8-e0f310af1065",
+      "tagKey": "qwen",
+      "displayName": "Qwen",
+      "aliases": [
+        "Alibaba Qwen"
+      ]
+    },
+    {
+      "id": "77b51ae6-f4c2-4a0a-be0a-49bc291f4081",
+      "tagKey": "rag",
+      "displayName": "RAG",
+      "aliases": [
+        "retrieval augmented generation"
+      ]
+    },
+    {
+      "id": "ed0eadce-700a-43c7-aaac-015a38ea8cdc",
+      "tagKey": "replicate",
+      "displayName": "Replicate",
+      "aliases": [
+        "Replicate AI"
+      ]
+    },
+    {
+      "id": "3f533e0b-3fce-4c51-bab4-2487bfbcc59a",
+      "tagKey": "roocode",
+      "displayName": "RooCode",
+      "aliases": [
+        "RooCode AI"
+      ]
+    },
+    {
+      "id": "f5472ff7-06fd-4185-b59d-5926ddb1b724",
+      "tagKey": "runway",
+      "displayName": "Runway",
+      "aliases": [
+        "Runway ML"
+      ]
+    },
+    {
+      "id": "c5076a2e-30cb-4079-b200-706e94049d28",
+      "tagKey": "safety",
+      "displayName": "Safety",
+      "aliases": [
+        "AI safety"
+      ]
+    },
+    {
+      "id": "d663cb1a-4239-49da-9e8c-7f209473c199",
+      "tagKey": "sora",
+      "displayName": "Sora",
+      "aliases": [
+        "OpenAI Sora"
+      ]
+    },
+    {
+      "id": "097eeed6-9a39-4e08-848d-1072d44c155a",
+      "tagKey": "stability-ai",
+      "displayName": "Stability AI",
+      "aliases": [
+        "Stability AI"
+      ]
+    },
+    {
+      "id": "d588d391-d885-4e49-9558-9d40b7b95ebc",
+      "tagKey": "stable-diffusion",
+      "displayName": "Stable Diffusion",
+      "aliases": [
+        "Stable Diffusion"
+      ]
+    },
+    {
+      "id": "d3b9b5cd-4ab5-461f-b996-ad2568938862",
+      "tagKey": "stargate",
+      "displayName": "Stargate",
+      "aliases": []
+    },
+    {
+      "id": "06384284-82f4-41e2-8c16-be3f4a5ee4f3",
+      "tagKey": "suno",
+      "displayName": "Suno",
+      "aliases": [
+        "Suno music AI"
+      ]
+    },
+    {
+      "id": "b1ea334c-76f1-4f05-887f-c0292ff5b7fc",
+      "tagKey": "udio",
+      "displayName": "Udio",
+      "aliases": [
+        "Udio music AI"
+      ]
+    },
+    {
+      "id": "60443933-1f1f-4820-ae41-82336c74d4bf",
+      "tagKey": "veo",
+      "displayName": "Veo",
+      "aliases": [
+        "Google Veo"
+      ]
+    },
+    {
+      "id": "a3d4ba7a-bba7-4924-9d03-4719bb84adb7",
+      "tagKey": "vercel-ai",
+      "displayName": "Vercel AI",
+      "aliases": [
+        "Vercel AI SDK"
+      ]
+    },
+    {
+      "id": "6c4ffc8b-6932-4bd5-9416-d6086fba24de",
+      "tagKey": "voice-ai",
+      "displayName": "Voice AI",
+      "aliases": [
+        "voice ai"
+      ]
+    },
+    {
+      "id": "caae2ecd-eada-41ce-b67f-f36612278eba",
+      "tagKey": "windsurf",
+      "displayName": "Windsurf",
+      "aliases": [
+        "Windsurf IDE"
+      ]
+    },
+    {
+      "id": "86e0a0cd-6ceb-453e-8d0b-78982511ed24",
+      "tagKey": "o1",
+      "displayName": "o1 / o3",
+      "aliases": [
+        "OpenAI o1 reasoning"
+      ]
+    },
+    {
+      "id": "87604451-ea91-4c56-8074-123c1fd7e4c5",
+      "tagKey": "open source",
+      "displayName": "oss",
+      "aliases": []
+    },
+    {
+      "id": "0b92583b-d639-472e-a5f2-17268802c121",
+      "tagKey": "xai",
+      "displayName": "xAI",
+      "aliases": [
+        "xAI Elon Musk"
+      ]
+    }
+  ]
+}
