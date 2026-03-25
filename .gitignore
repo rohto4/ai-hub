@@ -27,6 +27,7 @@ out/
 dist/
 
 # Local artifacts
+artifact/
 artifacts/
 backups/
 
