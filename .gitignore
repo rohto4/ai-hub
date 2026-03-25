@@ -30,6 +30,8 @@ dist/
 artifact/
 artifacts/
 backups/
+full_input*.json
+process-part*.mjs
 
 # Environment
 .env
