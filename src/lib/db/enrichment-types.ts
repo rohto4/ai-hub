@@ -14,6 +14,7 @@ export interface RawArticleForEnrichment {
   title: string | null
   snippet: string | null
   sourceUrl: string
+  sourcePublishedAt: string | null
   sourceUpdatedAt: string | null
   hasSourceUpdate: boolean
   commercialUsePolicy: 'permitted' | 'prohibited' | 'unknown'

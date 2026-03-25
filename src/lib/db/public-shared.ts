@@ -99,11 +99,73 @@ export const PERIOD_INTERVAL: Record<RankPeriod, string> = {
 
 export const PUBLIC_DISPLAY_MAX_AGE = '6 months'
 
+function normalizeArticleDomain(url: string): string | null {
+  try {
+    return new URL(url).hostname.toLowerCase().replace(/^www\./, '') || null
+  } catch {
+    return null
+  }
+}
+
+function toAlphaXivUrl(url: string, sourceType: Article['source_type']): string {
+  if (sourceType !== 'paper') {
+    return url
+  }
+
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return url
+  }
+
+  const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '')
+  if (hostname !== 'arxiv.org') {
+    return url
+  }
+
+  const match = parsed.pathname.match(/^\/(?:abs|pdf)\/(.+?)(?:\.pdf)?$/)
+  const paperId = match?.[1]?.trim()
+  if (!paperId) {
+    return url
+  }
+
+  return `https://www.alphaxiv.org/abs/${paperId}`
+}
+
+export function applyDomainDiversity<T extends ArticleWithScore>(articles: T[], limit: number): T[] {
+  const perDomainCount = new Map<string, number>()
+  const filtered: T[] = []
+
+  for (const article of articles) {
+    if (filtered.length >= limit) {
+      break
+    }
+
+    const domain = normalizeArticleDomain(article.url)
+    if (!domain) {
+      filtered.push(article)
+      continue
+    }
+
+    const current = perDomainCount.get(domain) ?? 0
+    const maxPerDomain = article.source_type === 'paper' ? 1 : 2
+    if (current >= maxPerDomain) {
+      continue
+    }
+
+    perDomainCount.set(domain, current + 1)
+    filtered.push(article)
+  }
+
+  return filtered
+}
+
 export function toArticle(row: PublicArticleRow): ArticleWithScore {
   return {
     id: row.id,
     publicKey: row.public_key ?? undefined,
-    url: row.url,
+    url: toAlphaXivUrl(row.url, row.source_type),
     title: row.title,
     sourceCategory: row.source_category,
     source_type: row.source_type,

@@ -28,65 +28,7 @@
 
 ## 2. 全体フロー
 
-```mermaid
-flowchart TD
-    classDef db fill:#fff3e0,stroke:#fb8c00,color:#4e342e
-    classDef code fill:#e3f2fd,stroke:#1e88e5,color:#0d47a1
-    classDef batch fill:#ede7f6,stroke:#5e35b1,color:#311b92
-    classDef api fill:#e0f7fa,stroke:#00838f,color:#004d40
-    classDef ui fill:#fce4ec,stroke:#d81b60,color:#880e4f
-    classDef asset fill:#e8f5e9,stroke:#43a047,color:#1b5e20
-    classDef legendBox fill:#ffffff,stroke:#9e9e9e,color:#424242
-
-    ST["source_type / source_category / content_language"]:::db
-    AE["articles_enriched<br/>title / summary / thumbnail_url"]:::db
-    AET["articles_enriched_tags"]:::db
-    TM["tags_master<br/>tag_key / display_name"]:::db
-    REG["thumbnail-tag-registry.ts"]:::code
-    ASSET["public/thumbs/icons<br/>public/thumbs/assets"]:::asset
-    BUILD["buildInternalThumbnailUrl()"]:::code
-    BACKFILL["scripts/backfill-thumbnail-urls.ts<br/>既存 thumbnail_url 再計算"]:::batch
-    PERSIST["persist-enriched.ts / hourly-publish<br/>保存時 thumbnail_url 反映"]:::batch
-    PA["public_articles<br/>thumbnail_url / thumbnail_emoji"]:::db
-    API["GET /api/thumb<br/>サムネイル SVG 返却"]:::api
-    DECODE["decodeThumbnailPayload()<br/>クエリ解釈"]:::code
-    RENDER["renderThumbnailSvg()<br/>SVG 合成"]:::code
-    CARD["ArticleCard img"]:::ui
-    EMOJI["thumbnail_emoji fallback"]:::ui
-
-    subgraph LEGEND["凡例"]
-        direction TB
-        LEGEND_DB["DB"]:::db
-        LEGEND_CODE["Code"]:::code
-        LEGEND_BATCH["Batch"]:::batch
-        LEGEND_API["API"]:::api
-        LEGEND_UI["UI"]:::ui
-        LEGEND_ASSET["Asset"]:::asset
-    end
-    class LEGEND legendBox
-
-    AE --> BUILD
-    AET --> BUILD
-    TM --> BUILD
-    ST --> BUILD
-    REG --> BUILD
-
-    BUILD --> PERSIST
-    BUILD --> BACKFILL
-    BACKFILL --> AE
-    PERSIST --> PA
-    AE --> PA
-
-    PA --> CARD
-    CARD --> API
-    API --> DECODE
-    DECODE --> REG
-    REG --> RENDER
-    ASSET --> RENDER
-    RENDER --> CARD
-
-    PA --> EMOJI
-```
+Mermaid 図は `docs/imp/flowchart.md` の「サムネイル生成フロー」へ移動した。
 
 ## 3. 保存時の依存関係
 
@@ -120,26 +62,8 @@ flowchart TD
 
 ## 4. レンダリング時の依存関係
 
-ブラウザ表示時は、保存済みの `thumbnail_url` を使って都度 SVG を返します。
-
-```mermaid
-sequenceDiagram
-    %% UI / API / Code / Asset color cue is expressed in labels to keep Mermaid stable
-    participant Card as ArticleCard
-    participant Thumb as /api/thumb\nサムネイル SVG 返却
-    participant Template as thumbnail-template.ts\nSVG 合成
-    participant Registry as thumbnail-tag-registry.ts
-    participant Assets as public/thumbs/*
-
-    Card->>Thumb: GET /api/thumb?bg=...&layout=...&tags=...&lang=...&v=3
-    Thumb->>Template: decodeThumbnailPayload(searchParams)
-    Template->>Registry: resolveThumbnailTagRegistryEntry(tagKey)
-    Registry-->>Template: accentColor / iconPath / highQualityAssetPath
-    Template->>Assets: loadAssetDataUri(assetPath)
-    Template->>Template: renderThumbnailSvg(payload)
-    Template-->>Thumb: SVG string
-    Thumb-->>Card: image/svg+xml
-```
+ブラウザ表示時は、保存済みの `thumbnail_url` を使って都度 SVG を返す。
+シーケンス図は `docs/imp/flowchart.md` の「サムネイル描画シーケンス」へ移動した。
 
 実装箇所:
 

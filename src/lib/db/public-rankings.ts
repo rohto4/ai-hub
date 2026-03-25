@@ -1,6 +1,7 @@
 import { getSql } from '@/lib/db'
 import type { ArticleWithScore, RankPeriod } from '@/lib/db/types'
 import {
+  applyDomainDiversity,
   PERIOD_INTERVAL,
   PUBLIC_DISPLAY_MAX_AGE,
   PublicArticleRow,
@@ -32,10 +33,10 @@ export async function listRankedPublicArticles(options: {
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
     ORDER BY COALESCE(pr.rank_position, 999999) ASC, COALESCE(pr.score, pa.content_score) DESC, COALESCE(pa.original_published_at, pa.created_at) DESC
-    LIMIT ${options.limit} OFFSET ${offset}
+    LIMIT ${Math.max(options.limit * 4, options.limit + offset + 20)} OFFSET ${offset}
   `) as PublicArticleRow[]
 
-  return rows.map(toArticle)
+  return applyDomainDiversity(rows.map(toArticle), options.limit)
 }
 
 export async function listDigestArticles(limit = 10): Promise<ArticleWithScore[]> {
@@ -66,8 +67,8 @@ export async function listContentLaneArticles(options: {
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${interval}::interval
     ORDER BY pa.content_score DESC, COALESCE(pa.original_published_at, pa.created_at) DESC
-    LIMIT ${options.limit}
+    LIMIT ${Math.max(options.limit * 4, options.limit + 20)}
   `) as PublicArticleRow[]
 
-  return rows.map(toArticle)
+  return applyDomainDiversity(rows.map(toArticle), options.limit)
 }

@@ -1,6 +1,6 @@
 import { getSql } from '@/lib/db'
 import type { Article } from '@/lib/db/types'
-import { PUBLIC_DISPLAY_MAX_AGE, PublicArticleRow, buildSourceCategoryFilter, toArticle } from '@/lib/db/public-shared'
+import { PUBLIC_DISPLAY_MAX_AGE, PublicArticleRow, applyDomainDiversity, buildSourceCategoryFilter, toArticle } from '@/lib/db/public-shared'
 
 export async function searchPublicArticles(options: {
   query: string
@@ -45,9 +45,9 @@ export async function searchPublicArticles(options: {
         OR COALESCE(pa.display_summary_200, '') ILIKE ${keyword}
       )
     ORDER BY COALESCE(pa.original_published_at, pa.created_at) DESC
-    LIMIT ${options.limit}
+    LIMIT ${Math.max(options.limit * 4, options.limit + 20)}
     OFFSET ${offset}
   `) as PublicArticleRow[]
 
-  return rows.map(toArticle)
+  return applyDomainDiversity(rows.map(toArticle), options.limit)
 }
