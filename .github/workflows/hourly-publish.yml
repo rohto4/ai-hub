@@ -1,8 +1,6 @@
 name: hourly-publish
 
 on:
-  schedule:
-    - cron: '50 * * * *'  # 毎時 :50 実行（fetch 00 / enrich 05,10,15,20,25,30,35,40 の後）
   workflow_dispatch:
 
 jobs:

@@ -82,6 +82,33 @@
 
 ---
 
+### 1.7 `arxiv-ai` の流入監視と再判断条件
+
+現状:
+- `arxiv-ai` は raw へは通常どおり取り込み、表示側での露出制御を別途検討する
+- `enrich-worker` は `20件 x 8回/時` へ拡張済みで、まずは throughput 増加で backlog を吸収できるかを見る
+- `enrich-worker` route の `maxDuration` は 600 秒へ延長し、Gemini まとめ処理 20 件の安定性を見る
+- backlog 手動吸収中は GitHub Actions scheduled を一時停止し、`workflow_dispatch` のみで運用する
+- `arxiv-ai` は L4 で 2 か月保持上限
+
+**継続監視する項目:**
+- `articles_raw` の `arxiv-ai` 未処理件数
+- 直近 24 時間の `arxiv-ai` fetch 件数
+- 直近 24 時間の `enrich-worker` 処理件数 / 成功件数
+- `arxiv-ai` が Home / ranking / search にどれだけ露出しているか
+
+**再判断条件:**
+- 2 週間〜1 か月観測しても `arxiv-ai` の流入が継続的に多く、backlog が縮小しない
+- `enrich-worker` の増速後でも Gemini API コストや待ち行列が不安定
+- 公開面で `arxiv-ai` の露出が強すぎて他 source を圧迫する
+
+**その場合の候補:**
+- 表示側で `arxiv-ai` の露出上限をかける
+- `arxiv-ai` の raw / enrich 対象期間を 2 か月へ揃える
+- `arxiv-ai` の fetch 流量または優先度を下げる
+
+---
+
 ## 2. 確定済み判断（参照用）
 
 | 項目 | 決定内容 |

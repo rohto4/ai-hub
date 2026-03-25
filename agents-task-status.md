@@ -9,6 +9,8 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-25 | done | enrich 20件実効化と scheduled 一時停止 | AI 要約バッチの 10 件 clamp を外して `maxDuration=600` へ延長、手動 backlog 吸収のため GitHub Actions scheduled を外して `workflow_dispatch` のみにした
+- 2026-03-25 | done | `arxiv-ai` の監視項目と再判断条件を判断待ちへ追加 | backlog・24h流入・enrich処理量・公開面露出を継続監視し、2週間〜1か月で再評価する条件を `implementation-wait.md` に固定
 - 2026-03-25 | done | ジョブログ件数の意味をレコード単位へ整理 | `daily-enrich` / `hourly-fetch` / `compute-ranks` の processed/success/failed を揃え、オールサクセス時に `n:n` になりやすく修正
 - 2026-03-25 | done | 定時 enrich を 20件 x 8回/時 に拡張 | `daily-enrich` の基本設定を 20 件へ、scheduler を `:05〜:40` の 8 回に変更し build/type-check を確認
 - 2026-03-25 | done | `arxiv-ai` の現況件数を確認 | `articles_raw total=1870 / unprocessed=1840`、5か月超 raw 0 件、L4 の 2か月超 0 件を確認

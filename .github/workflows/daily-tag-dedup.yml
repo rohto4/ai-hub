@@ -1,8 +1,6 @@
 name: daily-tag-dedup
 
 on:
-  schedule:
-    - cron: '30 2 * * *'  # 毎日 02:30 UTC（日本時間 11:30）
   workflow_dispatch:
 
 jobs:
