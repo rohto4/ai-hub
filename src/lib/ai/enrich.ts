@@ -9,7 +9,8 @@ const GEMINI_SUMMARY_MODEL = process.env.GEMINI_SUMMARY_MODEL || 'gemini-2.5-fla
 const OPENAI_SUMMARY_MODEL = process.env.OPENAI_SUMMARY_MODEL || 'gpt-5-mini'
 const OPENAI_REASONING_EFFORT = 'minimal'
 const OPENAI_MAX_OUTPUT_TOKENS = 4000
-const DEFAULT_SUMMARY_BATCH_SIZE = 10
+const DEFAULT_SUMMARY_BATCH_SIZE = 20
+const MAX_SUMMARY_BATCH_SIZE = 20
 const DEFAULT_SUMMARY_BATCH_PAUSE_MS = 0
 const MANUAL_PENDING_SUMMARY_100 = '要約待ち'
 const MANUAL_PENDING_SUMMARY_200 = '要約待ち'
@@ -218,7 +219,7 @@ function resolveBatchSize(batchSize?: number): number {
   if (!Number.isFinite(candidate)) {
     return DEFAULT_SUMMARY_BATCH_SIZE
   }
-  return Math.max(1, Math.min(10, Math.trunc(candidate)))
+  return Math.max(1, Math.min(MAX_SUMMARY_BATCH_SIZE, Math.trunc(candidate)))
 }
 
 function resolveBatchPauseMs(): number {

@@ -17,7 +17,7 @@ import {
   type DailyEnrichItemResult,
   type ManualPendingExportItem,
   type PreparedEnrichArticle,
-} from '@/lib/enrich/daily-enrich-shared'
+} from '@/lib/enrich/enrich-worker-shared'
 
 export async function processSummaryBatches(params: {
   jobRunId: number
@@ -36,7 +36,7 @@ export async function processSummaryBatches(params: {
       await runAiBatch(batch, params, params.summaryBatchSize)
     } catch (tier1Error) {
       console.warn(
-        `[daily-enrich] Tier-1 AI batch failed (${batch.length} articles, raw_ids: ${batch.map((article) => article.rawArticle.id).join(',')}). Switching to sub-batches of ${SUMMARY_FALLBACK_BATCH_SIZE}:`,
+        `[enrich-worker] Tier-1 AI batch failed (${batch.length} articles, raw_ids: ${batch.map((article) => article.rawArticle.id).join(',')}). Switching to sub-batches of ${SUMMARY_FALLBACK_BATCH_SIZE}:`,
         tier1Error instanceof Error ? tier1Error.message : tier1Error,
       )
 
@@ -45,7 +45,7 @@ export async function processSummaryBatches(params: {
           await runAiBatch(subBatch, params, subBatch.length)
         } catch (tier2Error) {
           console.warn(
-            `[daily-enrich] Tier-2 sub-batch failed (${subBatch.length} articles, raw_ids: ${subBatch.map((article) => article.rawArticle.id).join(',')}). Falling back to per-article:`,
+            `[enrich-worker] Tier-2 sub-batch failed (${subBatch.length} articles, raw_ids: ${subBatch.map((article) => article.rawArticle.id).join(',')}). Falling back to per-article:`,
             tier2Error instanceof Error ? tier2Error.message : tier2Error,
           )
 

@@ -22,7 +22,7 @@
 - admin Phase 3
 - `daily-tag-dedup`
 - OGP / sitemap / robots
-- `compute-ranks` 最適化
+- `hourly-compute-ranks` 最適化
 - `public_article_sources` バグ修正
 
 ### 3.2 いま確認すべきこと
@@ -68,8 +68,8 @@
 - `src/lib/db/enrichment-raw.ts`
 - `src/lib/db/enrichment-types.ts`
 - `src/lib/db/enrichment.ts`
-- `src/lib/enrich/daily-enrich-shared.ts`
-- `src/lib/jobs/daily-enrich.ts`
+- `src/lib/enrich/enrich-worker-shared.ts`
+- `src/lib/jobs/enrich-worker.ts`
 - `src/lib/collectors/api.ts`
 - `src/lib/source-retention.ts`
 - `src/lib/jobs/monthly-public-archive.ts`

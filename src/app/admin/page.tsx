@@ -19,7 +19,7 @@ export default function AdminDashboard() {
         </Link>
         <Link href="/admin/jobs" className="block p-6 bg-gray-900 rounded-lg hover:bg-gray-800 border border-gray-800">
           <h2 className="text-white font-semibold text-lg mb-1">ジョブログ</h2>
-          <p className="text-gray-400 text-sm">fetch / enrich / publish / compute-ranks の実行履歴と失敗ログ</p>
+          <p className="text-gray-400 text-sm">hourly-fetch / enrich-worker / hourly-publish / hourly-compute-ranks の実行履歴と失敗ログ</p>
         </Link>
       </div>
     </div>

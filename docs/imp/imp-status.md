@@ -12,7 +12,7 @@
 - Layer 1 → Layer 2 → Layer 4 の自動パイプラインは稼働済み
 - `content_language`、日本語ソース 14 件、`thumbnail_url`、admin Phase 3、OGP、sitemap、robots は実装済み
 - `daily-tag-dedup` まで含めてタグ系の基本運用は実装済み
-- `compute-ranks` は最適化済みだが、係数調整は未着手
+- `hourly-compute-ranks` は最適化済みだが、係数調整は未着手
 - Topic Group はスキーマ受け口のみで、本実装は未着手
 
 ## 2. 直近で重要な運用状態
@@ -22,7 +22,7 @@
 - `alphaXiv` は収集 source にしない
 - `arXiv` を収集 source とし、公開画面でだけ `alphaXiv` へ置換する
 - `paper` は同一ドメイン 1 件まで、それ以外は同一ドメイン 2 件までに抑制する
-- `daily-enrich` は 6 か月超の raw を claim 前に skip する
+- `enrich-worker` は 6 か月超の raw を claim 前に skip する
 - `arxiv-ai` は例外運用とし、5 か月超 raw は enrich 対象外、L4 は 2 か月保持上限とする実装を追加した
 - 定時 enrich は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1` を毎時 8 回（`:05`〜`:40` の 5 分刻み）で回す構成に更新した
 
@@ -45,7 +45,7 @@
 
 ### 後続
 
-1. `compute-ranks` 係数を実データで点検・調整する
+1. `hourly-compute-ranks` 係数を実データで点検・調整する
 2. Topic Group 本実装
 3. 言語フィルタ UI の要否判断
 4. tag alias 管理 UI の要否判断
@@ -54,23 +54,24 @@
 ## 4. 直近の重要変更
 
 1. `alphaXiv` 非採用、`arXiv` 収集 + 公開時置換へ方針固定
-2. `daily-enrich` に 6 か月超 raw の skip を追加
+2. `enrich-worker` に 6 か月超 raw の skip を追加
 3. `arxiv-ai` は 5 か月超 raw を enrich 対象外、L4 は 2 か月保持にする方針で確定
 4. `arxiv-ai` の source 別保持月数を `src/lib/source-retention.ts` に集約し、enrich / archive 両方から参照する実装を追加
-5. `daily-enrich` の基本設定を `20件 x 8回/時` に拡張し、scheduler / route / docs を同期更新
-6. 公開一覧系にドメイン偏重抑制を追加
-7. `thumbnail_url` backfill を追加し既存データへ再同期
-8. 旧 `/api/thumb` URL の互換維持を追加
-9. サムネイルを icon-only 合成へ変更
-10. `icon_pending` 可視化を `/admin/tags` に追加
-11. `daily-tag-dedup` を追加し、L2/L4 への遡及タグ付けを実装
-12. `compute-ranks` を `job_runs` に追加
-13. `public_article_sources` bigint バグを修正し全件バックフィル
-14. admin Phase 3 を実装
-15. `content_language` を公開 API へ常時伝搬
-16. 日本語ソース 14 件を seed 済み
-17. OGP / sitemap / robots を追加
-18. `monthly-public-archive` を追加
+5. `enrich-worker` の基本設定を `20件 x 8回/時` に拡張し、scheduler / route / docs を同期更新
+6. `/admin/jobs` 向けの `job_runs` 件数定義をレコード単位へ寄せ、all success 時に `処理 n / 成功 n` になりやすいよう整理した
+7. 公開一覧系にドメイン偏重抑制を追加
+8. `thumbnail_url` backfill を追加し既存データへ再同期
+9. 旧 `/api/thumb` URL の互換維持を追加
+10. サムネイルを icon-only 合成へ変更
+11. `icon_pending` 可視化を `/admin/tags` に追加
+12. `daily-tag-dedup` を追加し、L2/L4 への遡及タグ付けを実装
+13. `hourly-compute-ranks` を `job_runs` に追加
+14. `public_article_sources` bigint バグを修正し全件バックフィル
+15. admin Phase 3 を実装
+16. `content_language` を公開 API へ常時伝搬
+17. 日本語ソース 14 件を seed 済み
+18. OGP / sitemap / robots を追加
+19. `monthly-public-archive` を追加
 
 ## 5. 参照順
 

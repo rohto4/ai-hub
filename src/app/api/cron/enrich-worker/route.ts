@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { databaseUnavailableResponse } from '@/lib/api/responses'
 import { verifyCronSecret } from '@/lib/auth/admin'
 import { isDatabaseConfigured } from '@/lib/db'
-import { runDailyEnrich } from '@/lib/jobs/daily-enrich'
+import { runDailyEnrich } from '@/lib/jobs/enrich-worker'
 
 export const runtime = 'nodejs'
-export const maxDuration = 300
+export const maxDuration = 600
 
 const DEFAULT_SUMMARY_BATCH_SIZE = 20
 const MAX_SUMMARY_BATCH_SIZE = 20

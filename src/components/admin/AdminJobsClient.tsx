@@ -24,7 +24,7 @@ type FailedItem = {
   createdAt: string
 }
 
-const JOB_NAMES = ['hourly-fetch', 'daily-enrich', 'hourly-publish', 'compute-ranks', 'monthly-public-archive']
+const JOB_NAMES = ['hourly-fetch', 'enrich-worker', 'hourly-publish', 'hourly-compute-ranks', 'monthly-public-archive']
 
 const STATUS_STYLE: Record<string, string> = {
   completed: 'bg-green-900 text-green-300',

@@ -25,6 +25,7 @@ export interface DailyEnrichResult {
   attempted: number
   processed: number
   failed: number
+  skippedExpired: number
   manualPendingCount: number
   manualPendingExportPath: string | null
   items: DailyEnrichItemResult[]

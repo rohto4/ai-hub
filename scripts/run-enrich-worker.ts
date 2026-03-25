@@ -1,10 +1,10 @@
 #!/usr/bin/env npx tsx
 /**
- * daily-enrich を CLI から直接実行するスクリプト
+ * enrich-worker を CLI から直接実行するスクリプト
  * Usage:
- *   npx tsx scripts/run-daily-enrich.ts --limit 20
- *   npx tsx scripts/run-daily-enrich.ts --source-key hackernews-ai --limit 20 --summary-batch-size 20
- *   npx tsx scripts/run-daily-enrich.ts --limit 100 --summary-batch-size 20 --max-summary-batches 10
+ *   npx tsx scripts/run-enrich-worker.ts --limit 20
+ *   npx tsx scripts/run-enrich-worker.ts --source-key hackernews-ai --limit 20 --summary-batch-size 20
+ *   npx tsx scripts/run-enrich-worker.ts --limit 100 --summary-batch-size 20 --max-summary-batches 10
  */
 import { loadEnvConfig } from '@next/env'
 import { dirname, join } from 'node:path'
@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 loadEnvConfig(join(__dirname, '..'))
 
-import { runDailyEnrich } from '@/lib/jobs/daily-enrich'
+import { runDailyEnrich } from '@/lib/jobs/enrich-worker'
 
 const DEFAULT_SUMMARY_BATCH_SIZE = 20
 

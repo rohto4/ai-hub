@@ -11,7 +11,7 @@
 
 1. P0 ではジョブを責務単位で分割する
 2. 時間粒度と責務粒度は一致させない
-3. enrich は現行実装名が `daily-enrich` でも、運用上は毎時実行前提で扱う
+3. enrich は `enrich-worker` として、運用上は毎時の小分け実行前提で扱う
 4. 要約 API 呼び出しは 1 記事ずつではなく、`summaryBatchSize=20` を基本とする
 5. Gemini / OpenAI へ渡す要約指示は固定テンプレートファイルを使い、毎回同じルールを明示する
 4. 毎時運用は `fetch -> enrich` を直列にし、enrich は小分けで回す
@@ -23,7 +23,7 @@
 ## 3. P0 で必要なジョブ一覧
 
 1. `hourly-fetch`
-2. `daily-enrich`（運用上は毎時 enrich）
+2. `enrich-worker`
 3. `hourly-publish`
 4. `daily-tag-promote`
 5. `weekly-archive`
@@ -61,9 +61,9 @@
 - 出力
   - 未処理または再処理対象の raw レコード
 
-### 4.2 `daily-enrich`（運用上は毎時 enrich）
+### 4.2 `enrich-worker`
 
-> `layer1` から `layer2` を生成する整形ジョブ。現行実装名は `daily-enrich` だが、P0 運用では毎時実行を前提にする。
+> `layer1` から `layer2` を生成する整形ジョブ。短い間隔で繰り返し起動し、P0 運用では毎時の小分け実行を前提にする。
 
 - 目的
   - `layer1` の raw データを整形し、`layer2` を生成する
@@ -183,12 +183,12 @@
 ### 5.1 毎時の基本順
 
 1. `hourly-fetch`
-2. `daily-enrich`（毎時運用、直列、小分け）
+2. `enrich-worker`（毎時運用、直列、小分け）
 3. `hourly-publish`
 
 補足:
 
-1. 現行実装名は `daily-enrich` だが、運用上は毎時 `hourly-fetch` の後に小分けで直列実行する
+1. `enrich-worker` は毎時 `hourly-fetch` の後に小分けで直列実行する
 2. 実装入口は `/api/cron/hourly-layer12` とし、内部で `fetch -> enrich` を直列に回す
 3. GitHub Actions では `hourly-layer12.yml` から `APP_URL/api/cron/hourly-layer12` を叩く
 4. `hourly-enrich.yml` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40` の 8 回実行する

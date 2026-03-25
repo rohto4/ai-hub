@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   }
 
   const sql = getSql()
-  const jobRunId = await startJobRun({ jobName: 'compute-ranks', metadata: {} })
+  const jobRunId = await startJobRun({ jobName: 'hourly-compute-ranks', metadata: {} })
   const lastError: string | null = null
 
   // 1回のクエリで全公開記事を取得
@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
   }
 
   let totalUpdated = 0
+  const totalTargetRows = articles.length * WINDOWS.length
 
   // 4 window を並列処理
   const windowResults = await Promise.all(
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
   await finishJobRun({
     jobRunId,
     status: 'completed',
-    processedCount: articles.length,
+    processedCount: totalTargetRows,
     successCount: totalUpdated,
     failedCount: 0,
     metadata: { updated: totalUpdated, articles: articles.length, windows: WINDOWS.length },
