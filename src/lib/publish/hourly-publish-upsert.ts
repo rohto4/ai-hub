@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid'
 import { pickThumbnailEmoji } from '@/lib/publish/thumbnail-emoji'
 import type { PublishCandidate, SqlClient, UpsertedRow } from '@/lib/publish/hourly-publish-shared'
+import { syncPublicArticleAdjacentTagsBulk, syncPublicArticleAdjacentTagsOne } from '@/lib/publish/hourly-publish-adjacent-tags'
 import { syncPublicArticleSources } from '@/lib/publish/hourly-publish-sources'
 import { syncPublicArticleTagsBulk, syncPublicArticleTagsOne } from '@/lib/publish/hourly-publish-tags'
 
@@ -25,6 +26,7 @@ export async function bulkPublishBatch(
   const summary200s: (string | null)[] = []
   const thumbnailUrls: (string | null)[] = []
   const thumbnailEmojis: (string | null)[] = []
+  const thumbnailBgThemes: (string | null)[] = []
   const sourceCategories: string[] = []
   const sourceTypes: string[] = []
   const contentLanguages: (string | null)[] = []
@@ -43,6 +45,7 @@ export async function bulkPublishBatch(
     summary100s.push(candidate.summary_100)
     summary200s.push(displaySummary ?? null)
     thumbnailUrls.push(candidate.thumbnail_url ?? null)
+    thumbnailBgThemes.push(candidate.thumbnail_bg_theme ?? null)
     thumbnailEmojis.push(
       pickThumbnailEmoji({
         title: candidate.title,
@@ -65,14 +68,14 @@ export async function bulkPublishBatch(
     INSERT INTO public_articles (
       enriched_article_id, primary_source_target_id, public_key, canonical_url,
       display_title, display_summary_100, display_summary_200,
-      thumbnail_url, thumbnail_emoji,
+      thumbnail_url, thumbnail_emoji, thumbnail_bg_theme,
       source_category, source_type, content_language, summary_input_basis, publication_basis,
       content_score, original_published_at, visibility_status, public_refreshed_at
     )
     SELECT
       enriched_article_id::bigint,
       NULLIF(source_target_id, '')::uuid,
-      public_key, canonical_url, title, summary_100, summary_200, thumbnail_url, thumbnail_emoji,
+      public_key, canonical_url, title, summary_100, summary_200, thumbnail_url, thumbnail_emoji, thumbnail_bg_theme,
       source_category, source_type, content_language, summary_input_basis, publication_basis,
       score::numeric, NULLIF(published_at, '')::timestamptz,
       'published', now()
@@ -86,6 +89,7 @@ export async function bulkPublishBatch(
       ${summary200s}::text[],
       ${thumbnailUrls}::text[],
       ${thumbnailEmojis}::text[],
+      ${thumbnailBgThemes}::text[],
       ${sourceCategories}::text[],
       ${sourceTypes}::text[],
       ${contentLanguages}::text[],
@@ -93,7 +97,7 @@ export async function bulkPublishBatch(
       ${publicationBases}::text[],
       ${scores}::numeric[],
       ${publishedAts}::text[]
-    ) AS t(enriched_article_id, source_target_id, public_key, canonical_url, title, summary_100, summary_200, thumbnail_url, thumbnail_emoji, source_category, source_type, content_language, summary_input_basis, publication_basis, score, published_at)
+    ) AS t(enriched_article_id, source_target_id, public_key, canonical_url, title, summary_100, summary_200, thumbnail_url, thumbnail_emoji, thumbnail_bg_theme, source_category, source_type, content_language, summary_input_basis, publication_basis, score, published_at)
     ON CONFLICT (canonical_url) DO UPDATE SET
       enriched_article_id      = EXCLUDED.enriched_article_id,
       primary_source_target_id = EXCLUDED.primary_source_target_id,
@@ -102,6 +106,7 @@ export async function bulkPublishBatch(
       display_summary_200      = EXCLUDED.display_summary_200,
       thumbnail_url            = EXCLUDED.thumbnail_url,
       thumbnail_emoji          = EXCLUDED.thumbnail_emoji,
+      thumbnail_bg_theme       = EXCLUDED.thumbnail_bg_theme,
       source_category          = EXCLUDED.source_category,
       source_type              = EXCLUDED.source_type,
       content_language         = EXCLUDED.content_language,
@@ -131,8 +136,14 @@ export async function bulkPublishBatch(
     batch.map((candidate) => candidate.enriched_article_id),
     upsertedRows.map((row) => row.public_article_id),
   )
+  const adjacentTagsUpdated = await syncPublicArticleAdjacentTagsBulk(
+    sql,
+    enrichedToPublic,
+    batch.map((candidate) => candidate.enriched_article_id),
+    upsertedRows.map((row) => row.public_article_id),
+  )
 
-  return { upserted: upsertedRows.length, tagsUpdated }
+  return { upserted: upsertedRows.length, tagsUpdated: tagsUpdated + adjacentTagsUpdated }
 }
 
 export async function publishOne(
@@ -160,13 +171,13 @@ export async function publishOne(
     INSERT INTO public_articles (
       enriched_article_id, primary_source_target_id, public_key, canonical_url,
       display_title, display_summary_100, display_summary_200,
-      thumbnail_url, thumbnail_emoji, source_category, source_type,
+      thumbnail_url, thumbnail_emoji, thumbnail_bg_theme, source_category, source_type,
       content_language, summary_input_basis, publication_basis, content_score,
       original_published_at, visibility_status, public_refreshed_at
     )
     VALUES (
       ${candidate.enriched_article_id}, ${candidate.source_target_id}, ${publicKey}, ${candidate.canonical_url},
-      ${candidate.title}, ${candidate.summary_100}, ${displaySummary}, ${candidate.thumbnail_url}, ${thumbnailEmoji},
+      ${candidate.title}, ${candidate.summary_100}, ${displaySummary}, ${candidate.thumbnail_url}, ${thumbnailEmoji}, ${candidate.thumbnail_bg_theme},
       ${candidate.source_category}, ${candidate.source_type}, ${candidate.content_language}, ${candidate.summary_input_basis}, ${candidate.publication_basis},
       ${Number(candidate.score)}, ${candidate.source_updated_at}, 'published', now()
     )
@@ -178,6 +189,7 @@ export async function publishOne(
       display_summary_200      = EXCLUDED.display_summary_200,
       thumbnail_url            = EXCLUDED.thumbnail_url,
       thumbnail_emoji          = EXCLUDED.thumbnail_emoji,
+      thumbnail_bg_theme       = EXCLUDED.thumbnail_bg_theme,
       source_category          = EXCLUDED.source_category,
       source_type              = EXCLUDED.source_type,
       content_language         = EXCLUDED.content_language,
@@ -198,5 +210,7 @@ export async function publishOne(
     new Map([[candidate.canonical_url, candidate]]),
   )
 
-  return syncPublicArticleTagsOne(sql, candidate.enriched_article_id, publicArticleId)
+  const primaryTagCount = await syncPublicArticleTagsOne(sql, candidate.enriched_article_id, publicArticleId)
+  const adjacentTagCount = await syncPublicArticleAdjacentTagsOne(sql, candidate.enriched_article_id, publicArticleId)
+  return primaryTagCount + adjacentTagCount
 }

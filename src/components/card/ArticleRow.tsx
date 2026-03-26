@@ -18,6 +18,7 @@ export function ArticleRow({ article, summaryMode }: Props) {
         sourceType={article.source_type}
         thumbnailUrl={article.thumbnail_url}
         thumbnailEmoji={article.thumbnail_emoji}
+        thumbnailBgTheme={article.thumbnail_bg_theme}
         className="h-10 w-10 shrink-0 rounded-lg"
         emojiClassName="text-[22px]"
       />

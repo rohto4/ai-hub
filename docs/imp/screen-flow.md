@@ -1,6 +1,6 @@
 # AI Trend Hub Screen Flow
 
-最終更新: 2026-03-25
+最終更新: 2026-03-26
 
 ## 1. 目的
 
@@ -87,9 +87,10 @@
 2. 半年超は `public_articles_history` に月次退避
 3. `content_language` は公開面まで反映済み
 4. `thumbnail_url` は内部テンプレ方式
-5. OGP は `/api/og` で動的生成
-6. 管理面は `/admin/login` + `ADMIN_SECRET` 認証
-7. Topic Group は未実装
+5. `thumbnail_bg_theme` は隣接分野タグから決定してカード背景に反映
+6. OGP は `/api/og` で動的生成
+7. 管理面は `/admin/login` + `ADMIN_SECRET` 認証
+8. Topic Group は未実装
 
 ## 5. 関連図
 

@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { resolveThumbnailBgStyle } from '@/lib/publish/thumbnail-bg-theme'
 import { resolveThumbnailEmoji } from '@/lib/publish/thumbnail-emoji'
 
 type Props = {
@@ -6,6 +7,7 @@ type Props = {
   sourceType: 'official' | 'blog' | 'news' | 'video' | 'alerts' | 'paper'
   thumbnailUrl: string | null
   thumbnailEmoji: string | null
+  thumbnailBgTheme?: string | null
   className: string
   emojiClassName?: string
   badgeLabel?: string
@@ -22,14 +24,16 @@ export function ArticleThumbnail({
   sourceType,
   thumbnailUrl,
   thumbnailEmoji,
+  thumbnailBgTheme = null,
   className,
   emojiClassName = 'text-[28px]',
   badgeLabel,
   badgeClassName = 'absolute bottom-1 right-1 rounded-sm bg-black/30 px-0.5 text-[7px] font-semibold text-white',
-  backgroundStyle = DEFAULT_BACKGROUND,
+  backgroundStyle,
 }: Props) {
+  const effectiveBackground = backgroundStyle ?? resolveThumbnailBgStyle(thumbnailBgTheme) ?? DEFAULT_BACKGROUND
   return (
-    <div className={`relative overflow-hidden ${className}`} style={backgroundStyle}>
+    <div className={`relative overflow-hidden ${className}`} style={effectiveBackground}>
       {thumbnailUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={thumbnailUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />

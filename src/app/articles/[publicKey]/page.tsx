@@ -73,6 +73,7 @@ export default async function ArticleDetailPage({
               sourceType={article.source_type}
               thumbnailUrl={article.thumbnail_url}
               thumbnailEmoji={article.thumbnail_emoji}
+              thumbnailBgTheme={article.thumbnail_bg_theme}
               className="h-28 w-24 rounded-3xl"
               emojiClassName="text-5xl"
             />

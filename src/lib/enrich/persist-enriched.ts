@@ -8,6 +8,7 @@ import {
 } from '@/lib/db/enrichment'
 import { recordJobRunItem } from '@/lib/db/job-runs'
 import { buildInternalThumbnailUrl } from '@/lib/publish/thumbnail-template'
+import { matchAdjacentTagsFromKeywords, resolveThumbnailBgTheme } from '@/lib/tags/adjacent'
 import { matchTagsFromKeywords } from '@/lib/tags/match'
 import {
   chunkItems,
@@ -26,6 +27,7 @@ export async function processSummaryBatches(params: {
   maxSummaryBatches: number
   tagReferences: Awaited<ReturnType<typeof import('@/lib/db/tags').listActiveTagReferences>>
   tagKeywords: Awaited<ReturnType<typeof import('@/lib/db/tags').listCollectionTagKeywords>>
+  adjacentTagKeywords: Awaited<ReturnType<typeof import('@/lib/db/adjacent-tags').listAdjacentTagKeywords>>
   items: DailyEnrichItemResult[]
   manualPendingExports: ManualPendingExportItem[]
 }): Promise<void> {
@@ -68,6 +70,7 @@ async function runAiBatch(
     jobRunId: number
     tagReferences: Awaited<ReturnType<typeof import('@/lib/db/tags').listActiveTagReferences>>
     tagKeywords: Awaited<ReturnType<typeof import('@/lib/db/tags').listCollectionTagKeywords>>
+    adjacentTagKeywords: Awaited<ReturnType<typeof import('@/lib/db/adjacent-tags').listAdjacentTagKeywords>>
     items: DailyEnrichItemResult[]
     manualPendingExports: ManualPendingExportItem[]
   },
@@ -102,6 +105,7 @@ async function runAiBatch(
         jobRunId: params.jobRunId,
         tagReferences: params.tagReferences,
         tagKeywords: params.tagKeywords,
+        adjacentTagKeywords: params.adjacentTagKeywords,
         items: params.items,
         manualPendingExports: params.manualPendingExports,
       })
@@ -118,6 +122,7 @@ async function persistPreparedArticle(params: {
   jobRunId: number
   tagReferences: Awaited<ReturnType<typeof import('@/lib/db/tags').listActiveTagReferences>>
   tagKeywords: Awaited<ReturnType<typeof import('@/lib/db/tags').listCollectionTagKeywords>>
+  adjacentTagKeywords: Awaited<ReturnType<typeof import('@/lib/db/adjacent-tags').listAdjacentTagKeywords>>
   items: DailyEnrichItemResult[]
   manualPendingExports: ManualPendingExportItem[]
 }): Promise<void> {
@@ -195,6 +200,13 @@ async function persistPreparedArticle(params: {
       tagKey: reference.tagKey,
       displayName: reference.displayName,
     }))
+  const adjacentMatches = matchAdjacentTagsFromKeywords(
+    params.adjacentTagKeywords,
+    article.title,
+    summaryForArticle.summary200 || summaryForArticle.summary100,
+    2,
+  )
+  const thumbnailBgTheme = resolveThumbnailBgTheme(adjacentMatches)
   const thumbnailUrl = buildInternalThumbnailUrl({
     canonicalUrl: article.rawArticle.citedUrl ?? article.rawArticle.normalizedUrl,
     title: article.title,
@@ -204,6 +216,7 @@ async function persistPreparedArticle(params: {
     sourceCategory: article.rawArticle.sourceCategory as 'llm' | 'agent' | 'voice' | 'policy' | 'safety' | 'search' | 'news',
     contentLanguage: article.rawArticle.contentLanguage,
     matchedTags,
+    thumbnailBgTheme,
   })
 
   // en ソースは AI が生成した日本語タイトルを使う。ja ソースは元タイトルのまま。
@@ -261,6 +274,8 @@ async function persistPreparedArticle(params: {
     summaryEmbedding: params.embeddingResult.embedding,
     embeddingModel: params.embeddingResult.model,
     matchedTagIds: keywordMatchedTagIds,
+    adjacentTagIds: adjacentMatches.map((match) => match.adjacentTagId),
+    thumbnailBgTheme,
     // AI が抽出した固有名詞を候補タグとして保存（rule-based 候補より高精度）
     candidateTags: article.shouldPersistCandidateTags
       ? summaryForArticle.properNounTags.map((key) => ({

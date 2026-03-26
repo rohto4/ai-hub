@@ -9,6 +9,7 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-26 | done | 隣接分野タグ + 背景テーマ基盤を実装 | migration 038、enrich/publish/UI反映、`db:retag-layer2-layer4` と Gemini 支援プロンプト（`artifacts/gemini-tag-rebuild/`）を追加
 - 2026-03-26 | done | Gemini enrich part-008 を Codex実行で生成 | `output-templates/ai-enrich-outputs-part-008.json` と `outputs/ai-enrich-outputs-part-008.json` を 100件で生成し、件数・ID順・文字数・タグ整合の検証を通過
 - 2026-03-26 | done | Gemini enrich part-002 を新フォーマットで全件再生成 | `outputs/ai-enrich-outputs-part-002.json` を 200 件で再出力し、`matchedTagKeys/proposedTags`・文字数・ID順の検証を通過
 - 2026-03-26 | done | Gemini CLI backlog 1500件の artifact を生成 | `prepare-gemini-cli-enrich-artifacts.ts` を追加し、`artifact/gemini-cli-enrich-backlog-1500/` に 8 chunk の input / prompt / manifest を出力

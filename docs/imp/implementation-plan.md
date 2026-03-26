@@ -1,6 +1,6 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-03-25
+最終更新: 2026-03-26
 
 ## 1. 現在のフェーズ
 
@@ -16,6 +16,9 @@
 - `daily-tag-dedup`
 - OGP / sitemap / robots
 - `monthly-public-archive`
+- 隣接分野タグ基盤（schema / enrich / publish / UI 反映）
+- `thumbnail_bg_theme` 伝搬（L2→L4）
+- L2/L4 タグ洗い替えスクリプト（`db:retag-layer2-layer4`）
 
 ### 未完了
 
@@ -23,6 +26,7 @@
 2. Topic Group 本実装
 3. 必要なら言語フィルタ UI
 4. 必要なら tag alias 管理 UI
+5. 隣接分野タグの運用監査（6.7）
 
 ## 2. いま優先すること
 
@@ -30,6 +34,7 @@
 2. `job_run_id=563` の fetch 停滞有無確認
 3. enrich 実行可否の判断材料整理
 4. `hourly-compute-ranks` 係数調整に入る前の運用データ蓄積確認
+5. migration 038 のDB適用と全件 retag 実行
 
 ## 3. 現在の固定方針
 
@@ -83,36 +88,37 @@
 ## 6. 隣接分野タグ + 背景テーマ（新規）
 
 ### 6.1 仕様設計（区分追加）
-- 既存 AI タグ系とは分離して、`隣接分野タグ` 区分を追加する
-- 付与上限は `1〜2` 件を基本とし、AI 本体タグ `3〜5` 件と役割分担する
-- 公開面での利用先を `thumbnail 背景テーマ` と `回遊補助` に限定する
+- 実装済み。既存 AI タグ系とは分離し、`adjacent_tags_master` 系テーブルで管理する
+- 付与上限は `1〜2` 件（`matchAdjacentTagsFromKeywords(..., 2)`）
+- 公開面での主用途は `thumbnail_bg_theme` とする
 
 ### 6.2 マスタ追加（隣接分野タグ）
-- 隣接分野用のタグマスタ（名称・key・alias・優先度）を新設する
-- 既存 `tags_master` と混線しない命名規約を定義する
-- seed / migration / admin 参照経路を追加する
+- 実装済み（migration 038）
+- `adjacent_tags_master` / `adjacent_tag_keywords` を追加
+- 初期タグ（infra/security/robotics/media/finance/healthcare/education/legal/gaming/hardware）を投入
 
 ### 6.3 付与ロジック追加（title + summary_200）
-- 入力は `title + summary_200` を基本とする
-- まずルールベース（keyword + alias）で 1〜2 件を決定する
-- 既存 AI タグ付与とは別経路で保存できるようにする
+- 実装済み
+- `title + summary_200` を入力にルールベース判定
+- 保存先: `articles_enriched_adjacent_tags`（L2）
 
 ### 6.4 背景テーマ出力
-- 隣接分野タグから `thumbnail_bg_theme` を決定する関数を追加する
-- 未判定時は既存 fallback を使う
-- `hourly-publish` で `public_articles` へ背景テーマを反映する
+- 実装済み
+- L2: `articles_enriched.thumbnail_bg_theme`
+- L4: `public_articles.thumbnail_bg_theme`
+- 判定不可時は既存テーマへ fallback
 
 ### 6.5 合成ロジック（emoji + background）
-- `thumbnail_emoji` と `thumbnail_bg_theme` の合成規則を定義する
-- source_type / source_category / 隣接分野タグの優先順位を明文化する
-- UI 側で theme 適用（背景色・グラデーション）を実装する
+- 実装済み
+- `thumbnail_url` 生成時は `thumbnail_bg_theme` を優先利用
+- `thumbnail_url` 未設定時は `ArticleThumbnail` が `thumbnail_bg_theme` ベース背景で emoji を描画
 
 ### 6.6 スコア・公開優先度連携
-- 隣接分野タグは「加点目的」ではなく「文脈解像度」信号として扱う
-- タグ不足ノイズ減点ロジックとは独立に評価する
-- 必要なら `hourly-publish` 側で軽微な優先度調整を追加する
+- 実装済み（現時点）
+- 隣接分野タグは加点に使わず、表示文脈・背景テーマにのみ利用
+- 既存のタグ不足ノイズ減点ロジックは維持
 
 ### 6.7 検証・運用
-- サンプル監査（30〜50件）で tag 妥当性と背景テーマ整合を確認する
-- ノイズ記事（tag 0/1・汎用タグのみ）で公開順位が下がることを確認する
-- imp 系ドキュメントへ運用ルールと見直し条件を追記する
+- 実装準備済み（未実行）
+- `scripts/retag-layer2-layer4.ts` で全件洗い替え可能
+- 監査プロンプトを `artifacts/gemini-tag-rebuild/` に追加

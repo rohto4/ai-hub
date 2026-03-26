@@ -1,6 +1,6 @@
 # AI Trend Hub 実装ステータス
 
-最終更新: 2026-03-25
+最終更新: 2026-03-26
 
 運用ルール:
 - 履歴は最新 50 件相当までを目安に残し、古い詳細は別ファイルへ逃がす
@@ -12,6 +12,7 @@
 - Layer 1 → Layer 2 → Layer 4 の自動パイプラインは稼働済み
 - `content_language`、日本語ソース 14 件、`thumbnail_url`、admin Phase 3、OGP、sitemap、robots は実装済み
 - `daily-tag-dedup` まで含めてタグ系の基本運用は実装済み
+- 隣接分野タグ（L2/L4）と `thumbnail_bg_theme` の実装を追加済み
 - `hourly-compute-ranks` は最適化済みだが、係数調整は未着手
 - Topic Group はスキーマ受け口のみで、本実装は未着手
 
@@ -42,6 +43,7 @@
 1. `arxiv-ai` backlog の現状確認
 2. `job_run_id=563` 周辺の fetch 停滞有無確認
 3. enrich 実行可否の判断材料整理
+4. migration 038 適用と retag 実行可否の最終判断
 
 ### 後続
 
@@ -72,6 +74,9 @@
 17. 日本語ソース 14 件を seed 済み
 18. OGP / sitemap / robots を追加
 19. `monthly-public-archive` を追加
+20. 隣接分野タグ用 schema（migration 038）と `thumbnail_bg_theme` 伝搬を実装
+21. `db:retag-layer2-layer4` スクリプトを追加し、L2/L4 の全件タグ洗い替えを自動化
+22. `artifacts/gemini-tag-rebuild/` に監査・デザイン用プロンプトを追加
 
 ## 5. 参照順
 

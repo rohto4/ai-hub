@@ -37,6 +37,7 @@ export default async function DigestPage() {
                       sourceType={article.source_type}
                       thumbnailUrl={article.thumbnail_url}
                       thumbnailEmoji={article.thumbnail_emoji}
+                      thumbnailBgTheme={article.thumbnail_bg_theme}
                       className="h-14 w-14 rounded-2xl"
                       emojiClassName="text-[28px]"
                     />

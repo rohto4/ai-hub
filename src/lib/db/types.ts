@@ -56,6 +56,7 @@ export interface Article {
   source_type: SourceType
   thumbnail_url: string | null
   thumbnail_emoji: string | null
+  thumbnail_bg_theme: string | null
   content_language: ContentLanguage | null
   published_at: Date
   summary_100: string | null

@@ -306,6 +306,8 @@ async function main(): Promise<void> {
         sourceKey: inputItem.sourceKey,
         sourceDisplayName: inputItem.sourceKey,
         matchedTagIds: inputItem.matchedTagIds,
+        adjacentTagIds: [],
+        thumbnailBgTheme: null,
         candidateTags: inputItem.candidateTags,
         commercialUsePolicy: 'permitted',
       },

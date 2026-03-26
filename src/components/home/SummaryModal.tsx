@@ -38,6 +38,7 @@ export function SummaryModal({
               sourceType={article.source_type}
               thumbnailUrl={article.thumbnail_url}
               thumbnailEmoji={article.thumbnail_emoji}
+              thumbnailBgTheme={article.thumbnail_bg_theme}
               className="h-16 w-14 shrink-0 rounded-xl"
               emojiClassName="text-[30px]"
             />

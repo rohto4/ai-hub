@@ -51,6 +51,7 @@ export async function listPublishCandidates(sql: SqlClient): Promise<PublishCand
       ) AS score,
       ae.source_updated_at,
       ae.thumbnail_url,
+      ae.thumbnail_bg_theme,
       COALESCE(spr.priority_score, 100) AS priority_score
     FROM articles_enriched ae
     JOIN source_targets st ON st.source_target_id = ae.source_target_id

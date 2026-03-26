@@ -24,6 +24,9 @@
 - OGP / sitemap / robots
 - `hourly-compute-ranks` 最適化
 - `public_article_sources` バグ修正
+- 隣接分野タグ基盤（migration 038 / enrich / publish / UI反映）
+- `thumbnail_bg_theme` カラム伝搬
+- L2/L4 全件 retag スクリプト（`db:retag-layer2-layer4`）
 
 ### 3.2 いま確認すべきこと
 
@@ -81,6 +84,12 @@
 - GitHub Actions の変更
 - 件数確認なしの enrich 系ジョブ実行
 - `arxiv-ai` の 5 か月超除外実装前の enrich 実行
+
+## 8. 次セッションの first action
+
+1. migration 038 を適用できる環境か確認する
+2. `npm run db:retag-layer2-layer4 -- --dry-run` で出力確認
+3. 問題なければ `npm run db:retag-layer2-layer4` を実行し、L2/L4 整合を監査する
 
 ## 7. 直近の未コミット差分メモ
 
