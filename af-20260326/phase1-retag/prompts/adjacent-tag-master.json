@@ -1,0 +1,52 @@
+[
+  {
+    "tag_key": "infra",
+    "display_name": "Infrastructure",
+    "theme_key": "adj-infra"
+  },
+  {
+    "tag_key": "security",
+    "display_name": "Cybersecurity",
+    "theme_key": "adj-security"
+  },
+  {
+    "tag_key": "robotics",
+    "display_name": "Robotics",
+    "theme_key": "adj-robotics"
+  },
+  {
+    "tag_key": "media",
+    "display_name": "Media & Creator",
+    "theme_key": "adj-media"
+  },
+  {
+    "tag_key": "finance",
+    "display_name": "Finance",
+    "theme_key": "adj-finance"
+  },
+  {
+    "tag_key": "healthcare",
+    "display_name": "Healthcare",
+    "theme_key": "adj-healthcare"
+  },
+  {
+    "tag_key": "education",
+    "display_name": "Education",
+    "theme_key": "adj-education"
+  },
+  {
+    "tag_key": "legal",
+    "display_name": "Legal",
+    "theme_key": "adj-legal"
+  },
+  {
+    "tag_key": "gaming",
+    "display_name": "Gaming",
+    "theme_key": "adj-gaming"
+  },
+  {
+    "tag_key": "hardware",
+    "display_name": "Hardware",
+    "theme_key": "adj-hardware"
+  }
+]

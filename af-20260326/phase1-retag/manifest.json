@@ -1,0 +1,115 @@
+{
+  "generatedAt": "2026-03-26T15:15:08.995Z",
+  "totalArticles": 5990,
+  "chunkSize": 500,
+  "parts": [
+    {
+      "part": "part-001",
+      "inputPath": "inputs/ai-retag-inputs-part-001.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-001.json",
+      "outputPath": "outputs/ai-retag-outputs-part-001.json",
+      "count": 500,
+      "startEnrichedArticleId": "1",
+      "endEnrichedArticleId": "519"
+    },
+    {
+      "part": "part-002",
+      "inputPath": "inputs/ai-retag-inputs-part-002.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-002.json",
+      "outputPath": "outputs/ai-retag-outputs-part-002.json",
+      "count": 500,
+      "startEnrichedArticleId": "520",
+      "endEnrichedArticleId": "1022"
+    },
+    {
+      "part": "part-003",
+      "inputPath": "inputs/ai-retag-inputs-part-003.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-003.json",
+      "outputPath": "outputs/ai-retag-outputs-part-003.json",
+      "count": 500,
+      "startEnrichedArticleId": "1023",
+      "endEnrichedArticleId": "1525"
+    },
+    {
+      "part": "part-004",
+      "inputPath": "inputs/ai-retag-inputs-part-004.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-004.json",
+      "outputPath": "outputs/ai-retag-outputs-part-004.json",
+      "count": 500,
+      "startEnrichedArticleId": "1526",
+      "endEnrichedArticleId": "2026"
+    },
+    {
+      "part": "part-005",
+      "inputPath": "inputs/ai-retag-inputs-part-005.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-005.json",
+      "outputPath": "outputs/ai-retag-outputs-part-005.json",
+      "count": 500,
+      "startEnrichedArticleId": "2027",
+      "endEnrichedArticleId": "2529"
+    },
+    {
+      "part": "part-006",
+      "inputPath": "inputs/ai-retag-inputs-part-006.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-006.json",
+      "outputPath": "outputs/ai-retag-outputs-part-006.json",
+      "count": 500,
+      "startEnrichedArticleId": "2530",
+      "endEnrichedArticleId": "3049"
+    },
+    {
+      "part": "part-007",
+      "inputPath": "inputs/ai-retag-inputs-part-007.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-007.json",
+      "outputPath": "outputs/ai-retag-outputs-part-007.json",
+      "count": 500,
+      "startEnrichedArticleId": "3051",
+      "endEnrichedArticleId": "3582"
+    },
+    {
+      "part": "part-008",
+      "inputPath": "inputs/ai-retag-inputs-part-008.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-008.json",
+      "outputPath": "outputs/ai-retag-outputs-part-008.json",
+      "count": 500,
+      "startEnrichedArticleId": "3583",
+      "endEnrichedArticleId": "4097"
+    },
+    {
+      "part": "part-009",
+      "inputPath": "inputs/ai-retag-inputs-part-009.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-009.json",
+      "outputPath": "outputs/ai-retag-outputs-part-009.json",
+      "count": 500,
+      "startEnrichedArticleId": "4099",
+      "endEnrichedArticleId": "4647"
+    },
+    {
+      "part": "part-010",
+      "inputPath": "inputs/ai-retag-inputs-part-010.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-010.json",
+      "outputPath": "outputs/ai-retag-outputs-part-010.json",
+      "count": 500,
+      "startEnrichedArticleId": "4648",
+      "endEnrichedArticleId": "11083"
+    },
+    {
+      "part": "part-011",
+      "inputPath": "inputs/ai-retag-inputs-part-011.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-011.json",
+      "outputPath": "outputs/ai-retag-outputs-part-011.json",
+      "count": 500,
+      "startEnrichedArticleId": "11084",
+      "endEnrichedArticleId": "11583"
+    },
+    {
+      "part": "part-012",
+      "inputPath": "inputs/ai-retag-inputs-part-012.json",
+      "outputTemplatePath": "output-templates/ai-retag-outputs-part-012.json",
+      "outputPath": "outputs/ai-retag-outputs-part-012.json",
+      "count": 490,
+      "startEnrichedArticleId": "11584",
+      "endEnrichedArticleId": "12075"
+    }
+  ]
+}

@@ -1,0 +1,301 @@
+{
+  "generatedAt": "2026-03-26T19:33:09.212Z",
+  "sourceSummaryPath": "af-20260326/phase1-retag/summary-sheet.json",
+  "totalGroups": 9,
+  "groups": [
+    {
+      "groupId": "alias-group-001",
+      "comparableKey": "llm",
+      "heuristics": [
+        "pluralization-variation"
+      ],
+      "suggestedCanonicalKey": "llm",
+      "suggestedCanonicalLabel": "Llm",
+      "aiEvaluation": {
+        "status": "alias",
+        "confidence": "high",
+        "recommendedCanonicalKey": "llm",
+        "recommendedCanonicalLabel": "Llm",
+        "rationaleJa": "提供されたヒューリスティクス（pluralization-variation）に基づき、「llm」と「llms」は単数形と複数形のバリエーションであるため、同じ概念のエイリアスと判断されます。そのため、「llm」が推奨される正規キーであり、「Llm」が推奨される正規ラベルです。",
+        "cautionJa": "既存のタグ「llm」のラベルが「LLM」であるため、推奨される「Llm」との大文字・小文字の違いについて、今後の正規化処理で整合性を検討する必要があります。"
+      },
+      "terms": [
+        {
+          "key": "llm",
+          "label": "LLM",
+          "sourceType": "current-tag",
+          "articleCount": 4121
+        },
+        {
+          "key": "llms",
+          "label": "Llms",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 67,
+          "note": "Between the Layers Lies the Truth: Uncertainty Estimation in LLMs Using Intra-Layer Local Information Scores"
+        }
+      ]
+    },
+    {
+      "groupId": "alias-group-002",
+      "comparableKey": "huggingface",
+      "heuristics": [
+        "separator-variation"
+      ],
+      "suggestedCanonicalKey": "huggingface",
+      "suggestedCanonicalLabel": "Huggingface",
+      "aiEvaluation": {
+        "status": "alias",
+        "confidence": "high",
+        "recommendedCanonicalKey": "huggingface",
+        "recommendedCanonicalLabel": "Huggingface",
+        "rationaleJa": "複数の表記「hugging face」と「huggingface」が存在し、後者の「huggingface」がより多くの記事数で使用されているため、こちらを正規キーとして推奨します。",
+        "cautionJa": "システム内で「hugging face」表記がまだ使用されている可能性があり、正規化が必要になる場合があります。"
+      },
+      "terms": [
+        {
+          "key": "hugging face",
+          "label": "Hugging Face",
+          "sourceType": "current-tag",
+          "articleCount": 417
+        },
+        {
+          "key": "huggingface",
+          "label": "Hugging Face",
+          "sourceType": "current-tag",
+          "articleCount": 758
+        }
+      ]
+    },
+    {
+      "groupId": "alias-group-003",
+      "comparableKey": "transformer",
+      "heuristics": [
+        "pluralization-variation"
+      ],
+      "suggestedCanonicalKey": "transformer",
+      "suggestedCanonicalLabel": "Transformer",
+      "aiEvaluation": {
+        "status": "alias",
+        "confidence": "high",
+        "recommendedCanonicalKey": "transformer",
+        "recommendedCanonicalLabel": "Transformer",
+        "rationaleJa": "「transformer」と「transformers」は、単数形と複数形の関係にあり、同一の概念を指している可能性が非常に高いため、エイリアスとして扱います。",
+        "cautionJa": "「transformer」が文脈によって異なる意味を持つ可能性がないか、必要に応じて詳細な内容を確認してください。例：電気機器のトランスフォーマーなど。"
+      },
+      "terms": [
+        {
+          "key": "transformer",
+          "label": "transformer",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 34,
+          "note": "Weber's Law in Transformer Magnitude Representations: Efficient Coding, Representational Geometry, and Psychophysical Laws in Language Models"
+        },
+        {
+          "key": "transformers",
+          "label": "Transformers",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 14,
+          "note": "BitSkip: An Empirical Analysis of Quantization and Early Exit Composition in Transformers"
+        }
+      ]
+    },
+    {
+      "groupId": "alias-group-004",
+      "comparableKey": "vlm",
+      "heuristics": [
+        "pluralization-variation"
+      ],
+      "suggestedCanonicalKey": "vlm",
+      "suggestedCanonicalLabel": "Vlm",
+      "aiEvaluation": {
+        "status": "alias",
+        "confidence": "high",
+        "recommendedCanonicalKey": "vlm",
+        "recommendedCanonicalLabel": "Vlm",
+        "rationaleJa": "「vlm」と「vlms」は同じ概念を指し、「vlms」は複数形です。「pluralization-variation」ヒューリスティックに基づき、「vlm」を正規キーとして推奨します。",
+        "cautionJa": "単純な複数形であるため、特記事項はありません。"
+      },
+      "terms": [
+        {
+          "key": "vlm",
+          "label": "vlm",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 22,
+          "note": "Understanding Pruning Regimes in Vision-Language Models Through Domain-Aware Layer Selection"
+        },
+        {
+          "key": "vlms",
+          "label": "Vlms",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 10,
+          "note": "Medical Image Spatial Grounding with Semantic Sampling"
+        }
+      ]
+    },
+    {
+      "groupId": "alias-group-005",
+      "comparableKey": "mllm",
+      "heuristics": [
+        "pluralization-variation"
+      ],
+      "suggestedCanonicalKey": "mllms",
+      "suggestedCanonicalLabel": "Mllms",
+      "aiEvaluation": {
+        "status": "alias",
+        "confidence": "high",
+        "recommendedCanonicalKey": "mllms",
+        "recommendedCanonicalLabel": "Mllms",
+        "rationaleJa": "単数形と複数形のバリエーションであるため、より一般的な複数形を正規として推奨します。",
+        "cautionJa": "特になし"
+      },
+      "terms": [
+        {
+          "key": "mllm",
+          "label": "Mllm",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 8,
+          "note": "ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking"
+        },
+        {
+          "key": "mllms",
+          "label": "mllms",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 9,
+          "note": "Predictive Regularization Against Visual Representation Degradation in Multimodal Large Language Models"
+        }
+      ]
+    },
+    {
+      "groupId": "alias-group-006",
+      "comparableKey": "dynamic",
+      "heuristics": [
+        "pluralization-variation"
+      ],
+      "suggestedCanonicalKey": "dynamics",
+      "suggestedCanonicalLabel": "Dynamics",
+      "aiEvaluation": {
+        "status": "alias",
+        "confidence": "high",
+        "recommendedCanonicalKey": "dynamics",
+        "recommendedCanonicalLabel": "Dynamics",
+        "rationaleJa": "「dynamic」と「dynamics」は複数形の違いであるため、エイリアスとして扱います。",
+        "cautionJa": "この自動判定は、単語の複数形ルールに基づいています。文脈によっては別の意味を持つ可能性があるため、最終確認を推奨します。"
+      },
+      "terms": [
+        {
+          "key": "dynamic",
+          "label": "dynamic",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 5,
+          "note": "DIP: Efficient Large Multimodal Model Training with Dynamic Interleaved Pipeline"
+        },
+        {
+          "key": "dynamics",
+          "label": "dynamics",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 8,
+          "note": "Generalizing Dynamics Modeling More Easily from Representation Perspective"
+        }
+      ]
+    },
+    {
+      "groupId": "alias-group-007",
+      "comparableKey": "kernel",
+      "heuristics": [
+        "pluralization-variation"
+      ],
+      "suggestedCanonicalKey": "kernel",
+      "suggestedCanonicalLabel": "Kernel",
+      "aiEvaluation": {
+        "status": "error",
+        "confidence": "low",
+        "recommendedCanonicalKey": null,
+        "recommendedCanonicalLabel": null,
+        "rationaleJa": "Gemini 実行失敗: spawnSync powershell.exe ETIMEDOUT",
+        "cautionJa": "CLI 実行エラーのため手動確認が必要です。"
+      },
+      "terms": [
+        {
+          "key": "kernel",
+          "label": "kernel",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 7,
+          "note": "A Kernel Space-based Multidimensional Sparse Model for Dynamic PET Image Denoising"
+        },
+        {
+          "key": "kernels",
+          "label": "Kernels",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 7,
+          "note": "Bases of Steerable Kernels for Equivariant CNNs: From 2D Rotations to the Lorentz Group"
+        }
+      ]
+    },
+    {
+      "groupId": "alias-group-008",
+      "comparableKey": "pinn",
+      "heuristics": [
+        "pluralization-variation"
+      ],
+      "suggestedCanonicalKey": "pinn",
+      "suggestedCanonicalLabel": "Pinn",
+      "aiEvaluation": {
+        "status": "alias",
+        "confidence": "high",
+        "recommendedCanonicalKey": "pinn",
+        "recommendedCanonicalLabel": "Pinn",
+        "rationaleJa": "pinnとpinnsは単数形と複数形のバリエーションであり、同じ概念を指しているためエイリアスとして扱います。",
+        "cautionJa": "特になし。"
+      },
+      "terms": [
+        {
+          "key": "pinn",
+          "label": "pinn",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 5,
+          "note": "Verifiable Error Bounds for Physics-Informed Neural KKL Observers"
+        },
+        {
+          "key": "pinns",
+          "label": "pinns",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 5,
+          "note": "Randomness and signal propagation in physics-informed neural networks (PINNs): A neural PDE perspective"
+        }
+      ]
+    },
+    {
+      "groupId": "alias-group-009",
+      "comparableKey": "pde",
+      "heuristics": [
+        "pluralization-variation"
+      ],
+      "suggestedCanonicalKey": "pde",
+      "suggestedCanonicalLabel": "Pde",
+      "aiEvaluation": {
+        "status": "review",
+        "confidence": "low",
+        "recommendedCanonicalKey": null,
+        "recommendedCanonicalLabel": null,
+        "rationaleJa": "",
+        "cautionJa": ""
+      },
+      "terms": [
+        {
+          "key": "pde",
+          "label": "pde",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 4,
+          "note": "Randomness and signal propagation in physics-informed neural networks (PINNs): A neural PDE perspective"
+        },
+        {
+          "key": "pdes",
+          "label": "pdes",
+          "sourceType": "new-tag-candidate",
+          "seenCount": 4,
+          "note": "FastLSQ: Solving PDEs in One Shot via Fourier Features with Exact Analytical Derivatives"
+        }
+      ]
+    }
+  ]
+}

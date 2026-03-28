@@ -5,6 +5,10 @@ import { loadEnvConfig } from '@next/env'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getSql } from '@/lib/db'
+import {
+  buildPhase1RetagPromptSection,
+  filterPhase1PrimaryTagMaster,
+} from '@/lib/tags/retag-phase1'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 loadEnvConfig(join(__dirname, '..'))
@@ -96,7 +100,7 @@ async function main(): Promise<void> {
   const chunkSize = Number(readArg('--chunk-size', '400'))
   const sql = getSql()
 
-  const [articles, primaryTags, adjacentTags, tagMaster, adjacentMaster] = await Promise.all([
+  const [articles, primaryTags, adjacentTags, rawTagMaster, adjacentMaster] = await Promise.all([
     (sql`
       SELECT
         ae.enriched_article_id,
@@ -151,6 +155,8 @@ async function main(): Promise<void> {
     existing.push(row.tag_key)
     adjacentMap.set(row.enriched_article_id, existing)
   }
+
+  const tagMaster = filterPhase1PrimaryTagMaster(rawTagMaster)
 
   const items: ExportItem[] = articles.map((article) => ({
     enrichedArticleId: article.enriched_article_id,
@@ -260,6 +266,8 @@ async function main(): Promise<void> {
 ## Output Format
 - output-template と同一JSON形式で返却
 - \`enrichedArticleId\` の欠落・重複は禁止
+
+${buildPhase1RetagPromptSection()}
 
 ## Existing Masters
 - primaryTagMaster: \`${path.relative(process.cwd(), path.join(outDir, 'prompts', 'primary-tag-master.json')).replace(/\\/g, '/')}\`

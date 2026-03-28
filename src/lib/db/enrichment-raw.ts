@@ -149,7 +149,7 @@ export async function claimRawArticlesForEnrichment(
         claimed_rows AS (
           UPDATE articles_raw ar
           SET
-            process_after = now() + make_interval(mins => ${ENRICH_CLAIM_MINUTES}),
+            process_after = now() + (${ENRICH_CLAIM_MINUTES}::int * interval '1 minute'),
             updated_at = now()
           FROM candidate_rows cr
           WHERE ar.raw_article_id = cr.raw_article_id
@@ -196,7 +196,7 @@ export async function claimRawArticlesForEnrichment(
         claimed_rows AS (
           UPDATE articles_raw ar
           SET
-            process_after = now() + make_interval(mins => ${ENRICH_CLAIM_MINUTES}),
+            process_after = now() + (${ENRICH_CLAIM_MINUTES}::int * interval '1 minute'),
             updated_at = now()
           FROM candidate_rows cr
           WHERE ar.raw_article_id = cr.raw_article_id
@@ -288,12 +288,12 @@ export async function skipExpiredRawArticlesForEnrichment(sourceKey?: string | n
           AND st.source_key = ${sourceKey}
           AND ar.is_processed = false
           AND ar.source_published_at IS NOT NULL
-          AND ar.source_published_at < now() - make_interval(
-            months => ${
+          AND ar.source_published_at < now() - (
+            CAST(${
               sourceKey === ARXIV_AI_SOURCE_KEY
                 ? ARXIV_AI_ENRICH_MAX_ARTICLE_AGE_MONTHS
                 : DEFAULT_ENRICH_MAX_ARTICLE_AGE_MONTHS
-            }
+            } AS integer) * interval '1 month'
           )
         RETURNING ar.raw_article_id
       `
@@ -309,11 +309,11 @@ export async function skipExpiredRawArticlesForEnrichment(sourceKey?: string | n
         WHERE st.source_target_id = ar.source_target_id
           AND ar.is_processed = false
           AND ar.source_published_at IS NOT NULL
-          AND ar.source_published_at < now() - make_interval(
-            months => CASE
-              WHEN st.source_key = ${ARXIV_AI_SOURCE_KEY} THEN ${ARXIV_AI_ENRICH_MAX_ARTICLE_AGE_MONTHS}
-              ELSE ${DEFAULT_ENRICH_MAX_ARTICLE_AGE_MONTHS}
-            END
+          AND ar.source_published_at < now() - (
+            CASE
+              WHEN st.source_key = ${ARXIV_AI_SOURCE_KEY} THEN CAST(${ARXIV_AI_ENRICH_MAX_ARTICLE_AGE_MONTHS} AS integer)
+              ELSE CAST(${DEFAULT_ENRICH_MAX_ARTICLE_AGE_MONTHS} AS integer)
+            END * interval '1 month'
           )
         RETURNING ar.raw_article_id
       `) as Array<{ raw_article_id: number }>

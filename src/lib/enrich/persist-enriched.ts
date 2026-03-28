@@ -7,6 +7,8 @@ import {
   upsertEnrichedArticle,
 } from '@/lib/db/enrichment'
 import { recordJobRunItem } from '@/lib/db/job-runs'
+import { buildAiPrimaryTagOptions, resolvePrimaryTagIds } from '@/lib/enrich/ai-primary-tags'
+import { resolveAutoCanonicalTagMappings } from '@/lib/enrich/canonical-tag-hints'
 import { buildInternalThumbnailUrl } from '@/lib/publish/thumbnail-template'
 import { matchAdjacentTagsFromKeywords, resolveThumbnailBgTheme } from '@/lib/tags/adjacent'
 import { matchTagsFromKeywords } from '@/lib/tags/match'
@@ -28,6 +30,7 @@ export async function processSummaryBatches(params: {
   tagReferences: Awaited<ReturnType<typeof import('@/lib/db/tags').listActiveTagReferences>>
   tagKeywords: Awaited<ReturnType<typeof import('@/lib/db/tags').listCollectionTagKeywords>>
   adjacentTagKeywords: Awaited<ReturnType<typeof import('@/lib/db/adjacent-tags').listAdjacentTagKeywords>>
+  aiPrimaryTagOptions: ReturnType<typeof buildAiPrimaryTagOptions>
   items: DailyEnrichItemResult[]
   manualPendingExports: ManualPendingExportItem[]
 }): Promise<void> {
@@ -71,6 +74,7 @@ async function runAiBatch(
     tagReferences: Awaited<ReturnType<typeof import('@/lib/db/tags').listActiveTagReferences>>
     tagKeywords: Awaited<ReturnType<typeof import('@/lib/db/tags').listCollectionTagKeywords>>
     adjacentTagKeywords: Awaited<ReturnType<typeof import('@/lib/db/adjacent-tags').listAdjacentTagKeywords>>
+    aiPrimaryTagOptions: ReturnType<typeof buildAiPrimaryTagOptions>
     items: DailyEnrichItemResult[]
     manualPendingExports: ManualPendingExportItem[]
   },
@@ -85,6 +89,7 @@ async function runAiBatch(
       contentLanguage: article.rawArticle.contentLanguage,
     })),
     batchSizeHint,
+    params.aiPrimaryTagOptions,
   )
 
   const embeddings = await generateTextEmbeddings(
@@ -166,36 +171,34 @@ async function persistPreparedArticle(params: {
   const aiProcessingState =
     summaryForArticle.summarySource === 'manual_pending' ? 'manual_pending' : 'completed'
 
-  const paperTag = params.tagReferences.find((reference) => reference.tagKey === 'paper')
   const keywordMatchedTagIds =
-    article.rawArticle.sourceType === 'paper'
-      ? paperTag
-        ? [paperTag.id]
-        : []
-      : matchTagsFromKeywords(
-          params.tagKeywords,
-          article.title,
-          summaryForArticle.summary200 || summaryForArticle.summary100,
-        )
-
-  if (article.rawArticle.sourceType !== 'paper') {
-    const sourceCategoryTag = params.tagReferences.find(
-      (reference) => reference.tagKey === article.rawArticle.sourceCategory,
+    matchTagsFromKeywords(
+      params.tagKeywords,
+      article.title,
+      summaryForArticle.summary200 || summaryForArticle.summary100,
     )
-    if (sourceCategoryTag && !keywordMatchedTagIds.includes(sourceCategoryTag.id)) {
-      keywordMatchedTagIds.push(sourceCategoryTag.id)
-    }
-  }
+
+  const resolvedMatchedTagIds = resolvePrimaryTagIds({
+    tagReferences: params.tagReferences,
+    keywordMatchedTagIds,
+    aiMatchedTagKeys: summaryForArticle.matchedTagKeys,
+    summaryInputBasis: article.summaryInput.summaryInputBasis,
+  })
+  const canonicalMappings = resolveAutoCanonicalTagMappings({
+    tagReferences: params.tagReferences,
+    canonicalTagHints: summaryForArticle.canonicalTagHints,
+    summaryInputBasis: article.summaryInput.summaryInputBasis,
+  })
 
   const { score, scoreReason } = scoreArticle(
     article.contentResult.contentPath,
-    keywordMatchedTagIds.length,
+    resolvedMatchedTagIds.length,
     summaryForArticle.summarySource,
   )
   const adjustedScore = article.relevance.isRelevant ? score : Math.max(0, score - 25)
   const adjustedScoreReason = article.relevance.isRelevant ? scoreReason : `${scoreReason}; low source relevance`
   const matchedTags = params.tagReferences
-    .filter((reference) => keywordMatchedTagIds.includes(reference.id))
+    .filter((reference) => resolvedMatchedTagIds.includes(reference.id))
     .map((reference) => ({
       tagKey: reference.tagKey,
       displayName: reference.displayName,
@@ -273,7 +276,7 @@ async function persistPreparedArticle(params: {
     ],
     summaryEmbedding: params.embeddingResult.embedding,
     embeddingModel: params.embeddingResult.model,
-    matchedTagIds: keywordMatchedTagIds,
+    matchedTagIds: resolvedMatchedTagIds,
     adjacentTagIds: adjacentMatches.map((match) => match.adjacentTagId),
     thumbnailBgTheme,
     // AI が抽出した固有名詞を候補タグとして保存（rule-based 候補より高精度）
@@ -283,6 +286,8 @@ async function persistPreparedArticle(params: {
           displayName: key.charAt(0).toUpperCase() + key.slice(1),
         }))
       : [],
+    canonicalAliasMappings: canonicalMappings.aliasMappings,
+    canonicalKeywordMappings: canonicalMappings.keywordMappings,
     commercialUsePolicy: article.rawArticle.commercialUsePolicy,
   })
 
@@ -311,9 +316,13 @@ async function persistPreparedArticle(params: {
       extractedLength: article.contentResult.extractedLength,
       snippetLength: article.contentResult.snippetLength,
       extractionError: article.contentResult.extractionError ?? null,
-      matchedTagCount: article.tagResult.matchedTagIds.length,
-      candidateTagCount: article.shouldPersistCandidateTags ? article.tagResult.candidateTags.length : 0,
+      matchedTagCount: resolvedMatchedTagIds.length,
+      candidateTagCount: article.shouldPersistCandidateTags ? summaryForArticle.properNounTags.length : 0,
+      canonicalAliasCount: canonicalMappings.aliasMappings.length,
+      canonicalKeywordCount: canonicalMappings.keywordMappings.length,
       summarySource: summaryForArticle.summarySource,
+      aiMatchedTagKeys: summaryForArticle.matchedTagKeys,
+      aiCanonicalTagHints: summaryForArticle.canonicalTagHints,
       aiProcessingState,
     },
   })
@@ -335,7 +344,7 @@ async function persistPreparedArticle(params: {
       dedupeStatus: finalDedupeStatus,
       dedupeGroupKey: finalDedupeGroupKey,
       isRelevant: article.relevance.isRelevant,
-      matchedTagIds: keywordMatchedTagIds,
+      matchedTagIds: resolvedMatchedTagIds,
       candidateTags: article.shouldPersistCandidateTags ? article.tagResult.candidateTags : [],
       publicationBasisIfSummaryExists,
       summaryInputBasis: article.summaryInput.summaryInputBasis,

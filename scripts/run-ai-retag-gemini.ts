@@ -2,6 +2,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
+import {
+  buildPhase1RetagPromptSection,
+  isPhase1ExcludedTagLikeValue,
+} from '@/lib/tags/retag-phase1'
 
 type InputItem = {
   enrichedArticleId: number | string
@@ -165,12 +169,15 @@ function buildPrompt(params: {
     '- adjacentTagKeys is optional and should be empty when there is no clear context.',
     '- Consider title, summary100, summary200, sourceCategory, existing tags.',
     '',
+    buildPhase1RetagPromptSection(),
+    '',
     'Hard constraints:',
     '- Output format: {"items":[...]}',
     '- Keep all enrichedArticleId values exactly as input.',
     '- Do not invent tag keys outside master lists.',
     '- primaryTagKeys max 5, adjacentTagKeys max 2.',
     '- Evidence arrays should contain concise keywords.',
+    '- Excluded abstract primary tags must never appear in primaryTagKeys or proposedPrimaryTags.',
     '',
     `Allowed primary tag keys (${primaryKeys.length}):`,
     JSON.stringify(primaryKeys),
@@ -260,7 +267,10 @@ function validateAndNormalizeOutputs(
             reason: typeof item?.reason === 'string' ? item.reason.trim() : '',
             evidenceKeywords: uniqueStrings(item?.evidenceKeywords ?? [], 8),
           }))
-          .filter((item: any) => item.displayName.length > 0)
+          .filter(
+            (item: any) =>
+              item.displayName.length > 0 && !isPhase1ExcludedTagLikeValue(item.displayName),
+          )
       : []
     const proposedAdjacent = Array.isArray(parsed?.proposedAdjacentTags)
       ? parsed.proposedAdjacentTags
@@ -275,7 +285,7 @@ function validateAndNormalizeOutputs(
 
     byId.set(id, {
       enrichedArticleId: id,
-      primaryTagKeys: primary,
+      primaryTagKeys: primary.filter((key) => !isPhase1ExcludedTagLikeValue(key)),
       adjacentTagKeys: adjacent,
       primaryEvidenceKeywords: uniqueStrings(parsed?.primaryEvidenceKeywords ?? [], 12),
       adjacentEvidenceKeywords: uniqueStrings(parsed?.adjacentEvidenceKeywords ?? [], 12),
@@ -302,7 +312,7 @@ function validateAndNormalizeOutputs(
 }
 
 function runGemini(prompt: string, model: string): string {
-  const commandArgs = ['-m', model, '--output-format', 'text']
+  const commandArgs = ['-m', model, '-p', '.', '--output-format', 'text']
   const result = spawnSync('gemini', commandArgs, {
     input: prompt,
     encoding: 'utf8',

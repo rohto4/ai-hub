@@ -1,6 +1,12 @@
 #!/usr/bin/env npx tsx
 import fs from 'node:fs'
 import path from 'node:path'
+import {
+  PHASE1_CATEGORY_CANDIDATE_KEYS,
+  PHASE1_PRIMARY_TAG_EXCLUSION_KEYS,
+  isPhase1ExcludedTagLikeValue,
+  normalizePhase1CandidateName,
+} from '@/lib/tags/retag-phase1'
 
 type OutputItem = {
   enrichedArticleId: number
@@ -33,10 +39,6 @@ function readArg(flag: string, fallback: string): string {
   return process.argv[index + 1]
 }
 
-function normalizeName(value: string): string {
-  return value.trim().toLowerCase().replace(/\s+/g, ' ')
-}
-
 function countMapToSorted(map: Map<string, number>) {
   return [...map.entries()]
     .map(([key, count]) => ({ key, count }))
@@ -57,6 +59,8 @@ async function main(): Promise<void> {
   }
 
   let totalItems = 0
+  let primaryTagAssignments = 0
+  let adjacentTagAssignments = 0
   const primaryTagKeyCount = new Map<string, number>()
   const adjacentTagKeyCount = new Map<string, number>()
   const primaryEvidenceCount = new Map<string, number>()
@@ -72,9 +76,11 @@ async function main(): Promise<void> {
       totalItems += 1
 
       for (const key of item.primaryTagKeys ?? []) {
+        primaryTagAssignments += 1
         primaryTagKeyCount.set(key, (primaryTagKeyCount.get(key) ?? 0) + 1)
       }
       for (const key of item.adjacentTagKeys ?? []) {
+        adjacentTagAssignments += 1
         adjacentTagKeyCount.set(key, (adjacentTagKeyCount.get(key) ?? 0) + 1)
       }
       for (const keyword of item.primaryEvidenceKeywords ?? []) {
@@ -85,14 +91,15 @@ async function main(): Promise<void> {
       }
 
       for (const proposed of item.proposedPrimaryTags ?? []) {
-        const normalized = normalizeName(proposed.displayName)
+        const normalized = normalizePhase1CandidateName(proposed.displayName)
+        if (isPhase1ExcludedTagLikeValue(normalized)) continue
         proposedPrimaryCount.set(normalized, (proposedPrimaryCount.get(normalized) ?? 0) + 1)
         if (!proposedPrimaryReasonSample.has(normalized) && proposed.reason) {
           proposedPrimaryReasonSample.set(normalized, proposed.reason)
         }
       }
       for (const proposed of item.proposedAdjacentTags ?? []) {
-        const normalized = normalizeName(proposed.displayName)
+        const normalized = normalizePhase1CandidateName(proposed.displayName)
         proposedAdjacentCount.set(normalized, (proposedAdjacentCount.get(normalized) ?? 0) + 1)
         if (!proposedAdjacentReasonSample.has(normalized) && proposed.reason) {
           proposedAdjacentReasonSample.set(normalized, proposed.reason)
@@ -105,6 +112,10 @@ async function main(): Promise<void> {
     generatedAt: new Date().toISOString(),
     outputsDir: path.relative(process.cwd(), outputsDir).replace(/\\/g, '/'),
     totalItems,
+    averagePrimaryTagsPerItem: totalItems > 0 ? primaryTagAssignments / totalItems : 0,
+    averageAdjacentTagsPerItem: totalItems > 0 ? adjacentTagAssignments / totalItems : 0,
+    phase1PrimaryExclusions: PHASE1_PRIMARY_TAG_EXCLUSION_KEYS,
+    phase1CategoryCandidates: PHASE1_CATEGORY_CANDIDATE_KEYS,
     topPrimaryTagKeys: countMapToSorted(primaryTagKeyCount).slice(0, 100),
     topAdjacentTagKeys: countMapToSorted(adjacentTagKeyCount).slice(0, 100),
     topPrimaryEvidenceKeywords: countMapToSorted(primaryEvidenceCount).slice(0, 200),

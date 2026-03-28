@@ -99,6 +99,34 @@ async function upsertTagCandidates(
   }
 }
 
+async function upsertCanonicalAliasMappings(
+  aliasMappings: Array<{ tagId: string; aliasKey: string }>,
+): Promise<void> {
+  const sql = getSql()
+
+  for (const mapping of aliasMappings) {
+    await sql`
+      INSERT INTO tag_aliases (tag_id, alias_key)
+      VALUES (${mapping.tagId}::uuid, ${mapping.aliasKey})
+      ON CONFLICT (alias_key) DO NOTHING
+    `
+  }
+}
+
+async function upsertCanonicalKeywordMappings(
+  keywordMappings: Array<{ tagId: string; keyword: string }>,
+): Promise<void> {
+  const sql = getSql()
+
+  for (const mapping of keywordMappings) {
+    await sql`
+      INSERT INTO tag_keywords (tag_id, keyword)
+      VALUES (${mapping.tagId}::uuid, ${mapping.keyword})
+      ON CONFLICT (tag_id, keyword) DO NOTHING
+    `
+  }
+}
+
 async function syncEnrichedSources(
   enrichedArticleId: number,
   sourceRows: EnrichedSourceRow[],
@@ -304,6 +332,8 @@ export async function upsertEnrichedArticle(
     await syncEnrichedTags(existing.enriched_article_id, input.matchedTagIds)
     await syncEnrichedAdjacentTags(existing.enriched_article_id, input.adjacentTagIds)
     await upsertTagCandidates(input.candidateTags, input.rawArticleId)
+    await upsertCanonicalAliasMappings(input.canonicalAliasMappings ?? [])
+    await upsertCanonicalKeywordMappings(input.canonicalKeywordMappings ?? [])
     if (refreshTagCounts) {
       await refreshTagArticleCounts()
       await refreshAdjacentTagArticleCounts()
@@ -340,6 +370,8 @@ export async function upsertEnrichedArticle(
   await syncEnrichedTags(enrichedArticleId, input.matchedTagIds)
   await syncEnrichedAdjacentTags(enrichedArticleId, input.adjacentTagIds)
   await upsertTagCandidates(input.candidateTags, input.rawArticleId)
+  await upsertCanonicalAliasMappings(input.canonicalAliasMappings ?? [])
+  await upsertCanonicalKeywordMappings(input.canonicalKeywordMappings ?? [])
   if (refreshTagCounts) {
     await refreshTagArticleCounts()
     await refreshAdjacentTagArticleCounts()

@@ -72,15 +72,23 @@ export async function runDailyTagDedup(): Promise<TagDedupResult> {
         const results = await detectTagDuplicates(batch, dedupTags)
 
         for (const result of results) {
-          if (result.matchedTagId && result.confidence === 'high') {
+          if (result.matchedTagId && result.confidence === 'high' && result.relation !== 'separate') {
             const keyword = `%${result.candidateKey}%`
 
-            // 既存タグに candidate_key をキーワードとして登録（将来の enrich 用）
-            await sql`
-              INSERT INTO tag_keywords (tag_id, keyword)
-              VALUES (${result.matchedTagId}::uuid, ${result.candidateKey})
-              ON CONFLICT (tag_id, keyword) DO NOTHING
-            `
+            if (result.relation === 'alias') {
+              await sql`
+                INSERT INTO tag_aliases (tag_id, alias_key)
+                VALUES (${result.matchedTagId}::uuid, ${result.candidateKey})
+                ON CONFLICT (alias_key) DO NOTHING
+              `
+            } else {
+              // 既存タグに candidate_key をキーワードとして登録（将来の enrich 用）
+              await sql`
+                INSERT INTO tag_keywords (tag_id, keyword)
+                VALUES (${result.matchedTagId}::uuid, ${result.candidateKey})
+                ON CONFLICT (tag_id, keyword) DO NOTHING
+              `
+            }
 
             // 既存 articles_enriched への遡及タグ付け
             await sql`
@@ -127,7 +135,7 @@ export async function runDailyTagDedup(): Promise<TagDedupResult> {
             refreshedEnriched += refreshed.refreshedEnrichedCount
             refreshedPublic += refreshed.refreshedPublicCount
             merged++
-            console.log(`[tag-dedup] "${result.candidateKey}" → "${result.matchedTagKey}" にマージ（遡及タグ付け + thumbnail再計算済み）`)
+            console.log(`[tag-dedup] "${result.candidateKey}" → "${result.matchedTagKey}" に ${result.relation} として反映（遡及タグ付け + thumbnail再計算済み）`)
           } else {
             noMatch++
           }

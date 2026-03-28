@@ -1,6 +1,6 @@
 ﻿# Agents Task Status
 
-最終更新: 2026-03-26
+最終更新: 2026-03-28
 
 運用ルール:
 - 最新 50 件を目安に残し、古い行は下から削る
@@ -9,6 +9,12 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-28 | done | paper 専用タグ群の必要性を方針化 | `arxiv-ai` は基礎研究寄りで既存主タグに落ちにくいと整理。`paper` 専用研究タグ群を `implementation-wait` / `imp-*` に引き継ぎ、次は無タグ論文分析と allowlist 試験投入
+- 2026-03-28 | done | canonicalTagHints prompt を調整して再 live run | job_run_id=720 で canonical keyword 8件を確認。主タグ付きは4/20でコホート差が大きく、次は無タグ記事の原因分析へ進む
+- 2026-03-28 | done | OpenAI fallback を 20→10→5 分割再試行に対応 | job_run_id=719 で 20件 full_content を manual_pending なしで完了。主タグ16件・候補45件増を確認、canonical alias/keyword はまだ 0 件で次は prompt 調整
+- 2026-03-28 | done | enrich live run の実地確認と Neon SQL 修正 | `enrichment-raw.ts` の interval SQL を直して job_run_id=716/717/718 で 20件バッチ実行を確認。Gemini 429 と OpenAI parse 失敗で全件 manual_pending、次は OpenAI structured output の受け取り見直し
+- 2026-03-28 | done | 本文ベース canonical tag hints を enrich に追加 | `full_content` 記事で同一 AI 応答から alias/keyword 寄せヒントを受けて `tag_aliases` / `tag_keywords` へ高信頼反映、`daily-tag-dedup` も alias/keyword 分岐へ更新。次は live run で増分確認
+- 2026-03-27 | done | 1周目 retag 方針を固定 | カテゴリは先に確定せず属性として扱い、完全除外タグ・カテゴリ候補・`af-20260326/` 専用 artifact 方針を `imp-*` へ反映
 - 2026-03-26 | done | 隣接分野タグ + 背景テーマ基盤を実装 | migration 038、enrich/publish/UI反映、`db:retag-layer2-layer4` と Gemini 支援プロンプト（`artifacts/gemini-tag-rebuild/`）を追加
 - 2026-03-26 | done | Gemini enrich part-008 を Codex実行で生成 | `output-templates/ai-enrich-outputs-part-008.json` と `outputs/ai-enrich-outputs-part-008.json` を 100件で生成し、件数・ID順・文字数・タグ整合の検証を通過
 - 2026-03-26 | done | Gemini enrich part-002 を新フォーマットで全件再生成 | `outputs/ai-enrich-outputs-part-002.json` を 200 件で再出力し、`matchedTagKeys/proposedTags`・文字数・ID順の検証を通過

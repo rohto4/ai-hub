@@ -1,0 +1,5848 @@
+{
+  "generatedAt": "2026-03-26T15:41:30.625Z",
+  "rootDir": "af-20260326/phase1-retag",
+  "overview": {
+    "currentActiveTagCount": 79,
+    "newTagCandidateCount": 296,
+    "currentSourceCategoryCount": 7,
+    "currentSourceTypeCount": 6,
+    "phase1CategoryCandidateCount": 6
+  },
+  "currentTags": [
+    {
+      "tagKey": "llm",
+      "displayName": "LLM",
+      "articleCount": 4121
+    },
+    {
+      "tagKey": "paper",
+      "displayName": "Paper",
+      "articleCount": 1978
+    },
+    {
+      "tagKey": "openai",
+      "displayName": "OpenAI",
+      "articleCount": 833
+    },
+    {
+      "tagKey": "huggingface",
+      "displayName": "Hugging Face",
+      "articleCount": 758
+    },
+    {
+      "tagKey": "agent",
+      "displayName": "Agent",
+      "articleCount": 585
+    },
+    {
+      "tagKey": "hugging face",
+      "displayName": "Hugging Face",
+      "articleCount": 417
+    },
+    {
+      "tagKey": "coding-ai",
+      "displayName": "Coding AI",
+      "articleCount": 410
+    },
+    {
+      "tagKey": "google-ai",
+      "displayName": "Google AI",
+      "articleCount": 343
+    },
+    {
+      "tagKey": "phi",
+      "displayName": "Phi",
+      "articleCount": 342
+    },
+    {
+      "tagKey": "claude",
+      "displayName": "Claude",
+      "articleCount": 321
+    },
+    {
+      "tagKey": "rag",
+      "displayName": "RAG",
+      "articleCount": 321
+    },
+    {
+      "tagKey": "chatgpt",
+      "displayName": "ChatGPT",
+      "articleCount": 307
+    },
+    {
+      "tagKey": "gemini",
+      "displayName": "Gemini",
+      "articleCount": 283
+    },
+    {
+      "tagKey": "nvidia",
+      "displayName": "Nvidia",
+      "articleCount": 264
+    },
+    {
+      "tagKey": "generative-ai",
+      "displayName": "Generative AI",
+      "articleCount": 225
+    },
+    {
+      "tagKey": "policy",
+      "displayName": "Policy",
+      "articleCount": 223
+    },
+    {
+      "tagKey": "anthropic",
+      "displayName": "Anthropic",
+      "articleCount": 198
+    },
+    {
+      "tagKey": "open source",
+      "displayName": "oss",
+      "articleCount": 197
+    },
+    {
+      "tagKey": "safety",
+      "displayName": "Safety",
+      "articleCount": 194
+    },
+    {
+      "tagKey": "replicate",
+      "displayName": "Replicate",
+      "articleCount": 180
+    },
+    {
+      "tagKey": "gpt-5",
+      "displayName": "GPT-5",
+      "articleCount": 172
+    },
+    {
+      "tagKey": "claude-code",
+      "displayName": "Claude Code",
+      "articleCount": 150
+    },
+    {
+      "tagKey": "qwen",
+      "displayName": "Qwen",
+      "articleCount": 102
+    },
+    {
+      "tagKey": "llama",
+      "displayName": "Llama",
+      "articleCount": 97
+    },
+    {
+      "tagKey": "voice-ai",
+      "displayName": "Voice AI",
+      "articleCount": 74
+    },
+    {
+      "tagKey": "antigravity",
+      "displayName": "Antigravity",
+      "articleCount": 67
+    },
+    {
+      "tagKey": "google-deepmind",
+      "displayName": "Google DeepMind",
+      "articleCount": 66
+    },
+    {
+      "tagKey": "udio",
+      "displayName": "Udio",
+      "articleCount": 63
+    },
+    {
+      "tagKey": "github-copilot",
+      "displayName": "GitHub Copilot",
+      "articleCount": 33
+    },
+    {
+      "tagKey": "o1",
+      "displayName": "o1 / o3",
+      "articleCount": 33
+    },
+    {
+      "tagKey": "langchain",
+      "displayName": "LangChain",
+      "articleCount": 32
+    },
+    {
+      "tagKey": "deepseek",
+      "displayName": "DeepSeek",
+      "articleCount": 29
+    },
+    {
+      "tagKey": "gemma",
+      "displayName": "Gemma",
+      "articleCount": 29
+    },
+    {
+      "tagKey": "stable-diffusion",
+      "displayName": "Stable Diffusion",
+      "articleCount": 27
+    },
+    {
+      "tagKey": "cohere",
+      "displayName": "Cohere",
+      "articleCount": 26
+    },
+    {
+      "tagKey": "enterprise-ai",
+      "displayName": "Enterprise AI",
+      "articleCount": 25
+    },
+    {
+      "tagKey": "nemotron",
+      "displayName": "Nemotron",
+      "articleCount": 25
+    },
+    {
+      "tagKey": "cursor",
+      "displayName": "Cursor",
+      "articleCount": 24
+    },
+    {
+      "tagKey": "sora",
+      "displayName": "Sora",
+      "articleCount": 19
+    },
+    {
+      "tagKey": "gradio",
+      "displayName": "Gradio",
+      "articleCount": 18
+    },
+    {
+      "tagKey": "perplexity",
+      "displayName": "Perplexity",
+      "articleCount": 16
+    },
+    {
+      "tagKey": "dify",
+      "displayName": "Dify",
+      "articleCount": 13
+    },
+    {
+      "tagKey": "mistral",
+      "displayName": "Mistral",
+      "articleCount": 13
+    },
+    {
+      "tagKey": "banana",
+      "displayName": "Nano Banana",
+      "articleCount": 13
+    },
+    {
+      "tagKey": "stargate",
+      "displayName": "Stargate",
+      "articleCount": 13
+    },
+    {
+      "tagKey": "imagen",
+      "displayName": "Imagen",
+      "articleCount": 11
+    },
+    {
+      "tagKey": "flux",
+      "displayName": "Flux",
+      "articleCount": 10
+    },
+    {
+      "tagKey": "notebooklm",
+      "displayName": "NotebookLM",
+      "articleCount": 10
+    },
+    {
+      "tagKey": "xai",
+      "displayName": "xAI",
+      "articleCount": 10
+    },
+    {
+      "tagKey": "codex",
+      "displayName": "Codex",
+      "articleCount": 9
+    },
+    {
+      "tagKey": "nano-banana",
+      "displayName": "Nano Banana",
+      "articleCount": 9
+    },
+    {
+      "tagKey": "cline",
+      "displayName": "Cline",
+      "articleCount": 8
+    },
+    {
+      "tagKey": "dall-e",
+      "displayName": "DALL-E",
+      "articleCount": 8
+    },
+    {
+      "tagKey": "manus",
+      "displayName": "Manus",
+      "articleCount": 8
+    },
+    {
+      "tagKey": "veo",
+      "displayName": "Veo",
+      "articleCount": 6
+    },
+    {
+      "tagKey": "elevenlabs",
+      "displayName": "ElevenLabs",
+      "articleCount": 5
+    },
+    {
+      "tagKey": "grok",
+      "displayName": "Grok",
+      "articleCount": 5
+    },
+    {
+      "tagKey": "microsoft-copilot",
+      "displayName": "Microsoft Copilot",
+      "articleCount": 5
+    },
+    {
+      "tagKey": "amazon-q",
+      "displayName": "Amazon Q",
+      "articleCount": 4
+    },
+    {
+      "tagKey": "devin",
+      "displayName": "Devin",
+      "articleCount": 4
+    },
+    {
+      "tagKey": "groundsource",
+      "displayName": "Groundsource",
+      "articleCount": 4
+    },
+    {
+      "tagKey": "meta-ai",
+      "displayName": "Meta AI",
+      "articleCount": 4
+    },
+    {
+      "tagKey": "kling",
+      "displayName": "Kling",
+      "articleCount": 2
+    },
+    {
+      "tagKey": "llamaindex",
+      "displayName": "LlamaIndex",
+      "articleCount": 2
+    },
+    {
+      "tagKey": "stability-ai",
+      "displayName": "Stability AI",
+      "articleCount": 2
+    },
+    {
+      "tagKey": "autogen",
+      "displayName": "AutoGen",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "crewai",
+      "displayName": "CrewAI",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "heygen",
+      "displayName": "HeyGen",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "mistral-ai",
+      "displayName": "Mistral AI",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "notion-ai",
+      "displayName": "Notion AI",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "nvidia-inception",
+      "displayName": "Nvidia Inception",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "pika",
+      "displayName": "Pika",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "runway",
+      "displayName": "Runway",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "windsurf",
+      "displayName": "Windsurf",
+      "articleCount": 1
+    },
+    {
+      "tagKey": "adobe-firefly",
+      "displayName": "Adobe Firefly",
+      "articleCount": 0
+    },
+    {
+      "tagKey": "midjourney",
+      "displayName": "Midjourney",
+      "articleCount": 0
+    },
+    {
+      "tagKey": "roocode",
+      "displayName": "RooCode",
+      "articleCount": 0
+    },
+    {
+      "tagKey": "suno",
+      "displayName": "Suno",
+      "articleCount": 0
+    },
+    {
+      "tagKey": "vercel-ai",
+      "displayName": "Vercel AI",
+      "articleCount": 0
+    }
+  ],
+  "newTagCandidates": [
+    {
+      "candidateKey": "llms",
+      "displayName": "Llms",
+      "seenCount": 67,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Between the Layers Lies the Truth: Uncertainty Estimation in LLMs Using Intra-Layer Local Information Scores",
+      "sourceUrl": "https://arxiv.org/abs/2603.22299"
+    },
+    {
+      "candidateKey": "transformer",
+      "displayName": "transformer",
+      "seenCount": 34,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Weber's Law in Transformer Magnitude Representations: Efficient Coding, Representational Geometry, and Psychophysical Laws in Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.20642"
+    },
+    {
+      "candidateKey": "iclr",
+      "displayName": "iclr",
+      "seenCount": 26,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Low-pass Personalized Subgraph Federated Recommendation",
+      "sourceUrl": "https://arxiv.org/abs/2603.20338"
+    },
+    {
+      "candidateKey": "vlm",
+      "displayName": "vlm",
+      "seenCount": 22,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Understanding Pruning Regimes in Vision-Language Models Through Domain-Aware Layer Selection",
+      "sourceUrl": "https://arxiv.org/abs/2603.20275"
+    },
+    {
+      "candidateKey": "arxiv",
+      "displayName": "Arxiv",
+      "seenCount": 20,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Heavy-Tailed and Long-Range Dependent Noise in Stochastic Approximation: A Finite-Time Analysis",
+      "sourceUrl": "https://arxiv.org/abs/2603.19648"
+    },
+    {
+      "candidateKey": "rl",
+      "displayName": "Rl",
+      "seenCount": 16,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery",
+      "sourceUrl": "https://arxiv.org/abs/2603.20295"
+    },
+    {
+      "candidateKey": "lora",
+      "displayName": "lora",
+      "seenCount": 14,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Hetero-Net: An Energy-Efficient Resource Allocation and 3D Placement in Heterogeneous LoRa Networks via Multi-Agent Optimization",
+      "sourceUrl": "https://arxiv.org/abs/2603.20404"
+    },
+    {
+      "candidateKey": "ai",
+      "displayName": "Ai",
+      "seenCount": 14,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "RedacBench: Can AI Erase Your Secrets?",
+      "sourceUrl": "https://arxiv.org/abs/2603.20208"
+    },
+    {
+      "candidateKey": "transformers",
+      "displayName": "Transformers",
+      "seenCount": 14,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "BitSkip: An Empirical Analysis of Quantization and Early Exit Composition in Transformers",
+      "sourceUrl": "https://arxiv.org/abs/2510.23766"
+    },
+    {
+      "candidateKey": "chain-of-thought",
+      "displayName": "chain-of-thought",
+      "seenCount": 13,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Lie to Me: How Faithful Is Chain-of-Thought Reasoning in Reasoning Models?",
+      "sourceUrl": "https://arxiv.org/abs/2603.22582"
+    },
+    {
+      "candidateKey": "evolving",
+      "displayName": "evolving",
+      "seenCount": 12,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "AETAS: Analysis of Evolving Temporal Affect and Semantics for Legal History",
+      "sourceUrl": "https://arxiv.org/abs/2512.22196"
+    },
+    {
+      "candidateKey": "gnn",
+      "displayName": "gnn",
+      "seenCount": 12,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "FastPFRec: A Fast Personalized Federated Recommendation with Secure Sharing",
+      "sourceUrl": "https://arxiv.org/abs/2603.20283"
+    },
+    {
+      "candidateKey": "cvpr",
+      "displayName": "Cvpr",
+      "seenCount": 12,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "RealUnify: Do Unified Models Truly Benefit from Unification? A Comprehensive Benchmark",
+      "sourceUrl": "https://arxiv.org/abs/2509.24897"
+    },
+    {
+      "candidateKey": "diffusion models",
+      "displayName": "Diffusion models",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "DiffGraph: An Automated Agent-driven Model Merging Framework for In-the-Wild Text-to-Image Generation",
+      "sourceUrl": "https://arxiv.org/abs/2603.20470"
+    },
+    {
+      "candidateKey": "federated learning",
+      "displayName": "Federated learning",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Federated Learning Playground",
+      "sourceUrl": "https://arxiv.org/abs/2602.19489"
+    },
+    {
+      "candidateKey": "mnist",
+      "displayName": "Mnist",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Growing Networks with Autonomous Pruning",
+      "sourceUrl": "https://arxiv.org/abs/2603.19759"
+    },
+    {
+      "candidateKey": "mamba",
+      "displayName": "Mamba",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Team LEYA in 10th ABAW Competition: Multimodal Ambivalence/Hesitancy Recognition Approach",
+      "sourceUrl": "https://arxiv.org/abs/2603.12848"
+    },
+    {
+      "candidateKey": "driven",
+      "displayName": "Driven",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "S3T-Former: A Purely Spike-Driven State-Space Topology Transformer for Skeleton Action Recognition",
+      "sourceUrl": "https://arxiv.org/abs/2603.18062"
+    },
+    {
+      "candidateKey": "automated",
+      "displayName": "Automated",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Towards Automated Community Notes Generation with Large Vision Language Models for Combating Contextual Deception",
+      "sourceUrl": "https://arxiv.org/abs/2603.22453"
+    },
+    {
+      "candidateKey": "clip",
+      "displayName": "clip",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Dodgersort: Uncertainty-Aware VLM-Guided Human-in-the-Loop Pairwise Ranking",
+      "sourceUrl": "https://arxiv.org/abs/2603.20839"
+    },
+    {
+      "candidateKey": "federated",
+      "displayName": "federated",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Fast convergence of a Federated Expectation-Maximization Algorithm",
+      "sourceUrl": "https://arxiv.org/abs/2408.05819"
+    },
+    {
+      "candidateKey": "gpt-4o",
+      "displayName": "gpt-4o",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "EnterpriseLab: A Full-Stack Platform for developing and deploying agents in Enterprises",
+      "sourceUrl": "https://arxiv.org/abs/2603.21630"
+    },
+    {
+      "candidateKey": "grpo",
+      "displayName": "grpo",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Visual Exclusivity Attacks: Automatic Multimodal Red Teaming via Agentic Planning",
+      "sourceUrl": "https://arxiv.org/abs/2603.20198"
+    },
+    {
+      "candidateKey": "cifar-10",
+      "displayName": "Cifar-10",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Collaborative Adaptive Curriculum for Progressive Knowledge Distillation",
+      "sourceUrl": "https://arxiv.org/abs/2603.20296"
+    },
+    {
+      "candidateKey": "large language models",
+      "displayName": "Large language models",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Enhancing Safety of Large Language Models via Embedding Space Separation",
+      "sourceUrl": "https://arxiv.org/abs/2603.20206"
+    },
+    {
+      "candidateKey": "vlms",
+      "displayName": "Vlms",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Medical Image Spatial Grounding with Semantic Sampling",
+      "sourceUrl": "https://arxiv.org/abs/2603.14579"
+    },
+    {
+      "candidateKey": "cot",
+      "displayName": "Cot",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "L2V-CoT: Cross-Modal Transfer of Chain-of-Thought Reasoning via Latent Intervention",
+      "sourceUrl": "https://arxiv.org/abs/2511.17910"
+    },
+    {
+      "candidateKey": "domain",
+      "displayName": "Domain",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "RubricRAG: Towards Interpretable and Reliable LLM Evaluation via Domain Knowledge Retrieval for Rubric Generation",
+      "sourceUrl": "https://arxiv.org/abs/2603.20882"
+    },
+    {
+      "candidateKey": "machine",
+      "displayName": "Machine",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Bridging the Gap Between Climate Science and Machine Learning in Climate Model Emulation",
+      "sourceUrl": "https://arxiv.org/abs/2603.22320"
+    },
+    {
+      "candidateKey": "nlp",
+      "displayName": "Nlp",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Select, Label, Evaluate: Active Testing in NLP",
+      "sourceUrl": "https://arxiv.org/abs/2603.21840"
+    },
+    {
+      "candidateKey": "information",
+      "displayName": "information",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Knowing What's Missing: Assessing Information Sufficiency in Question Answering",
+      "sourceUrl": "https://arxiv.org/abs/2512.06476"
+    },
+    {
+      "candidateKey": "mllms",
+      "displayName": "mllms",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Predictive Regularization Against Visual Representation Degradation in Multimodal Large Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.20808"
+    },
+    {
+      "candidateKey": "moe",
+      "displayName": "moe",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Run Qwen3.5 flagship model with 397 billion parameters at 5 – 9 tok/s on a $2,100 desktop! Two $500 GPUs, 32GB RAM, one NVMe drive. Uses Q4_K_M quants",
+      "sourceUrl": "https://www.reddit.com/r/LocalLLaMA/comments/1s1wgph/run_qwen35_flagship_model_with_397_billion/"
+    },
+    {
+      "candidateKey": "prediction",
+      "displayName": "prediction",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Precision-Varying Prediction (PVP): Robustifying ASR systems against adversarial attacks",
+      "sourceUrl": "https://arxiv.org/abs/2603.22590"
+    },
+    {
+      "candidateKey": "neurips",
+      "displayName": "Neurips",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking",
+      "sourceUrl": "https://arxiv.org/abs/2511.09833"
+    },
+    {
+      "candidateKey": "continual",
+      "displayName": "continual",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "DesCLIP: Robust Continual Learning via General Attribute Descriptions for VLM-Based Visual Recognition",
+      "sourceUrl": "https://arxiv.org/abs/2502.00618"
+    },
+    {
+      "candidateKey": "continual learning",
+      "displayName": "continual learning",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Stochastic approximation in non-markovian environments revisited",
+      "sourceUrl": "https://arxiv.org/abs/2603.21091"
+    },
+    {
+      "candidateKey": "dynamics",
+      "displayName": "dynamics",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Generalizing Dynamics Modeling More Easily from Representation Perspective",
+      "sourceUrl": "https://arxiv.org/abs/2603.22655"
+    },
+    {
+      "candidateKey": "genai",
+      "displayName": "genai",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Beyond Detection: Governing GenAI in Academic Peer Review as a Sociotechnical Challenge",
+      "sourceUrl": "https://arxiv.org/abs/2603.20214"
+    },
+    {
+      "candidateKey": "generalized",
+      "displayName": "generalized",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Seed1.8 Model Card: Towards Generalized Real-World Agency",
+      "sourceUrl": "https://arxiv.org/abs/2603.20633"
+    },
+    {
+      "candidateKey": "rlvr",
+      "displayName": "rlvr",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "On the Direction of RLVR Updates for LLM Reasoning: Identification and Exploitation",
+      "sourceUrl": "https://arxiv.org/abs/2603.22117"
+    },
+    {
+      "candidateKey": "robust",
+      "displayName": "robust",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Cloud-Edge Collaborative Large Models for Robust Photovoltaic Power Forecasting",
+      "sourceUrl": "https://arxiv.org/abs/2603.22343"
+    },
+    {
+      "candidateKey": "structure",
+      "displayName": "structure",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Neural Structure Embedding for Symbolic Regression via Continuous Structure Search and Coefficient Optimization",
+      "sourceUrl": "https://arxiv.org/abs/2603.22429"
+    },
+    {
+      "candidateKey": "mllm",
+      "displayName": "Mllm",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking",
+      "sourceUrl": "https://arxiv.org/abs/2511.09833"
+    },
+    {
+      "candidateKey": "cross",
+      "displayName": "Cross",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Cross-site scripting adversarial attacks based on deep reinforcement learning: Evaluation and extension study",
+      "sourceUrl": "https://arxiv.org/abs/2502.19095"
+    },
+    {
+      "candidateKey": "latent",
+      "displayName": "Latent",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "ReLaX: Reasoning with Latent Exploration for Large Reasoning Models",
+      "sourceUrl": "https://arxiv.org/abs/2512.07558"
+    },
+    {
+      "candidateKey": "attention",
+      "displayName": "Attention",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Multi-Modal CNN-LSTM Framework with Multi-Head Attention and Focal Loss for Real-Time Elderly Fall Detection",
+      "sourceUrl": "https://arxiv.org/abs/2603.22313"
+    },
+    {
+      "candidateKey": "clustering",
+      "displayName": "Clustering",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Research on Individual Trait Clustering and Development Pathway Adaptation Based on the K-means Algorithm",
+      "sourceUrl": "https://arxiv.org/abs/2603.22302"
+    },
+    {
+      "candidateKey": "responses",
+      "displayName": "Responses",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Evaluating Large Language Models' Responses to Sexual and Reproductive Health Queries in Nepali",
+      "sourceUrl": "https://arxiv.org/abs/2603.22291"
+    },
+    {
+      "candidateKey": "adversarial",
+      "displayName": "adversarial",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Hybrid Quantum Generative Adversarial Networks for Molecular Simulation and Drug Discovery",
+      "sourceUrl": "https://arxiv.org/abs/2212.07826"
+    },
+    {
+      "candidateKey": "distillation",
+      "displayName": "distillation",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "On-Policy Context Distillation for Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2602.12275"
+    },
+    {
+      "candidateKey": "eeg",
+      "displayName": "eeg",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Riding Brainwaves in LLM Space: Understanding Activation Patterns Using Individual Neural Signatures",
+      "sourceUrl": "https://arxiv.org/abs/2603.21847"
+    },
+    {
+      "candidateKey": "generalization",
+      "displayName": "generalization",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Sharper Generalization Bounds for Transformer",
+      "sourceUrl": "https://arxiv.org/abs/2603.21541"
+    },
+    {
+      "candidateKey": "grounded",
+      "displayName": "grounded",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "LGSE: Lexically Grounded Subword Embedding Initialization for Low-Resource Language Adaptation",
+      "sourceUrl": "https://arxiv.org/abs/2603.22629"
+    },
+    {
+      "candidateKey": "group",
+      "displayName": "group",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Demystifying Group Relative Policy Optimization: Its Policy Gradient is a U-Statistic",
+      "sourceUrl": "https://arxiv.org/abs/2603.01162"
+    },
+    {
+      "candidateKey": "imagenet",
+      "displayName": "imagenet",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Show Me What You Don't Know: Efficient Sampling from Invariant Sets for Model Validation",
+      "sourceUrl": "https://arxiv.org/abs/2603.21782"
+    },
+    {
+      "candidateKey": "kernel",
+      "displayName": "kernel",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Kernel Space-based Multidimensional Sparse Model for Dynamic PET Image Denoising",
+      "sourceUrl": "https://arxiv.org/abs/2509.18801"
+    },
+    {
+      "candidateKey": "meets",
+      "displayName": "meets",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Bot Meets Shortcut: How Can LLMs Aid in Handling Unknown Invariance OOD Scenarios?",
+      "sourceUrl": "https://arxiv.org/abs/2511.08455"
+    },
+    {
+      "candidateKey": "openclaw",
+      "displayName": "openclaw",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "When OpenClaw Meets Hospital: Toward an Agentic Operating System for Dynamic Clinical Workflows",
+      "sourceUrl": "https://arxiv.org/abs/2603.11721"
+    },
+    {
+      "candidateKey": "processing",
+      "displayName": "processing",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Leveraging Natural Language Processing and Machine Learning for Evidence-Based Food Security Policy Decision-Making in Data-Scarce Making",
+      "sourceUrl": "https://arxiv.org/abs/2603.20425"
+    },
+    {
+      "candidateKey": "reason",
+      "displayName": "reason",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Native Reasoning Models: Training Language Models to Reason on Unverifiable Data",
+      "sourceUrl": "https://arxiv.org/abs/2602.11549"
+    },
+    {
+      "candidateKey": "sampling",
+      "displayName": "sampling",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Power-SMC: Low-Latency Sequence-Level Power Sampling for Training-Free LLM Reasoning",
+      "sourceUrl": "https://arxiv.org/abs/2602.10273"
+    },
+    {
+      "candidateKey": "spectral",
+      "displayName": "spectral",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Filtered Spectral Projection for Quantum Principal Component Analysis",
+      "sourceUrl": "https://arxiv.org/abs/2603.13441"
+    },
+    {
+      "candidateKey": "stable",
+      "displayName": "stable",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Stable Neural Statistical Dependence Estimator for Autoencoder Feature Analysis",
+      "sourceUrl": "https://arxiv.org/abs/2603.11428"
+    },
+    {
+      "candidateKey": "super",
+      "displayName": "super",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "REVERE: Reflective Evolving Research Engineer for Scientific Workflows",
+      "sourceUrl": "https://arxiv.org/abs/2603.20667"
+    },
+    {
+      "candidateKey": "tokens",
+      "displayName": "tokens",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Support Tokens, Stability Margins, and a New Foundation for Robust LLMs",
+      "sourceUrl": "https://arxiv.org/abs/2602.22271"
+    },
+    {
+      "candidateKey": "uncertainty",
+      "displayName": "uncertainty",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Semantic Self-Distillation for Language Model Uncertainty",
+      "sourceUrl": "https://arxiv.org/abs/2602.04577"
+    },
+    {
+      "candidateKey": "aaai",
+      "displayName": "Aaai",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery",
+      "sourceUrl": "https://arxiv.org/abs/2603.20295"
+    },
+    {
+      "candidateKey": "langsmith",
+      "displayName": "Langsmith",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Join LangChain at Google Cloud Next 2026",
+      "sourceUrl": "https://blog.langchain.com/join-langchain-at-google-cloud-next-2026/"
+    },
+    {
+      "candidateKey": "vit",
+      "displayName": "Vit",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Detached Skip-Links and $R$-Probe: Decoupling Feature Aggregation from Gradient Propagation for MLLM OCR",
+      "sourceUrl": "https://arxiv.org/abs/2603.20020"
+    },
+    {
+      "candidateKey": "machine learning",
+      "displayName": "Machine learning",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "On the (In)Security of Loading Machine Learning Models",
+      "sourceUrl": "https://arxiv.org/abs/2509.06703"
+    },
+    {
+      "candidateKey": "planning",
+      "displayName": "Planning",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Improved Generalized Planning with LLMs through Strategy Refinement and Reflection",
+      "sourceUrl": "https://arxiv.org/abs/2508.13876"
+    },
+    {
+      "candidateKey": "speech",
+      "displayName": "Speech",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Borderless Long Speech Synthesis",
+      "sourceUrl": "https://arxiv.org/abs/2603.19798"
+    },
+    {
+      "candidateKey": "kernels",
+      "displayName": "Kernels",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Bases of Steerable Kernels for Equivariant CNNs: From 2D Rotations to the Lorentz Group",
+      "sourceUrl": "https://arxiv.org/abs/2603.12459"
+    },
+    {
+      "candidateKey": "india",
+      "displayName": "India",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Accelerating discovery in India through AI-powered science and education",
+      "sourceUrl": "https://deepmind.google/blog/accelerating-discovery-in-india-through-ai-powered-science-and-education/"
+    },
+    {
+      "candidateKey": "between",
+      "displayName": "Between",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Bridging the Gap Between Climate Science and Machine Learning in Climate Model Emulation",
+      "sourceUrl": "https://arxiv.org/abs/2603.22320"
+    },
+    {
+      "candidateKey": "drive",
+      "displayName": "Drive",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Causal Evidence that Language Models use Confidence to Drive Behavior",
+      "sourceUrl": "https://arxiv.org/abs/2603.22161"
+    },
+    {
+      "candidateKey": "selection",
+      "displayName": "Selection",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "When Agents Disagree: The Selection Bottleneck in Multi-Agent LLM Pipelines",
+      "sourceUrl": "https://arxiv.org/abs/2603.20324"
+    },
+    {
+      "candidateKey": "strategies",
+      "displayName": "Strategies",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Evaluating Prompting Strategies for Chart Question Answering with Large Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.22288"
+    },
+    {
+      "candidateKey": "comprehensive",
+      "displayName": "comprehensive",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "RoboFAC: A Comprehensive Framework for Robotic Failure Analysis and Correction",
+      "sourceUrl": "https://arxiv.org/abs/2505.12224"
+    },
+    {
+      "candidateKey": "constrained",
+      "displayName": "constrained",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Conformal Constrained Policy Optimization for Cost-Effective LLM Agents",
+      "sourceUrl": "https://arxiv.org/abs/2511.11828"
+    },
+    {
+      "candidateKey": "finetuning",
+      "displayName": "finetuning",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Invisible Safety Threat: Malicious Finetuning for LLM via Steganography",
+      "sourceUrl": "https://arxiv.org/abs/2603.08104"
+    },
+    {
+      "candidateKey": "gpt",
+      "displayName": "gpt",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "EARTalking: End-to-end GPT-style Autoregressive Talking Head Synthesis with Frame-wise Control",
+      "sourceUrl": "https://arxiv.org/abs/2603.20307"
+    },
+    {
+      "candidateKey": "gradient",
+      "displayName": "gradient",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Transformers Trained via Gradient Descent Can Provably Learn a Class of Teacher Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.22801"
+    },
+    {
+      "candidateKey": "linear",
+      "displayName": "linear",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Coordinate Encoding on Linear Grids for Physics-Informed Neural Networks",
+      "sourceUrl": "https://arxiv.org/abs/2603.22700"
+    },
+    {
+      "candidateKey": "mathematical",
+      "displayName": "mathematical",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Deconstructing Multimodal Mathematical Reasoning: Towards a Unified Perception-Alignment-Reasoning Paradigm",
+      "sourceUrl": "https://arxiv.org/abs/2603.08291"
+    },
+    {
+      "candidateKey": "mixture-of-experts",
+      "displayName": "mixture-of-experts",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Holistic Scaling Laws for Optimal Mixture-of-Experts Architecture Optimization",
+      "sourceUrl": "https://arxiv.org/abs/2603.21862"
+    },
+    {
+      "candidateKey": "oracle",
+      "displayName": "oracle",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "ORACLE: Optimizing Reasoning Abilities of Large Language Models via Constraint-Led Synthetic Data Elicitation",
+      "sourceUrl": "https://arxiv.org/abs/2603.21140"
+    },
+    {
+      "candidateKey": "pytorch",
+      "displayName": "pytorch",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "MiSiSUn: Minimum Simplex Semisupervised Unmixing",
+      "sourceUrl": "https://arxiv.org/abs/2603.20263"
+    },
+    {
+      "candidateKey": "quantum",
+      "displayName": "quantum",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Hybrid Quantum Generative Adversarial Networks for Molecular Simulation and Drug Discovery",
+      "sourceUrl": "https://arxiv.org/abs/2212.07826"
+    },
+    {
+      "candidateKey": "sft",
+      "displayName": "sft",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Clinical Cognition Alignment for Gastrointestinal Diagnosis with Multimodal LLMs",
+      "sourceUrl": "https://arxiv.org/abs/2603.20698"
+    },
+    {
+      "candidateKey": "simulation",
+      "displayName": "simulation",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Differentiable Simulation of Hard Contacts with Soft Gradients for Learning and Control",
+      "sourceUrl": "https://arxiv.org/abs/2506.14186"
+    },
+    {
+      "candidateKey": "social",
+      "displayName": "social",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Avoiding Over-smoothing in Social Media Rumor Detection with Pre-trained Propagation Tree Transformer",
+      "sourceUrl": "https://arxiv.org/abs/2603.22854"
+    },
+    {
+      "candidateKey": "visual",
+      "displayName": "visual",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Towards Unified World Models for Visual Navigation via Memory-Augmented Planning and Foresight",
+      "sourceUrl": "https://arxiv.org/abs/2510.08713"
+    },
+    {
+      "candidateKey": "shap",
+      "displayName": "Shap",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Interpretable Multiple Myeloma Prognosis with Observational Medical Outcomes Partnership Data",
+      "sourceUrl": "https://arxiv.org/abs/2603.20341"
+    },
+    {
+      "candidateKey": "dpo",
+      "displayName": "Dpo",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "PolicySim: An LLM-Based Agent Social Simulation Sandbox for Proactive Policy Optimization",
+      "sourceUrl": "https://arxiv.org/abs/2603.19649"
+    },
+    {
+      "candidateKey": "prompt injection",
+      "displayName": "Prompt injection",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The Autonomy Tax: Defense Training Breaks LLM Agents",
+      "sourceUrl": "https://arxiv.org/abs/2603.19423"
+    },
+    {
+      "candidateKey": "robot",
+      "displayName": "Robot",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The Robot's Inner Critic: Self-Refinement of Social Behaviors through VLM-based Replanning",
+      "sourceUrl": "https://arxiv.org/abs/2603.20164"
+    },
+    {
+      "candidateKey": "healthcare",
+      "displayName": "Healthcare",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Spelling Correction in Healthcare Query-Answer Systems: Methods, Retrieval Impact, and Empirical Evaluation",
+      "sourceUrl": "https://arxiv.org/abs/2603.19249"
+    },
+    {
+      "candidateKey": "deep think",
+      "displayName": "Deep Think",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Try Deep Think in the Gemini app",
+      "sourceUrl": "https://deepmind.google/blog/try-deep-think-in-the-gemini-app/"
+    },
+    {
+      "candidateKey": "inception member",
+      "displayName": "Inception Member",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "NDay, an NVIDIA Inception Member, Launches Self-Service GARAK AI LLM Red Teaming ...",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://www.app.com/press-release/story/45547/nday-an-nvidia-inception-member-launches-self-service-garak-ai-llm-red-teaming-expanding-continuous-exploitability/&ct=ga&cd=CAIyHDdlYTEzNmNjOGFhNDcyMDY6Y29tOmphOlVTOkw&usg=AOvVaw18_1vgHZoN3IiCFCnGrlzR"
+    },
+    {
+      "candidateKey": "inception",
+      "displayName": "Inception",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "NDay, an NVIDIA Inception Member, Launches Self-Service GARAK AI LLM Red Teaming ...",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://www.app.com/press-release/story/45547/nday-an-nvidia-inception-member-launches-self-service-garak-ai-llm-red-teaming-expanding-continuous-exploitability/&ct=ga&cd=CAIyHDdlYTEzNmNjOGFhNDcyMDY6Y29tOmphOlVTOkw&usg=AOvVaw18_1vgHZoN3IiCFCnGrlzR"
+    },
+    {
+      "candidateKey": "nvidia demo",
+      "displayName": "Nvidia Demo",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Offline Voice AI: Arm and NVIDIA Demo Real-Time, Private Assistant on DGX Spark",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://www.indexbox.io/blog/offline-voice-ai-arm-and-nvidia-demo-real-time-private-assistant-on-dgx-spark/&ct=ga&cd=CAIyHDlmMDRlOWE2NTI1MGYxN2E6Y29tOmphOlVTOkw&usg=AOvVaw0AMke8wR4UzkXzq_XmMUgR"
+    },
+    {
+      "candidateKey": "arm nvidia",
+      "displayName": "Arm Nvidia",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Offline Voice AI: Arm and NVIDIA Demo Real-Time, Private Assistant on DGX Spark",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://www.indexbox.io/blog/offline-voice-ai-arm-and-nvidia-demo-real-time-private-assistant-on-dgx-spark/&ct=ga&cd=CAIyHDlmMDRlOWE2NTI1MGYxN2E6Y29tOmphOlVTOkw&usg=AOvVaw0AMke8wR4UzkXzq_XmMUgR"
+    },
+    {
+      "candidateKey": "personalities",
+      "displayName": "Personalities",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Why AI Chatbots Like Gemini and Claude Develop Personalities",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://time.com/article/2026/03/10/ai-chatbots-claude-gemini-personality/&ct=ga&cd=CAIyHGUxZmI4NzQ4OTJkNjI0ZWE6Y29tOmphOlVTOkw&usg=AOvVaw0GNmkEe3QTfRRkb6-DuiXl"
+    },
+    {
+      "candidateKey": "develop personalities",
+      "displayName": "Develop Personalities",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Why AI Chatbots Like Gemini and Claude Develop Personalities",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://time.com/article/2026/03/10/ai-chatbots-claude-gemini-personality/&ct=ga&cd=CAIyHGUxZmI4NzQ4OTJkNjI0ZWE6Y29tOmphOlVTOkw&usg=AOvVaw0GNmkEe3QTfRRkb6-DuiXl"
+    },
+    {
+      "candidateKey": "like develop",
+      "displayName": "Like Develop",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Why AI Chatbots Like Gemini and Claude Develop Personalities",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://time.com/article/2026/03/10/ai-chatbots-claude-gemini-personality/&ct=ga&cd=CAIyHGUxZmI4NzQ4OTJkNjI0ZWE6Y29tOmphOlVTOkw&usg=AOvVaw0GNmkEe3QTfRRkb6-DuiXl"
+    },
+    {
+      "candidateKey": "chatbots like",
+      "displayName": "Chatbots Like",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Why AI Chatbots Like Gemini and Claude Develop Personalities",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://time.com/article/2026/03/10/ai-chatbots-claude-gemini-personality/&ct=ga&cd=CAIyHGUxZmI4NzQ4OTJkNjI0ZWE6Y29tOmphOlVTOkw&usg=AOvVaw0GNmkEe3QTfRRkb6-DuiXl"
+    },
+    {
+      "candidateKey": "fidelity",
+      "displayName": "Fidelity",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Evaluating the Reliability and Fidelity of Automated Judgment Systems of Large Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.22214"
+    },
+    {
+      "candidateKey": "gap between",
+      "displayName": "Gap Between",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Bridging the Gap Between Climate Science and Machine Learning in Climate Model Emulation",
+      "sourceUrl": "https://arxiv.org/abs/2603.22320"
+    },
+    {
+      "candidateKey": "infrastructure",
+      "displayName": "Infrastructure",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "AEGIS: An Operational Infrastructure for Post-Market Governance of Adaptive Medical AI Under US and EU Regulations",
+      "sourceUrl": "https://arxiv.org/abs/2603.22322"
+    },
+    {
+      "candidateKey": "operational",
+      "displayName": "Operational",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "AEGIS: An Operational Infrastructure for Post-Market Governance of Adaptive Medical AI Under US and EU Regulations",
+      "sourceUrl": "https://arxiv.org/abs/2603.22322"
+    },
+    {
+      "candidateKey": "parallel",
+      "displayName": "Parallel",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Stability of Sequential and Parallel Coordinate Ascent Variational Inference",
+      "sourceUrl": "https://arxiv.org/abs/2603.20929"
+    },
+    {
+      "candidateKey": "prompting",
+      "displayName": "Prompting",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Evaluating Prompting Strategies for Chart Question Answering with Large Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.22288"
+    },
+    {
+      "candidateKey": "reward",
+      "displayName": "Reward",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "TIPS: Turn-Level Information-Potential Reward Shaping for Search-Augmented LLMs",
+      "sourceUrl": "https://arxiv.org/abs/2603.22293"
+    },
+    {
+      "candidateKey": "routing",
+      "displayName": "Routing",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Geometric Mixture-of-Experts with Curvature-Guided Adaptive Routing for Graph Representation Learning",
+      "sourceUrl": "https://arxiv.org/abs/2603.22317"
+    },
+    {
+      "candidateKey": "software",
+      "displayName": "Software",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "From Human Interfaces to Agent Interfaces: Rethinking Software Design in the Age of AI-Native Systems",
+      "sourceUrl": "https://arxiv.org/abs/2603.20300"
+    },
+    {
+      "candidateKey": "aistats",
+      "displayName": "aistats",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "On the Interplay of Priors and Overparametrization in Bayesian Neural Network Posteriors",
+      "sourceUrl": "https://arxiv.org/abs/2603.22030"
+    },
+    {
+      "candidateKey": "balanced",
+      "displayName": "balanced",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Improving Safety Alignment via Balanced Direct Preference Optimization",
+      "sourceUrl": "https://arxiv.org/abs/2603.22829"
+    },
+    {
+      "candidateKey": "bedrock",
+      "displayName": "bedrock",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Accelerating custom entity recognition with Claude tool use in Amazon Bedrock - AWS",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://aws.amazon.com/blogs/machine-learning/accelerating-custom-entity-recognition-with-claude-tool-use-in-amazon-bedrock/&ct=ga&cd=CAIyHGUxZmI4NzQ4OTJkNjI0ZWE6Y29tOmphOlVTOkw&usg=AOvVaw0QBQy4gGl61PYlc8cQEKs7"
+    },
+    {
+      "candidateKey": "collaborative",
+      "displayName": "collaborative",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Cloud-Edge Collaborative Large Models for Robust Photovoltaic Power Forecasting",
+      "sourceUrl": "https://arxiv.org/abs/2603.22343"
+    },
+    {
+      "candidateKey": "contextual",
+      "displayName": "contextual",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Understanding Contextual Recall in Transformers: How Finetuning Enables In-Context Reasoning over Pretraining Knowledge",
+      "sourceUrl": "https://arxiv.org/abs/2603.20969"
+    },
+    {
+      "candidateKey": "document",
+      "displayName": "document",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Unlocking Multimodal Document Intelligence: From Current Triumphs to Future Frontiers of Visual Document Retrieval",
+      "sourceUrl": "https://arxiv.org/abs/2602.19961"
+    },
+    {
+      "candidateKey": "dynamic",
+      "displayName": "dynamic",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "DIP: Efficient Large Multimodal Model Training with Dynamic Interleaved Pipeline",
+      "sourceUrl": "https://arxiv.org/abs/2504.14145"
+    },
+    {
+      "candidateKey": "evolutionary",
+      "displayName": "evolutionary",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "FormalEvolve: Neuro-Symbolic Evolutionary Search for Diverse and Prover-Effective Autoformalization",
+      "sourceUrl": "https://arxiv.org/abs/2603.19828"
+    },
+    {
+      "candidateKey": "incremental",
+      "displayName": "incremental",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "RAIE: Region-Aware Incremental Preference Editing with LoRA for LLM-based Recommendation",
+      "sourceUrl": "https://arxiv.org/abs/2603.00638"
+    },
+    {
+      "candidateKey": "lstm",
+      "displayName": "lstm",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Fusing Memory and Attention: A study on LSTM, Transformer and Hybrid Architectures for Symbolic Music Generation",
+      "sourceUrl": "https://arxiv.org/abs/2603.21282"
+    },
+    {
+      "candidateKey": "matching",
+      "displayName": "matching",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Flow Matching from Viewpoint of Proximal Operators",
+      "sourceUrl": "https://arxiv.org/abs/2602.12683"
+    },
+    {
+      "candidateKey": "personalized",
+      "displayName": "personalized",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Spiking Personalized Federated Learning for Brain-Computer Interface-Enabled Immersive Communication",
+      "sourceUrl": "https://arxiv.org/abs/2603.22727"
+    },
+    {
+      "candidateKey": "pinn",
+      "displayName": "pinn",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Verifiable Error Bounds for Physics-Informed Neural KKL Observers",
+      "sourceUrl": "https://arxiv.org/abs/2603.20434"
+    },
+    {
+      "candidateKey": "pinns",
+      "displayName": "pinns",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Randomness and signal propagation in physics-informed neural networks (PINNs): A neural PDE perspective",
+      "sourceUrl": "https://arxiv.org/abs/2509.18131"
+    },
+    {
+      "candidateKey": "ppo",
+      "displayName": "ppo",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Proximal Policy Optimization in Path Space: A Schr\\\"odinger Bridge Perspective",
+      "sourceUrl": "https://arxiv.org/abs/2603.21621"
+    },
+    {
+      "candidateKey": "relu",
+      "displayName": "relu",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Multilevel Picard approximations and deep neural networks with ReLU, leaky ReLU, and softplus activation overcome the curse of dimensionality when approximating semilinear parabolic partial differential equations in $L^p$-sense",
+      "sourceUrl": "https://arxiv.org/abs/2409.20431"
+    },
+    {
+      "candidateKey": "scientific",
+      "displayName": "scientific",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The AI Scientific Community: Agentic Virtual Lab Swarms",
+      "sourceUrl": "https://arxiv.org/abs/2603.21344"
+    },
+    {
+      "candidateKey": "series",
+      "displayName": "series",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Rethinking Multimodal Fusion for Time Series: Auxiliary Modalities Need Constrained Fusion",
+      "sourceUrl": "https://arxiv.org/abs/2603.22372"
+    },
+    {
+      "candidateKey": "space",
+      "displayName": "space",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Characterizing State Space Model and Hybrid Language Model Performance with Long Context",
+      "sourceUrl": "https://arxiv.org/abs/2507.12442"
+    },
+    {
+      "candidateKey": "sparse",
+      "displayName": "sparse",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "CALM: Class-Conditional Sparse Attention Vectors for Large Audio-Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2602.07077"
+    },
+    {
+      "candidateKey": "target",
+      "displayName": "target",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "VorTEX: Various overlap ratio for Target speech EXtraction",
+      "sourceUrl": "https://arxiv.org/abs/2603.14803"
+    },
+    {
+      "candidateKey": "vae",
+      "displayName": "vae",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Spherical VAE with Cluster-Aware Feasible Regions: Guaranteed Prevention of Posterior Collapse",
+      "sourceUrl": "https://arxiv.org/abs/2603.10935"
+    },
+    {
+      "candidateKey": "virtual",
+      "displayName": "virtual",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The AI Scientific Community: Agentic Virtual Lab Swarms",
+      "sourceUrl": "https://arxiv.org/abs/2603.21344"
+    },
+    {
+      "candidateKey": "jepa",
+      "displayName": "Jepa",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Probing the Latent World: Emergent Discrete Symbols and Physical Structure in Latent Representations",
+      "sourceUrl": "https://arxiv.org/abs/2603.20327"
+    },
+    {
+      "candidateKey": "random forest",
+      "displayName": "Random forest",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Spatio-Temporal Grid Intelligence: A Hybrid Graph Neural Network and LSTM Framework for Robust Electricity Theft Detection",
+      "sourceUrl": "https://arxiv.org/abs/2603.20488"
+    },
+    {
+      "candidateKey": "rlhf",
+      "displayName": "Rlhf",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Reinforcement Learning from Multi-Source Imperfect Preferences: Best-of-Both-Regimes Regret",
+      "sourceUrl": "https://arxiv.org/abs/2603.20453"
+    },
+    {
+      "candidateKey": "mlp",
+      "displayName": "Mlp",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Less is More: Towards Simple Graph Contrastive Learning",
+      "sourceUrl": "https://arxiv.org/abs/2509.25742"
+    },
+    {
+      "candidateKey": "gpt-2",
+      "displayName": "Gpt-2",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "An Empirical Study of SFT-DPO Interaction and Parameterization in Small Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.20100"
+    },
+    {
+      "candidateKey": "sgd",
+      "displayName": "Sgd",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Two-Time-Scale Learning Dynamics: A Population View of Neural Network Training",
+      "sourceUrl": "https://arxiv.org/abs/2603.19808"
+    },
+    {
+      "candidateKey": "flow matching",
+      "displayName": "Flow matching",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Warm-Start Flow Matching for Guaranteed Fast Text/Image Generation",
+      "sourceUrl": "https://arxiv.org/abs/2603.19360"
+    },
+    {
+      "candidateKey": "nvfp4",
+      "displayName": "Nvfp4",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "MXNorm: Reusing MXFP block scales for efficient tensor normalisation",
+      "sourceUrl": "https://arxiv.org/abs/2603.13180"
+    },
+    {
+      "candidateKey": "scope",
+      "displayName": "Scope",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "SCOPE: Semantic Coreset with Orthogonal Projection Embeddings for Federated learning",
+      "sourceUrl": "https://arxiv.org/abs/2603.12976"
+    },
+    {
+      "candidateKey": "informed",
+      "displayName": "Informed",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Community-Informed AI Models for Police Accountability",
+      "sourceUrl": "https://arxiv.org/abs/2402.01703"
+    },
+    {
+      "candidateKey": "modality",
+      "displayName": "Modality",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "On the Cone Effect and Modality Gap in Medical Vision-Language Embeddings",
+      "sourceUrl": "https://arxiv.org/abs/2603.17246"
+    },
+    {
+      "candidateKey": "method",
+      "displayName": "Method",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Pragmatic Method for Comparing Clusterings with Overlaps and Outliers",
+      "sourceUrl": "https://arxiv.org/abs/2602.14855"
+    },
+    {
+      "candidateKey": "preference",
+      "displayName": "Preference",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Preference-Driven Multi-Objective Combinatorial Optimization with Conditional Computation",
+      "sourceUrl": "https://arxiv.org/abs/2506.08898"
+    },
+    {
+      "candidateKey": "architecture",
+      "displayName": "Architecture",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "An Agentic Multi-Agent Architecture for Cybersecurity Risk Management",
+      "sourceUrl": "https://arxiv.org/abs/2603.20131"
+    },
+    {
+      "candidateKey": "review",
+      "displayName": "Review",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The IJCNN 2025 Review Process",
+      "sourceUrl": "https://arxiv.org/abs/2603.19244"
+    },
+    {
+      "candidateKey": "expert",
+      "displayName": "Expert",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "SAGE: Sustainable Agent-Guided Expert-tuning for Culturally Attuned Translation in Low-Resource Southeast Asia",
+      "sourceUrl": "https://arxiv.org/abs/2603.19931"
+    },
+    {
+      "candidateKey": "utility",
+      "displayName": "Utility",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Utility-Guided Agent Orchestration for Efficient LLM Tool Use",
+      "sourceUrl": "https://arxiv.org/abs/2603.19896"
+    },
+    {
+      "candidateKey": "arabic",
+      "displayName": "Arabic",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Structured Prompting for Arabic Essay Proficiency: A Trait-Centric Evaluation Approach",
+      "sourceUrl": "https://arxiv.org/abs/2603.19668"
+    },
+    {
+      "candidateKey": "specific",
+      "displayName": "Specific",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Build a Domain-Specific Embedding Model in Under a Day",
+      "sourceUrl": "https://huggingface.co/blog/nvidia/domain-specific-embedding-finetune"
+    },
+    {
+      "candidateKey": "delivers",
+      "displayName": "Delivers",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "NVIDIA Vera CPU Delivers High Performance, Bandwidth, and Efficiency for AI Factories",
+      "sourceUrl": "https://developer.nvidia.com/blog/nvidia-vera-cpu-delivers-high-performance-bandwidth-and-efficiency-for-ai-factories/"
+    },
+    {
+      "candidateKey": "powers",
+      "displayName": "Powers",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "How NVIDIA Dynamo 1.0 Powers Multi-Node Inference at Production Scale",
+      "sourceUrl": "https://developer.nvidia.com/blog/nvidia-dynamo-1-production-ready/"
+    },
+    {
+      "candidateKey": "multiple",
+      "displayName": "Multiple",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Rethinking Multiple-Choice Questions for RLVR: Unlocking Potential via Distractor Design",
+      "sourceUrl": "https://arxiv.org/abs/2603.12826"
+    },
+    {
+      "candidateKey": "preview",
+      "displayName": "Preview",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Gemini 2.5 Pro Preview: even better coding performance",
+      "sourceUrl": "https://deepmind.google/blog/gemini-25-pro-preview-even-better-coding-performance/"
+    },
+    {
+      "candidateKey": "department",
+      "displayName": "Department",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Google DeepMind supports U.S. Department of Energy on Genesis: a national mission to accelerate innovation and scientific discovery",
+      "sourceUrl": "https://deepmind.google/blog/google-deepmind-supports-us-department-of-energy-on-genesis/"
+    },
+    {
+      "candidateKey": "groundsource turning",
+      "displayName": "Groundsource Turning",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Introducing Groundsource: Turning news reports into data with Gemini",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://research.google/blog/introducing-groundsource-turning-news-reports-into-data-with-gemini/&ct=ga&cd=CAIyHDM0MzE0MWM2Mjk1NGYzODU6Y29tOmphOlVTOkw&usg=AOvVaw16iKDlyVbZXLKyfBgSDSd9"
+    },
+    {
+      "candidateKey": "introducing groundsource",
+      "displayName": "Introducing Groundsource",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Introducing Groundsource: Turning news reports into data with Gemini",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://research.google/blog/introducing-groundsource-turning-news-reports-into-data-with-gemini/&ct=ga&cd=CAIyHDM0MzE0MWM2Mjk1NGYzODU6Y29tOmphOlVTOkw&usg=AOvVaw16iKDlyVbZXLKyfBgSDSd9"
+    },
+    {
+      "candidateKey": "blueprint",
+      "displayName": "Blueprint",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Blueprint for Self-Evolving Coding Agents in Vehicle Aerodynamic Drag Prediction",
+      "sourceUrl": "https://arxiv.org/abs/2603.21698"
+    },
+    {
+      "candidateKey": "conditional",
+      "displayName": "Conditional",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "MCLR: Improving Conditional Modeling in Visual Generative Models via Inter-Class Likelihood-Ratio Maximization and Establishing the Equivalence between Classifier-Free Guidance and Alignment Objectives",
+      "sourceUrl": "https://arxiv.org/abs/2603.22364"
+    },
+    {
+      "candidateKey": "dataset",
+      "displayName": "Dataset",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "CN-Buzz2Portfolio: A Chinese-Market Dataset and Benchmark for LLM-Based Macro and Sector Asset Allocation from Daily Trending Financial News",
+      "sourceUrl": "https://arxiv.org/abs/2603.22305"
+    },
+    {
+      "candidateKey": "engine",
+      "displayName": "Engine",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Memory Bear AI Memory Science Engine for Multimodal Affective Intelligence: A Technical Report",
+      "sourceUrl": "https://arxiv.org/abs/2603.22306"
+    },
+    {
+      "candidateKey": "estimation",
+      "displayName": "Estimation",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Between the Layers Lies the Truth: Uncertainty Estimation in LLMs Using Intra-Layer Local Information Scores",
+      "sourceUrl": "https://arxiv.org/abs/2603.22299"
+    },
+    {
+      "candidateKey": "individual",
+      "displayName": "Individual",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Research on Individual Trait Clustering and Development Pathway Adaptation Based on the K-means Algorithm",
+      "sourceUrl": "https://arxiv.org/abs/2603.22302"
+    },
+    {
+      "candidateKey": "interaction",
+      "displayName": "Interaction",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Fusing Driver Perceived and Physical Risk for Safety Critical Scenario Screening in Autonomous Driving",
+      "sourceUrl": "https://arxiv.org/abs/2603.20232"
+    },
+    {
+      "candidateKey": "modular",
+      "displayName": "Modular",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "FinRL-X: An AI-Native Modular Infrastructure for Quantitative Trading",
+      "sourceUrl": "https://arxiv.org/abs/2603.21330"
+    },
+    {
+      "candidateKey": "neural network",
+      "displayName": "Neural Network",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Restoring Neural Network Plasticity for Faster Transfer Learning",
+      "sourceUrl": "https://arxiv.org/abs/2603.20860"
+    },
+    {
+      "candidateKey": "operator",
+      "displayName": "Operator",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "UniFluids: Unified Neural Operator Learning with Conditional Flow-matching",
+      "sourceUrl": "https://arxiv.org/abs/2603.22309"
+    },
+    {
+      "candidateKey": "physics informed",
+      "displayName": "Physics Informed",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Sparsely-Supervised Data Assimilation via Physics-Informed Schr\\\"odinger Bridge",
+      "sourceUrl": "https://arxiv.org/abs/2603.22319"
+    },
+    {
+      "candidateKey": "product",
+      "displayName": "Product",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Powering Product Discovery in ChatGPT - OpenAI",
+      "sourceUrl": "https://www.google.com/url?rct=j&sa=t&url=https://openai.com/index/powering-product-discovery-in-chatgpt/&ct=ga&cd=CAIyHGY0YTliMWIyZGRkZWUyMDI6Y29tOmphOlVTOkw&usg=AOvVaw1FB0P15BkxI94QTjF80xsr"
+    },
+    {
+      "candidateKey": "reliability",
+      "displayName": "Reliability",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Evaluating the Reliability and Fidelity of Automated Judgment Systems of Large Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.22214"
+    },
+    {
+      "candidateKey": "sequential",
+      "displayName": "Sequential",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Stability of Sequential and Parallel Coordinate Ascent Variational Inference",
+      "sourceUrl": "https://arxiv.org/abs/2603.20929"
+    },
+    {
+      "candidateKey": "sparsity",
+      "displayName": "Sparsity",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Scaling Attention via Feature Sparsity",
+      "sourceUrl": "https://arxiv.org/abs/2603.22300"
+    },
+    {
+      "candidateKey": "survey",
+      "displayName": "Survey",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Survey of Reinforcement Learning For Economics",
+      "sourceUrl": "https://arxiv.org/abs/2603.08956"
+    },
+    {
+      "candidateKey": "transfer",
+      "displayName": "Transfer",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Guided Transfer Learning for Discrete Diffusion Models",
+      "sourceUrl": "https://arxiv.org/abs/2512.10877"
+    },
+    {
+      "candidateKey": "accuracy",
+      "displayName": "accuracy",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "PivotRL: High Accuracy Agentic Post-Training at Low Compute Cost",
+      "sourceUrl": "https://arxiv.org/abs/2603.21383"
+    },
+    {
+      "candidateKey": "actions",
+      "displayName": "actions",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Agent Control Protocol: Admission Control for Agent Actions",
+      "sourceUrl": "https://arxiv.org/abs/2603.18829"
+    },
+    {
+      "candidateKey": "adaptation",
+      "displayName": "adaptation",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Pruned Adaptation Modules: A Simple yet Strong Baseline for Continual Foundation Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.21170"
+    },
+    {
+      "candidateKey": "aligned",
+      "displayName": "aligned",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "LEAF: Language-EEG Aligned Foundation Model for Brain-Computer Interfaces",
+      "sourceUrl": "https://arxiv.org/abs/2509.24302"
+    },
+    {
+      "candidateKey": "anatomy",
+      "displayName": "anatomy",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The Anatomy of an Edit: Mechanism-Guided Activation Steering for Knowledge Editing",
+      "sourceUrl": "https://arxiv.org/abs/2603.20795"
+    },
+    {
+      "candidateKey": "augmentation",
+      "displayName": "augmentation",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "DALDALL: Data Augmentation for Lexical and Semantic Diverse in Legal Domain by leveraging LLM-Persona",
+      "sourceUrl": "https://arxiv.org/abs/2603.22765"
+    },
+    {
+      "candidateKey": "automatic",
+      "displayName": "automatic",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Generalizable Self-Evolving Memory for Automatic Prompt Optimization",
+      "sourceUrl": "https://arxiv.org/abs/2603.21520"
+    },
+    {
+      "candidateKey": "bert",
+      "displayName": "bert",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "An Industrial-Scale Retrieval-Augmented Generation Framework for Requirements Engineering: Empirical Evaluation with Automotive Manufacturing Data",
+      "sourceUrl": "https://arxiv.org/abs/2603.20534"
+    },
+    {
+      "candidateKey": "biases",
+      "displayName": "biases",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Problems with Chinchilla Approach 2: Systematic Biases in IsoFLOP Parabola Fits",
+      "sourceUrl": "https://arxiv.org/abs/2603.22339"
+    },
+    {
+      "candidateKey": "board",
+      "displayName": "board",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Multidisciplinary AI Board for Multimodal Dementia Characterization and Risk Assessment",
+      "sourceUrl": "https://arxiv.org/abs/2603.21597"
+    },
+    {
+      "candidateKey": "comparison",
+      "displayName": "comparison",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Empirical Comparison of Agent Communication Protocols for Task Orchestration",
+      "sourceUrl": "https://arxiv.org/abs/2603.22823"
+    },
+    {
+      "candidateKey": "compute",
+      "displayName": "compute",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Sonny: Breaking the Compute Wall in Medium-Range Weather Forecasting",
+      "sourceUrl": "https://arxiv.org/abs/2603.21284"
+    },
+    {
+      "candidateKey": "critical",
+      "displayName": "critical",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Sparse but Critical: A Token-Level Analysis of Distributional Shifts in RLVR Fine-Tuning of LLMs",
+      "sourceUrl": "https://arxiv.org/abs/2603.22446"
+    },
+    {
+      "candidateKey": "detect",
+      "displayName": "detect",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "What \"Not\" to Detect: Negation-Aware VLMs via Structured Reasoning and Token Merging",
+      "sourceUrl": "https://arxiv.org/abs/2510.13232"
+    },
+    {
+      "candidateKey": "detection",
+      "displayName": "detection",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Learn from Foundation Model: Fruit Detection Model without Manual Annotation",
+      "sourceUrl": "https://arxiv.org/abs/2411.16196"
+    },
+    {
+      "candidateKey": "differentiable",
+      "displayName": "differentiable",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Model Predictive Control with Differentiable World Models for Offline Reinforcement Learning",
+      "sourceUrl": "https://arxiv.org/abs/2603.22430"
+    },
+    {
+      "candidateKey": "distributed",
+      "displayName": "distributed",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Delightful Distributed Policy Gradient",
+      "sourceUrl": "https://arxiv.org/abs/2603.20521"
+    },
+    {
+      "candidateKey": "dlm",
+      "displayName": "dlm",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Confidence-Based Decoding is Provably Efficient for Diffusion Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.22248"
+    },
+    {
+      "candidateKey": "drl",
+      "displayName": "drl",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "RE-SAC: Disentangling aleatoric and epistemic risks in bus fleet control: A stable and robust ensemble DRL approach",
+      "sourceUrl": "https://arxiv.org/abs/2603.18396"
+    },
+    {
+      "candidateKey": "empirical",
+      "displayName": "empirical",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Multi-Domain Empirical Bayes for Linearly-Mixed Causal Representations",
+      "sourceUrl": "https://arxiv.org/abs/2603.18404"
+    },
+    {
+      "candidateKey": "entire",
+      "displayName": "entire",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Gitは『何を変えたか』は残せる──でも『なぜ変えたか』は消えていた",
+      "sourceUrl": "https://zenn.dev/terason/articles/4568cc701f1cb0"
+    },
+    {
+      "candidateKey": "entropy",
+      "displayName": "entropy",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Maximum Entropy Relaxation of Multi-Way Cardinality Constraints for Synthetic Population Generation",
+      "sourceUrl": "https://arxiv.org/abs/2603.22558"
+    },
+    {
+      "candidateKey": "formalevolve",
+      "displayName": "formalevolve",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "FormalEvolve: Neuro-Symbolic Evolutionary Search for Diverse and Prover-Effective Autoformalization",
+      "sourceUrl": "https://arxiv.org/abs/2603.19828"
+    },
+    {
+      "candidateKey": "gemma-3",
+      "displayName": "gemma-3",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "AdditiveLLM2: A Multi-modal Large Language Model for Additive Manufacturing",
+      "sourceUrl": "https://arxiv.org/abs/2603.22017"
+    },
+    {
+      "candidateKey": "geneval",
+      "displayName": "geneval",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "InjectFlow: Weak Guides Strong via Orthogonal Injection for Flow Matching",
+      "sourceUrl": "https://arxiv.org/abs/2603.20303"
+    },
+    {
+      "candidateKey": "gpu",
+      "displayName": "gpu",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Modernizing Amdahl's Law: How AI Scaling Laws Shape Computer Architecture",
+      "sourceUrl": "https://arxiv.org/abs/2603.20654"
+    },
+    {
+      "candidateKey": "healthbench",
+      "displayName": "healthbench",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Guideline-grounded retrieval-augmented generation for ophthalmic clinical decision support",
+      "sourceUrl": "https://arxiv.org/abs/2603.21925"
+    },
+    {
+      "candidateKey": "imitation",
+      "displayName": "imitation",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Non-Adversarial Imitation Learning Provably Free of Compounding Errors: The Role of Bellman Constraints",
+      "sourceUrl": "https://arxiv.org/abs/2603.22713"
+    },
+    {
+      "candidateKey": "infonce",
+      "displayName": "infonce",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Multihead Continual Learning Framework for Fine-Grained Fashion Image Retrieval with Contrastive Learning and Exponential Moving Average Distillation",
+      "sourceUrl": "https://arxiv.org/abs/2603.20648"
+    },
+    {
+      "candidateKey": "instruction",
+      "displayName": "instruction",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Multi-Task Instruction Tuning via Data Scheduling for Low-Resource Arabic AudioLLMs",
+      "sourceUrl": "https://arxiv.org/abs/2601.12494"
+    },
+    {
+      "candidateKey": "interspeech",
+      "displayName": "interspeech",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Voice Privacy from an Attribute-based Perspective",
+      "sourceUrl": "https://arxiv.org/abs/2603.20301"
+    },
+    {
+      "candidateKey": "master",
+      "displayName": "master",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Grounded Chess Reasoning in Language Models via Master Distillation",
+      "sourceUrl": "https://arxiv.org/abs/2603.20510"
+    },
+    {
+      "candidateKey": "medical",
+      "displayName": "medical",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Multi-Method Validation of Large Language Model Medical Translation Across High- and Low-Resource Languages",
+      "sourceUrl": "https://arxiv.org/abs/2603.22642"
+    },
+    {
+      "candidateKey": "missing",
+      "displayName": "missing",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Large Language Models for Missing Data Imputation: Understanding Behavior, Hallucination Effects, and Control Mechanisms",
+      "sourceUrl": "https://arxiv.org/abs/2603.22332"
+    },
+    {
+      "candidateKey": "natural",
+      "displayName": "natural",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Leveraging Natural Language Processing and Machine Learning for Evidence-Based Food Security Policy Decision-Making in Data-Scarce Making",
+      "sourceUrl": "https://arxiv.org/abs/2603.20425"
+    },
+    {
+      "candidateKey": "novel",
+      "displayName": "novel",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Novel TSK Fuzzy System Incorporating Multi-view Collaborative Transfer Learning for Personalized Epileptic EEG Detection",
+      "sourceUrl": "https://arxiv.org/abs/2111.08457"
+    },
+    {
+      "candidateKey": "pde",
+      "displayName": "pde",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Randomness and signal propagation in physics-informed neural networks (PINNs): A neural PDE perspective",
+      "sourceUrl": "https://arxiv.org/abs/2509.18131"
+    },
+    {
+      "candidateKey": "pdes",
+      "displayName": "pdes",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "FastLSQ: Solving PDEs in One Shot via Fourier Features with Exact Analytical Derivatives",
+      "sourceUrl": "https://arxiv.org/abs/2602.10541"
+    },
+    {
+      "candidateKey": "prior",
+      "displayName": "prior",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Multitask-Informed Prior for In-Context Learning on Tabular Data: Application to Steel Property Prediction",
+      "sourceUrl": "https://arxiv.org/abs/2603.22738"
+    },
+    {
+      "candidateKey": "process",
+      "displayName": "process",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "SHAining on Process Mining: Explaining Event Log Characteristics Impact on Algorithms",
+      "sourceUrl": "https://arxiv.org/abs/2509.08482"
+    },
+    {
+      "candidateKey": "qwen3-4b",
+      "displayName": "qwen3-4b",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "EvoIdeator: Evolving Scientific Ideas through Checklist-Grounded Reinforcement Learning",
+      "sourceUrl": "https://arxiv.org/abs/2603.21728"
+    },
+    {
+      "candidateKey": "right",
+      "displayName": "right",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Curveball Steering: The Right Direction To Steer Isn't Always Linear",
+      "sourceUrl": "https://arxiv.org/abs/2603.09313"
+    },
+    {
+      "candidateKey": "robotic",
+      "displayName": "robotic",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Energy-Aware Reinforcement Learning for Robotic Manipulation of Articulated Components in Infrastructure Operation and Maintenance",
+      "sourceUrl": "https://arxiv.org/abs/2602.12288"
+    },
+    {
+      "candidateKey": "sample",
+      "displayName": "sample",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Token Sample Complexity of Attention",
+      "sourceUrl": "https://arxiv.org/abs/2512.10656"
+    },
+    {
+      "candidateKey": "shortcut",
+      "displayName": "shortcut",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Mitigating Shortcut Reasoning in Language Models: A Gradient-Aware Training Approach",
+      "sourceUrl": "https://arxiv.org/abs/2603.20899"
+    },
+    {
+      "candidateKey": "society",
+      "displayName": "society",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "From Thinker to Society: Security in Hierarchical Autonomy Evolution of AI Agents",
+      "sourceUrl": "https://arxiv.org/abs/2603.07496"
+    },
+    {
+      "candidateKey": "steering",
+      "displayName": "steering",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Latent Policy Steering with Embodiment-Agnostic Pretrained World Models",
+      "sourceUrl": "https://arxiv.org/abs/2507.13340"
+    },
+    {
+      "candidateKey": "stochastic",
+      "displayName": "stochastic",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "High-Fidelity Modeling of Stochastic Chemical Dynamics on Complex Manifolds: A Multi-Scale SIREN-PINN Framework for the Curvature-Perturbed Ginzburg-Landau Equation",
+      "sourceUrl": "https://arxiv.org/abs/2601.08104"
+    },
+    {
+      "candidateKey": "subspace",
+      "displayName": "subspace",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "SSAM: Singular Subspace Alignment for Merging Multimodal Large Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.21584"
+    },
+    {
+      "candidateKey": "topology",
+      "displayName": "topology",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Reasoning Topology Matters: Network-of-Thought for Complex Reasoning Tasks",
+      "sourceUrl": "https://arxiv.org/abs/2603.20730"
+    },
+    {
+      "candidateKey": "understand",
+      "displayName": "understand",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Do LLMs Understand Collaborative Signals? Diagnosis and Repair",
+      "sourceUrl": "https://arxiv.org/abs/2505.20730"
+    },
+    {
+      "candidateKey": "verifiable",
+      "displayName": "verifiable",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Instruction-Tuned, but Not More Verifiable Instruction-Following: A Cross-Task Diagnosis for LoRA Adapters",
+      "sourceUrl": "https://arxiv.org/abs/2603.22379"
+    },
+    {
+      "candidateKey": "knowledge graph",
+      "displayName": "Knowledge graph",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Towards Intelligent Geospatial Data Discovery: a knowledge graph-driven multi-agent framework powered by large language models",
+      "sourceUrl": "https://arxiv.org/abs/2603.20670"
+    },
+    {
+      "candidateKey": "lean 4",
+      "displayName": "Lean 4",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Exponential Family Discriminant Analysis: Generalizing LDA-Style Generative Classification to Non-Gaussian Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.20655"
+    },
+    {
+      "candidateKey": "pca",
+      "displayName": "Pca",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Collaborative Adaptive Curriculum for Progressive Knowledge Distillation",
+      "sourceUrl": "https://arxiv.org/abs/2603.20296"
+    },
+    {
+      "candidateKey": "cnn",
+      "displayName": "Cnn",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Adaptive Relative Pose Estimation Framework with Dual Noise Tuning for Safe Approaching Maneuvers",
+      "sourceUrl": "https://arxiv.org/abs/2507.16214"
+    },
+    {
+      "candidateKey": "reddit",
+      "displayName": "Reddit",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Interpretable Early Warnings using Machine Learning in an Online Game-experiment",
+      "sourceUrl": "https://arxiv.org/abs/2502.09880"
+    },
+    {
+      "candidateKey": "qwen3",
+      "displayName": "Qwen3",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The Art of Efficient Reasoning: Data, Reward, and Optimization",
+      "sourceUrl": "https://arxiv.org/abs/2602.20945"
+    },
+    {
+      "candidateKey": "vision-language models",
+      "displayName": "Vision-language models",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "RobotArena $\\infty$: Scalable Robot Benchmarking via Real-to-Sim Translation",
+      "sourceUrl": "https://arxiv.org/abs/2510.23571"
+    },
+    {
+      "candidateKey": "vla",
+      "displayName": "Vla",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "RobotArena $\\infty$: Scalable Robot Benchmarking via Real-to-Sim Translation",
+      "sourceUrl": "https://arxiv.org/abs/2510.23571"
+    },
+    {
+      "candidateKey": "diffusion transformer",
+      "displayName": "Diffusion transformer",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "VSSFlow: Unifying Video-conditioned Sound and Speech Generation via Joint Learning",
+      "sourceUrl": "https://arxiv.org/abs/2509.24773"
+    },
+    {
+      "candidateKey": "conformal prediction",
+      "displayName": "Conformal prediction",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Flow-based Conformal Prediction for Multi-dimensional Time Series",
+      "sourceUrl": "https://arxiv.org/abs/2502.05709"
+    },
+    {
+      "candidateKey": "python",
+      "displayName": "Python",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Simulation-based Inference with the Python Package sbijax",
+      "sourceUrl": "https://arxiv.org/abs/2409.19435"
+    },
+    {
+      "candidateKey": "eacl",
+      "displayName": "Eacl",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Modeling Turn-Taking with Semantically Informed Gestures",
+      "sourceUrl": "https://arxiv.org/abs/2510.19350"
+    },
+    {
+      "candidateKey": "asr",
+      "displayName": "Asr",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Demonstration of Adapt4Me: An Uncertainty-Aware Authoring Environment for Personalizing Automatic Speech Recognition to Non-normative Speech",
+      "sourceUrl": "https://arxiv.org/abs/2603.20112"
+    },
+    {
+      "candidateKey": "iot",
+      "displayName": "Iot",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Model-Driven Learning-Based Physical Layer Authentication for Mobile Wi-Fi Devices",
+      "sourceUrl": "https://arxiv.org/abs/2603.19972"
+    },
+    {
+      "candidateKey": "trace",
+      "displayName": "Trace",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "TRACE: Trajectory Recovery with State Propagation Diffusion for Urban Mobility",
+      "sourceUrl": "https://arxiv.org/abs/2603.19474"
+    },
+    {
+      "candidateKey": "clare",
+      "displayName": "Clare",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "CLaRE-ty Amid Chaos: Quantifying Representational Entanglement to Predict Ripple Effects in LLM Editing",
+      "sourceUrl": "https://arxiv.org/abs/2603.19297"
+    },
+    {
+      "candidateKey": "diffusion llms",
+      "displayName": "Diffusion llms",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Dependency-Aware Parallel Decoding via Attention for Diffusion LLMs",
+      "sourceUrl": "https://arxiv.org/abs/2603.12996"
+    },
+    {
+      "candidateKey": "llm inference",
+      "displayName": "Llm Inference",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Deploying Disaggregated LLM Inference Workloads on Kubernetes",
+      "sourceUrl": "https://developer.nvidia.com/blog/deploying-disaggregated-llm-inference-workloads-on-kubernetes/"
+    },
+    {
+      "candidateKey": "unsupervised",
+      "displayName": "Unsupervised",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Unsupervised Feature Selection via Robust Autoencoder and Adaptive Graph Learning",
+      "sourceUrl": "https://arxiv.org/abs/2512.18720"
+    },
+    {
+      "candidateKey": "selective",
+      "displayName": "Selective",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Investigating layer-selective transfer learning of QAOA parameters for Max-Cut problem",
+      "sourceUrl": "https://arxiv.org/abs/2412.21071"
+    },
+    {
+      "candidateKey": "difficulty",
+      "displayName": "Difficulty",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Evaluating Game Difficulty in Tetris Block Puzzle",
+      "sourceUrl": "https://arxiv.org/abs/2603.18994"
+    },
+    {
+      "candidateKey": "injection",
+      "displayName": "Injection",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Prompt Injection as Role Confusion",
+      "sourceUrl": "https://arxiv.org/abs/2603.12277"
+    },
+    {
+      "candidateKey": "accelerated",
+      "displayName": "Accelerated",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "mlx-vis: GPU-Accelerated Dimensionality Reduction and Visualization on Apple Silicon",
+      "sourceUrl": "https://arxiv.org/abs/2603.04035"
+    },
+    {
+      "candidateKey": "efficient reasoning",
+      "displayName": "Efficient Reasoning",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The Art of Efficient Reasoning: Data, Reward, and Optimization",
+      "sourceUrl": "https://arxiv.org/abs/2602.20945"
+    },
+    {
+      "candidateKey": "brain",
+      "displayName": "Brain",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Alzheimer's Disease Brain Network Mining",
+      "sourceUrl": "https://arxiv.org/abs/2512.17276"
+    },
+    {
+      "candidateKey": "server",
+      "displayName": "Server",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "TAPAS: Efficient Two-Server Asymmetric Private Aggregation Beyond Prio(+)",
+      "sourceUrl": "https://arxiv.org/abs/2603.19949"
+    },
+    {
+      "candidateKey": "time series",
+      "displayName": "Time Series",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Deep Autocorrelation Modeling for Time-Series Forecasting: Progress and Prospects",
+      "sourceUrl": "https://arxiv.org/abs/2603.19899"
+    },
+    {
+      "candidateKey": "grained",
+      "displayName": "Grained",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "FB-CLIP: Fine-Grained Zero-Shot Anomaly Detection with Foreground-Background Disentanglement",
+      "sourceUrl": "https://arxiv.org/abs/2603.19608"
+    },
+    {
+      "candidateKey": "embodied",
+      "displayName": "Embodied",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Evolving Embodied Intelligence: Graph Neural Network--Driven Co-Design of Morphology and Control in Soft Robotics",
+      "sourceUrl": "https://arxiv.org/abs/2603.19582"
+    },
+    {
+      "candidateKey": "embedding",
+      "displayName": "Embedding",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Spectral Tempering for Embedding Compression in Dense Passage Retrieval",
+      "sourceUrl": "https://arxiv.org/abs/2603.19339"
+    },
+    {
+      "candidateKey": "grounding",
+      "displayName": "Grounding",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Evaluating Evidence Grounding Under User Pressure in Instruction-Tuned Language Models",
+      "sourceUrl": "https://arxiv.org/abs/2603.20162"
+    },
+    {
+      "candidateKey": "nvidia vera",
+      "displayName": "Nvidia Vera",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Inside the NVIDIA Vera Rubin Platform: Six New Chips, One AI Supercomputer",
+      "sourceUrl": "https://developer.nvidia.com/blog/inside-the-nvidia-rubin-platform-six-new-chips-one-ai-supercomputer/"
+    },
+    {
+      "candidateKey": "service",
+      "displayName": "Service",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Foundry Agent Service is GA: private networking, Voice Live, and enterprise-grade evaluations",
+      "sourceUrl": "https://devblogs.microsoft.com/foundry/foundry-agent-service-ga/"
+    },
+    {
+      "candidateKey": "management",
+      "displayName": "Management",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Operationalising Cyber Risk Management Using AI: Connecting Cyber Incidents to MITRE ATT&CK Techniques, Security Controls, and Metrics",
+      "sourceUrl": "https://arxiv.org/abs/2603.12455"
+    },
+    {
+      "candidateKey": "cyber",
+      "displayName": "Cyber",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Operationalising Cyber Risk Management Using AI: Connecting Cyber Incidents to MITRE ATT&CK Techniques, Security Controls, and Metrics",
+      "sourceUrl": "https://arxiv.org/abs/2603.12455"
+    },
+    {
+      "candidateKey": "experimental",
+      "displayName": "Experimental",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Optimal Experimental Design for Reliable Learning of History-Dependent Constitutive Laws",
+      "sourceUrl": "https://arxiv.org/abs/2603.12365"
+    },
+    {
+      "candidateKey": "countries",
+      "displayName": "Countries",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Introducing OpenAI for Countries",
+      "sourceUrl": "https://openai.com/global-affairs/openai-for-countries"
+    },
+    {
+      "candidateKey": "responses api",
+      "displayName": "Responses Api",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "New tools and features in the Responses API",
+      "sourceUrl": "https://openai.com/index/new-tools-and-features-in-the-responses-api"
+    },
+    {
+      "candidateKey": "vulnerability",
+      "displayName": "Vulnerability",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Learnability and Privacy Vulnerability are Entangled in a Few Critical Weights",
+      "sourceUrl": "https://arxiv.org/abs/2603.13186"
+    },
+    {
+      "candidateKey": "gemma scope",
+      "displayName": "Gemma Scope",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Google releases Gemma 2 2B, ShieldGemma and Gemma Scope",
+      "sourceUrl": "https://huggingface.co/blog/gemma-july-update"
+    },
+    {
+      "candidateKey": "europe",
+      "displayName": "Europe",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The EU Code of Practice and future of AI in Europe",
+      "sourceUrl": "https://openai.com/global-affairs/eu-code-of-practice"
+    },
+    {
+      "candidateKey": "practice",
+      "displayName": "Practice",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The EU Code of Practice and future of AI in Europe",
+      "sourceUrl": "https://openai.com/global-affairs/eu-code-of-practice"
+    },
+    {
+      "candidateKey": "vertex",
+      "displayName": "Vertex",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Deploy Meta Llama 3.1 405B on Google Cloud Vertex AI",
+      "sourceUrl": "https://huggingface.co/blog/llama31-on-vertex-ai"
+    },
+    {
+      "candidateKey": "data processing",
+      "displayName": "Data Processing",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Scaling AI-based Data Processing with Hugging Face + Dask",
+      "sourceUrl": "https://huggingface.co/blog/dask-scaling"
+    },
+    {
+      "candidateKey": "llm leaderboard",
+      "displayName": "Llm Leaderboard",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "CLARIN-PT-LDB: An Open LLM Leaderboard for Portuguese to assess Language, Culture and Civility",
+      "sourceUrl": "https://arxiv.org/abs/2603.12872"
+    },
+    {
+      "candidateKey": "facts",
+      "displayName": "Facts",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "FACTS Grounding: A new benchmark for evaluating the factuality of large language models",
+      "sourceUrl": "https://deepmind.google/blog/facts-grounding-a-new-benchmark-for-evaluating-the-factuality-of-large-language-models/"
+    },
+    {
+      "candidateKey": "frontier framework",
+      "displayName": "Frontier Framework",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Updating the Frontier Safety Framework",
+      "sourceUrl": "https://deepmind.google/blog/updating-the-frontier-safety-framework/"
+    },
+    {
+      "candidateKey": "learning large",
+      "displayName": "Learning Large",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "A Method for Learning Large-Scale Computational Construction Grammars from Semantically Annotated Corpora",
+      "sourceUrl": "https://arxiv.org/abs/2603.12754"
+    },
+    {
+      "candidateKey": "robotics brings",
+      "displayName": "Robotics Brings",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Gemini Robotics brings AI into the physical world",
+      "sourceUrl": "https://deepmind.google/blog/gemini-robotics-brings-ai-into-the-physical-world/"
+    },
+    {
+      "candidateKey": "curvature",
+      "displayName": "Curvature",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Sobolev--Ricci Curvature",
+      "sourceUrl": "https://arxiv.org/abs/2603.12652"
+    },
+    {
+      "candidateKey": "mixture experts",
+      "displayName": "Mixture Experts",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "LightMoE: Reducing Mixture-of-Experts Redundancy through Expert Replacing",
+      "sourceUrl": "https://arxiv.org/abs/2603.12645"
+    },
+    {
+      "candidateKey": "mixture",
+      "displayName": "Mixture",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "LightMoE: Reducing Mixture-of-Experts Redundancy through Expert Replacing",
+      "sourceUrl": "https://arxiv.org/abs/2603.12645"
+    },
+    {
+      "candidateKey": "banana pro",
+      "displayName": "Banana Pro",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Introducing Nano Banana Pro",
+      "sourceUrl": "https://deepmind.google/blog/introducing-nano-banana-pro/"
+    },
+    {
+      "candidateKey": "suite",
+      "displayName": "Suite",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "FACTS Benchmark Suite: Systematically evaluating the factuality of large language models",
+      "sourceUrl": "https://deepmind.google/blog/facts-benchmark-suite-systematically-evaluating-the-factuality-of-large-language-models/"
+    },
+    {
+      "candidateKey": "builder",
+      "displayName": "Builder",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "New in Agent Builder: all new agent chat, file uploads + tool registry",
+      "sourceUrl": "https://blog.langchain.com/new-in-agent-builder-all-new-agent-chat-file-uploads-tool-registry/"
+    },
+    {
+      "candidateKey": "train",
+      "displayName": "Train",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Easily Train Models with H100 GPUs on NVIDIA DGX Cloud",
+      "sourceUrl": "https://huggingface.co/blog/train-dgx-cloud"
+    },
+    {
+      "candidateKey": "supply chain",
+      "displayName": "Supply Chain",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The Economics of AI Supply Chain Regulation",
+      "sourceUrl": "https://arxiv.org/abs/2603.12630"
+    },
+    {
+      "candidateKey": "supply",
+      "displayName": "Supply",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "The Economics of AI Supply Chain Regulation",
+      "sourceUrl": "https://arxiv.org/abs/2603.12630"
+    },
+    {
+      "candidateKey": "access",
+      "displayName": "Access",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Improving Hugging Face Model Access for Kaggle Users",
+      "sourceUrl": "https://huggingface.co/blog/kaggle-integration"
+    },
+    {
+      "candidateKey": "collaborate",
+      "displayName": "Collaborate",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "Consilium: When Multiple LLMs Collaborate",
+      "sourceUrl": "https://huggingface.co/blog/consilium-multi-llm"
+    },
+    {
+      "candidateKey": "gpt instant",
+      "displayName": "Gpt Instant",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false,
+      "latestTrendsScore": null,
+      "categoryCandidate": false,
+      "originTitle": "GPT-5.1 Instant and GPT-5.1 Thinking System Card Addendum",
+      "sourceUrl": "https://openai.com/index/gpt-5-system-card-addendum-gpt-5-1"
+    }
+  ],
+  "currentCategories": {
+    "sourceCategory": [
+      {
+        "key": "llm",
+        "publishedArticleCount": 3332
+      },
+      {
+        "key": "agent",
+        "publishedArticleCount": 126
+      },
+      {
+        "key": "voice",
+        "publishedArticleCount": 34
+      },
+      {
+        "key": "policy",
+        "publishedArticleCount": 50
+      },
+      {
+        "key": "safety",
+        "publishedArticleCount": 34
+      },
+      {
+        "key": "search",
+        "publishedArticleCount": 55
+      },
+      {
+        "key": "news",
+        "publishedArticleCount": 8
+      }
+    ],
+    "sourceType": [
+      {
+        "key": "official",
+        "publishedArticleCount": 1717
+      },
+      {
+        "key": "blog",
+        "publishedArticleCount": 456
+      },
+      {
+        "key": "news",
+        "publishedArticleCount": 32
+      },
+      {
+        "key": "video",
+        "publishedArticleCount": 0
+      },
+      {
+        "key": "alerts",
+        "publishedArticleCount": 469
+      },
+      {
+        "key": "paper",
+        "publishedArticleCount": 965
+      }
+    ]
+  },
+  "categoryCandidates": [
+    {
+      "key": "paper",
+      "candidateSeenCount": 0,
+      "candidateStatus": "",
+      "existingTagArticleCount": 1978,
+      "currentSourceCategoryCount": 0,
+      "currentSourceTypeCount": 965
+    },
+    {
+      "key": "official",
+      "candidateSeenCount": 0,
+      "candidateStatus": "",
+      "existingTagArticleCount": 0,
+      "currentSourceCategoryCount": 0,
+      "currentSourceTypeCount": 1717
+    },
+    {
+      "key": "news",
+      "candidateSeenCount": 0,
+      "candidateStatus": "",
+      "existingTagArticleCount": 0,
+      "currentSourceCategoryCount": 8,
+      "currentSourceTypeCount": 32
+    },
+    {
+      "key": "search-rag",
+      "candidateSeenCount": 0,
+      "candidateStatus": "",
+      "existingTagArticleCount": 0,
+      "currentSourceCategoryCount": 0,
+      "currentSourceTypeCount": 0
+    },
+    {
+      "key": "oss",
+      "candidateSeenCount": 0,
+      "candidateStatus": "",
+      "existingTagArticleCount": 0,
+      "currentSourceCategoryCount": 0,
+      "currentSourceTypeCount": 0
+    },
+    {
+      "key": "enterprise-ai",
+      "candidateSeenCount": 0,
+      "candidateStatus": "",
+      "existingTagArticleCount": 25,
+      "currentSourceCategoryCount": 0,
+      "currentSourceTypeCount": 0
+    }
+  ],
+  "newTagAssignmentCounts": [
+    {
+      "candidateKey": "llms",
+      "displayName": "Llms",
+      "seenCount": 67,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "transformer",
+      "displayName": "transformer",
+      "seenCount": 34,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "iclr",
+      "displayName": "iclr",
+      "seenCount": 26,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "vlm",
+      "displayName": "vlm",
+      "seenCount": 22,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "arxiv",
+      "displayName": "Arxiv",
+      "seenCount": 20,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "rl",
+      "displayName": "Rl",
+      "seenCount": 16,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "lora",
+      "displayName": "lora",
+      "seenCount": 14,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "ai",
+      "displayName": "Ai",
+      "seenCount": 14,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "transformers",
+      "displayName": "Transformers",
+      "seenCount": 14,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "chain-of-thought",
+      "displayName": "chain-of-thought",
+      "seenCount": 13,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "evolving",
+      "displayName": "evolving",
+      "seenCount": 12,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gnn",
+      "displayName": "gnn",
+      "seenCount": 12,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "cvpr",
+      "displayName": "Cvpr",
+      "seenCount": 12,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "diffusion models",
+      "displayName": "Diffusion models",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "federated learning",
+      "displayName": "Federated learning",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mnist",
+      "displayName": "Mnist",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mamba",
+      "displayName": "Mamba",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "driven",
+      "displayName": "Driven",
+      "seenCount": 11,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "automated",
+      "displayName": "Automated",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "clip",
+      "displayName": "clip",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "federated",
+      "displayName": "federated",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gpt-4o",
+      "displayName": "gpt-4o",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "grpo",
+      "displayName": "grpo",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "cifar-10",
+      "displayName": "Cifar-10",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "large language models",
+      "displayName": "Large language models",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "vlms",
+      "displayName": "Vlms",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "cot",
+      "displayName": "Cot",
+      "seenCount": 10,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "domain",
+      "displayName": "Domain",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "machine",
+      "displayName": "Machine",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "nlp",
+      "displayName": "Nlp",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "information",
+      "displayName": "information",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mllms",
+      "displayName": "mllms",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "moe",
+      "displayName": "moe",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "prediction",
+      "displayName": "prediction",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "neurips",
+      "displayName": "Neurips",
+      "seenCount": 9,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "continual",
+      "displayName": "continual",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "continual learning",
+      "displayName": "continual learning",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "dynamics",
+      "displayName": "dynamics",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "genai",
+      "displayName": "genai",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "generalized",
+      "displayName": "generalized",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "rlvr",
+      "displayName": "rlvr",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "robust",
+      "displayName": "robust",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "structure",
+      "displayName": "structure",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mllm",
+      "displayName": "Mllm",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "cross",
+      "displayName": "Cross",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "latent",
+      "displayName": "Latent",
+      "seenCount": 8,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "attention",
+      "displayName": "Attention",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "clustering",
+      "displayName": "Clustering",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "responses",
+      "displayName": "Responses",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "adversarial",
+      "displayName": "adversarial",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "distillation",
+      "displayName": "distillation",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "eeg",
+      "displayName": "eeg",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "generalization",
+      "displayName": "generalization",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "grounded",
+      "displayName": "grounded",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "group",
+      "displayName": "group",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "imagenet",
+      "displayName": "imagenet",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "kernel",
+      "displayName": "kernel",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "meets",
+      "displayName": "meets",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "openclaw",
+      "displayName": "openclaw",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "processing",
+      "displayName": "processing",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "reason",
+      "displayName": "reason",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "sampling",
+      "displayName": "sampling",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "spectral",
+      "displayName": "spectral",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "stable",
+      "displayName": "stable",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "super",
+      "displayName": "super",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "tokens",
+      "displayName": "tokens",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "uncertainty",
+      "displayName": "uncertainty",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "aaai",
+      "displayName": "Aaai",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "langsmith",
+      "displayName": "Langsmith",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "vit",
+      "displayName": "Vit",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "machine learning",
+      "displayName": "Machine learning",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "planning",
+      "displayName": "Planning",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "speech",
+      "displayName": "Speech",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "kernels",
+      "displayName": "Kernels",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "india",
+      "displayName": "India",
+      "seenCount": 7,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "between",
+      "displayName": "Between",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "drive",
+      "displayName": "Drive",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "selection",
+      "displayName": "Selection",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "strategies",
+      "displayName": "Strategies",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "comprehensive",
+      "displayName": "comprehensive",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "constrained",
+      "displayName": "constrained",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "finetuning",
+      "displayName": "finetuning",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gpt",
+      "displayName": "gpt",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gradient",
+      "displayName": "gradient",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "linear",
+      "displayName": "linear",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mathematical",
+      "displayName": "mathematical",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mixture-of-experts",
+      "displayName": "mixture-of-experts",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "oracle",
+      "displayName": "oracle",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "pytorch",
+      "displayName": "pytorch",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "quantum",
+      "displayName": "quantum",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "sft",
+      "displayName": "sft",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "simulation",
+      "displayName": "simulation",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "social",
+      "displayName": "social",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "visual",
+      "displayName": "visual",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "shap",
+      "displayName": "Shap",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "dpo",
+      "displayName": "Dpo",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "prompt injection",
+      "displayName": "Prompt injection",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "robot",
+      "displayName": "Robot",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "healthcare",
+      "displayName": "Healthcare",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "deep think",
+      "displayName": "Deep Think",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "inception member",
+      "displayName": "Inception Member",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "inception",
+      "displayName": "Inception",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "nvidia demo",
+      "displayName": "Nvidia Demo",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "arm nvidia",
+      "displayName": "Arm Nvidia",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "personalities",
+      "displayName": "Personalities",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "develop personalities",
+      "displayName": "Develop Personalities",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "like develop",
+      "displayName": "Like Develop",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "chatbots like",
+      "displayName": "Chatbots Like",
+      "seenCount": 6,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "fidelity",
+      "displayName": "Fidelity",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gap between",
+      "displayName": "Gap Between",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "infrastructure",
+      "displayName": "Infrastructure",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "operational",
+      "displayName": "Operational",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "parallel",
+      "displayName": "Parallel",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "prompting",
+      "displayName": "Prompting",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "reward",
+      "displayName": "Reward",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "routing",
+      "displayName": "Routing",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "software",
+      "displayName": "Software",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "aistats",
+      "displayName": "aistats",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "balanced",
+      "displayName": "balanced",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "bedrock",
+      "displayName": "bedrock",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "collaborative",
+      "displayName": "collaborative",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "contextual",
+      "displayName": "contextual",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "document",
+      "displayName": "document",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "dynamic",
+      "displayName": "dynamic",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "evolutionary",
+      "displayName": "evolutionary",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "incremental",
+      "displayName": "incremental",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "lstm",
+      "displayName": "lstm",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "matching",
+      "displayName": "matching",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "personalized",
+      "displayName": "personalized",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "pinn",
+      "displayName": "pinn",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "pinns",
+      "displayName": "pinns",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "ppo",
+      "displayName": "ppo",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "relu",
+      "displayName": "relu",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "scientific",
+      "displayName": "scientific",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "series",
+      "displayName": "series",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "space",
+      "displayName": "space",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "sparse",
+      "displayName": "sparse",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "target",
+      "displayName": "target",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "vae",
+      "displayName": "vae",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "virtual",
+      "displayName": "virtual",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "jepa",
+      "displayName": "Jepa",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "random forest",
+      "displayName": "Random forest",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "rlhf",
+      "displayName": "Rlhf",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mlp",
+      "displayName": "Mlp",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gpt-2",
+      "displayName": "Gpt-2",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "sgd",
+      "displayName": "Sgd",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "flow matching",
+      "displayName": "Flow matching",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "nvfp4",
+      "displayName": "Nvfp4",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "scope",
+      "displayName": "Scope",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "informed",
+      "displayName": "Informed",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "modality",
+      "displayName": "Modality",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "method",
+      "displayName": "Method",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "preference",
+      "displayName": "Preference",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "architecture",
+      "displayName": "Architecture",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "review",
+      "displayName": "Review",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "expert",
+      "displayName": "Expert",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "utility",
+      "displayName": "Utility",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "arabic",
+      "displayName": "Arabic",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "specific",
+      "displayName": "Specific",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "delivers",
+      "displayName": "Delivers",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "powers",
+      "displayName": "Powers",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "multiple",
+      "displayName": "Multiple",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "preview",
+      "displayName": "Preview",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "department",
+      "displayName": "Department",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "groundsource turning",
+      "displayName": "Groundsource Turning",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "introducing groundsource",
+      "displayName": "Introducing Groundsource",
+      "seenCount": 5,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "blueprint",
+      "displayName": "Blueprint",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "conditional",
+      "displayName": "Conditional",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "dataset",
+      "displayName": "Dataset",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "engine",
+      "displayName": "Engine",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "estimation",
+      "displayName": "Estimation",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "individual",
+      "displayName": "Individual",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "interaction",
+      "displayName": "Interaction",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "modular",
+      "displayName": "Modular",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "neural network",
+      "displayName": "Neural Network",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "operator",
+      "displayName": "Operator",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "physics informed",
+      "displayName": "Physics Informed",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "product",
+      "displayName": "Product",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "reliability",
+      "displayName": "Reliability",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "sequential",
+      "displayName": "Sequential",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "sparsity",
+      "displayName": "Sparsity",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "survey",
+      "displayName": "Survey",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "transfer",
+      "displayName": "Transfer",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "accuracy",
+      "displayName": "accuracy",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "actions",
+      "displayName": "actions",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "adaptation",
+      "displayName": "adaptation",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "aligned",
+      "displayName": "aligned",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "anatomy",
+      "displayName": "anatomy",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "augmentation",
+      "displayName": "augmentation",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "automatic",
+      "displayName": "automatic",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "bert",
+      "displayName": "bert",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "biases",
+      "displayName": "biases",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "board",
+      "displayName": "board",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "comparison",
+      "displayName": "comparison",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "compute",
+      "displayName": "compute",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "critical",
+      "displayName": "critical",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "detect",
+      "displayName": "detect",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "detection",
+      "displayName": "detection",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "differentiable",
+      "displayName": "differentiable",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "distributed",
+      "displayName": "distributed",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "dlm",
+      "displayName": "dlm",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "drl",
+      "displayName": "drl",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "empirical",
+      "displayName": "empirical",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "entire",
+      "displayName": "entire",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "entropy",
+      "displayName": "entropy",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "formalevolve",
+      "displayName": "formalevolve",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gemma-3",
+      "displayName": "gemma-3",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "geneval",
+      "displayName": "geneval",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gpu",
+      "displayName": "gpu",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "healthbench",
+      "displayName": "healthbench",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "imitation",
+      "displayName": "imitation",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "infonce",
+      "displayName": "infonce",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "instruction",
+      "displayName": "instruction",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "interspeech",
+      "displayName": "interspeech",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "master",
+      "displayName": "master",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "medical",
+      "displayName": "medical",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "missing",
+      "displayName": "missing",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "natural",
+      "displayName": "natural",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "novel",
+      "displayName": "novel",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "pde",
+      "displayName": "pde",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "pdes",
+      "displayName": "pdes",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "prior",
+      "displayName": "prior",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "process",
+      "displayName": "process",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "qwen3-4b",
+      "displayName": "qwen3-4b",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "right",
+      "displayName": "right",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "robotic",
+      "displayName": "robotic",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "sample",
+      "displayName": "sample",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "shortcut",
+      "displayName": "shortcut",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "society",
+      "displayName": "society",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "steering",
+      "displayName": "steering",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "stochastic",
+      "displayName": "stochastic",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "subspace",
+      "displayName": "subspace",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "topology",
+      "displayName": "topology",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "understand",
+      "displayName": "understand",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "verifiable",
+      "displayName": "verifiable",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "knowledge graph",
+      "displayName": "Knowledge graph",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "lean 4",
+      "displayName": "Lean 4",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "pca",
+      "displayName": "Pca",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "cnn",
+      "displayName": "Cnn",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "reddit",
+      "displayName": "Reddit",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "qwen3",
+      "displayName": "Qwen3",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "vision-language models",
+      "displayName": "Vision-language models",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "vla",
+      "displayName": "Vla",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "diffusion transformer",
+      "displayName": "Diffusion transformer",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "conformal prediction",
+      "displayName": "Conformal prediction",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "python",
+      "displayName": "Python",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "eacl",
+      "displayName": "Eacl",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "asr",
+      "displayName": "Asr",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "iot",
+      "displayName": "Iot",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "trace",
+      "displayName": "Trace",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "clare",
+      "displayName": "Clare",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "diffusion llms",
+      "displayName": "Diffusion llms",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "llm inference",
+      "displayName": "Llm Inference",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "unsupervised",
+      "displayName": "Unsupervised",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "selective",
+      "displayName": "Selective",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "difficulty",
+      "displayName": "Difficulty",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "injection",
+      "displayName": "Injection",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "accelerated",
+      "displayName": "Accelerated",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "efficient reasoning",
+      "displayName": "Efficient Reasoning",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "brain",
+      "displayName": "Brain",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "server",
+      "displayName": "Server",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "time series",
+      "displayName": "Time Series",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "grained",
+      "displayName": "Grained",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "embodied",
+      "displayName": "Embodied",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "embedding",
+      "displayName": "Embedding",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "grounding",
+      "displayName": "Grounding",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "nvidia vera",
+      "displayName": "Nvidia Vera",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "service",
+      "displayName": "Service",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "management",
+      "displayName": "Management",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "cyber",
+      "displayName": "Cyber",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "experimental",
+      "displayName": "Experimental",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "countries",
+      "displayName": "Countries",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "responses api",
+      "displayName": "Responses Api",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "vulnerability",
+      "displayName": "Vulnerability",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gemma scope",
+      "displayName": "Gemma Scope",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "europe",
+      "displayName": "Europe",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "practice",
+      "displayName": "Practice",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "vertex",
+      "displayName": "Vertex",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "data processing",
+      "displayName": "Data Processing",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "llm leaderboard",
+      "displayName": "Llm Leaderboard",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "facts",
+      "displayName": "Facts",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "frontier framework",
+      "displayName": "Frontier Framework",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "learning large",
+      "displayName": "Learning Large",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "robotics brings",
+      "displayName": "Robotics Brings",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "curvature",
+      "displayName": "Curvature",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mixture experts",
+      "displayName": "Mixture Experts",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "mixture",
+      "displayName": "Mixture",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "banana pro",
+      "displayName": "Banana Pro",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "suite",
+      "displayName": "Suite",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "builder",
+      "displayName": "Builder",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "train",
+      "displayName": "Train",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "supply chain",
+      "displayName": "Supply Chain",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "supply",
+      "displayName": "Supply",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "access",
+      "displayName": "Access",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "collaborate",
+      "displayName": "Collaborate",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    },
+    {
+      "candidateKey": "gpt instant",
+      "displayName": "Gpt Instant",
+      "seenCount": 4,
+      "reviewStatus": "candidate",
+      "manualReviewRequired": false
+    }
+  ]
+}
