@@ -19,12 +19,14 @@ export interface UseHomeStateReturn {
   period: RankPeriod
   activeTopic: TopicChip
   summaryMode: 100 | 200
+  selectedTagKeys: string[]
   summaryModalArticle: UiArticle | null
   share: ShareState
   savedArticleIds: string[]
   likedArticleIds: string[]
   focusedArticleId: string | null
   searchDraft: string
+  searchQuery: string
   setPeriod: (period: RankPeriod) => void
   setActiveTopic: (topic: TopicChip) => void
   setSummaryMode: (mode: 100 | 200) => void
@@ -35,6 +37,7 @@ export interface UseHomeStateReturn {
   setShareIncludeSummary: (value: boolean) => void
   setSearchDraft: (value: string) => void
   setShareTextContent: (value: string) => void
+  toggleSelectedTagKey: (tagKey: string) => void
   handleCardClick: (articleId: string) => void
   handleOpenArticle: (articleId: string) => void
   handleArticleAction: (type: ActionType, articleId: string) => void
@@ -47,8 +50,15 @@ export function useHomeState(): UseHomeStateReturn {
   const [period, setPeriod] = useState<RankPeriod>('24h')
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTopic, setActiveTopic] = useState<TopicChip>('all')
-  const { homeData, homeStats, homeActivity, searchState } = useHomeData(period, searchQuery, activeTopic)
+  const [selectedTagKeys, setSelectedTagKeys] = useState<string[]>([])
+  const { homeData, homeStats, homeActivity, searchState } = useHomeData(period, searchQuery, activeTopic, selectedTagKeys)
   const actions = useHomeActions({ homeData, searchState, homeStats, homeActivity, activeTopic, setActiveTopic })
+
+  function toggleSelectedTagKey(tagKey: string) {
+    setSelectedTagKeys((current) =>
+      current.includes(tagKey) ? current.filter((value) => value !== tagKey) : [...current, tagKey],
+    )
+  }
 
   return {
     homeData,
@@ -63,12 +73,14 @@ export function useHomeState(): UseHomeStateReturn {
     period,
     activeTopic,
     summaryMode: actions.summaryMode,
+    selectedTagKeys,
     summaryModalArticle: actions.summaryModalArticle,
     share: actions.share,
     savedArticleIds: actions.savedArticleIds,
     likedArticleIds: actions.likedArticleIds,
     focusedArticleId: actions.focusedArticleId,
     searchDraft: actions.searchDraft,
+    searchQuery,
     setPeriod,
     setActiveTopic,
     setSummaryMode: actions.setSummaryMode,
@@ -79,6 +91,7 @@ export function useHomeState(): UseHomeStateReturn {
     setShareIncludeSummary: actions.setShareIncludeSummary,
     setSearchDraft: actions.setSearchDraft,
     setShareTextContent: actions.setShareTextContent,
+    toggleSelectedTagKey,
     handleCardClick: actions.handleCardClick,
     handleOpenArticle: actions.handleOpenArticle,
     handleArticleAction: actions.handleArticleAction,
@@ -86,6 +99,10 @@ export function useHomeState(): UseHomeStateReturn {
       const query = actions.searchDraft.trim()
       setSearchQuery(query)
       actions.handleSearchSubmit(query)
+      if (!query || typeof window === 'undefined') return
+      window.requestAnimationFrame(() => {
+        document.getElementById('section-search')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
     },
     handleShareCopyUrl: actions.handleShareCopyUrl,
     handleShareCopyText: actions.handleShareCopyText,

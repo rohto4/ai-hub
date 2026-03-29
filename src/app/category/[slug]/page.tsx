@@ -1,10 +1,10 @@
 import { PublicArticleList } from '@/components/site/PublicArticleList'
+import { PublicDiscoveryRail } from '@/components/site/PublicDiscoveryRail'
 import { EmptyPanel, PublicScaffold } from '@/components/site/PublicScaffold'
 import { isDatabaseConfigured } from '@/lib/db'
-import { listLatestPublicArticles, listRankedPublicArticles } from '@/lib/db/public-feed'
-
-const SOURCE_TYPES = new Set(['official', 'blog', 'paper', 'news', 'alerts', 'video'])
-const TOPICS = new Set(['llm', 'agent', 'voice', 'policy', 'safety', 'search', 'news'])
+import { listAdjacentTagSummaries } from '@/lib/db/adjacent-tags'
+import { listArticlesByTag, listLatestPublicArticles, listRankedPublicArticles, listTagSummaries } from '@/lib/db/public-feed'
+import { findSiteCategory } from '@/lib/site/navigation'
 
 export default async function CategoryPage({
   params,
@@ -12,20 +12,38 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const sourceType = SOURCE_TYPES.has(slug) ? slug : null
-  const sourceCategory = !sourceType && TOPICS.has(slug) ? slug : 'all'
-  const articles = isDatabaseConfigured()
-    ? sourceType
-      ? await listLatestPublicArticles({ limit: 30, sourceType })
-      : await listRankedPublicArticles({ period: '24h', sourceCategory, limit: 30 })
-    : []
+  const category = findSiteCategory(slug)
+
+  const [primaryTags, adjacentTags, articles] = isDatabaseConfigured()
+    ? await Promise.all([
+        listTagSummaries(18),
+        listAdjacentTagSummaries(18),
+        category?.kind === 'source-type'
+          ? listLatestPublicArticles({ limit: 30, sourceType: category.queryValue })
+          : category?.kind === 'source-category'
+            ? listRankedPublicArticles({ period: '24h', sourceCategory: category.queryValue, limit: 30 })
+            : category?.kind === 'tag'
+              ? listArticlesByTag({ tagKey: category.queryValue, limit: 30 })
+            : Promise.resolve([]),
+      ])
+    : [[], [], []]
+
+  const title = category?.label ?? slug
+  const description = category
+    ? `カテゴリ「${category.label}」の一覧です。カテゴリ導線の位置づけを確認しやすいよう、ここでは一覧を素直に見せています。`
+    : `カテゴリ「${slug}」の一覧です。`
 
   return (
-    <PublicScaffold title={slug} description={`「${slug}」カテゴリのAI記事一覧です。`}>
+    <PublicScaffold
+      eyebrow="Category"
+      title={title}
+      description={description}
+      sidebar={<PublicDiscoveryRail primaryTags={primaryTags} adjacentTags={adjacentTags} />}
+    >
       {articles.length > 0 ? (
-        <PublicArticleList articles={articles} showRank={!sourceType} />
+        <PublicArticleList articles={articles} showRank={category?.kind === 'source-category'} />
       ) : (
-        <EmptyPanel message={`カテゴリ「${slug}」に一致する記事はありません。`} />
+        <EmptyPanel message={`カテゴリ「${slug}」に一致する記事はまだありません。`} />
       )}
     </PublicScaffold>
   )

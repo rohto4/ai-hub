@@ -11,5 +11,5 @@ export {
 } from '@/lib/db/public-articles'
 export { getHomeActivity, getHomeStats } from '@/lib/db/public-home'
 export { searchPublicArticles } from '@/lib/db/public-search'
-export { listArticlesByTag, listTagSummaries } from '@/lib/db/public-tags'
+export { listArticlesByAdjacentTag, listArticlesByTag, listTagSummaries, listWeeklyTopPrimaryTags } from '@/lib/db/public-tags'
 export type { PublicArticleDetail, PublicTagSummary } from '@/lib/db/public-shared'

@@ -1,22 +1,158 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #fff9f3;
-  --color-header-bg: rgba(255, 249, 243, 0.92);
-  --color-card: #fffdf9;
-  --color-card-second: #fffdf8;
-  --color-dim-fg: #ffebdf;
-  --color-accent-light: #fff1e4;
-  --color-accent-lighter: #ffe7d4;
+  --color-bg: #fbf4ec;
+  --color-header-bg: rgba(251, 244, 236, 0.76);
+  --color-card: #fffdfa;
+  --color-card-second: #fff8f1;
+  --color-dim-fg: #f6e1d4;
+  --color-accent-light: #fff0e2;
+  --color-accent-lighter: #ffe2cb;
   --color-accent-dark: #a35b2e;
-  --color-accent-darker: #8a4a20;
-  --color-orange: #f28a43;
-  --color-second-orange: #ffd4b9;
-  --color-btn-dark: #4b4b51;
-  --color-ink: #1f2630;
-  --color-muted: #8a93a3;
-  --color-subtle: #6f7785;
+  --color-accent-darker: #7b3d16;
+  --color-orange: #ef8b42;
+  --color-second-orange: #ffd4b7;
+  --color-btn-dark: #252532;
+  --color-ink: #1c2530;
+  --color-muted: #8d8b90;
+  --color-subtle: #625f68;
+  --color-panel-strong: #fff3e7;
+  --color-hot: #ee5f4d;
+  --color-hover-soft: #f1c28c;
 
-  --font-family-base: "BIZ UDPGothic", "Noto Sans JP", system-ui, sans-serif;
+  --font-family-base: "IBM Plex Mono", "Cascadia Code", "Roboto Mono", "Noto Sans Mono CJK JP", ui-monospace, monospace;
   --font-family-voces: "Voces", serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255, 180, 132, 0.22), transparent 32%),
+    radial-gradient(circle at 88% 12%, rgba(96, 165, 250, 0.14), transparent 24%),
+    linear-gradient(180deg, #fff8f1 0%, #fbf4ec 48%, #f6ede4 100%);
+  color: var(--color-ink);
+  font-family: var(--font-family-base);
+}
+
+::selection {
+  background: rgba(163, 91, 46, 0.18);
+}
+
+a,
+button,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.site-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(163, 91, 46, 0.14);
+  background: rgba(255, 243, 231, 0.9);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent-darker);
+}
+
+.site-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 248, 241, 0.8));
+  padding: 1.25rem;
+  box-shadow: 0 18px 56px rgba(43, 31, 24, 0.08);
+}
+
+.home-rail-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 248, 241, 0.72));
+  padding: 1.15rem;
+  box-shadow: 0 18px 56px rgba(43, 31, 24, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.site-nav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent-darker);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.site-nav-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(163, 91, 46, 0.18);
+  background: rgba(255, 243, 231, 0.94);
+  box-shadow: 0 12px 24px rgba(163, 91, 46, 0.12);
+}
+
+.site-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  background: linear-gradient(135deg, var(--color-btn-dark), #3d3b52 58%, #4d445d);
+  padding: 0.8rem 1.1rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: white;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 12px 30px rgba(37, 37, 50, 0.24);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
+}
+
+.site-button-primary:hover {
+  transform: translateY(-1px) scale(1.01);
+  filter: saturate(1.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 16px 36px rgba(37, 37, 50, 0.28);
+}
+
+.site-button-primary:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.site-button-primary:focus-visible,
+.site-nav-chip:focus-visible,
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid rgba(163, 91, 46, 0.4);
+  outline-offset: 2px;
 }

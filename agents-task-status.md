@@ -9,6 +9,11 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-03-28 | done | 導線評価の進め方を変更 | `screen-flow` / `flowchart` の草案追加後、図だけでは判断しづらいと整理。次は Web 実装を先に進め、実画面を見てカテゴリ・主タグ・周辺分野タグ導線を評価する方針へ切替
+- 2026-03-28 | done | 新導線の草案を docs に追加 | `screen-flow` と `flowchart` に vNext draft を追記。カテゴリ=サイドバー導線、周辺分野タグ=当面通常タグ導線、主タグ/カテゴリ/周辺分野タグの役割分担を相談できる状態にした
+- 2026-03-28 | done | Phase 1 正本の新規タグ案を DB 反映 | `final-tag-decisions.json` から新規主タグ13件を昇格し、`llm` / `agent` など broad tag とカテゴリ寄せ対象を inactive 化。`retag-layer2-layer4` で L2 6028 件を洗い替え、deprecated tag の L2/L4 付与を除去
+- 2026-03-28 | done | タグ整理の実行方針を更新 | カテゴリはサイドバー導線、周辺分野タグは当面通常タグと同じクリック導線、将来の視覚マッピングページとタグTBL再編は後続へ整理
+- 2026-03-28 | done | 優先タスクをタグ整理と公開導線へ切替 | 719/720 の原因確認は完了済みとして SQL 深掘りを外し、主タグ / 新規立項タグ / カテゴリ / 周辺分野タグ整理とウェブ導線確立を最優先へ更新。`paper` 専用タグマスタ案は後続へ保留
 - 2026-03-28 | done | paper 専用タグ群の必要性を方針化 | `arxiv-ai` は基礎研究寄りで既存主タグに落ちにくいと整理。`paper` 専用研究タグ群を `implementation-wait` / `imp-*` に引き継ぎ、次は無タグ論文分析と allowlist 試験投入
 - 2026-03-28 | done | canonicalTagHints prompt を調整して再 live run | job_run_id=720 で canonical keyword 8件を確認。主タグ付きは4/20でコホート差が大きく、次は無タグ記事の原因分析へ進む
 - 2026-03-28 | done | OpenAI fallback を 20→10→5 分割再試行に対応 | job_run_id=719 で 20件 full_content を manual_pending なしで完了。主タグ16件・候補45件増を確認、canonical alias/keyword はまだ 0 件で次は prompt 調整

@@ -198,6 +198,11 @@ export function buildSourceTypeFilter(sourceType?: string | null): string | null
   return sourceType
 }
 
+export function buildTagKeysFilter(tagKeys?: string[] | null): string[] | null {
+  if (!tagKeys || tagKeys.length === 0) return null
+  return tagKeys
+}
+
 export function mapHomeStats(row?: HomeStatsRow): HomeStats {
   return {
     publishedToday: Number(row?.published_today ?? 0),

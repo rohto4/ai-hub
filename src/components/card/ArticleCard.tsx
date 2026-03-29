@@ -55,12 +55,14 @@ export function ArticleCard({
     .filter(Boolean)
     .join(' / ')
 
+  const isLongSummary = summaryMode === 200
+
   return (
     <article
       id={`article-card-${article.id}`}
-      className="relative overflow-hidden rounded-xl border bg-card-second"
+      className="relative overflow-hidden border bg-card-second"
       style={{
-        minHeight: 180,
+        minHeight: isLongSummary ? 220 : 180,
         borderColor: isFocused ? 'var(--color-orange)' : '#e5e5e5',
         boxShadow: '0 2px 4px rgba(0,0,0,0.12)',
       }}
@@ -82,7 +84,11 @@ export function ArticleCard({
       {/* メインコンテンツ（クリックでモーダル） */}
       <button
         type="button"
-        className="flex w-full gap-2.5 p-2.5 pb-12 text-left"
+        className="flex w-full text-left"
+        style={{
+          gap: isLongSummary ? 12 : 10,
+          padding: isLongSummary ? '12px 12px 52px' : '10px 10px 48px',
+        }}
         onClick={() => onCardClick(article.id)}
       >
         {/* サムネイル (小型) */}
@@ -92,7 +98,7 @@ export function ArticleCard({
           thumbnailUrl={article.thumbnail_url}
           thumbnailEmoji={article.thumbnail_emoji}
           thumbnailBgTheme={article.thumbnail_bg_theme}
-          className="mt-0.5 h-[72px] w-[56px] shrink-0 rounded-lg"
+          className={isLongSummary ? 'mt-0.5 h-[92px] w-[68px] shrink-0' : 'mt-0.5 h-[72px] w-[56px] shrink-0'}
           badgeLabel={sourceLabel[article.source_type]}
         />
 
@@ -112,10 +118,10 @@ export function ArticleCard({
               </span>
             ) : null}
           </div>
-          <p className="line-clamp-2 text-[13px] font-extrabold leading-[1.4] text-ink">
+          <p className={isLongSummary ? 'line-clamp-3 text-[14px] font-extrabold leading-[1.45] text-ink' : 'line-clamp-2 text-[13px] font-extrabold leading-[1.4] text-ink'}>
             {article.title}
           </p>
-          <p className="line-clamp-3 text-[11px] leading-[1.6] text-[#4f5969]">
+          <p className={isLongSummary ? 'line-clamp-5 text-[12px] leading-[1.7] text-[#4f5969]' : 'line-clamp-3 text-[11px] leading-[1.6] text-[#4f5969]'}>
             {summary}
           </p>
           <p className="text-[10px] text-muted">{metaText}</p>
@@ -153,7 +159,7 @@ function ActButton({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-full text-[10px]"
+      className="text-[10px]"
       style={{
         height: 24,
         minWidth: wide ? 96 : 48,

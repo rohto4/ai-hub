@@ -34,6 +34,7 @@
     "db:generate-phase1-summary-sheet": "npx tsx scripts/generate-phase1-summary-sheet.ts",
     "db:generate-phase1-decision-page": "npx tsx scripts/generate-phase1-decision-page.ts",
     "db:generate-phase1-final-manifest": "npx tsx scripts/generate-phase1-final-manifest.ts",
+    "db:apply-phase1-tag-decisions": "npx tsx scripts/apply-phase1-tag-decisions.ts",
     "db:generate-tag-alias-review": "npx tsx scripts/generate-tag-alias-review.ts",
     "db:generate-tag-alias-review-page": "npx tsx scripts/generate-tag-alias-review-page.ts",
     "db:prune-tag-candidates": "node scripts/prune-tag-candidates.mjs",

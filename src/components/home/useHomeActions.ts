@@ -53,7 +53,6 @@ export function useHomeActions({
     searchState,
     homeStats,
     homeActivity,
-    savedCount: 0,
   })
   const articleActions = useHomeArticleActions({
     allArticles: baseDerived.allArticles,
@@ -66,7 +65,6 @@ export function useHomeActions({
     searchState,
     homeStats,
     homeActivity,
-    savedCount: articleActions.savedArticleIds.length,
   })
 
   function handleSearchSubmit(query: string) {

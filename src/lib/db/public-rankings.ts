@@ -6,18 +6,21 @@ import {
   PUBLIC_DISPLAY_MAX_AGE,
   PublicArticleRow,
   buildSourceCategoryFilter,
+  buildTagKeysFilter,
   toArticle,
 } from '@/lib/db/public-shared'
 
 export async function listRankedPublicArticles(options: {
   period: RankPeriod
   sourceCategory?: string | null
+  tagKeys?: string[] | null
   limit: number
   offset?: number
 }): Promise<ArticleWithScore[]> {
   const sql = getSql()
   const rankingWindow = options.period
   const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
+  const tagKeys = buildTagKeysFilter(options.tagKeys)
   const offset = options.offset ?? 0
 
   const rows = (await sql`
@@ -31,6 +34,16 @@ export async function listRankedPublicArticles(options: {
     LEFT JOIN public_rankings pr ON pr.public_article_id = pa.public_article_id AND pr.ranking_window = ${rankingWindow}
     WHERE pa.visibility_status = 'published'
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
+      AND (
+        ${tagKeys}::text[] IS NULL
+        OR EXISTS (
+          SELECT 1
+          FROM public_article_tags pat
+          JOIN tags_master tm ON tm.tag_id = pat.tag_id
+          WHERE pat.public_article_id = pa.public_article_id
+            AND tm.tag_key = ANY(${tagKeys}::text[])
+        )
+      )
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
     ORDER BY COALESCE(pr.rank_position, 999999) ASC, COALESCE(pr.score, pa.content_score) DESC, COALESCE(pa.original_published_at, pa.created_at) DESC
     LIMIT ${Math.max(options.limit * 4, options.limit + offset + 20)} OFFSET ${offset}
@@ -48,10 +61,12 @@ export async function listContentLaneArticles(options: {
   period: RankPeriod
   limit: number
   sourceCategory?: string | null
+  tagKeys?: string[] | null
 }): Promise<ArticleWithScore[]> {
   const sql = getSql()
   const interval = PERIOD_INTERVAL[options.period]
   const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
+  const tagKeys = buildTagKeysFilter(options.tagKeys)
 
   const rows = (await sql`
     SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
@@ -64,6 +79,16 @@ export async function listContentLaneArticles(options: {
     WHERE pa.visibility_status = 'published'
       AND pa.source_type = ${options.sourceType}
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
+      AND (
+        ${tagKeys}::text[] IS NULL
+        OR EXISTS (
+          SELECT 1
+          FROM public_article_tags pat
+          JOIN tags_master tm ON tm.tag_id = pat.tag_id
+          WHERE pat.public_article_id = pa.public_article_id
+            AND tm.tag_key = ANY(${tagKeys}::text[])
+        )
+      )
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${interval}::interval
     ORDER BY pa.content_score DESC, COALESCE(pa.original_published_at, pa.created_at) DESC

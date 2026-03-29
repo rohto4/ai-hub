@@ -5,17 +5,17 @@ import type { Article, ArticleWithScore } from '@/lib/db/types'
 function sourceTone(sourceType: ArticleWithScore['source_type']): string {
   switch (sourceType) {
     case 'official':
-      return 'bg-[#dbeafe] text-[#1d4ed8]'
+      return 'bg-sky-100 text-sky-800'
     case 'blog':
-      return 'bg-[#dcfce7] text-[#15803d]'
+      return 'bg-emerald-100 text-emerald-800'
     case 'paper':
-      return 'bg-[#f3e8ff] text-[#7e22ce]'
+      return 'bg-fuchsia-100 text-fuchsia-800'
     case 'alerts':
-      return 'bg-[#fef3c7] text-[#b45309]'
+      return 'bg-amber-100 text-amber-800'
     case 'news':
-      return 'bg-[#fee2e2] text-[#b91c1c]'
+      return 'bg-rose-100 text-rose-800'
     case 'video':
-      return 'bg-[#fde68a] text-[#92400e]'
+      return 'bg-orange-100 text-orange-800'
   }
 }
 
@@ -29,7 +29,11 @@ export function PublicArticleList({
   return (
     <div className="grid gap-4">
       {articles.map((article, index) => (
-        <article key={article.id} className="rounded-3xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+        <article
+          key={article.id}
+          className="group relative overflow-hidden border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,249,244,0.88))] p-5 shadow-[0_22px_60px_rgba(43,31,24,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_80px_rgba(43,31,24,0.12)]"
+        >
+          <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,rgba(163,91,46,0.9),rgba(255,170,95,0.55),rgba(255,255,255,0))]" />
           <div className="flex gap-4">
             <ArticleThumbnail
               articleId={article.id}
@@ -37,20 +41,38 @@ export function PublicArticleList({
               thumbnailUrl={article.thumbnail_url}
               thumbnailEmoji={article.thumbnail_emoji}
               thumbnailBgTheme={article.thumbnail_bg_theme}
-              className="h-24 w-20 shrink-0 rounded-2xl"
+              className="h-28 w-24 shrink-0 border border-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]"
               emojiClassName="text-4xl"
             />
+
             <div className="min-w-0 flex-1">
-              <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
-                {showRank ? <span className="font-extrabold text-accent-dark">#{index + 1}</span> : null}
-                <span className={`rounded-full px-2 py-1 font-bold ${sourceTone(article.source_type)}`}>{article.source_type}</span>
-                <span className="rounded-full bg-[#f6f0ea] px-2 py-1 font-bold text-accent-darker">{article.sourceCategory}</span>
-                <span className="text-muted">{article.published_at.toLocaleDateString('ja-JP')}</span>
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-xs">
+                {showRank ? (
+                  <span className="rounded-full bg-[color:var(--color-panel-strong)] px-2.5 py-1 font-black text-[color:var(--color-accent-darker)]">
+                    #{index + 1}
+                  </span>
+                ) : null}
+                <span className={`rounded-full px-2.5 py-1 font-bold ${sourceTone(article.source_type)}`}>
+                  {article.source_type}
+                </span>
+                <span className="rounded-full bg-black/5 px-2.5 py-1 font-bold text-[color:var(--color-accent-darker)]">
+                  {article.sourceCategory}
+                </span>
+                <span className="text-[color:var(--color-muted)]">
+                  {article.published_at.toLocaleDateString('ja-JP')}
+                </span>
               </div>
-              <Link href={`/articles/${article.publicKey ?? article.id}`} className="text-lg font-extrabold leading-tight hover:underline">
+
+              <Link
+                href={`/articles/${article.publicKey ?? article.id}`}
+                className="inline-block text-xl font-black leading-tight tracking-[-0.04em] text-[color:var(--color-ink)] transition group-hover:text-[color:var(--color-accent-darker)]"
+              >
                 {article.title}
               </Link>
-              <p className="mt-2 text-sm leading-7 text-[#4f5969]">{article.summary_100 ?? '要約を準備中です。'}</p>
+
+              <p className="mt-3 text-sm leading-7 text-[color:var(--color-subtle)]">
+                {article.summary_100 ?? '要約は準備中です。'}
+              </p>
             </div>
           </div>
         </article>

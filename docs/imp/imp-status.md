@@ -20,6 +20,11 @@
 - live run では job_run_id=719 で `summaryBatchSize=20`・`maxSummaryBatches=1`・20件 full_content 処理を OpenAI fallback で完了し、`manualPendingCount=0` を確認した
 - prompt 調整後の live run（job_run_id=720）で `canonicalKeywordCount` が合計 8 件に増え、本文ベース `canonicalTagHints` が発火することを確認した
 - `arxiv-ai` のタイトル群を見る限り基礎研究寄りが多く、通常記事で外した一般研究語を `paper` 専用タグ群として扱う必要性が高い
+- ただし 719 / 720 の原因切り分けは確認済みで、次は SQL 深掘りではなくタグ整理と公開導線の確立を優先する
+- カテゴリは公開面サイドバー導線に使う前提で進め、周辺分野タグは当面通常タグと同様にクリック可能な導線へ寄せる
+- `af-20260326/phase1-retag/outputs/final-tag-decisions.json` の正本に従い、新規主タグ 13 件を `tags_master` / `tag_keywords` へ反映し、`llm` / `agent` などの広すぎる既存タグとカテゴリ寄せ対象タグを inactive 化した
+- あわせて L2/L4 を再タグ付けし、inactive 化した broad tag の付与行を `articles_enriched_tags` / `public_article_tags` から除去した
+- 導線図だけでは評価しづらいので、次は図で詰め切らず Web 実装を先に進めて評価する方針へ切り替えた
 
 ## 2. 直近で重要な運用状態
 
@@ -65,11 +70,11 @@
 ### 優先
 
 1. 今回用 artifact / prompt / outputs を `af-20260326/` 系へ切り直す
-2. 主タグの完全除外リストを 1周目フローへ反映する
-3. 50〜200件チャンクで 1周目の全件再判定を回す
-4. 新規立項タグ候補を集計し、ユーザー提示用の候補一覧を作る
-5. job_run_id=719/720 の結果を比較し、本文を見ても主タグが増えない記事群を分類して原因を整理する
-6. `paper` 専用タグ群の初期候補を作り、`source_type='paper'` 限定 allowlist の試験投入方針を決める
+2. 主タグ・新規立項タグ・カテゴリ・周辺分野タグの役割分担を整理する
+3. カテゴリをサイドバー導線として使う前提で公開面を実装する
+4. 周辺分野タグを当面通常タグと同様にクリック可能な導線として実装する
+5. 実装した Web を見ながらカテゴリ配置とタグ導線を評価する
+6. 人間が TBL を直接見られるタグ参照 SQL を使って、新規立項タグ候補の次ラウンド判断を進める
 
 ### 後続
 
@@ -79,6 +84,9 @@
 4. tag alias 管理 UI の要否判断
 5. `push_subscriptions.genres` rename の判断
 6. 2周目着手前にカテゴリ / 属性設計を確定する
+7. `paper` 専用タグマスタ新設と `paper` 判定時の切替ロジックを設計する
+8. 周辺分野タグを使った視覚的マッピングページを設計する
+9. タグ関連テーブル再編の要否を整理する（分割 or 共通化 + `tag_type`）
 
 ## 4. 直近の重要変更
 
@@ -91,6 +99,10 @@
 7. job_run_id=719 では `canonicalAliasCount` / `canonicalKeywordCount` は 0 のままで、prompt 追加調整なしでは alias / keyword 寄せはまだ出ていない
 8. prompt の矛盾を解消し `matchedTagKeys` 上限を 5 件へ広げた結果、job_run_id=720 では `canonicalKeywordCount=8`、`matched_total=17` を確認した
 9. ただし job_run_id=720 は別コホートで、20 件中 4 件しか主タグが付いていない。量的改善の評価には、無タグ記事の内容分類とタグマスタ被覆の分析が必要
+10. `apply-phase1-tag-decisions.ts` を追加し、Phase 1 正本から新規主タグ 13 件の昇格、broad tag / カテゴリ寄せタグの inactive 化、candidate pool の reject 反映を自動化した
+11. `listCollectionTagKeywords()` を active tag 限定に修正し、inactive 化したタグが retag で再付与されないようにした
+12. `retag-layer2-layer4.ts` を実行し、L2 6028 件を洗い替え、L4 401 件のサムネイル同期を更新した
+13. inactive 化した `llm` / `agent` / `paper` / `rag` などの付与行を `articles_enriched_tags` / `public_article_tags` から除去し、`tags_master.article_count` を 0 に再計算した
 10. `alphaXiv` 非採用、`arXiv` 収集 + 公開時置換へ方針固定
 11. `enrich-worker` に 6 か月超 raw の skip を追加
 12. `arxiv-ai` は 5 か月超 raw を enrich 対象外、L4 は 2 か月保持にする方針で確定
