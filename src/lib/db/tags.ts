@@ -18,9 +18,11 @@ type TagKeywordRow = {
 export async function listCollectionTagKeywords(): Promise<TagKeywordReference[]> {
   const sql = getSql()
   const rows = (await sql`
-    SELECT tag_id, keyword, is_case_sensitive
-    FROM tag_keywords
-    WHERE use_for_collection = true
+    SELECT tk.tag_id, tk.keyword, tk.is_case_sensitive
+    FROM tag_keywords tk
+    JOIN tags_master tm ON tm.tag_id = tk.tag_id
+    WHERE tk.use_for_collection = true
+      AND tm.is_active = true
     ORDER BY tag_id, keyword
   `) as TagKeywordRow[]
 

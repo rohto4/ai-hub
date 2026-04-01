@@ -28,14 +28,12 @@ export function useHomeDerivedArticles({
   searchState,
   homeStats,
   homeActivity,
-  savedCount,
 }: {
   activeTopic: TopicChip
   homeData: HomeData
   searchState: SearchLoadState
   homeStats: HomeStatsSnapshot
   homeActivity: HomeActivitySnapshot
-  savedCount: number
 }) {
   const randomArticles = useMemo(
     () => filterByTopic(homeData.random, activeTopic),
@@ -77,22 +75,16 @@ export function useHomeDerivedArticles({
 
   const kpis = useMemo(
     () => [
-      { label: '公開記事数', value: homeStats.publishedTotal, group: 'total' },
-      { label: '本日の新着', value: homeStats.publishedToday, group: 'total' },
-      { label: '注目記事', value: homeStats.topRatedCount, group: 'total' },
-      { label: '保存済み', value: savedCount, group: 'total' },
-      { label: 'OFFICIAL', value: homeStats.officialCount, group: 'lane' },
-      { label: 'BLOG', value: homeStats.blogCount, group: 'lane' },
-      { label: 'PAPER', value: homeStats.paperCount, group: 'lane' },
-      { label: 'NEWS', value: homeStats.newsCount, group: 'lane' },
-      { label: 'Agent', value: homeStats.agentCount, group: 'genre' },
-      { label: 'Voice', value: homeStats.voiceCount, group: 'genre' },
-      { label: 'Policy', value: homeStats.policyCount, group: 'genre' },
-      { label: 'Safety', value: homeStats.safetyCount, group: 'genre' },
-      { label: '1h 閲覧', value: homeActivity.impressionCountLastHour, group: 'activity' },
-      { label: '1h シェア', value: homeActivity.shareCountLastHour, group: 'activity' },
+      { label: '公開記事', value: homeStats.publishedTotal, group: 'blue' },
+      { label: '新着記事', value: homeStats.publishedToday, group: 'blue' },
+      { label: 'OFFICIAL', value: homeStats.officialCount, group: 'green' },
+      { label: 'BLOG', value: homeStats.blogCount, group: 'green' },
+      { label: 'NEWS', value: homeStats.newsCount, group: 'green' },
+      { label: 'PAPER', value: homeStats.paperCount, group: 'green' },
+      { label: '今月の閲覧数', value: homeActivity.impressionCountLastHour, group: 'red' },
+      { label: '今月のシェア数', value: homeActivity.shareCountLastHour, group: 'red' },
     ],
-    [homeActivity, homeStats, savedCount],
+    [homeActivity, homeStats],
   )
 
   return {

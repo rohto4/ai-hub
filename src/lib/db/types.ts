@@ -126,6 +126,11 @@ export interface HomeResponse {
   unique: ArticleWithScore[]
   ranked: ArticleWithScore[]
   lanes: Lanes
+  focusTags: Array<{
+    tagKey: string
+    displayName: string
+    articleCount: number
+  }>
   period: RankPeriod
   stats: HomeStats
   activity: HomeActivity

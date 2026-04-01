@@ -6,14 +6,20 @@ import {
   PUBLIC_DISPLAY_MAX_AGE,
   PublicArticleRow,
   buildSourceCategoryFilter,
+  buildTagKeysFilter,
   buildSourceTypeFilter,
   toArticle,
 } from '@/lib/db/public-shared'
 import { listContentLaneArticles } from '@/lib/db/public-rankings'
 
-export async function listRandomPublicArticles(options: { limit: number; sourceCategory?: string | null }): Promise<ArticleWithScore[]> {
+export async function listRandomPublicArticles(options: {
+  limit: number
+  sourceCategory?: string | null
+  tagKeys?: string[] | null
+}): Promise<ArticleWithScore[]> {
   const sql = getSql()
   const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
+  const tagKeys = buildTagKeysFilter(options.tagKeys)
   const rows = (await sql`
     SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
            pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, to_jsonb(pa)->>'thumbnail_bg_theme' AS thumbnail_bg_theme, pa.content_language,
@@ -24,6 +30,16 @@ export async function listRandomPublicArticles(options: { limit: number; sourceC
     FROM public_articles pa
     WHERE pa.visibility_status = 'published'
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
+      AND (
+        ${tagKeys}::text[] IS NULL
+        OR EXISTS (
+          SELECT 1
+          FROM public_article_tags pat
+          JOIN tags_master tm ON tm.tag_id = pat.tag_id
+          WHERE pat.public_article_id = pa.public_article_id
+            AND tm.tag_key = ANY(${tagKeys}::text[])
+        )
+      )
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
     ORDER BY RANDOM()
     LIMIT ${Math.max(options.limit * 4, options.limit + 20)}
@@ -37,11 +53,13 @@ export async function listLatestPublicArticles(options: {
   sourceCategory?: string | null
   sourceType?: string | null
   period?: RankPeriod
+  tagKeys?: string[] | null
 }): Promise<ArticleWithScore[]> {
   const sql = getSql()
   const offset = options.offset ?? 0
   const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
   const sourceType = buildSourceTypeFilter(options.sourceType)
+  const tagKeys = buildTagKeysFilter(options.tagKeys)
   const interval = options.period ? PERIOD_INTERVAL[options.period] : null
   const rows = (await sql`
     SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
@@ -54,6 +72,16 @@ export async function listLatestPublicArticles(options: {
     WHERE pa.visibility_status = 'published'
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
       AND (${sourceType}::text IS NULL OR pa.source_type = ${sourceType})
+      AND (
+        ${tagKeys}::text[] IS NULL
+        OR EXISTS (
+          SELECT 1
+          FROM public_article_tags pat
+          JOIN tags_master tm ON tm.tag_id = pat.tag_id
+          WHERE pat.public_article_id = pa.public_article_id
+            AND tm.tag_key = ANY(${tagKeys}::text[])
+        )
+      )
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
       AND (${interval}::text IS NULL OR COALESCE(pa.original_published_at, pa.created_at) >= now() - ${interval}::interval)
     ORDER BY COALESCE(pa.original_published_at, pa.created_at) DESC
@@ -62,9 +90,14 @@ export async function listLatestPublicArticles(options: {
   return applyDomainDiversity(rows.map(toArticle), options.limit)
 }
 
-export async function listUniquePublicArticles(options: { limit: number; sourceCategory?: string | null }): Promise<ArticleWithScore[]> {
+export async function listUniquePublicArticles(options: {
+  limit: number
+  sourceCategory?: string | null
+  tagKeys?: string[] | null
+}): Promise<ArticleWithScore[]> {
   const sql = getSql()
   const sourceCategory = buildSourceCategoryFilter(options.sourceCategory)
+  const tagKeys = buildTagKeysFilter(options.tagKeys)
   const rows = (await sql`
     SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
            pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, to_jsonb(pa)->>'thumbnail_bg_theme' AS thumbnail_bg_theme, pa.content_language,
@@ -75,6 +108,16 @@ export async function listUniquePublicArticles(options: { limit: number; sourceC
     FROM public_articles pa
     WHERE pa.visibility_status = 'published'
       AND (${sourceCategory}::text IS NULL OR pa.source_category = ${sourceCategory})
+      AND (
+        ${tagKeys}::text[] IS NULL
+        OR EXISTS (
+          SELECT 1
+          FROM public_article_tags pat
+          JOIN tags_master tm ON tm.tag_id = pat.tag_id
+          WHERE pat.public_article_id = pa.public_article_id
+            AND tm.tag_key = ANY(${tagKeys}::text[])
+        )
+      )
       AND COALESCE(pa.original_published_at, pa.created_at) >= now() - ${PUBLIC_DISPLAY_MAX_AGE}::interval
     ORDER BY pa.source_category, pa.content_score DESC
     LIMIT ${Math.max(options.limit * 4, options.limit + 20)}
@@ -86,11 +129,12 @@ export async function listContentLanes(options: {
   period: RankPeriod
   perLane: number
   sourceCategory?: string | null
+  tagKeys?: string[] | null
 }): Promise<Lanes> {
   const [official, paper, news] = await Promise.all([
-    listContentLaneArticles({ sourceType: 'official', period: options.period, limit: options.perLane, sourceCategory: options.sourceCategory }),
-    listContentLaneArticles({ sourceType: 'paper', period: options.period, limit: options.perLane, sourceCategory: options.sourceCategory }),
-    listContentLaneArticles({ sourceType: 'news', period: options.period, limit: options.perLane, sourceCategory: options.sourceCategory }),
+    listContentLaneArticles({ sourceType: 'official', period: options.period, limit: options.perLane, sourceCategory: options.sourceCategory, tagKeys: options.tagKeys }),
+    listContentLaneArticles({ sourceType: 'paper', period: options.period, limit: options.perLane, sourceCategory: options.sourceCategory, tagKeys: options.tagKeys }),
+    listContentLaneArticles({ sourceType: 'news', period: options.period, limit: options.perLane, sourceCategory: options.sourceCategory, tagKeys: options.tagKeys }),
   ])
   return { official, paper, news }
 }
@@ -99,6 +143,11 @@ export async function listFeedArticles(limit = 20): Promise<ArticleWithScore[]> 
   return listLatestPublicArticles({ limit })
 }
 
-export async function listPublicArticlesLanes(options: { period: RankPeriod; perLane: number; sourceCategory?: string | null }) {
+export async function listPublicArticlesLanes(options: {
+  period: RankPeriod
+  perLane: number
+  sourceCategory?: string | null
+  tagKeys?: string[] | null
+}) {
   return listContentLanes(options)
 }

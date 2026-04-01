@@ -175,7 +175,7 @@ async function main(): Promise<void> {
       if (tagRows.length > 0) {
         await sql`
           INSERT INTO articles_enriched_tags (enriched_article_id, tag_id, tag_source, is_primary)
-          SELECT enriched_article_id::bigint, tag_id::uuid, 'retag_rebuild', is_primary
+          SELECT enriched_article_id::bigint, tag_id::uuid, 'master', is_primary
           FROM unnest(
             ${tagRows.map((row) => row.enriched_article_id)}::bigint[],
             ${tagRows.map((row) => row.tag_id)}::text[],

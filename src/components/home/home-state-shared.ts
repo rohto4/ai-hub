@@ -9,6 +9,7 @@ export type HomeData = {
   latest: UiArticle[]
   unique: UiArticle[]
   lanes: UiLanes
+  focusTags: HomeResponse['focusTags']
   loading: boolean
   message: string | null
 }
@@ -35,6 +36,7 @@ export const initialHomeData: HomeData = {
   latest: [],
   unique: [],
   lanes: emptyLanes,
+  focusTags: [],
   loading: true,
   message: 'ホームを読み込み中です。',
 }

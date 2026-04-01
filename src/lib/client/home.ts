@@ -4,7 +4,6 @@ const SESSION_KEY = 'ai-trend-hub/session-id'
 const SAVED_IDS_KEY = 'ai-trend-hub/saved-article-ids'
 const SHARE_TAG_KEY = 'ai-trend-hub/share-append-tag'
 const MISSKEY_INSTANCE_KEY = 'ai-trend-hub/misskey-instance'
-const RETURN_FOCUS_KEY = 'ai-trend-hub/return-focus-article-id'
 
 function canUseStorage(): boolean {
   return typeof window !== 'undefined'
@@ -68,19 +67,6 @@ export function getMisskeyInstance(): string {
 export function setMisskeyInstance(instance: string): void {
   if (!canUseStorage()) return
   window.localStorage.setItem(MISSKEY_INSTANCE_KEY, instance.trim())
-}
-
-export function setReturnFocusArticleId(articleId: string): void {
-  if (!canUseStorage()) return
-  window.sessionStorage.setItem(RETURN_FOCUS_KEY, articleId)
-}
-
-export function consumeReturnFocusArticleId(): string | null {
-  if (!canUseStorage()) return null
-  const articleId = window.sessionStorage.getItem(RETURN_FOCUS_KEY)
-  if (!articleId) return null
-  window.sessionStorage.removeItem(RETURN_FOCUS_KEY)
-  return articleId
 }
 
 function detectPlatform(): Platform {

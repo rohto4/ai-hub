@@ -3,21 +3,26 @@
 import { useEffect, useState } from 'react'
 import type { HomeActivity, HomeStats, RankPeriod } from '@/lib/db/types'
 import {
-  HomeData,
-  SearchLoadState,
+  type HomeData,
+  type HomeLoadResponse,
+  type SearchLoadResponse,
+  type SearchLoadState,
+  type TopicChip,
+  emptyLanes,
   fetchJson,
   initialHomeActivity,
   initialHomeData,
   initialHomeStats,
   initialSearchState,
   toUiArticles,
-  emptyLanes,
-  HomeLoadResponse,
-  SearchLoadResponse,
-  TopicChip,
 } from '@/components/home/home-state-shared'
 
-export function useHomeData(period: RankPeriod, searchQuery: string, activeTopic: TopicChip) {
+export function useHomeData(
+  period: RankPeriod,
+  searchQuery: string,
+  activeTopic: TopicChip,
+  selectedTagKeys: string[],
+) {
   const [homeData, setHomeData] = useState<HomeData>(initialHomeData)
   const [homeStats, setHomeStats] = useState<HomeStats>(initialHomeStats)
   const [homeActivity, setHomeActivity] = useState<HomeActivity>(initialHomeActivity)
@@ -28,8 +33,19 @@ export function useHomeData(period: RankPeriod, searchQuery: string, activeTopic
 
     async function loadHome() {
       setHomeData((current) => ({ ...current, loading: true, message: 'ホームを読み込み中です。' }))
+
       try {
-        const response = await fetchJson<HomeLoadResponse>(`/api/home?period=${period}&limit=20&topic=${activeTopic}`)
+        const params = new URLSearchParams({
+          period,
+          limit: '20',
+          topic: activeTopic,
+        })
+
+        if (selectedTagKeys.length > 0) {
+          params.set('selectedTags', selectedTagKeys.join(','))
+        }
+
+        const response = await fetchJson<HomeLoadResponse>(`/api/home?${params.toString()}`)
         if (ignore) return
 
         setHomeData({
@@ -41,15 +57,24 @@ export function useHomeData(period: RankPeriod, searchQuery: string, activeTopic
             paper: toUiArticles(response.lanes.paper as HomeData['lanes']['paper']),
             news: toUiArticles(response.lanes.news as HomeData['lanes']['news']),
           },
+          focusTags: response.focusTags,
           loading: false,
-          message: `${response.random.length} 件表示中です。`,
+          message: null,
         })
         setHomeStats(response.stats)
         setHomeActivity(response.activity)
       } catch (error) {
         if (ignore) return
         const message = error instanceof Error ? error.message : 'ホームの取得に失敗しました。'
-        setHomeData({ random: [], latest: [], unique: [], lanes: emptyLanes, loading: false, message })
+        setHomeData({
+          random: [],
+          latest: [],
+          unique: [],
+          lanes: emptyLanes,
+          focusTags: [],
+          loading: false,
+          message,
+        })
       }
     }
 
@@ -57,7 +82,7 @@ export function useHomeData(period: RankPeriod, searchQuery: string, activeTopic
     return () => {
       ignore = true
     }
-  }, [period, activeTopic])
+  }, [period, activeTopic, selectedTagKeys])
 
   useEffect(() => {
     let ignore = false
@@ -68,7 +93,7 @@ export function useHomeData(period: RankPeriod, searchQuery: string, activeTopic
         return
       }
 
-      setSearchState({ articles: [], loading: true, message: `「${searchQuery}」を検索中です。` })
+      setSearchState({ articles: [], loading: true, message: `「${searchQuery}」を検索しています…` })
 
       try {
         const response = await fetchJson<SearchLoadResponse>(`/api/search?q=${encodeURIComponent(searchQuery)}&limit=12`)

@@ -54,6 +54,16 @@
 - prompt の矛盾を解消して `matchedTagKeys` 上限を 5 件へ広げた結果、job_run_id=720 では `canonicalKeywordCount=8` が出た
 - ただし job_run_id=720 の 20 件では主タグ付きは 4 件のみで、コホート差を踏まえた無タグ記事分析が次に必要
 - ユーザー仮説として、`arxiv-ai` / `paper` は基礎研究寄りが多く、記事系では除外した一般研究語（`rag`, `slm` など）を `paper` 専用タグ群として持つ案が有力
+- 719 / 720 の原因分析自体は完了済み。次は SQL 深掘りではなく、主タグ / 新規立項タグ / カテゴリ / 周辺分野タグ整理と公開導線の確立を優先する
+- `paper` 専用タグマスタ新設と `paper` 判定時の切替ロジックは有力案だが、いったん `implementation-plan` 上の後続タスクとして保留する
+- カテゴリは公開面サイドバー導線に使う前提
+- 周辺分野タグは当面通常タグ同様のクリック導線に留め、将来の視覚的マッピングページは後続へ回す
+- タグ関連テーブル再編は将来論点として残すが、今は `tag_type` などの schema 再編に入らず既存構成のまま進める
+- `final-tag-decisions.json` から新規主タグ 13 件を DB へ昇格済み
+- `llm` / `agent` / `paper` / `rag` / `policy` / `safety` / `huggingface` と、カテゴリ寄せ対象 `open source` / `enterprise-ai` は inactive 化し、L2/L4 付与も除去済み
+- `scripts/apply-phase1-tag-decisions.ts` を追加済み。再実行で同じ反映を再適用できる
+- `listCollectionTagKeywords()` は active tag のみ返すよう修正済み
+- `screen-flow` / `flowchart` に vNext draft は追加済みだが、図だけでは導線評価しづらいと判断。次は図を詰めるより Web 実装を先に進めて実画面で評価する
 
 ### 3.3 今回セッションで固定した判断
 
@@ -135,8 +145,11 @@
 4. 50〜200件チャンクで 1周目を回し、新規立項タグ候補を集計する
 5. ユーザー提示用の新規立項タグ候補一覧を作る
 6. live run で `job_runs` / `job_run_items` / `articles_enriched_tags` / `tag_candidate_pool` / `tag_aliases` / `tag_keywords` の増分を確認する
-7. job_run_id=719/720 の無タグ記事を分類し、タグマスタ被覆不足か prompt 判断不足かを切り分ける
-8. `paper` 専用タグ群の初期候補を作り、`source_type='paper'` 限定 allowlist の試験導入を検討する
+7. 主タグ / 新規立項タグ / カテゴリ / 周辺分野タグの役割分担を整理する
+8. 公開面のタグ / カテゴリ / 周辺分野タグ導線を、図ではなく Web 実装として先に進める
+9. 実装した Web を見ながら導線を評価し、必要な修正点を洗う
+10. タグ参照用 SQL を使って TBL を直接見ながら次ラウンドの昇格 / 保留 / 導線判断を進める
+11. `paper` 専用タグマスタ新設と `paper` 判定時切替ロジックは後続タスクとして plan に残す
 
 ## 8. Gemini 再開用プロンプト
 

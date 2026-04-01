@@ -1,128 +1,49 @@
 'use client'
 
 import { HomeArticleSection } from '@/components/home/HomeArticleSection'
-import { HomeLaneSection } from '@/components/home/HomeLaneSection'
 import type { UseHomeStateReturn } from '@/components/home/useHomeState'
 import { PwaInstallBanner } from '@/components/pwa/PwaInstallBanner'
-import { Toolbar } from '@/components/toolbar/Toolbar'
 import type { LaneKey } from '@/lib/db/types'
 
-const TOPIC_CHIPS = ['all', 'llm', 'agent', 'voice', 'policy', 'safety', 'search', 'news'] as const
 const LANE_ORDER: LaneKey[] = ['official', 'paper', 'news']
-const LANE_LABELS: Record<LaneKey, string> = { official: 'OFFICIAL', paper: 'Paper', news: 'News' }
-const LANE_TONES: Record<LaneKey, { bg: string; text: string }> = {
-  official: { bg: '#dbeafe', text: '#1e40af' },
-  paper: { bg: '#f3e8ff', text: '#7e22ce' },
-  news: { bg: '#fee2e2', text: '#b91c1c' },
+const LANE_LABELS: Record<LaneKey, string> = {
+  official: 'Official',
+  paper: 'Paper',
+  news: 'News',
+}
+const LANE_TONES: Record<LaneKey, { text: string }> = {
+  official: { text: '#1974d2' },
+  paper: { text: '#a21caf' },
+  news: { text: '#d43d51' },
 }
 
+const SECTION_LINKS = [
+  { href: '#section-random', label: 'ランダム' },
+  { href: '#section-latest', label: '新着順' },
+  { href: '#section-unique', label: 'ユニーク順' },
+]
+
 export function HomePrimaryColumn({ state }: { state: UseHomeStateReturn }) {
+  const shouldShowSearch =
+    Boolean(state.searchQuery) ||
+    state.searchState.loading ||
+    state.searchState.articles.length > 0 ||
+    state.searchState.message !== null
+
   return (
-    <div className="flex-1 rounded-[14px] bg-white/10 p-2.5">
-      <div className="mb-2 flex items-center gap-2 rounded-lg border border-[#f4d9c1] bg-[#fff8ef] px-3 py-2 text-[11px] text-accent-darker">
-        <span className="font-bold">Focus</span>
-        <span>{state.homeData.message ?? '公開候補を表示中です。'}</span>
-      </div>
+    <div className="min-w-0 flex-1">
+      <SectionNavigator activeHref="#section-random" emphasizeActive />
 
-      <SummaryModeToggle summaryMode={state.summaryMode} onChange={state.setSummaryMode} />
-
-      <Toolbar period={state.period} onPeriodChange={state.setPeriod} />
-
-      <div className="mt-2 flex flex-wrap gap-2 px-1">
-        {TOPIC_CHIPS.map((topic) => (
-          <button
-            key={topic}
-            type="button"
-            className="rounded-full border px-3 py-1 text-[11px] font-bold"
-            style={{
-              background: state.activeTopic === topic ? 'var(--color-accent-lighter)' : '#fff',
-              color: state.activeTopic === topic ? 'var(--color-accent-darker)' : 'var(--color-subtle)',
-              borderColor: state.activeTopic === topic ? '#f4c29a' : 'rgba(0,0,0,0.05)',
-            }}
-            onClick={() => state.setActiveTopic(topic)}
-          >
-            {topic}
-          </button>
-        ))}
-      </div>
-
-      <HomeArticleSection
-        id="section-random"
-        title="ランダム表示"
-        articles={state.randomArticles}
-        loading={state.homeData.loading}
-        summaryMode={state.summaryMode}
-        focusedArticleId={state.focusedArticleId}
-        savedArticleIds={state.savedArticleIds}
-        likedArticleIds={state.likedArticleIds}
-        onCardClick={state.handleCardClick}
-        onAction={state.handleArticleAction}
-        onOpenArticle={state.handleOpenArticle}
-      />
-
-      <HomeArticleSection
-        id="section-latest"
-        title="新着順"
-        articles={state.latestArticles}
-        loading={state.homeData.loading}
-        summaryMode={state.summaryMode}
-        focusedArticleId={state.focusedArticleId}
-        savedArticleIds={state.savedArticleIds}
-        likedArticleIds={state.likedArticleIds}
-        onCardClick={state.handleCardClick}
-        onAction={state.handleArticleAction}
-        onOpenArticle={state.handleOpenArticle}
-      />
-
-      <HomeArticleSection
-        id="section-unique"
-        title="ユニーク順"
-        articles={state.uniqueArticles}
-        loading={state.homeData.loading}
-        summaryMode={state.summaryMode}
-        focusedArticleId={state.focusedArticleId}
-        savedArticleIds={state.savedArticleIds}
-        likedArticleIds={state.likedArticleIds}
-        onCardClick={state.handleCardClick}
-        onAction={state.handleArticleAction}
-        onOpenArticle={state.handleOpenArticle}
-      />
-
-      <SectionLabel className="mt-6">ソースレーン</SectionLabel>
-      <div className="flex flex-col gap-5">
-        {LANE_ORDER.map((laneKey) => (
-          <HomeLaneSection
-            key={laneKey}
-            laneKey={laneKey}
-            label={LANE_LABELS[laneKey]}
-            tone={LANE_TONES[laneKey]}
-            articles={state.homeData.lanes[laneKey]}
-            loading={state.homeData.loading}
-            summaryMode={state.summaryMode}
-          />
-        ))}
-      </div>
-
-      <div className="mt-5 rounded-2xl border border-black/5 bg-white p-4 text-center">
-        <p className="text-[13px] font-extrabold">AIダイジェスト</p>
-        <p className="mt-1 text-[11px] text-muted">毎日のトピック要約をまとめて確認できます。</p>
-        <a
-          href="/digest"
-          className="mt-3 inline-block rounded-xl px-5 py-2 text-[12px] font-bold text-white"
-          style={{ background: 'var(--color-orange)' }}
-        >
-          ダイジェストを見る
-        </a>
-      </div>
-
-      {state.searchDraft || state.searchState.articles.length > 0 ? (
-        <div className="mt-5">
+      {shouldShowSearch ? (
+        <section id="section-search" className="mb-8 border border-black/6 bg-white/86 px-4 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.04)]">
           <SectionLabel>検索結果</SectionLabel>
-          <p className="mb-2 text-[11px] text-muted">
-            {state.searchState.loading ? '検索中です。' : `${state.visibleSearchArticles.length} 件`}
+          <p className="mb-3 text-[11px] text-[color:var(--color-muted)]">
+            {state.searchState.loading
+              ? `「${state.searchQuery}」を検索しています…`
+              : state.searchState.message ?? `${state.visibleSearchArticles.length} 件`}
           </p>
           <HomeArticleSection
-            id="section-search"
+            id="section-search-results"
             title="検索結果"
             articles={state.visibleSearchArticles}
             loading={state.searchState.loading}
@@ -134,10 +55,72 @@ export function HomePrimaryColumn({ state }: { state: UseHomeStateReturn }) {
             onAction={state.handleArticleAction}
             onOpenArticle={state.handleOpenArticle}
           />
-        </div>
+        </section>
       ) : null}
 
-      <div className="mt-4">
+      <HomeArticleSection
+        id="section-random"
+        title="ランダム"
+        showHeading={false}
+        articles={state.randomArticles}
+        loading={state.homeData.loading}
+        summaryMode={state.summaryMode}
+        focusedArticleId={state.focusedArticleId}
+        savedArticleIds={state.savedArticleIds}
+        likedArticleIds={state.likedArticleIds}
+        onCardClick={state.handleCardClick}
+        onAction={state.handleArticleAction}
+        onOpenArticle={state.handleOpenArticle}
+      />
+
+      <SectionNavigator activeHref="#section-latest" className="mt-8" />
+
+      <HomeArticleSection
+        id="section-latest"
+        title="新着順"
+        showHeading={false}
+        articles={state.latestArticles}
+        loading={state.homeData.loading}
+        summaryMode={state.summaryMode}
+        focusedArticleId={state.focusedArticleId}
+        savedArticleIds={state.savedArticleIds}
+        likedArticleIds={state.likedArticleIds}
+        onCardClick={state.handleCardClick}
+        onAction={state.handleArticleAction}
+        onOpenArticle={state.handleOpenArticle}
+      />
+
+      <SectionNavigator activeHref="#section-unique" className="mt-8" />
+
+      <HomeArticleSection
+        id="section-unique"
+        title="ユニーク順"
+        showHeading={false}
+        articles={state.uniqueArticles}
+        loading={state.homeData.loading}
+        summaryMode={state.summaryMode}
+        focusedArticleId={state.focusedArticleId}
+        savedArticleIds={state.savedArticleIds}
+        likedArticleIds={state.likedArticleIds}
+        onCardClick={state.handleCardClick}
+        onAction={state.handleArticleAction}
+        onOpenArticle={state.handleOpenArticle}
+      />
+
+      <SectionLabel className="mt-10">レーン</SectionLabel>
+      <div className="flex flex-col gap-5">
+        {LANE_ORDER.map((laneKey) => (
+          <LanePreview
+            key={laneKey}
+            label={LANE_LABELS[laneKey]}
+            tone={LANE_TONES[laneKey]}
+            count={state.homeData.lanes[laneKey].length}
+            href={`/category/${laneKey}`}
+          />
+        ))}
+      </div>
+
+      <div className="mt-8 hidden">
         <SectionLabel>PWA</SectionLabel>
         <PwaInstallBanner />
       </div>
@@ -145,38 +128,71 @@ export function HomePrimaryColumn({ state }: { state: UseHomeStateReturn }) {
   )
 }
 
-function SummaryModeToggle({
-  summaryMode,
-  onChange,
+function SectionNavigator({
+  activeHref,
+  emphasizeActive = false,
+  className = '',
 }: {
-  summaryMode: 100 | 200
-  onChange: (mode: 100 | 200) => void
+  activeHref: string
+  emphasizeActive?: boolean
+  className?: string
 }) {
   return (
-    <div className="mb-2 flex overflow-hidden rounded-lg border border-black/5" style={{ background: 'var(--color-card-second)' }}>
-      {([100, 200] as const).map((mode) => (
-        <button
-          key={mode}
-          type="button"
-          onClick={() => onChange(mode)}
-          className="flex-1 py-1.5 text-[11px] font-bold transition-all"
-          style={{
-            background: summaryMode === mode ? 'var(--color-accent-lighter)' : 'transparent',
-            color: summaryMode === mode ? 'var(--color-accent-darker)' : 'var(--color-subtle)',
-          }}
-        >
-          {mode}字モード
-        </button>
-      ))}
+    <div className={`mb-5 flex flex-wrap items-center gap-2 border-b border-l-[3px] border-[color:var(--color-accent-darker)] pb-2 pl-3 ${className}`}>
+      {SECTION_LINKS.map((link) => {
+        const isActive = link.href === activeHref
+        return (
+          <a
+            key={link.href}
+            href={link.href}
+            className="px-4 py-2 font-bold transition"
+            style={{
+              background: isActive ? 'var(--color-accent-light)' : 'transparent',
+              color: isActive ? 'var(--color-accent-darker)' : 'var(--color-accent-dark)',
+              borderRadius: isActive ? 10 : 0,
+              fontSize: isActive && emphasizeActive ? 16 : isActive ? 13 : 12,
+              letterSpacing: isActive && emphasizeActive ? '-0.04em' : '0',
+            }}
+          >
+            {link.label}
+          </a>
+        )
+      })}
     </div>
   )
 }
 
-function SectionLabel({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function LanePreview({
+  label,
+  tone,
+  count,
+  href,
+}: {
+  label: string
+  tone: { text: string }
+  count: number
+  href: string
+}) {
   return (
-    <div
-      className={`mb-2 inline-block rounded-md bg-[#f2dfd0] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.05em] text-[#7a4525] ${className}`}
-    >
+    <a href={href} className="border-b border-black/8 pb-2 text-sm font-bold text-[color:var(--color-ink)]">
+      <span className="inline-flex items-center gap-2">
+        <span className="inline-block h-2.5 w-2.5" style={{ backgroundColor: tone.text }} />
+        {label}
+      </span>
+      <span className="ml-3 text-[11px] text-[color:var(--color-muted)]">{count}件</span>
+    </a>
+  )
+}
+
+function SectionLabel({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div className={`mb-3 text-sm font-black tracking-[-0.04em] text-[color:var(--color-ink)] ${className}`}>
       {children}
     </div>
   )
