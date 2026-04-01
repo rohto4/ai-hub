@@ -225,18 +225,35 @@
 - GH Actions に専用 yml がなく、`hourly-publish` 内で処理されている
 - **判断待ち:** 独立起動が必要なユースケースがあるか、`hourly-publish` 内処理のみで十分かを確認する
 
-#### (h) 取得ソース急増時の臨時 enrich バッチがない
+#### (h) 追いつきバッチの自動化方式の選択
+
+現状:
+- 追いつき CLI フロー（prepare → Gemini CLI → import）は動作しており、backlog 1840 件で実績あり
+- 自動化されておらず、実行は手動（ローカルで npm スクリプトを叩く + Gemini CLI を手で回す）
+- Gemini API の rate limit を受けず、月額定額で大量処理できる利点がある
+
+**判断待ち:** 以下の方式のどれを正式な追いつきバッチとするか
+1. **現状維持（手動 CLI）** — ソース急増時だけ手動で prepare → CLI → import を回す
+2. **GH Actions 緊急 yml 追加** — `workflow_dispatch` + limit/maxSummaryBatches 入力で通常 enrich-worker を大量実行する（Gemini API 課金・rate limit あり）
+3. **CLI フローの半自動化** — prepare と import だけ GH Actions / Vercel Cron で自動化し、Gemini CLI 部分は月次手動のまま残す
+
+判断に必要な情報:
+- Gemini API が安定稼働している期間と rate limit 頻度の実績
+- 追いつきが必要になる頻度（ソース追加頻度・バッチ停止リスク）
+
+---
+
+#### (i) 取得ソース急増時・バッチ停止後の対応手順が未整備
 
 現状の手段:
 - `hourly-enrich.yml` の `workflow_dispatch` で手動発火（1回20件固定）
 - `scripts/prepare-gemini-cli-enrich-artifacts.ts` + Gemini CLI による手動バッチ処理（arxiv-ai backlog 1840件で実績あり）
 
-いずれも自動化されておらず、backlog が急増した場合の対応コストが高い。
+追いつき CLI フローの詳細は `implementation-plan.md` 3.10 に記載。
+自動化方式の選択は (h) に記載。
 
-**判断待ち:** 以下のいずれかを検討する
-- `workflow_dispatch` に `limit` パラメータを渡せる緊急用 yml を追加する（例: `emergency-enrich.yml`、limit=100）
-- backlog 件数が閾値を超えたら自動でスロットルアップする仕組みを設ける
-- 現状の手動対応（workflow_dispatch + Gemini CLI）のままでよいか判断する
+**判断待ち:** 追いつき CLI フロー完了後の後処理（db:retag-layer2-layer4 実行）を
+どのタイミング・誰の判断で行うかを運用ルールとして定める
 
 ---
 

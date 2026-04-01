@@ -118,6 +118,30 @@
 - 各回の `enrich-worker` は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1` を基本設定とする
 - `hourly-publish` は引き続き毎時 `:50` に実行する
 
+## 3.10 追いつきバッチ（CLI フロー）の不足実装
+
+追いつき CLI フロー（`prepare-gemini-cli-enrich-artifacts.ts` → Gemini CLI → `import-ai-enrich-outputs.ts`）は
+動作しているが、以下の 2 点が通常 `enrich-worker` と挙動が異なるため補完が必要。
+
+### (a) `properNounTags` → `tag_candidate_pool` の未反映
+
+- `import-ai-enrich-outputs.ts` は Gemini CLI output の `properNounTags` を読み込んでいるが、
+  `tag_candidate_pool` への書き込みを行っていない
+- 通常 `enrich-worker` では `candidateTags` が `tag_candidate_pool` に蓄積されるため、
+  追いつき import 後はその分だけタグ候補が欠落する
+- **実装内容:** `import-ai-enrich-outputs.ts` の upsert ループ内で、
+  output の `properNounTags` を `tag_candidate_pool` へ upsert する処理を追加する
+
+### (b) adjacent tags / thumbnail_bg_theme が空になる
+
+- `import-ai-enrich-outputs.ts` は `adjacentTagIds: []`、`thumbnailBgTheme: null` 固定で upsert している
+- import 直後は `articles_enriched_adjacent_tags` が空になり、L4 公開後も `thumbnail_bg_theme` が設定されない
+- **実装内容（運用手順として明文化）:**
+  import 完了後に `npm run db:retag-layer2-layer4` を実行することを
+  追いつきバッチの完了手順に明示する（新規スクリプトは不要、既存で対応可）
+
+---
+
 ## 4. 後回しでよいもの
 
 1. Topic Group
