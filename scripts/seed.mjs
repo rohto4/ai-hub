@@ -431,6 +431,18 @@ const sourceTargets = [
     commercialUsePolicy: 'permitted',
   },
   {
+    id: 'ae1b2c3d-0001-4000-8000-000000000055',
+    sourceKey: 'mercari-engineering-blog',
+    displayName: 'Mercari Engineering Blog',
+    fetchKind: 'rss',
+    sourceCategory: 'llm',
+    sourceType: 'blog',
+    baseUrl: 'https://engineering.mercari.com/blog/feed.xml',
+    contentAccessPolicy: 'feed_only',
+    contentLanguage: 'ja',
+    commercialUsePolicy: 'permitted', // newssite-new.md §2.1 商用利用可能として確認済み（2026-04-02）
+  },
+  {
     id: 'ae1b2c3d-0001-4000-8000-000000000012',
     sourceKey: 'reddit-machinelearning',
     displayName: 'Reddit r/MachineLearning',
@@ -613,6 +625,7 @@ const officialDomains = [
   { domain: 'tech.preferred.jp', sourceKey: 'pfn-tech-blog' },
   { domain: 'developers.cyberagent.co.jp', sourceKey: 'cyberagent-dev-blog' },
   { domain: 'jdla.org', sourceKey: 'jdla-news' },
+  { domain: 'engineering.mercari.com', sourceKey: 'mercari-engineering-blog' },
 ]
 
 const tags = [

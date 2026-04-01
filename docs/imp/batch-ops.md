@@ -74,7 +74,7 @@
 
 | コマンド | 用途 | 基本呼び出し例 |
 |---|---|---|
-| `db:run-hourly-fetch` | hourly-fetch の手動実行 | `npm run db:run-hourly-fetch -- --limit 20` |
+| `db:run-hourly-fetch` | hourly-fetch の手動実行 | `npm run db:run-hourly-fetch -- --limit 20 [--source-key <key>]` |
 | `db:run-enrich-worker` | enrich-worker の手動実行 | `npm run db:run-enrich-worker -- --limit 20 --summary-batch-size 20 --max-summary-batches 1` |
 | `db:prepare-gemini-cli-enrich` | 追いつき enrich の入力生成 | `npm run db:prepare-gemini-cli-enrich` |
 | `db:import-ai-enrich-outputs` | Gemini CLI 結果の DB 反映 | import 後は必ず `db:retag-layer2-layer4` を続ける |
