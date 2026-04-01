@@ -225,6 +225,19 @@
 - GH Actions に専用 yml がなく、`hourly-publish` 内で処理されている
 - **判断待ち:** 独立起動が必要なユースケースがあるか、`hourly-publish` 内処理のみで十分かを確認する
 
+#### (h) 取得ソース急増時の臨時 enrich バッチがない
+
+現状の手段:
+- `hourly-enrich.yml` の `workflow_dispatch` で手動発火（1回20件固定）
+- `scripts/prepare-gemini-cli-enrich-artifacts.ts` + Gemini CLI による手動バッチ処理（arxiv-ai backlog 1840件で実績あり）
+
+いずれも自動化されておらず、backlog が急増した場合の対応コストが高い。
+
+**判断待ち:** 以下のいずれかを検討する
+- `workflow_dispatch` に `limit` パラメータを渡せる緊急用 yml を追加する（例: `emergency-enrich.yml`、limit=100）
+- backlog 件数が閾値を超えたら自動でスロットルアップする仕組みを設ける
+- 現状の手動対応（workflow_dispatch + Gemini CLI）のままでよいか判断する
+
 ---
 
 ## 2. 確定済み判断（参照用）
