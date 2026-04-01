@@ -25,10 +25,17 @@ export function HomeCategoryRail({
   onTagToggle: (tagKey: string) => void
 }) {
   return (
-    <aside className="hidden xl:block xl:w-[220px] xl:shrink-0">
-      <div className="bg-[color:var(--color-card-second)] px-[10px] py-[10px] shadow-[0_2px_10px_rgba(0,0,0,0.04)]">
+    <aside className="hidden xl:block xl:w-[243px] xl:shrink-0">
+      <div
+        className="border bg-[color:var(--color-card-second)] px-[10px] py-[10px]"
+        style={{
+          borderColor: '#e8d9cb',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+          fontFamily: 'JetBrains Mono, var(--font-family-base)',
+        }}
+      >
         <SectionTitle>カテゴリ</SectionTitle>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col">
           {SITE_CATEGORIES.map((category) => {
             const isActive =
               category.kind === 'source-category' && activeTopic !== 'all' && activeTopic === category.queryValue
@@ -37,27 +44,38 @@ export function HomeCategoryRail({
               <Link
                 key={category.slug}
                 href={`/category/${category.slug}`}
-                className="group relative flex min-h-[42px] items-center overflow-hidden border-b border-black/6 px-3 text-[12px] font-semibold transition-[color,box-shadow,transform] duration-200"
+                className="group relative block h-[58px] overflow-hidden border"
                 style={{
-                  background: isActive ? `linear-gradient(90deg, ${category.softColor}, transparent 78%)` : 'transparent',
-                  color: isActive ? 'var(--color-accent-darker)' : 'var(--color-ink)',
-                  boxShadow: isActive ? `inset 0 0 22px ${category.softColor}` : 'inset 0 0 0 transparent',
+                  marginTop: '-1px',
+                  borderColor: '#ece2d9',
+                  background: '#fff8f1',
                 }}
               >
                 <span
-                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                  className="absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                   style={{
-                    background: `linear-gradient(90deg, ${category.softColor}, transparent 78%)`,
-                    boxShadow: `inset 0 0 26px ${category.softColor}`,
+                    background: `linear-gradient(90deg, ${category.softColor}, rgba(255,248,241,0) 78%)`,
+                    boxShadow: `inset 0 0 24px ${category.softColor}`,
                   }}
                 />
+                {isActive ? (
+                  <span
+                    className="absolute inset-0"
+                    style={{
+                      background: `linear-gradient(90deg, ${category.softColor}, rgba(255,248,241,0) 78%)`,
+                      boxShadow: `inset 0 0 20px ${category.softColor}`,
+                    }}
+                  />
+                ) : null}
                 <span
-                  className="absolute inset-y-0 left-0 w-3"
+                  className="absolute inset-y-0 left-0 w-[14px]"
                   style={{
                     background: `linear-gradient(180deg, ${category.solidColor}, ${category.softColor})`,
                   }}
                 />
-                <span className="relative z-10 pl-4">{category.label}</span>
+                <span className="absolute left-[26px] top-[21px] text-[12px] font-bold tracking-[-0.02em] text-[color:var(--color-ink)]">
+                  {category.label}
+                </span>
               </Link>
             )
           })}
@@ -66,7 +84,7 @@ export function HomeCategoryRail({
         <SectionDivider />
 
         <SectionTitle>注目タグ</SectionTitle>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-x-[6px] gap-y-[8px]">
           {focusTags.slice(0, 10).map((tag) => {
             const isSelected = selectedTagKeys.includes(tag.tagKey)
             return (
@@ -74,11 +92,11 @@ export function HomeCategoryRail({
                 key={tag.tagKey}
                 type="button"
                 onClick={() => onTagToggle(tag.tagKey)}
-                className="border px-2 py-1 text-[11px] font-bold transition-colors"
+                className="inline-flex h-7 items-center justify-center border px-[10px] text-[11px] font-bold transition-colors"
                 style={{
-                  borderColor: 'rgba(0,0,0,0.06)',
-                  background: isSelected ? 'var(--color-accent-lighter)' : 'transparent',
-                  color: isSelected ? 'var(--color-accent-darker)' : 'var(--color-subtle)',
+                  borderColor: '#e8d9cb',
+                  background: isSelected ? '#fff1e4' : '#fff8f1',
+                  color: isSelected ? '#a35b2e' : '#625f68',
                 }}
               >
                 {tag.displayName}
@@ -90,7 +108,7 @@ export function HomeCategoryRail({
         <SectionDivider />
 
         <SectionTitle>未読管理</SectionTitle>
-        <div className="flex flex-col gap-1">
+        <div>
           <MetricRow label="未読" value={unreadCount} />
           <MetricRow label="高評価" value={likedCount} />
           <MetricRow label="後で読む" value={savedCount} />
@@ -101,18 +119,30 @@ export function HomeCategoryRail({
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <div className="mb-[6px] text-[13px] font-extrabold text-[color:var(--color-ink)]">{children}</div>
+  return (
+    <div className="mb-[10px] text-[14px] font-bold tracking-[-0.02em] text-[color:var(--color-ink)]">
+      {children}
+    </div>
+  )
 }
 
 function SectionDivider() {
-  return <div className="my-[10px] border-t border-black/5" />
+  return <div className="my-[16px] border-t" style={{ borderColor: '#ece2d9' }} />
 }
 
 function MetricRow({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center justify-between border-b border-black/6 px-2 py-2 text-[12px] text-[color:var(--color-accent-darker)]">
-      <span>{label}</span>
-      <span className="text-[14px] font-bold text-[color:var(--color-orange)]">{value}</span>
+    <div
+      className="relative h-10 border-r border-b text-[12px] font-bold"
+      style={{
+        borderColor: '#e8d9cb',
+        color: '#a35b2e',
+      }}
+    >
+      <span className="absolute left-[20px] top-[12px]">{label}</span>
+      <span className="absolute right-[14px] top-[12px] text-[12px] text-[color:var(--color-orange)]">
+        {value}
+      </span>
     </div>
   )
 }

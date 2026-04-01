@@ -12,22 +12,23 @@ interface Props {
   onCardClick: (articleId: string) => void
   onOpenArticle: (articleId: string) => void
   onAction: (type: ActionType, articleId: string) => void
-  onLike: (articleId: string) => void
 }
 
 const sourceLabel: Record<Article['source_type'], string> = {
-  official: 'Official',
-  alerts: 'Alerts',
-  blog: 'Blog',
-  paper: 'Paper',
-  news: 'News',
-  video: 'Video',
+  official: 'official',
+  alerts: 'alerts',
+  blog: 'blog',
+  paper: 'paper',
+  news: 'news',
+  video: 'video',
 }
 
 const languageLabel: Record<NonNullable<Article['content_language']>, string> = {
   ja: 'JP',
   en: 'EN',
 }
+
+const CARD_OUTER_GAP = 4
 
 export function ArticleCard({
   article,
@@ -38,153 +39,178 @@ export function ArticleCard({
   onCardClick,
   onOpenArticle,
   onAction,
-  onLike,
 }: Props) {
-  const rawScore = article.score
-  const numericScore = rawScore != null && Number.isFinite(Number(rawScore)) ? Number(rawScore) : undefined
-
+  const numericScore = article.score != null && Number.isFinite(Number(article.score)) ? Number(article.score) : undefined
   const summary =
     (summaryMode === 200 ? article.summary_200 : article.summary_100) ??
     article.summary_100 ??
-    '要約は準備中です。'
-
-  const metaText = [
-    article.sourceCategory,
-    numericScore != null ? `Score ${numericScore.toFixed(1)}` : null,
+    '要約を準備中です。'
+  const isLongSummary = summaryMode === 200
+  const tagLine = [
+    `#${article.sourceCategory}`,
+    `#${sourceLabel[article.source_type]}`,
+    article.content_language ? `#${languageLabel[article.content_language]}` : null,
   ]
     .filter(Boolean)
-    .join(' / ')
-
-  const isLongSummary = summaryMode === 200
+    .join(' ')
 
   return (
     <article
       id={`article-card-${article.id}`}
-      className="relative overflow-hidden border bg-card-second"
+      className="flex flex-col border bg-[color:var(--color-card-second)] transition-transform duration-150 hover:-translate-y-[3px]"
       style={{
-        minHeight: isLongSummary ? 220 : 180,
-        borderColor: isFocused ? 'var(--color-orange)' : '#e5e5e5',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.12)',
+        height: isLongSummary ? 296 : 215,
+        borderColor: isFocused ? '#d7b898' : '#e8d9cb',
+        boxShadow: '0 10px 22px rgba(78, 52, 26, 0.08), 0 1px 0 rgba(255,255,255,0.72) inset',
+        borderRadius: 3,
+        fontFamily: 'JetBrains Mono, var(--font-family-base)',
       }}
     >
-      {/* ☆ 高評価ボタン (右上) */}
-      <button
-        type="button"
-        className="absolute right-2 top-2 z-10 text-[18px] leading-none"
-        style={{ color: isLiked ? 'var(--color-orange)' : 'var(--color-second-orange)' }}
-        onClick={(e) => {
-          e.stopPropagation()
-          onLike(article.id)
-        }}
-        aria-label={isLiked ? '高評価を取り消す' : '高評価'}
-      >
-        {isLiked ? '★' : '☆'}
-      </button>
-
-      {/* メインコンテンツ（クリックでモーダル） */}
-      <button
-        type="button"
-        className="flex w-full text-left"
+      <div
+        className="border bg-[color:var(--color-card)]"
         style={{
-          gap: isLongSummary ? 12 : 10,
-          padding: isLongSummary ? '12px 12px 52px' : '10px 10px 48px',
+          height: isLongSummary ? 237 : 168,
+          marginTop: CARD_OUTER_GAP,
+          marginRight: CARD_OUTER_GAP,
+          marginBottom: CARD_OUTER_GAP,
+          marginLeft: CARD_OUTER_GAP,
+          borderColor: '#f0e5da',
+          padding: '3.4% 1.7% 2.8%',
         }}
-        onClick={() => onCardClick(article.id)}
       >
-        {/* サムネイル (小型) */}
-        <ArticleThumbnail
-          articleId={article.id}
-          sourceType={article.source_type}
-          thumbnailUrl={article.thumbnail_url}
-          thumbnailEmoji={article.thumbnail_emoji}
-          thumbnailBgTheme={article.thumbnail_bg_theme}
-          className={isLongSummary ? 'mt-0.5 h-[92px] w-[68px] shrink-0' : 'mt-0.5 h-[72px] w-[56px] shrink-0'}
-          badgeLabel={sourceLabel[article.source_type]}
-        />
-
-        {/* テキスト */}
-        <div className="flex min-w-0 flex-1 flex-col gap-1 pr-6 pt-0.5">
-          <div className="flex items-center gap-1.5">
-            {article.content_language ? (
-              <span
-                className="inline-flex rounded-full border px-1.5 py-0.5 text-[9px] font-bold leading-none"
-                style={{
-                  borderColor: 'var(--color-second-orange)',
-                  color: 'var(--color-accent-darker)',
-                  backgroundColor: '#fff7ed',
-                }}
-              >
-                {languageLabel[article.content_language]}
-              </span>
-            ) : null}
+        <div
+          className="grid h-full items-start"
+          style={{
+            gridTemplateColumns: '13.1% minmax(0, 1fr)',
+            columnGap: '4.2%',
+          }}
+        >
+          <div className="flex h-full flex-col items-center text-center">
+            <button
+              type="button"
+              className="block w-full"
+              style={{
+                marginTop: isLongSummary ? '20%' : '8%',
+              }}
+              onClick={() => onCardClick(article.id)}
+              aria-label="記事の概要を開く"
+            >
+              <ArticleThumbnail
+                articleId={`${article.id}-thumb`}
+                sourceType={article.source_type}
+                thumbnailUrl={article.thumbnail_url}
+                thumbnailEmoji={article.thumbnail_emoji}
+                thumbnailBgTheme={article.thumbnail_bg_theme}
+                className="mx-auto aspect-[52/92] w-full max-w-[52px] overflow-hidden border"
+                badgeLabel={undefined}
+                badgeClassName=""
+                emojiClassName="text-[28px]"
+              />
+            </button>
+            <div className="mt-[6px] text-center text-[9px] font-bold lowercase leading-none text-black">
+              {sourceLabel[article.source_type]}
+            </div>
           </div>
-          <p className={isLongSummary ? 'line-clamp-3 text-[14px] font-extrabold leading-[1.45] text-ink' : 'line-clamp-2 text-[13px] font-extrabold leading-[1.4] text-ink'}>
-            {article.title}
-          </p>
-          <p className={isLongSummary ? 'line-clamp-5 text-[12px] leading-[1.7] text-[#4f5969]' : 'line-clamp-3 text-[11px] leading-[1.6] text-[#4f5969]'}>
-            {summary}
-          </p>
-          <p className="text-[10px] text-muted">{metaText}</p>
-        </div>
-      </button>
 
-      {/* アクションボタン */}
-      <div className="absolute inset-x-0 bottom-1.5 flex items-center gap-1 px-2">
-        <ActButton label="元記事" variant="external" onClick={() => onOpenArticle(article.id)} />
-        <ActButton label="関連トピック" wide onClick={() => onAction('topic_group_open', article.id)} />
-        <ActButton label="共有" variant="share" onClick={() => onAction('share_open', article.id)} />
-        <ActButton
+          <div className="min-w-0">
+            <button
+              type="button"
+              className="block w-full text-left"
+              onClick={() => onCardClick(article.id)}
+              aria-label="記事の概要を開く"
+            >
+              <div className="line-clamp-2 text-[14px] font-bold leading-[1.45] text-[color:var(--color-ink)]">
+                {article.title}
+              </div>
+            </button>
+
+            <div className="mt-[9px] flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1 text-[11px] font-bold leading-[1.45] text-[#8d8b90]">
+                {tagLine}
+              </div>
+              <div className="shrink-0 pl-2 text-[11px] font-bold text-[#8d8b90]">
+                {numericScore != null ? `Score ${numericScore.toFixed(1)}` : 'Score --'}
+              </div>
+            </div>
+
+            <div
+              className={
+                isLongSummary
+                  ? 'mt-[10px] line-clamp-[7] whitespace-pre-wrap text-[12px] leading-[1.55] text-[#625f68]'
+                  : 'mt-[10px] line-clamp-[4] whitespace-pre-wrap text-[12px] leading-[1.55] text-[#625f68]'
+              }
+            >
+              {summary}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="grid items-center"
+        style={{
+          height: isLongSummary ? 47 : 35,
+          marginRight: CARD_OUTER_GAP,
+          marginBottom: CARD_OUTER_GAP,
+          marginLeft: CARD_OUTER_GAP,
+          gridTemplateColumns: '24% 20% 20% 32.4%',
+          columnGap: '1.2%',
+        }}
+      >
+        <ActionButton
+          label="関連トピック"
+          variant="topic"
+          onClick={() => onAction('topic_group_open', article.id)}
+        />
+        <ActionButton
           label={isSaved ? '保存済み' : '後で読む'}
           onClick={() => onAction(isSaved ? 'unsave' : 'save', article.id)}
         />
+        <ActionButton
+          label={isLiked ? '閲覧済み' : '保存'}
+          onClick={() => onAction(isLiked ? 'unlike' : 'like', article.id)}
+        />
+        <ActionButton
+          label="共有"
+          variant="share"
+          onClick={() => onAction('share_open', article.id)}
+        />
       </div>
+
+      <button type="button" className="sr-only" onClick={() => onOpenArticle(article.id)}>
+        元記事を開く
+      </button>
     </article>
   )
 }
 
-function ActButton({
+function ActionButton({
   label,
   variant = 'default',
-  wide = false,
   onClick,
 }: {
   label: string
-  variant?: 'default' | 'share' | 'external'
-  wide?: boolean
+  variant?: 'default' | 'share' | 'topic'
   onClick: () => void
 }) {
   const isShare = variant === 'share'
-  const isExternal = variant === 'external'
+  const isTopic = variant === 'topic'
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className="text-[10px]"
+      className="inline-flex h-7 min-w-0 items-center justify-center border px-2 text-[11px] font-bold transition-colors"
       style={{
-        height: 24,
-        minWidth: wide ? 96 : 48,
-        paddingLeft: 8,
-        paddingRight: 8,
-        background: isShare
-          ? 'var(--color-orange)'
-          : isExternal
-            ? 'var(--color-accent-light)'
-            : 'transparent',
-        color: isShare
-          ? '#fff'
-          : isExternal
-            ? 'var(--color-accent-darker)'
-            : 'var(--color-ink)',
-        fontWeight: isShare || isExternal ? 700 : 500,
-        border: isShare
-          ? '1px solid var(--color-accent-darker)'
-          : isExternal
-            ? '1px solid var(--color-accent-dark)'
-            : '1px solid var(--color-second-orange)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+        borderColor: isTopic ? 'transparent' : isShare ? '#e17e00' : '#d7b898',
+        background: isTopic ? 'transparent' : isShare ? '#f59313' : '#fff8f1',
+        color: isShare ? '#ffffff' : '#a35b2e',
+        borderLeft: isTopic ? '3px solid #c77719' : undefined,
+        boxShadow: 'none',
+        fontFamily: 'JetBrains Mono, var(--font-family-base)',
       }}
     >
-      {label}
+      <span className="truncate">{label}</span>
     </button>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Bell, Search, Sparkles } from 'lucide-react'
+import { BellDot, Bot, ListOrdered, Search as SearchIcon } from 'lucide-react'
 import type { RankPeriod } from '@/lib/db/types'
 
 interface Props {
@@ -17,21 +17,21 @@ interface Props {
   onSummaryModeChange: (mode: 100 | 200) => void
 }
 
-interface NotifItem {
+interface QuickAccessItem {
   title: string
-  desc: string
+  description: string
   href: string
 }
 
-const NOTIF_ITEMS: NotifItem[] = [
-  { title: '日次ダイジェスト', desc: '流れをまとめて追う', href: '/digest' },
-  { title: 'あとで読む', desc: '保存した記事を見返す', href: '/saved' },
+const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
+  { title: '保存記事', description: 'あとで読むに追加した記事を確認', href: '/saved' },
+  { title: 'ダイジェスト', description: '最新の要約ダイジェストを確認', href: '/digest' },
 ]
 
-const PERIOD_OPTIONS: Array<{ label: string; value: RankPeriod }> = [
-  { label: 'day', value: '24h' },
-  { label: 'week', value: '7d' },
-  { label: 'month', value: '30d' },
+const PERIOD_OPTIONS: Array<{ label: string; value: RankPeriod; width: number }> = [
+  { label: 'DAY', value: '24h', width: 40 },
+  { label: 'WEEK', value: '7d', width: 48 },
+  { label: 'MONTH', value: '30d', width: 56 },
 ]
 
 export function Header({
@@ -45,24 +45,24 @@ export function Header({
   onSummaryModeChange,
 }: Props) {
   const [hidden, setHidden] = useState(false)
-  const [notifOpen, setNotifOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const lastY = useRef(0)
-  const notifRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function onScroll() {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1024) {
         setHidden(false)
         return
       }
 
-      const y = window.scrollY
-      if (y > lastY.current + 4 && y > 52) {
+      const nextY = window.scrollY
+      if (nextY > lastY.current + 4 && nextY > 52) {
         setHidden(true)
-      } else if (y < lastY.current - 4) {
+      } else if (nextY < lastY.current - 4) {
         setHidden(false)
       }
-      lastY.current = y
+      lastY.current = nextY
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -74,134 +74,144 @@ export function Header({
   }, [])
 
   useEffect(() => {
-    function handleClick(event: MouseEvent) {
-      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
-        setNotifOpen(false)
+    function handlePointerDown(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false)
       }
     }
 
-    if (notifOpen) {
-      document.addEventListener('mousedown', handleClick)
+    if (menuOpen) {
+      document.addEventListener('mousedown', handlePointerDown)
     }
 
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [notifOpen])
+    return () => document.removeEventListener('mousedown', handlePointerDown)
+  }, [menuOpen])
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-50 border-b border-black/8 bg-[color:var(--color-header-bg)] backdrop-blur-xl transition-transform duration-300"
+      className="fixed inset-x-0 top-0 z-50 border-b bg-[color:var(--color-bg)] transition-transform duration-300"
       style={{
         height: 58,
+        borderColor: '#e8d9cb',
         transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
       }}
     >
-      <div className="mx-auto flex h-full items-center gap-3 px-4 md:px-6 xl:px-[120px]" style={{ maxWidth: 1440 }}>
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <Sparkles size={16} className="text-[color:var(--color-accent-darker)]" />
-          <span className="text-[15px] font-black tracking-[-0.04em] text-[color:var(--color-ink)] md:text-[17px]">
+      <div className="mx-auto flex h-full max-w-[1440px] items-center gap-2 px-3 md:px-4 xl:px-[120px]">
+        <Link href="/" className="flex shrink-0 items-center gap-2 pr-2" style={{ fontFamily: 'JetBrains Mono, var(--font-family-base)' }}>
+          <Bot size={16} strokeWidth={2.1} className="text-[color:var(--color-accent-darker)]" />
+          <span className="text-[15px] font-bold tracking-[-0.03em] text-[color:var(--color-ink)] md:text-[17px]">
             AI Trend Hub
           </span>
         </Link>
 
-        <div className="hidden items-center gap-1.5 xl:flex">
+        <div className="hidden items-center gap-[6px] xl:flex" style={{ fontFamily: 'JetBrains Mono, var(--font-family-base)' }}>
           {PERIOD_OPTIONS.map((option) => (
-            <button
+            <HeaderToggle
               key={option.value}
-              type="button"
+              label={option.label}
+              width={option.width}
+              active={period === option.value}
               onClick={() => onPeriodChange(option.value)}
-              className="border px-2 py-1 text-[11px] font-bold uppercase transition"
-              style={{
-                borderColor: period === option.value ? 'rgba(163,91,46,0.28)' : 'rgba(0,0,0,0.08)',
-                backgroundColor: period === option.value ? 'var(--color-panel-strong)' : 'transparent',
-                color: period === option.value ? 'var(--color-accent-darker)' : 'var(--color-subtle)',
-              }}
-            >
-              {option.label}
-            </button>
+            />
           ))}
         </div>
 
-        <div className="hidden items-center gap-1 xl:flex">
-          <span className="text-[11px] font-bold text-[color:var(--color-subtle)]">要約文</span>
-          {([100, 200] as const).map((mode, index) => (
-            <button
-              key={mode}
-              type="button"
-              onClick={() => onSummaryModeChange(mode)}
-              className="border px-2 py-1 text-[11px] font-bold transition"
-              style={{
-                borderColor: summaryMode === mode ? 'rgba(163,91,46,0.28)' : 'rgba(0,0,0,0.08)',
-                backgroundColor: summaryMode === mode ? 'var(--color-panel-strong)' : 'transparent',
-                color: summaryMode === mode ? 'var(--color-accent-darker)' : 'var(--color-subtle)',
-              }}
-            >
-              {index === 0 ? '短' : '長'}
-            </button>
-          ))}
+        <div className="hidden items-center gap-[6px] xl:flex" style={{ fontFamily: 'JetBrains Mono, var(--font-family-base)' }}>
+          <span className="text-[14px] font-bold text-[#625f68]">要約文</span>
+          <HeaderToggle label="短" width={28} active={summaryMode === 100} onClick={() => onSummaryModeChange(100)} />
+          <HeaderToggle label="長" width={28} active={summaryMode === 200} onClick={() => onSummaryModeChange(200)} />
         </div>
 
         <form
-          className="ml-auto flex min-w-0 flex-1 items-center gap-2 md:flex-none"
+          className="ml-auto flex min-w-0 items-center gap-3"
           onSubmit={(event) => {
             event.preventDefault()
             onSearchSubmit()
           }}
         >
-          <div className="relative flex min-w-0 flex-1 items-center md:w-[320px] xl:w-[440px]">
-            <Search size={15} className="absolute left-3 text-[color:var(--color-accent-dark)]" />
+          <button
+            type="submit"
+            className="hidden shrink-0 items-center gap-2 border px-3 text-[13px] font-bold text-[color:var(--color-accent-dark)] transition hover:bg-[#fff6ee] lg:inline-flex"
+            style={{
+              height: 28,
+              borderColor: '#e8d9cb',
+              background: '#fff1e4',
+              fontFamily: 'JetBrains Mono, var(--font-family-base)',
+            }}
+          >
+            <SearchIcon size={16} strokeWidth={2.1} />
+            SEARCH
+          </button>
+
+          <label className="relative flex min-w-0 items-center">
             <input
               type="search"
               value={searchValue}
               onChange={(event) => onSearchChange(event.target.value)}
-              placeholder="Claude / Gemini / OpenAI / OSS"
-              className="w-full border border-black/8 bg-white py-2 pl-10 pr-3 text-[13px] text-[color:var(--color-ink)] outline-none transition placeholder:text-[color:var(--color-muted)] focus:border-[color:var(--color-accent-dark)]/30"
+              placeholder="Claude / OSS / エージェント"
+              className="h-7 min-w-0 border bg-white px-3 text-[13px] font-bold text-[color:var(--color-ink)] outline-none placeholder:text-[#8d8b90] focus:border-[color:var(--color-accent-dark)]"
+              style={{
+                width: 'clamp(230px, 33vw, 380px)',
+                borderColor: '#e8d9cb',
+                fontFamily: 'JetBrains Mono, var(--font-family-base)',
+              }}
             />
-          </div>
-
-          <button type="submit" className="border border-black/8 px-3 py-2 text-[11px] font-bold uppercase text-[color:var(--color-accent-darker)] transition hover:border-[color:var(--color-accent-dark)]/20">
-            Search
-          </button>
+          </label>
         </form>
 
-        <div className="hidden items-center gap-2 lg:flex">
-          <Link href="/ranking" className="border border-black/8 px-3 py-2 text-[11px] font-bold uppercase text-[color:var(--color-accent-darker)] transition hover:border-[color:var(--color-accent-dark)]/20">
-            Ranking
+        <div className="hidden items-center gap-3 lg:flex" style={{ fontFamily: 'JetBrains Mono, var(--font-family-base)' }}>
+          <Link
+            href="/ranking"
+            className="inline-flex shrink-0 items-center gap-2 border px-3 text-[13px] font-bold text-[color:var(--color-accent-dark)] transition hover:bg-[#fff6ee]"
+            style={{
+              height: 29,
+              borderColor: '#e8d9cb',
+              background: '#fff1e4',
+            }}
+          >
+            <ListOrdered size={16} strokeWidth={2.1} />
+            ランキング
           </Link>
 
-          <div ref={notifRef} className="relative">
+          <div ref={menuRef} className="relative">
             <button
               type="button"
-              className="relative border border-black/8 px-3 py-2 text-[11px] font-bold uppercase text-[color:var(--color-accent-darker)] transition hover:border-[color:var(--color-accent-dark)]/20"
-              onClick={() => setNotifOpen((open) => !open)}
+              className="relative inline-flex shrink-0 items-center gap-2 border px-3 text-[13px] font-bold text-[color:var(--color-accent-dark)] transition hover:bg-[#fff6ee]"
+              style={{
+                height: 30,
+                borderColor: '#e8d9cb',
+                background: '#fff1e4',
+                minWidth: 92,
+              }}
+              onClick={() => setMenuOpen((current) => !current)}
             >
-              <span className="inline-flex items-center gap-2">
-                <Bell size={14} />
-                Library
-              </span>
+              <BellDot size={16} strokeWidth={2.1} />
+              通知
               {savedCount > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center bg-[color:var(--color-hot)] px-1 text-[10px] font-black text-white">
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center bg-[color:var(--color-hot)] px-1 text-[10px] font-bold leading-none text-white">
                   {savedCount > 9 ? '9+' : savedCount}
                 </span>
               ) : null}
             </button>
 
-            {notifOpen ? (
-              <div className="absolute right-0 top-full z-[200] mt-2 w-[300px] border border-black/8 bg-[color:var(--color-bg)] shadow-[0_20px_60px_rgba(25,18,12,0.14)]">
-                <div className="border-b border-black/8 px-4 py-3">
-                  <span className="text-sm font-black tracking-[-0.03em] text-[color:var(--color-ink)]">Quick Access</span>
+            {menuOpen ? (
+              <div
+                className="absolute right-0 top-full mt-2 w-[280px] border bg-[color:var(--color-card)] shadow-[0_18px_40px_rgba(35,22,10,0.12)]"
+                style={{ borderColor: '#e8d9cb' }}
+              >
+                <div className="border-b px-4 py-3 text-[13px] font-bold text-[color:var(--color-ink)]" style={{ borderColor: '#efe2d7' }}>
+                  Quick Access
                 </div>
-                {NOTIF_ITEMS.map((item) => (
+                {QUICK_ACCESS_ITEMS.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-start gap-3 px-4 py-4 transition hover:bg-[color:var(--color-panel-strong)]"
-                    onClick={() => setNotifOpen(false)}
+                    className="block border-b px-4 py-3 last:border-b-0 hover:bg-[#fff8f1]"
+                    style={{ borderColor: '#f3e7db' }}
+                    onClick={() => setMenuOpen(false)}
                   >
-                    <div className="mt-0.5 h-2.5 w-2.5 bg-[color:var(--color-accent-dark)]" />
-                    <div className="flex flex-col gap-1">
-                      <span className="text-sm font-bold text-[color:var(--color-ink)]">{item.title}</span>
-                      <span className="text-xs leading-5 text-[color:var(--color-subtle)]">{item.desc}</span>
-                    </div>
+                    <div className="text-[12px] font-bold text-[color:var(--color-ink)]">{item.title}</div>
+                    <div className="mt-1 text-[11px] leading-5 text-[#625f68]">{item.description}</div>
                   </Link>
                 ))}
               </div>
@@ -210,5 +220,35 @@ export function Header({
         </div>
       </div>
     </header>
+  )
+}
+
+function HeaderToggle({
+  label,
+  width,
+  active,
+  onClick,
+}: {
+  label: string
+  width: number
+  active: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center justify-center border text-[14px] font-bold transition"
+      style={{
+        width,
+        height: 28,
+        borderColor: active ? '#e5c8ab' : '#e8d9cb',
+        background: active ? '#fff1e4' : '#fbf4ec',
+        color: active ? '#a35b2e' : '#8d8b90',
+        fontFamily: 'JetBrains Mono, var(--font-family-base)',
+      }}
+    >
+      {label}
+    </button>
   )
 }

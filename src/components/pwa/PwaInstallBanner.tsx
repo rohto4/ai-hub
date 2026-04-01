@@ -7,11 +7,29 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
 }
 
+const PWA_INSTALL_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PWA_INSTALL === 'true'
+
+async function unregisterAppServiceWorkers(): Promise<void> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
+
+  const registrations = await navigator.serviceWorker.getRegistrations()
+  await Promise.all(
+    registrations
+      .filter((registration) => registration.scope.startsWith(window.location.origin))
+      .map((registration) => registration.unregister()),
+  )
+}
+
 export function PwaInstallBanner() {
   const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null)
   const [installed, setInstalled] = useState(false)
 
   useEffect(() => {
+    if (!PWA_INSTALL_ENABLED) {
+      void unregisterAppServiceWorkers()
+      return
+    }
+
     if ('serviceWorker' in navigator) {
       void navigator.serviceWorker.register('/sw.js')
     }
@@ -33,6 +51,10 @@ export function PwaInstallBanner() {
       window.removeEventListener('appinstalled', handleInstalled)
     }
   }, [])
+
+  if (!PWA_INSTALL_ENABLED) {
+    return null
+  }
 
   if (installed) {
     return (

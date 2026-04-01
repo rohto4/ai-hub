@@ -38,7 +38,7 @@ export function HomeArticleSection({
       {loading ? (
         <LoadingGrid />
       ) : articles.length > 0 ? (
-        <div className={summaryMode === 200 ? 'grid grid-cols-1 gap-3 md:grid-cols-2' : 'grid grid-cols-1 gap-2 md:grid-cols-2'}>
+        <div className={summaryMode === 200 ? 'grid grid-cols-1 gap-4 xl:grid-cols-2' : 'grid grid-cols-1 gap-4 xl:grid-cols-2'}>
           {articles.map((article) => (
             <ArticleCard
               key={`${id}-${article.id}`}
@@ -50,12 +50,11 @@ export function HomeArticleSection({
               onCardClick={onCardClick}
               onAction={onAction}
               onOpenArticle={onOpenArticle}
-              onLike={() => onAction(likedArticleIds.includes(article.id) ? 'unlike' : 'like', article.id)}
             />
           ))}
         </div>
       ) : (
-        <EmptyState title="記事がまだありません" description="期間や topic を切り替えて確認してください。" />
+        <EmptyState title="記事がまだありません" description="期間やタグを変えて再読み込みしてください。" />
       )}
     </div>
   )

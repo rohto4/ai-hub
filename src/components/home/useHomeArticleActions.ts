@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import {
-  consumeReturnFocusArticleId,
   getLikedArticleIds,
   getOrCreateSessionId,
   getSavedArticleIds,
-  setReturnFocusArticleId,
   toggleLikedArticleId,
   toggleSavedArticleId,
   trackAction,
@@ -31,7 +29,6 @@ export function useHomeArticleActions({
     getOrCreateSessionId()
     setSavedArticleIds(getSavedArticleIds())
     setLikedArticleIds(getLikedArticleIds())
-    setFocusedArticleId(consumeReturnFocusArticleId())
   }, [])
 
   useEffect(() => {
@@ -52,7 +49,6 @@ export function useHomeArticleActions({
     const article = findArticle(articleId)
     if (!article) return
 
-    setReturnFocusArticleId(article.id)
     window.open(article.url, '_blank', 'noopener,noreferrer')
     void trackAction({ actionType: 'article_open', articleId: article.id, source: 'direct' })
   }

@@ -32,6 +32,18 @@ html {
   scroll-behavior: smooth;
 }
 
+html.custom-cursor-enabled,
+html.custom-cursor-enabled body,
+html.custom-cursor-enabled a,
+html.custom-cursor-enabled button,
+html.custom-cursor-enabled input,
+html.custom-cursor-enabled textarea,
+html.custom-cursor-enabled select,
+html.custom-cursor-enabled summary,
+html.custom-cursor-enabled label {
+  cursor: none !important;
+}
+
 body {
   min-height: 100vh;
   background:

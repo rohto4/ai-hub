@@ -1,6 +1,8 @@
-﻿import type { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { BIZ_UDPGothic } from 'next/font/google'
 import { BottomNav } from '@/components/mobile/BottomNav'
+import { CustomCursor } from '@/components/site/CustomCursor'
+import '@/components/site/CustomCursor.css'
 import './globals.css'
 
 const bizUDPGothic = BIZ_UDPGothic({
@@ -36,6 +38,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className={`${bizUDPGothic.variable} font-sans bg-bg text-ink antialiased pb-[56px] md:pb-0`}>
         {children}
+        <CustomCursor />
         <BottomNav />
       </body>
     </html>
