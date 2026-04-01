@@ -95,7 +95,7 @@
 2. `display_name`
 3. `fetch_kind`（rss / api / alerts / manual）
 4. `source_category`（llm / agent / voice / policy / safety / search / news）
-5. `source_type`（official / blog / news / video / alerts）
+5. `source_type`（official / blog / news / video / alerts / paper）
 6. `content_access_policy`
 7. `content_language`
 8. `commercial_use_policy`
@@ -111,6 +111,7 @@
 | `news` | ニュースメディア / まとめサイト | AI News Roundup（inactive） |
 | `video` | 動画（YouTube 等） | 将来追加予定 |
 | `alerts` | Google Alerts（discovery feed） | Google Alerts 系 |
+| `paper` | 論文・プレプリント導線 | arXiv 系 |
 
 ### 4.2 `articles_raw`
 

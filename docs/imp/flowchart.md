@@ -1,6 +1,6 @@
 # AI Trend Hub Flowchart
 
-最終更新: 2026-03-28
+最終更新: 2026-04-02
 
 このファイルには Mermaid 図だけを集約する。図の補足説明は元ファイル側へ残す。
 
@@ -162,13 +162,13 @@ flowchart TD
         記事収集"]:::batch
         L1["articles_raw
         生記事"]:::db
-        Enrich["hourly-enrich :10〜:40
+        Enrich["hourly-enrich :05〜:40
         AI要約・タグ付け"]:::batch
         L2["articles_enriched
         整形済み記事"]:::db
         Publish["hourly-publish :50
         公開反映"]:::batch
-        Rank["compute-ranks
+        Rank["hourly-compute-ranks
         ランキング計算"]:::batch
         L4["public_articles
         公開記事"]:::db
@@ -265,6 +265,8 @@ flowchart LR
 
     Fetch["hourly-fetch :00
     記事収集"]:::batch
+    Enrich05["hourly-enrich :05
+    AI要約・タグ付け"]:::batch
     Enrich10["hourly-enrich :10
     AI要約・タグ付け"]:::batch
     Enrich20["hourly-enrich :20
@@ -275,7 +277,7 @@ flowchart LR
     AI要約・タグ付け"]:::batch
     Publish["hourly-publish :50
     公開反映"]:::batch
-    Rank["compute-ranks
+    Rank["hourly-compute-ranks
     ランキング計算"]:::batch
     Archive["monthly-public-archive
     月次アーカイブ"]:::batch
@@ -284,9 +286,9 @@ flowchart LR
 
     ST --> Fetch
     Fetch --> L1
-    L1 --> Enrich10 & Enrich20 & Enrich30 & Enrich40
-    Enrich10 & Enrich20 & Enrich30 & Enrich40 --> L2
-    Enrich10 --> TCP
+    L1 --> Enrich05 & Enrich10 & Enrich20 & Enrich30 & Enrich40
+    Enrich05 & Enrich10 & Enrich20 & Enrich30 & Enrich40 --> L2
+    Enrich05 --> TCP
     L2 --> Publish
     Publish --> L4
     L4 --> Rank --> R
@@ -380,7 +382,7 @@ sequenceDiagram
     Thumb-->>Card: image/svg+xml
 ```
 
-## 7. 旧 memo の Layer2 フロー
+## 7. Layer2 フロー（現行名称）
 
 ```mermaid
 flowchart TB
@@ -391,8 +393,7 @@ flowchart TB
     U --> R["articles_raw"]
 
     R --> N["URL 正規化 / 更新検知"]
-    N --> O["hourly-layer12<br/>fetch -> enrich orchestration"]
-    O --> E["enrich ジョブ<br/>現行実装名: daily-enrich"]
+    N --> E["enrich-worker<br/>小分け定時実行"]
 
     E --> P0["source content_access_policy 判定"]
     P0 -->|fulltext_allowed| C["本文取得"]
@@ -417,7 +418,7 @@ flowchart TB
 
     J --> K["db:check-layer12"]
 
-    TC --> TP["daily-tag-promote<br/>高閾値・保守運用"]
+    TC --> TP["daily-tag-dedup<br/>候補統合・保留整理"]
     TP --> TM["tags_master / tag_aliases"]
     TM --> A
 

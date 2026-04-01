@@ -1,6 +1,16 @@
 # バッチジョブ設計
 
-最終更新: 2026-03-15
+最終更新: 2026-04-02
+
+> **注意**: このファイルは 2026-03-15 の設計書です。現在の実装状態・運用手順は `docs/imp/batch-ops.md` が正です。
+> 本ファイルは仕様の設計根拠として保持し、実装が変わったときに合わせて更新します。
+>
+> 主な現況:
+> - ジョブ名は `daily-tag-dedup` が正
+> - `hourly-compute-ranks` は独立した `lib/jobs` + CLI 入口あり
+> - GitHub Actions schedule は 2026-04-02 に復旧済み
+> - `monthly-public-archive` は workflow / route / job 実装済み
+> - `priority-queue-worker` と `weekly-archive` は未実装の後続論点
 
 ## 1. 目的
 
@@ -14,20 +24,20 @@
 3. enrich は `enrich-worker` として、運用上は毎時の小分け実行前提で扱う
 4. 要約 API 呼び出しは 1 記事ずつではなく、`summaryBatchSize=20` を基本とする
 5. Gemini / OpenAI へ渡す要約指示は固定テンプレートファイルを使い、毎回同じルールを明示する
-4. 毎時運用は `fetch -> enrich` を直列にし、enrich は小分けで回す
-5. 即時反映は定期バッチに混ぜず、優先キュー経由で処理する
-6. 記事単位失敗でスキップし、ジョブ全体は止めない
-7. ローカル定期実行と GitHub Actions scheduled の両方から呼べる entrypoint にする
-8. GitHub Actions の定期実行入口は `/api/cron/hourly-layer12` とし、`APP_URL` / `CRON_SECRET` を使う
+6. 毎時運用は `fetch -> enrich` を直列にし、enrich は小分けで回す
+7. 即時反映は定期バッチに混ぜず、優先キュー経由で処理する
+8. 記事単位失敗でスキップし、ジョブ全体は止めない
+9. ローカル定期実行と GitHub Actions scheduled の両方から呼べる entrypoint にする
+10. GitHub Actions からは各 cron route を直接叩く
 
 ## 3. P0 で必要なジョブ一覧
 
 1. `hourly-fetch`
 2. `enrich-worker`
 3. `hourly-publish`
-4. `daily-tag-promote`
-5. `weekly-archive`
-6. `priority-queue-worker`
+4. `hourly-compute-ranks`
+5. `daily-tag-dedup`
+6. `monthly-public-archive`
 
 ## 4. ジョブ別仕様
 
@@ -89,8 +99,10 @@
     - `summary_100`
     - `summary_200`
     - provider 順は `Gemini(primary) -> Gemini(secondary) -> OpenAI gpt-5-mini`
-    - 両 provider が落ちた場合は `template fallback` へは落とさず `manual_pending` に回す
+    - 両 provider が落ちた場合は `manual_pending` に回す
     - `manual_pending` 行は `hold` のまま保持し、手動 import 用 JSON を `artifacts/manual-pending/` へ出力する
+  - `summaryInputBasis=full_content` のときだけ `canonicalTagHints` を受け、`tag_aliases` / `tag_keywords` への高信頼寄せに使う
+  - `title + summary_200` から隣接分野タグを 1〜2 件抽出し、`thumbnail_bg_theme` を決定する
   - タグ候補を抽出する
   - `tags_master` / `tag_aliases` に照合する
     - 一致タグを `articles_enriched_tags` へ保存する
@@ -106,6 +118,7 @@
   - `articles_enriched`
   - `articles_enriched_history`
   - `articles_enriched_tags`
+  - `articles_enriched_adjacent_tags`
   - `tag_candidate_pool`
   - `articles_raw`
   - `job_runs`
@@ -139,39 +152,58 @@
 
 - 主処理
   - 公開候補を抽出する
-  - 必要なら `priority_processing_queue` を先に処理する
+  - `commercial_use_policy='prohibited'` を除外する
   - 重複群ごとに代表ソースを決める
   - `public_articles` を更新する
   - `public_article_sources` を更新する
   - `public_article_tags` を更新する
-  - `public_rankings` を更新する
+  - `public_article_adjacent_tags` を更新する
 
-### 4.4 `daily-tag-promote`
+### 4.4 `hourly-compute-ranks`
 
-> 未採用タグ候補を標準タグへ昇格させる日次ジョブ。
+> `public_articles` と `activity_metrics_hourly` から `public_rankings` を更新するランキング計算ジョブ。
+
+- 入力
+  - `public_articles`
+  - `activity_metrics_hourly`
+
+- 主処理
+  - 公開記事を読み込む
+  - `hourly / 24h / 7d / 30d` の 4 window を計算する
+  - `public_rankings` を upsert する
+  - stale ranking を削除する
+
+- 更新先
+  - `public_rankings`
+  - `job_runs`
+
+### 4.5 `daily-tag-dedup`
+
+> タグ候補と既存タグを照合し、alias / keyword 統合や保留整理を行う日次ジョブ。
 
 - 目的
-  - 未採用タグ候補をタグマスタへ昇格させる
+  - 候補タグを既存タグへ自動統合し、必要な保留だけを残す
 
 - 入力
   - `tag_candidate_pool`
-  - Google Trends
+  - `tags_master`
+  - `tag_aliases`
+  - `tag_keywords`
 
 - 主処理
-  - 高閾値で候補を取得する
-  - 日本語基準の類似一致で Google Trends を照合する
-  - 一致候補を `tags_master` に昇格する
-  - 必要なら `tag_aliases` を追加する
+  - 候補と既存タグを照合する
+  - alias / keyword / 保留を判定する
+  - 必要なら `tag_aliases` / `tag_keywords` を追加する
   - 候補の `review_status` を更新する
 
-### 4.5 `weekly-archive`
+### 4.6 `monthly-public-archive`
 
-> 生データの保持ポリシーを守るための整理ジョブ。
+> 公開面の保持ポリシーを守るため、古い `public_articles` を履歴へ退避する月次ジョブ。
 
 - 目的
-  - `layer1` の保管期間を守り、古い raw を履歴へ移す
+  - `public_articles` の公開集合を半年以内に保つ
 
-### 4.6 `priority-queue-worker`
+### 4.7 `priority-queue-worker`
 
 > 定期バッチ待ちにしない即時反映ジョブ。
 
@@ -185,10 +217,14 @@
 1. `hourly-fetch`
 2. `enrich-worker`（毎時運用、直列、小分け）
 3. `hourly-publish`
+4. `hourly-compute-ranks`
 
 補足:
 
 1. `enrich-worker` は毎時 `hourly-fetch` の後に小分けで直列実行する
-2. 実装入口は `/api/cron/hourly-layer12` とし、内部で `fetch -> enrich` を直列に回す
-3. GitHub Actions では `hourly-layer12.yml` から `APP_URL/api/cron/hourly-layer12` を叩く
-4. `hourly-enrich.yml` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40` の 8 回実行する
+2. `hourly-fetch` は `/api/cron/hourly-fetch`
+3. `enrich-worker` は `/api/cron/enrich-worker`
+4. `hourly-publish` は `/api/cron/hourly-publish`
+5. `hourly-compute-ranks` は `/api/cron/hourly-compute-ranks`
+6. `hourly-enrich.yml` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40` の 8 回実行する
+7. `hourly-publish.yml` は毎時 `:50` に publish と ranks を直列実行する

@@ -120,7 +120,7 @@
 
 現状の弱い点:
 - batch 単位で Gemini 失敗すると、その batch 全件が `noMatch` として落ち、失敗と非該当が区別しにくい。
-- spec 側には `daily-tag-promote` とあり、名称が揺れている。
+- 現在は `daily-tag-dedup` が正で、候補統合・保留整理を担う。
 - alias と keyword の運用が同じジョブに混在しており、レビュー観点が曖昧。
 
 追加したい処理:

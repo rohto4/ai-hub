@@ -57,6 +57,7 @@
 
 - 主タグ: `/tags/:tagKey` の主導線
 - カテゴリ: Home サイドバーの大枠導線
+  - 実装上は `source-type` / `source-category` / `tag` の 3 種を `SITE_CATEGORIES` で束ねている
 - 周辺分野タグ: 当面は通常タグと同じクリック導線
 - 新規立項タグ候補: 公開導線ではなく運用判断用
 

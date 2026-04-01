@@ -9,6 +9,7 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-04-02 | done | `docs/imp` / `docs/spec` を現行実装へ追随 | batch 名称・schedule・manual pending・隣接分野タグ・カテゴリ導線・`hourly-compute-ranks` の記述をコード基準へ更新
 - 2026-04-02 | done | `docs/imp` と `docs/spec/04-data-model-and-sql.md` を圧縮 | 履歴ノイズと重複説明を削り、`imp` は現況/未決/次、`spec` は現行仕様中心へ再整理
 - 2026-04-02 | done | 定時 batch の schedule を docs へ同期 | `data-flow` と `implementation-plan` を schedule 復旧後の前提へ更新
 - 2026-04-02 | done | `monthly-public-archive` と ranks CLI を反映 | batch 改善の現況を docs に反映し、batch 系参照先を `batch-reforme-spec` / `batch-ops` へ整理

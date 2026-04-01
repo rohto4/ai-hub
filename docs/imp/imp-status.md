@@ -80,6 +80,7 @@
 
 ## 6. 直近の重要変更
 
+1. `docs/imp` / `docs/spec` を現行実装へ追随させ、batch 名称、schedule、`manual_pending`、隣接分野タグ、`hourly-compute-ranks`、カテゴリ導線の記述を整理した
 1. 定時 batch の GitHub Actions schedule を復旧し、`monthly-public-archive` workflow を追加した
 2. `scripts/run-hourly-compute-ranks.ts` を追加し、route ロジックを `src/lib/jobs/hourly-compute-ranks.ts` に抽出した
 3. `canonicalTagHints` を使った alias / keyword 自動反映を enrich と `daily-tag-dedup` に統合した

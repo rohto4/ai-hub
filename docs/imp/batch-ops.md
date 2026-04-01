@@ -15,7 +15,7 @@
 | `hourly-enrich` | `hourly-enrich.yml` | schedule 有効 | `/api/cron/enrich-worker` | 毎時 8 回実行 |
 | `hourly-publish` | `hourly-publish.yml` | schedule 有効 | `/api/cron/hourly-publish` + `/api/cron/hourly-compute-ranks` | publish と ranks が 1 workflow に直列 |
 | `hourly-compute-ranks` | `hourly-publish.yml` の後段 | schedule 有効 | `/api/cron/hourly-compute-ranks` | CLI 実行も可能 |
-| `daily-tag-dedup` | `daily-tag-dedup.yml` | schedule 有効 | `/api/cron/daily-tag-dedup` | spec 上の旧名 `daily-tag-promote` と揺れあり |
+| `daily-tag-dedup` | `daily-tag-dedup.yml` | schedule 有効 | `/api/cron/daily-tag-dedup` | 候補統合・保留整理を担当 |
 | `monthly-public-archive` | `monthly-public-archive.yml` | schedule 有効 | `/api/cron/monthly-public-archive` | route / job / workflow あり |
 | `daily-db-backup` | `daily-db-backup.yml` | schedule 有効 | スクリプト直接実行 | artifacts 7日保持のみ |
 | `send-digest` | **workflow なし** | **未接続** | `/api/cron/send-digest` | route 実装はあり |
@@ -38,9 +38,39 @@
 
 ---
 
-## 3. フォローバッチ一覧（CLIリファレンス）
+## 3. 全スクリプト一覧（package.json）
 
-### 3.1 fetch / enrich 系
+### 3.0 開発・ビルド系
+
+| コマンド | 用途 |
+|---|---|
+| `npm run dev` | 開発サーバー起動 |
+| `npm run dev:turbo` | Turbopack モードで起動 |
+| `npm run build` | 本番ビルド |
+| `npm run lint` | ESLint |
+| `npm run type-check` | TypeScript 型チェック |
+| `codex:find-session` | Codex セッション検索ユーティリティ |
+
+### 3.1 DB 基盤系
+
+| コマンド | 用途 |
+|---|---|
+| `db:migrate` | migration 適用 |
+| `db:seed` | source_targets / master データ投入 |
+| `db:seed-keywords` | tag キーワード投入 |
+
+### 3.2 確認・診断系
+
+| コマンド | 用途 |
+|---|---|
+| `db:check-layer12` | L1/L2 状態確認（backlog・直近 job_runs）|
+| `db:check-domain-policies` | ドメインポリシー確認 |
+| `db:check-source-policies` | ソースポリシー確認 |
+| `db:check-snippet-domains` | snippet 取得ドメイン確認 |
+
+### 3.3 フォローバッチ一覧（CLIリファレンス）
+
+### 3.4 fetch / enrich 系
 
 | コマンド | 用途 | 基本呼び出し例 |
 |---|---|---|
@@ -52,7 +82,7 @@
 | `db:skip-raw-backlog` | backlog の意図的スキップ | 古すぎる raw や不要 source 向け |
 | `db:repair-stale-job-runs` | stuck job_runs の修復 | `/admin/jobs` で対象を特定してから実行 |
 
-### 3.2 publish / ranks 系
+### 3.5 publish / ranks 系
 
 | コマンド | 用途 | 基本呼び出し例 |
 |---|---|---|
@@ -62,7 +92,7 @@
 | `db:backfill-public-article-sources` | public_article_sources の再同期 | 整合不整合補修用 |
 | `db:backfill-thumbnail-urls` | thumbnail_url の一括再生成 | サムネイル仕様変更後 |
 
-### 3.3 tag 系
+### 3.6 tag 系
 
 | コマンド | 用途 | 備考 |
 |---|---|---|
@@ -73,7 +103,50 @@
 | `db:summarize-ai-retag-outputs` | AI retag 出力の集計 | 全 part 完走後に実行 |
 | `db:generate-ai-retag-sql` | AI retag 反映 SQL の生成 | 差分確認してから適用 |
 
-### 3.4 archive / backup 系
+### 3.7 source / domain 管理系
+
+| コマンド | 用途 |
+|---|---|
+| `db:set-source-state` | source の active / inactive 切り替え |
+| `db:set-source-policy` | source の content policy 設定 |
+| `db:set-domain-policy` | ドメインの policy 設定 |
+| `db:promote-domain-policy` | domain policy の昇格 |
+| `db:sync-observed-domains` | 観測ドメインの同期 |
+
+### 3.8 repair / 補修系
+
+| コマンド | 用途 |
+|---|---|
+| `db:repair-google-alerts-urls` | Google Alerts URL の修復 |
+| `db:repair-raw-titles-from-url` | URL から raw タイトルを補修 |
+| `db:repair-stale-job-runs` | stuck な job_runs を修復 |
+| `db:requeue-raw` | raw を再処理待ちへ戻す |
+| `db:skip-raw-backlog` | backlog の意図的スキップ |
+
+### 3.9 generate / export 系（主にタグ整理・一括処理用）
+
+| コマンド | 用途 |
+|---|---|
+| `db:export-ai-enrich-inputs` | enrich 用 AI 入力を export |
+| `db:export-thumbnail-prompts` | サムネイルプロンプトを export |
+| `db:generate-tag-icons` | タグアイコンを生成 |
+| `db:generate-tag-alias-review` | タグ alias レビュー用 JSON を生成 |
+| `db:generate-tag-alias-review-page` | タグ alias レビューページを生成 |
+| `db:promote-tag-candidates` | タグ候補を昇格 |
+| `db:prune-tag-candidates` | タグ候補を剪定 |
+| `db:generate-phase1-summary-sheet` | Phase 1 集計シートを生成 |
+| `db:generate-phase1-decision-page` | Phase 1 判断ページを生成 |
+| `db:generate-phase1-final-manifest` | Phase 1 最終 manifest を生成 |
+| `db:apply-phase1-tag-decisions` | Phase 1 確定方針を DB に反映 |
+
+### 3.10 backfill 系
+
+| コマンド | 用途 |
+|---|---|
+| `db:backfill-article-tags` | 既存記事へのタグ再反映 |
+| `db:backfill-thumbnail-urls` | thumbnail_url の一括再生成 |
+
+### 3.11 archive / backup 系
 
 | コマンド | 用途 | 備考 |
 |---|---|---|
