@@ -173,6 +173,60 @@
 
 ---
 
+---
+
+### 1.10 バッチ仕様ドキュメント作成時に発見した不一致・疑問点
+
+バッチのデータフロー図（`batch-sequence.md` / `batch-dataflow.md`）を作成する際に、
+仕様書・GH Actions・実装間で以下の揺れ・未確認点が見つかった。
+
+#### (a) `daily-tag-dedup` と `daily-tag-promote` の名称不一致
+
+- `spec/11-batch-job-design.md` には `daily-tag-promote` と記載
+- GH Actions は `daily-tag-dedup.yml`、`data-flow.md` は `daily-tag-dedup`
+- 図では `daily-tag-dedup` に統一したが、同一ジョブかどうか要確認
+- **判断待ち:** spec 側の名称を `daily-tag-dedup` へ統一するか、実態として別ジョブなら分けて記述する
+
+#### (b) `weekly-archive` の GH Actions が存在しない
+
+- `spec/11-batch-job-design.md` に `weekly-archive`（articles_raw 1ヶ月超 → articles_raw_history）が定義されている
+- `.github/workflows/` に対応 yml が見当たらない
+- **判断待ち:** 未実装なのか、手動 SQL 運用なのか、別の仕組みで動いているのかを確認する
+
+#### (c) `monthly-public-archive` の GH Actions が存在しない
+
+- `data-flow.md` に `monthly-public-archive`（public_articles 半年超 → public_articles_history）が記載されている
+- `.github/workflows/` に対応 yml がなく、定期起動の経路が不明
+- **判断待ち:** Vercel Cron 経由か、手動実行のみか、スケジュール登録が抜けているかを確認する
+
+#### (d) `daily-tag-dedup` の Google Trends 連携の実装有無
+
+- `spec/11-batch-job-design.md` の `daily-tag-promote` 仕様には Google Trends 照合が記載されている
+- `data-flow.md` の `daily-tag-dedup` には Google Trends への言及がない
+- 図では仕様書どおり Google Trends 連携を書いたが、実際の `/api/cron/daily-tag-dedup` に実装があるか未確認
+- **判断待ち:** 実装されていなければ、図から Google Trends ノードを除去し、仕様書の記述も現状に合わせる
+
+#### (e) `articles_enriched_sources` テーブルの位置づけ
+
+- `data-flow.md` の Layer2 一覧に `articles_enriched_sources` が記載されている
+- `spec/04-data-model-and-sql.md` の主キー列一覧・補助テーブル一覧には記載がない
+- CRUD 表・今回の図では含めていない
+- **判断待ち:** テーブルが実在するなら spec とデータフロー図に追加する
+
+#### (f) `tag_keywords` テーブルの CRUD 表未記載
+
+- `flowchart.md` の既存図には `tag_keywords` が登場し、`daily-tag-dedup` がここへ書き込む
+- CRUD 表・今回の図では `tag_aliases` のみ記載し `tag_keywords` を落とした
+- **判断待ち:** `tag_keywords` が `tags_master` の子テーブルとして正式に存在するなら、CRUD 表と図に追加する
+
+#### (g) `priority-queue-worker` の独立起動経路が不明
+
+- `spec/11-batch-job-design.md` に独立ジョブとして定義されている
+- GH Actions に専用 yml がなく、`hourly-publish` 内で処理されている
+- **判断待ち:** 独立起動が必要なユースケースがあるか、`hourly-publish` 内処理のみで十分かを確認する
+
+---
+
 ## 2. 確定済み判断（参照用）
 
 | 項目 | 決定内容 |
