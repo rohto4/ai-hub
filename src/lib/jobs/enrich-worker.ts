@@ -2,6 +2,7 @@ import {
   claimRawArticlesForEnrichment,
   skipExpiredRawArticlesForEnrichment,
 } from '@/lib/db/enrichment'
+import { listAdjacentTagKeywords } from '@/lib/db/adjacent-tags'
 import { finishJobRun, startJobRun } from '@/lib/db/job-runs'
 import { listActiveTagReferences, listCollectionTagKeywords } from '@/lib/db/tags'
 import {
@@ -11,6 +12,7 @@ import {
   type ManualPendingExportItem,
   writeManualPendingExport,
 } from '@/lib/enrich/enrich-worker-shared'
+import { buildAiPrimaryTagOptions } from '@/lib/enrich/ai-primary-tags'
 import { prepareEnrichArticles } from '@/lib/enrich/prepare-articles'
 import { processSummaryBatches } from '@/lib/enrich/persist-enriched'
 
@@ -41,7 +43,9 @@ export async function runDailyEnrich(
   const skippedExpired = await skipExpiredRawArticlesForEnrichment(sourceKey)
   const rawArticles = await claimRawArticlesForEnrichment(limit, sourceKey)
   const tagReferences = await listActiveTagReferences()
+  const aiPrimaryTagOptions = buildAiPrimaryTagOptions(tagReferences)
   const tagKeywords = await listCollectionTagKeywords()
+  const adjacentTagKeywords = await listAdjacentTagKeywords()
   const items: DailyEnrichItemResult[] = []
   const manualPendingExports: ManualPendingExportItem[] = []
 
@@ -59,6 +63,8 @@ export async function runDailyEnrich(
     maxSummaryBatches,
     tagReferences,
     tagKeywords,
+    adjacentTagKeywords,
+    aiPrimaryTagOptions,
     items,
     manualPendingExports,
   })

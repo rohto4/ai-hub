@@ -7,7 +7,7 @@ export async function getPublicArticleDetail(publicKey: string): Promise<PublicA
 
   const articleRows = (await sql`
     SELECT pa.public_article_id AS id, pa.public_key, pa.canonical_url AS url, pa.display_title AS title,
-           pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, pa.content_language,
+           pa.source_category, pa.source_type, pa.thumbnail_url, pa.thumbnail_emoji, to_jsonb(pa)->>'thumbnail_bg_theme' AS thumbnail_bg_theme, pa.content_language,
            COALESCE(pa.original_published_at, pa.created_at) AS published_at,
            pa.display_summary_100 AS summary_100, pa.display_summary_200 AS summary_200, pa.critique,
            pa.publication_basis, pa.summary_input_basis, NULL::text AS topic_group_id,

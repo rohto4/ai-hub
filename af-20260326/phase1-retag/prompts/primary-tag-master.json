@@ -1,0 +1,282 @@
+[
+  {
+    "tag_key": "adobe-firefly",
+    "display_name": "Adobe Firefly"
+  },
+  {
+    "tag_key": "amazon-q",
+    "display_name": "Amazon Q"
+  },
+  {
+    "tag_key": "anthropic",
+    "display_name": "Anthropic"
+  },
+  {
+    "tag_key": "antigravity",
+    "display_name": "Antigravity"
+  },
+  {
+    "tag_key": "autogen",
+    "display_name": "AutoGen"
+  },
+  {
+    "tag_key": "banana",
+    "display_name": "Nano Banana"
+  },
+  {
+    "tag_key": "chatgpt",
+    "display_name": "ChatGPT"
+  },
+  {
+    "tag_key": "claude",
+    "display_name": "Claude"
+  },
+  {
+    "tag_key": "claude-code",
+    "display_name": "Claude Code"
+  },
+  {
+    "tag_key": "cline",
+    "display_name": "Cline"
+  },
+  {
+    "tag_key": "codex",
+    "display_name": "Codex"
+  },
+  {
+    "tag_key": "coding-ai",
+    "display_name": "Coding AI"
+  },
+  {
+    "tag_key": "cohere",
+    "display_name": "Cohere"
+  },
+  {
+    "tag_key": "crewai",
+    "display_name": "CrewAI"
+  },
+  {
+    "tag_key": "cursor",
+    "display_name": "Cursor"
+  },
+  {
+    "tag_key": "dall-e",
+    "display_name": "DALL-E"
+  },
+  {
+    "tag_key": "deepseek",
+    "display_name": "DeepSeek"
+  },
+  {
+    "tag_key": "devin",
+    "display_name": "Devin"
+  },
+  {
+    "tag_key": "dify",
+    "display_name": "Dify"
+  },
+  {
+    "tag_key": "elevenlabs",
+    "display_name": "ElevenLabs"
+  },
+  {
+    "tag_key": "enterprise-ai",
+    "display_name": "Enterprise AI"
+  },
+  {
+    "tag_key": "flux",
+    "display_name": "Flux"
+  },
+  {
+    "tag_key": "gemini",
+    "display_name": "Gemini"
+  },
+  {
+    "tag_key": "gemma",
+    "display_name": "Gemma"
+  },
+  {
+    "tag_key": "github-copilot",
+    "display_name": "GitHub Copilot"
+  },
+  {
+    "tag_key": "google-ai",
+    "display_name": "Google AI"
+  },
+  {
+    "tag_key": "google-deepmind",
+    "display_name": "Google DeepMind"
+  },
+  {
+    "tag_key": "gpt-5",
+    "display_name": "GPT-5"
+  },
+  {
+    "tag_key": "gradio",
+    "display_name": "Gradio"
+  },
+  {
+    "tag_key": "grok",
+    "display_name": "Grok"
+  },
+  {
+    "tag_key": "groundsource",
+    "display_name": "Groundsource"
+  },
+  {
+    "tag_key": "heygen",
+    "display_name": "HeyGen"
+  },
+  {
+    "tag_key": "imagen",
+    "display_name": "Imagen"
+  },
+  {
+    "tag_key": "kling",
+    "display_name": "Kling"
+  },
+  {
+    "tag_key": "langchain",
+    "display_name": "LangChain"
+  },
+  {
+    "tag_key": "llama",
+    "display_name": "Llama"
+  },
+  {
+    "tag_key": "llamaindex",
+    "display_name": "LlamaIndex"
+  },
+  {
+    "tag_key": "manus",
+    "display_name": "Manus"
+  },
+  {
+    "tag_key": "meta-ai",
+    "display_name": "Meta AI"
+  },
+  {
+    "tag_key": "microsoft-copilot",
+    "display_name": "Microsoft Copilot"
+  },
+  {
+    "tag_key": "midjourney",
+    "display_name": "Midjourney"
+  },
+  {
+    "tag_key": "mistral",
+    "display_name": "Mistral"
+  },
+  {
+    "tag_key": "mistral-ai",
+    "display_name": "Mistral AI"
+  },
+  {
+    "tag_key": "nano-banana",
+    "display_name": "Nano Banana"
+  },
+  {
+    "tag_key": "nemotron",
+    "display_name": "Nemotron"
+  },
+  {
+    "tag_key": "notebooklm",
+    "display_name": "NotebookLM"
+  },
+  {
+    "tag_key": "notion-ai",
+    "display_name": "Notion AI"
+  },
+  {
+    "tag_key": "nvidia",
+    "display_name": "Nvidia"
+  },
+  {
+    "tag_key": "nvidia-inception",
+    "display_name": "Nvidia Inception"
+  },
+  {
+    "tag_key": "o1",
+    "display_name": "o1 / o3"
+  },
+  {
+    "tag_key": "open source",
+    "display_name": "oss"
+  },
+  {
+    "tag_key": "openai",
+    "display_name": "OpenAI"
+  },
+  {
+    "tag_key": "perplexity",
+    "display_name": "Perplexity"
+  },
+  {
+    "tag_key": "phi",
+    "display_name": "Phi"
+  },
+  {
+    "tag_key": "pika",
+    "display_name": "Pika"
+  },
+  {
+    "tag_key": "qwen",
+    "display_name": "Qwen"
+  },
+  {
+    "tag_key": "replicate",
+    "display_name": "Replicate"
+  },
+  {
+    "tag_key": "roocode",
+    "display_name": "RooCode"
+  },
+  {
+    "tag_key": "runway",
+    "display_name": "Runway"
+  },
+  {
+    "tag_key": "sora",
+    "display_name": "Sora"
+  },
+  {
+    "tag_key": "stability-ai",
+    "display_name": "Stability AI"
+  },
+  {
+    "tag_key": "stable-diffusion",
+    "display_name": "Stable Diffusion"
+  },
+  {
+    "tag_key": "stargate",
+    "display_name": "Stargate"
+  },
+  {
+    "tag_key": "suno",
+    "display_name": "Suno"
+  },
+  {
+    "tag_key": "udio",
+    "display_name": "Udio"
+  },
+  {
+    "tag_key": "veo",
+    "display_name": "Veo"
+  },
+  {
+    "tag_key": "vercel-ai",
+    "display_name": "Vercel AI"
+  },
+  {
+    "tag_key": "voice-ai",
+    "display_name": "Voice AI"
+  },
+  {
+    "tag_key": "windsurf",
+    "display_name": "Windsurf"
+  },
+  {
+    "tag_key": "xai",
+    "display_name": "xAI"
+  }
+]

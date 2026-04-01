@@ -21,6 +21,7 @@ export {
 } from '@/lib/db/enrichment-dedupe'
 
 export {
+  refreshAdjacentTagArticleCounts,
   refreshTagArticleCounts,
   upsertEnrichedArticle,
 } from '@/lib/db/enrichment-upsert'

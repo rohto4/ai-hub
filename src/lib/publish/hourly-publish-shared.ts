@@ -31,6 +31,7 @@ export type PublishCandidate = {
   score: string | number
   source_updated_at: string | null
   thumbnail_url: string | null
+  thumbnail_bg_theme: string | null
   priority_score: string | number | null
 }
 
@@ -38,6 +39,12 @@ export type TagRow = {
   enriched_article_id: number
   tag_id: string
   is_primary: boolean
+}
+
+export type AdjacentTagRow = {
+  enriched_article_id: number
+  adjacent_tag_id: string
+  sort_order: number
 }
 
 export type UpsertedRow = {

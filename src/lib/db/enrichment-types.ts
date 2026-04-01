@@ -78,7 +78,11 @@ export interface UpsertEnrichedInput {
   summaryEmbedding?: number[] | null
   embeddingModel?: string | null
   matchedTagIds: string[]
+  adjacentTagIds: string[]
+  thumbnailBgTheme: string | null
   candidateTags: Array<{ candidateKey: string; displayName: string }>
+  canonicalAliasMappings?: Array<{ tagId: string; aliasKey: string }>
+  canonicalKeywordMappings?: Array<{ tagId: string; keyword: string }>
   commercialUsePolicy: 'permitted' | 'prohibited' | 'unknown'
 }
 

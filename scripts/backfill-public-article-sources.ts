@@ -40,7 +40,8 @@ async function backfillPublicArticleSources() {
       ae.publication_text,
       ae.score,
       ae.source_updated_at,
-      ae.thumbnail_url
+      ae.thumbnail_url,
+      ae.thumbnail_bg_theme
     FROM public_articles pa
     JOIN articles_enriched ae ON ae.enriched_article_id = pa.enriched_article_id
     JOIN source_targets st ON st.source_target_id = ae.source_target_id
@@ -65,6 +66,7 @@ async function backfillPublicArticleSources() {
     score: string | number
     source_updated_at: string | null
     thumbnail_url: string | null
+    thumbnail_bg_theme: string | null
   }>
 
   console.log(`対象記事: ${rows.length} 件`)
@@ -103,6 +105,7 @@ async function backfillPublicArticleSources() {
           score: row.score,
           source_updated_at: row.source_updated_at,
           thumbnail_url: row.thumbnail_url,
+          thumbnail_bg_theme: row.thumbnail_bg_theme,
           priority_score: null,
         },
       ]),

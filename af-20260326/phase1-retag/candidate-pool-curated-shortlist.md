@@ -1,0 +1,52 @@
+# Phase 1 Candidate Pool Curated Shortlist
+
+- generatedAt: 2026-03-26T15:28:42.746Z
+- threshold: seen_count >= 7
+- totalCandidates: 44
+- helperExclusions: llms, transformer, transformers, arxiv, ai, rl, chain-of-thought, evolving, driven, automated, diffusion models, federated, federated learning, large language models, domain, machine, information, prediction, continual, continual learning, dynamics, generalized, robust, structure, attention, clustering, responses, adversarial, distillation, generalization, latent
+
+## Curated Shortlist
+- iclr (iclr) | seen=26, status=candidate | title=Low-pass Personalized Subgraph Federated Recommendation
+- vlm (vlm) | seen=22, status=candidate | title=Understanding Pruning Regimes in Vision-Language Models Through Domain-Aware Layer Selection
+- lora (lora) | seen=14, status=candidate | title=Hetero-Net: An Energy-Efficient Resource Allocation and 3D Placement in Heterogeneous LoRa Networks via Multi-Agent Optimization
+- gnn (gnn) | seen=12, status=candidate | title=FastPFRec: A Fast Personalized Federated Recommendation with Secure Sharing
+- Cvpr (cvpr) | seen=12, status=candidate | title=RealUnify: Do Unified Models Truly Benefit from Unification? A Comprehensive Benchmark
+- Mnist (mnist) | seen=11, status=candidate | title=Growing Networks with Autonomous Pruning
+- Mamba (mamba) | seen=11, status=candidate | title=Team LEYA in 10th ABAW Competition: Multimodal Ambivalence/Hesitancy Recognition Approach
+- clip (clip) | seen=10, status=candidate | title=Dodgersort: Uncertainty-Aware VLM-Guided Human-in-the-Loop Pairwise Ranking
+- gpt-4o (gpt-4o) | seen=10, status=candidate | title=EnterpriseLab: A Full-Stack Platform for developing and deploying agents in Enterprises
+- grpo (grpo) | seen=10, status=candidate | title=Visual Exclusivity Attacks: Automatic Multimodal Red Teaming via Agentic Planning
+- Cifar-10 (cifar-10) | seen=10, status=candidate | title=Collaborative Adaptive Curriculum for Progressive Knowledge Distillation
+- Vlms (vlms) | seen=10, status=candidate | title=Medical Image Spatial Grounding with Semantic Sampling
+- Cot (cot) | seen=10, status=candidate | title=L2V-CoT: Cross-Modal Transfer of Chain-of-Thought Reasoning via Latent Intervention
+- Nlp (nlp) | seen=9, status=candidate | title=Select, Label, Evaluate: Active Testing in NLP
+- mllms (mllms) | seen=9, status=candidate | title=Predictive Regularization Against Visual Representation Degradation in Multimodal Large Language Models
+- moe (moe) | seen=9, status=candidate | title=Run Qwen3.5 flagship model with 397 billion parameters at 5 – 9 tok/s on a $2,100 desktop! Two $500 GPUs, 32GB RAM, one NVMe drive. Uses Q4_K_M quants
+- Neurips (neurips) | seen=9, status=candidate | title=ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking
+- genai (genai) | seen=8, status=candidate | title=Beyond Detection: Governing GenAI in Academic Peer Review as a Sociotechnical Challenge
+- rlvr (rlvr) | seen=8, status=candidate | title=On the Direction of RLVR Updates for LLM Reasoning: Identification and Exploitation
+- Mllm (mllm) | seen=8, status=candidate | title=ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking
+- Cross (cross) | seen=8, status=candidate | title=Cross-site scripting adversarial attacks based on deep reinforcement learning: Evaluation and extension study
+- eeg (eeg) | seen=7, status=candidate | title=Riding Brainwaves in LLM Space: Understanding Activation Patterns Using Individual Neural Signatures
+- grounded (grounded) | seen=7, status=candidate | title=LGSE: Lexically Grounded Subword Embedding Initialization for Low-Resource Language Adaptation
+- group (group) | seen=7, status=candidate | title=Demystifying Group Relative Policy Optimization: Its Policy Gradient is a U-Statistic
+- imagenet (imagenet) | seen=7, status=candidate | title=Show Me What You Don't Know: Efficient Sampling from Invariant Sets for Model Validation
+- kernel (kernel) | seen=7, status=candidate | title=A Kernel Space-based Multidimensional Sparse Model for Dynamic PET Image Denoising
+- meets (meets) | seen=7, status=candidate | title=Bot Meets Shortcut: How Can LLMs Aid in Handling Unknown Invariance OOD Scenarios?
+- openclaw (openclaw) | seen=7, status=candidate | title=When OpenClaw Meets Hospital: Toward an Agentic Operating System for Dynamic Clinical Workflows
+- processing (processing) | seen=7, status=candidate | title=Leveraging Natural Language Processing and Machine Learning for Evidence-Based Food Security Policy Decision-Making in Data-Scarce Making
+- reason (reason) | seen=7, status=candidate | title=Native Reasoning Models: Training Language Models to Reason on Unverifiable Data
+- sampling (sampling) | seen=7, status=candidate | title=Power-SMC: Low-Latency Sequence-Level Power Sampling for Training-Free LLM Reasoning
+- spectral (spectral) | seen=7, status=candidate | title=Filtered Spectral Projection for Quantum Principal Component Analysis
+- stable (stable) | seen=7, status=candidate | title=A Stable Neural Statistical Dependence Estimator for Autoencoder Feature Analysis
+- super (super) | seen=7, status=candidate | title=REVERE: Reflective Evolving Research Engineer for Scientific Workflows
+- tokens (tokens) | seen=7, status=candidate | title=Support Tokens, Stability Margins, and a New Foundation for Robust LLMs
+- uncertainty (uncertainty) | seen=7, status=candidate | title=Semantic Self-Distillation for Language Model Uncertainty
+- Aaai (aaai) | seen=7, status=candidate | title=MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery
+- Langsmith (langsmith) | seen=7, status=candidate | title=Join LangChain at Google Cloud Next 2026
+- Vit (vit) | seen=7, status=candidate | title=Detached Skip-Links and $R$-Probe: Decoupling Feature Aggregation from Gradient Propagation for MLLM OCR
+- Machine learning (machine learning) | seen=7, status=candidate | title=On the (In)Security of Loading Machine Learning Models
+- Planning (planning) | seen=7, status=candidate | title=Improved Generalized Planning with LLMs through Strategy Refinement and Reflection
+- Speech (speech) | seen=7, status=candidate | title=Borderless Long Speech Synthesis
+- Kernels (kernels) | seen=7, status=candidate | title=Bases of Steerable Kernels for Equivariant CNNs: From 2D Rotations to the Lorentz Group
+- India (india) | seen=7, status=candidate | title=Accelerating discovery in India through AI-powered science and education

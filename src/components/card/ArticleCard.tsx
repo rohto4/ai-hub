@@ -91,6 +91,7 @@ export function ArticleCard({
           sourceType={article.source_type}
           thumbnailUrl={article.thumbnail_url}
           thumbnailEmoji={article.thumbnail_emoji}
+          thumbnailBgTheme={article.thumbnail_bg_theme}
           className="mt-0.5 h-[72px] w-[56px] shrink-0 rounded-lg"
           badgeLabel={sourceLabel[article.source_type]}
         />

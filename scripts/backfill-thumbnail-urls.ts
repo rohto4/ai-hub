@@ -33,6 +33,7 @@ type EnrichedThumbnailRow = {
   source_type: SourceType
   source_category: SourceCategory
   content_language: ContentLanguage
+  thumbnail_bg_theme: string | null
   tag_key: string | null
   display_name: string | null
 }
@@ -46,6 +47,7 @@ type ThumbnailRecord = {
   sourceType: SourceType
   sourceCategory: SourceCategory
   contentLanguage: ContentLanguage
+  thumbnailBgTheme: string | null
   matchedTags: Array<{ tagKey: string; displayName: string }>
 }
 
@@ -76,6 +78,7 @@ function groupRows(rows: EnrichedThumbnailRow[]): ThumbnailRecord[] {
       sourceType: row.source_type,
       sourceCategory: row.source_category,
       contentLanguage: row.content_language,
+      thumbnailBgTheme: row.thumbnail_bg_theme,
       matchedTags: row.tag_key && row.display_name
         ? [{ tagKey: row.tag_key, displayName: row.display_name }]
         : [],
@@ -98,6 +101,7 @@ async function backfillThumbnailUrls() {
       ae.source_type,
       ae.source_category,
       ae.content_language,
+      ae.thumbnail_bg_theme,
       tm.tag_key,
       tm.display_name
     FROM articles_enriched ae
@@ -125,6 +129,7 @@ async function backfillThumbnailUrls() {
         sourceCategory: article.sourceCategory,
         contentLanguage: article.contentLanguage,
         matchedTags: article.matchedTags,
+        thumbnailBgTheme: article.thumbnailBgTheme,
       })
 
       await sql`

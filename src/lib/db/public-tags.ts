@@ -41,6 +41,7 @@ export async function listArticlesByTag(options: {
       pa.source_type,
       pa.thumbnail_url,
       pa.thumbnail_emoji,
+      to_jsonb(pa)->>'thumbnail_bg_theme' AS thumbnail_bg_theme,
       pa.content_language,
       COALESCE(pa.original_published_at, pa.created_at) AS published_at,
       pa.display_summary_100 AS summary_100,

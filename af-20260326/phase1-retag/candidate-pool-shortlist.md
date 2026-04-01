@@ -1,0 +1,82 @@
+# Phase 1 Candidate Pool Shortlist
+
+- generatedAt: 2026-03-26T15:28:42.746Z
+- threshold: seen_count >= 7
+- totalCandidates: 75
+
+## Shortlist
+- Llms (llms) | seen=67, status=candidate | title=Between the Layers Lies the Truth: Uncertainty Estimation in LLMs Using Intra-Layer Local Information Scores
+- transformer (transformer) | seen=34, status=candidate | title=Weber's Law in Transformer Magnitude Representations: Efficient Coding, Representational Geometry, and Psychophysical Laws in Language Models
+- iclr (iclr) | seen=26, status=candidate | title=Low-pass Personalized Subgraph Federated Recommendation
+- vlm (vlm) | seen=22, status=candidate | title=Understanding Pruning Regimes in Vision-Language Models Through Domain-Aware Layer Selection
+- Arxiv (arxiv) | seen=20, status=candidate | title=Heavy-Tailed and Long-Range Dependent Noise in Stochastic Approximation: A Finite-Time Analysis
+- Rl (rl) | seen=16, status=candidate | title=MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery
+- lora (lora) | seen=14, status=candidate | title=Hetero-Net: An Energy-Efficient Resource Allocation and 3D Placement in Heterogeneous LoRa Networks via Multi-Agent Optimization
+- Ai (ai) | seen=14, status=candidate | title=RedacBench: Can AI Erase Your Secrets?
+- Transformers (transformers) | seen=14, status=candidate | title=BitSkip: An Empirical Analysis of Quantization and Early Exit Composition in Transformers
+- chain-of-thought (chain-of-thought) | seen=13, status=candidate | title=Lie to Me: How Faithful Is Chain-of-Thought Reasoning in Reasoning Models?
+- evolving (evolving) | seen=12, status=candidate | title=AETAS: Analysis of Evolving Temporal Affect and Semantics for Legal History
+- gnn (gnn) | seen=12, status=candidate | title=FastPFRec: A Fast Personalized Federated Recommendation with Secure Sharing
+- Cvpr (cvpr) | seen=12, status=candidate | title=RealUnify: Do Unified Models Truly Benefit from Unification? A Comprehensive Benchmark
+- Diffusion models (diffusion models) | seen=11, status=candidate | title=DiffGraph: An Automated Agent-driven Model Merging Framework for In-the-Wild Text-to-Image Generation
+- Federated learning (federated learning) | seen=11, status=candidate | title=Federated Learning Playground
+- Mnist (mnist) | seen=11, status=candidate | title=Growing Networks with Autonomous Pruning
+- Mamba (mamba) | seen=11, status=candidate | title=Team LEYA in 10th ABAW Competition: Multimodal Ambivalence/Hesitancy Recognition Approach
+- Driven (driven) | seen=11, status=candidate | title=S3T-Former: A Purely Spike-Driven State-Space Topology Transformer for Skeleton Action Recognition
+- Automated (automated) | seen=10, status=candidate | title=Towards Automated Community Notes Generation with Large Vision Language Models for Combating Contextual Deception
+- clip (clip) | seen=10, status=candidate | title=Dodgersort: Uncertainty-Aware VLM-Guided Human-in-the-Loop Pairwise Ranking
+- federated (federated) | seen=10, status=candidate | title=Fast convergence of a Federated Expectation-Maximization Algorithm
+- gpt-4o (gpt-4o) | seen=10, status=candidate | title=EnterpriseLab: A Full-Stack Platform for developing and deploying agents in Enterprises
+- grpo (grpo) | seen=10, status=candidate | title=Visual Exclusivity Attacks: Automatic Multimodal Red Teaming via Agentic Planning
+- Cifar-10 (cifar-10) | seen=10, status=candidate | title=Collaborative Adaptive Curriculum for Progressive Knowledge Distillation
+- Large language models (large language models) | seen=10, status=candidate | title=Enhancing Safety of Large Language Models via Embedding Space Separation
+- Vlms (vlms) | seen=10, status=candidate | title=Medical Image Spatial Grounding with Semantic Sampling
+- Cot (cot) | seen=10, status=candidate | title=L2V-CoT: Cross-Modal Transfer of Chain-of-Thought Reasoning via Latent Intervention
+- Domain (domain) | seen=9, status=candidate | title=RubricRAG: Towards Interpretable and Reliable LLM Evaluation via Domain Knowledge Retrieval for Rubric Generation
+- Machine (machine) | seen=9, status=candidate | title=Bridging the Gap Between Climate Science and Machine Learning in Climate Model Emulation
+- Nlp (nlp) | seen=9, status=candidate | title=Select, Label, Evaluate: Active Testing in NLP
+- information (information) | seen=9, status=candidate | title=Knowing What's Missing: Assessing Information Sufficiency in Question Answering
+- mllms (mllms) | seen=9, status=candidate | title=Predictive Regularization Against Visual Representation Degradation in Multimodal Large Language Models
+- moe (moe) | seen=9, status=candidate | title=Run Qwen3.5 flagship model with 397 billion parameters at 5 – 9 tok/s on a $2,100 desktop! Two $500 GPUs, 32GB RAM, one NVMe drive. Uses Q4_K_M quants
+- prediction (prediction) | seen=9, status=candidate | title=Precision-Varying Prediction (PVP): Robustifying ASR systems against adversarial attacks
+- Neurips (neurips) | seen=9, status=candidate | title=ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking
+- continual (continual) | seen=8, status=candidate | title=DesCLIP: Robust Continual Learning via General Attribute Descriptions for VLM-Based Visual Recognition
+- continual learning (continual learning) | seen=8, status=candidate | title=Stochastic approximation in non-markovian environments revisited
+- dynamics (dynamics) | seen=8, status=candidate | title=Generalizing Dynamics Modeling More Easily from Representation Perspective
+- genai (genai) | seen=8, status=candidate | title=Beyond Detection: Governing GenAI in Academic Peer Review as a Sociotechnical Challenge
+- generalized (generalized) | seen=8, status=candidate | title=Seed1.8 Model Card: Towards Generalized Real-World Agency
+- rlvr (rlvr) | seen=8, status=candidate | title=On the Direction of RLVR Updates for LLM Reasoning: Identification and Exploitation
+- robust (robust) | seen=8, status=candidate | title=Cloud-Edge Collaborative Large Models for Robust Photovoltaic Power Forecasting
+- structure (structure) | seen=8, status=candidate | title=Neural Structure Embedding for Symbolic Regression via Continuous Structure Search and Coefficient Optimization
+- Mllm (mllm) | seen=8, status=candidate | title=ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking
+- Cross (cross) | seen=8, status=candidate | title=Cross-site scripting adversarial attacks based on deep reinforcement learning: Evaluation and extension study
+- Latent (latent) | seen=8, status=candidate | title=ReLaX: Reasoning with Latent Exploration for Large Reasoning Models
+- Attention (attention) | seen=7, status=candidate | title=A Multi-Modal CNN-LSTM Framework with Multi-Head Attention and Focal Loss for Real-Time Elderly Fall Detection
+- Clustering (clustering) | seen=7, status=candidate | title=Research on Individual Trait Clustering and Development Pathway Adaptation Based on the K-means Algorithm
+- Responses (responses) | seen=7, status=candidate | title=Evaluating Large Language Models' Responses to Sexual and Reproductive Health Queries in Nepali
+- adversarial (adversarial) | seen=7, status=candidate | title=Hybrid Quantum Generative Adversarial Networks for Molecular Simulation and Drug Discovery
+- distillation (distillation) | seen=7, status=candidate | title=On-Policy Context Distillation for Language Models
+- eeg (eeg) | seen=7, status=candidate | title=Riding Brainwaves in LLM Space: Understanding Activation Patterns Using Individual Neural Signatures
+- generalization (generalization) | seen=7, status=candidate | title=Sharper Generalization Bounds for Transformer
+- grounded (grounded) | seen=7, status=candidate | title=LGSE: Lexically Grounded Subword Embedding Initialization for Low-Resource Language Adaptation
+- group (group) | seen=7, status=candidate | title=Demystifying Group Relative Policy Optimization: Its Policy Gradient is a U-Statistic
+- imagenet (imagenet) | seen=7, status=candidate | title=Show Me What You Don't Know: Efficient Sampling from Invariant Sets for Model Validation
+- kernel (kernel) | seen=7, status=candidate | title=A Kernel Space-based Multidimensional Sparse Model for Dynamic PET Image Denoising
+- meets (meets) | seen=7, status=candidate | title=Bot Meets Shortcut: How Can LLMs Aid in Handling Unknown Invariance OOD Scenarios?
+- openclaw (openclaw) | seen=7, status=candidate | title=When OpenClaw Meets Hospital: Toward an Agentic Operating System for Dynamic Clinical Workflows
+- processing (processing) | seen=7, status=candidate | title=Leveraging Natural Language Processing and Machine Learning for Evidence-Based Food Security Policy Decision-Making in Data-Scarce Making
+- reason (reason) | seen=7, status=candidate | title=Native Reasoning Models: Training Language Models to Reason on Unverifiable Data
+- sampling (sampling) | seen=7, status=candidate | title=Power-SMC: Low-Latency Sequence-Level Power Sampling for Training-Free LLM Reasoning
+- spectral (spectral) | seen=7, status=candidate | title=Filtered Spectral Projection for Quantum Principal Component Analysis
+- stable (stable) | seen=7, status=candidate | title=A Stable Neural Statistical Dependence Estimator for Autoencoder Feature Analysis
+- super (super) | seen=7, status=candidate | title=REVERE: Reflective Evolving Research Engineer for Scientific Workflows
+- tokens (tokens) | seen=7, status=candidate | title=Support Tokens, Stability Margins, and a New Foundation for Robust LLMs
+- uncertainty (uncertainty) | seen=7, status=candidate | title=Semantic Self-Distillation for Language Model Uncertainty
+- Aaai (aaai) | seen=7, status=candidate | title=MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery
+- Langsmith (langsmith) | seen=7, status=candidate | title=Join LangChain at Google Cloud Next 2026
+- Vit (vit) | seen=7, status=candidate | title=Detached Skip-Links and $R$-Probe: Decoupling Feature Aggregation from Gradient Propagation for MLLM OCR
+- Machine learning (machine learning) | seen=7, status=candidate | title=On the (In)Security of Loading Machine Learning Models
+- Planning (planning) | seen=7, status=candidate | title=Improved Generalized Planning with LLMs through Strategy Refinement and Reflection
+- Speech (speech) | seen=7, status=candidate | title=Borderless Long Speech Synthesis
+- Kernels (kernels) | seen=7, status=candidate | title=Bases of Steerable Kernels for Equivariant CNNs: From 2D Rotations to the Lorentz Group
+- India (india) | seen=7, status=candidate | title=Accelerating discovery in India through AI-powered science and education

@@ -1,6 +1,6 @@
 # AI Trend Hub 実装判断待ち
 
-最終更新: 2026-03-22
+最終更新: 2026-03-27
 
 ここには実装を止めずに進めるために後から判断したい論点だけを残す。
 解決済みの項目はこのファイルに残さない。
@@ -109,6 +109,154 @@
 
 ---
 
+### 1.8 1周目 retag 後のカテゴリ / 属性設計確定
+
+現状:
+- 直近の retag は 1周目であり、この段階ではカテゴリを先に固定しない
+- まずは主タグ / 隣接分野タグ / 新規立項タグ候補を「属性」として全件再構築する
+- その後、2周目に入る前にカテゴリ / 主タグ / 隣接タグの境界を確定する
+
+1周目の固定前提:
+- 主タグ完全除外:
+  - `llm`
+  - `generative-ai`
+  - `rag`
+  - `agent`
+  - `huggingface`
+  - `hugging face`
+  - `paper`
+  - `policy`
+  - `safety`
+- カテゴリからも不要:
+  - `llm`
+  - `agent`
+  - `voice`
+- 将来のカテゴリ候補:
+  - `paper`
+  - `official`
+  - `news`
+  - `search-rag`
+  - `oss`
+  - `enterprise-ai`
+
+再判断タイミング:
+- 1周目の新規立項タグ候補一覧を見たあと
+- 主タグ平均件数が 4 件に届くか、隣接分野タグの付与件数が公開導線として足りるかを見たあと
+
+その時に決めること:
+- `oss` をカテゴリ専用にするか、属性としても残すか
+- `enterprise-ai` をカテゴリ専用にするか、属性としても残すか
+- `official` / `news` / `paper` / `search-rag` を最終的にどの導線へ寄せるか
+
+---
+
+### 1.9 `paper` 専用タグ群の要否
+
+現状:
+- `arxiv-ai` の live run では `full_content` 扱いでも無タグ記事が多い
+- タイトルを見る限り、基礎研究・手法論・評価論文が多く、企業名 / 製品名 / OSS 名の既存主タグへ落ちにくい
+- 記事・公式導線では外した一般研究語（例: `rag`, `slm` など）が、論文導線では有効な可能性が高い
+
+仮説:
+- `paper` カテゴリ / `source_type='paper'` 向けには、通常記事とは別の主タグ群が必要
+- 例: `rag`, `slm`, `reasoning`, `alignment`, `rl`, `distillation`, `quantization`, `multimodal` など
+- 公開一般タグと混在させるのではなく、論文導線専用または論文優先で使う
+
+判断待ち:
+- `paper` 専用 allowed tag set をコード上で先行導入するか
+- `tags_master` に将来的な tag group / paper-only 属性を持たせるか
+- `paper` 専用タグを公開面でどこまで見せるか
+
+次の確認:
+- job_run_id=719/720 の無タグ論文を分類し、タグマスタ被覆不足か prompt 判断不足かを切り分ける
+- `paper` 専用タグ候補の初期セットを 20〜40 語程度で仮置きし、再度 live run で付与率を見る
+
+---
+
+---
+
+### 1.10 バッチ仕様ドキュメント作成時に発見した不一致・疑問点
+
+バッチのデータフロー図（`batch-sequence.md` / `batch-dataflow.md`）を作成する際に、
+仕様書・GH Actions・実装間で以下の揺れ・未確認点が見つかった。
+
+#### (a) `daily-tag-dedup` と `daily-tag-promote` の名称不一致
+
+- `spec/11-batch-job-design.md` には `daily-tag-promote` と記載
+- GH Actions は `daily-tag-dedup.yml`、`data-flow.md` は `daily-tag-dedup`
+- 図では `daily-tag-dedup` に統一したが、同一ジョブかどうか要確認
+- **判断待ち:** spec 側の名称を `daily-tag-dedup` へ統一するか、実態として別ジョブなら分けて記述する
+
+#### (b) `weekly-archive` の GH Actions が存在しない
+
+- `spec/11-batch-job-design.md` に `weekly-archive`（articles_raw 1ヶ月超 → articles_raw_history）が定義されている
+- `.github/workflows/` に対応 yml が見当たらない
+- **判断待ち:** 未実装なのか、手動 SQL 運用なのか、別の仕組みで動いているのかを確認する
+
+#### (c) `monthly-public-archive` の GH Actions が存在しない
+
+- `data-flow.md` に `monthly-public-archive`（public_articles 半年超 → public_articles_history）が記載されている
+- `.github/workflows/` に対応 yml がなく、定期起動の経路が不明
+- **判断待ち:** Vercel Cron 経由か、手動実行のみか、スケジュール登録が抜けているかを確認する
+
+#### (d) `daily-tag-dedup` の Google Trends 連携の実装有無
+
+- `spec/11-batch-job-design.md` の `daily-tag-promote` 仕様には Google Trends 照合が記載されている
+- `data-flow.md` の `daily-tag-dedup` には Google Trends への言及がない
+- 図では仕様書どおり Google Trends 連携を書いたが、実際の `/api/cron/daily-tag-dedup` に実装があるか未確認
+- **判断待ち:** 実装されていなければ、図から Google Trends ノードを除去し、仕様書の記述も現状に合わせる
+
+#### (e) `articles_enriched_sources` テーブルの位置づけ
+
+- `data-flow.md` の Layer2 一覧に `articles_enriched_sources` が記載されている
+- `spec/04-data-model-and-sql.md` の主キー列一覧・補助テーブル一覧には記載がない
+- CRUD 表・今回の図では含めていない
+- **判断待ち:** テーブルが実在するなら spec とデータフロー図に追加する
+
+#### (f) `tag_keywords` テーブルの CRUD 表未記載
+
+- `flowchart.md` の既存図には `tag_keywords` が登場し、`daily-tag-dedup` がここへ書き込む
+- CRUD 表・今回の図では `tag_aliases` のみ記載し `tag_keywords` を落とした
+- **判断待ち:** `tag_keywords` が `tags_master` の子テーブルとして正式に存在するなら、CRUD 表と図に追加する
+
+#### (g) `priority-queue-worker` の独立起動経路が不明
+
+- `spec/11-batch-job-design.md` に独立ジョブとして定義されている
+- GH Actions に専用 yml がなく、`hourly-publish` 内で処理されている
+- **判断待ち:** 独立起動が必要なユースケースがあるか、`hourly-publish` 内処理のみで十分かを確認する
+
+#### (h) 追いつきバッチの自動化方式の選択
+
+現状:
+- 追いつき CLI フロー（prepare → Gemini CLI → import）は動作しており、backlog 1840 件で実績あり
+- 自動化されておらず、実行は手動（ローカルで npm スクリプトを叩く + Gemini CLI を手で回す）
+- Gemini API の rate limit を受けず、月額定額で大量処理できる利点がある
+
+**判断待ち:** 以下の方式のどれを正式な追いつきバッチとするか
+1. **現状維持（手動 CLI）** — ソース急増時だけ手動で prepare → CLI → import を回す
+2. **GH Actions 緊急 yml 追加** — `workflow_dispatch` + limit/maxSummaryBatches 入力で通常 enrich-worker を大量実行する（Gemini API 課金・rate limit あり）
+3. **CLI フローの半自動化** — prepare と import だけ GH Actions / Vercel Cron で自動化し、Gemini CLI 部分は月次手動のまま残す
+
+判断に必要な情報:
+- Gemini API が安定稼働している期間と rate limit 頻度の実績
+- 追いつきが必要になる頻度（ソース追加頻度・バッチ停止リスク）
+
+---
+
+#### (i) 取得ソース急増時・バッチ停止後の対応手順が未整備
+
+現状の手段:
+- `hourly-enrich.yml` の `workflow_dispatch` で手動発火（1回20件固定）
+- `scripts/prepare-gemini-cli-enrich-artifacts.ts` + Gemini CLI による手動バッチ処理（arxiv-ai backlog 1840件で実績あり）
+
+追いつき CLI フローの詳細は `implementation-plan.md` 3.10 に記載。
+自動化方式の選択は (h) に記載。
+
+**判断待ち:** 追いつき CLI フロー完了後の後処理（db:retag-layer2-layer4 実行）を
+どのタイミング・誰の判断で行うかを運用ルールとして定める
+
+---
+
 ## 2. 確定済み判断（参照用）
 
 | 項目 | 決定内容 |
@@ -150,6 +298,7 @@
 - 隣接分野タグマスタを既存タグ系と分離できていること
 - title + summary_200 から 1〜2件に安定付与できること
 - 背景テーマ合成（emoji + background）の優先順位が固定されていること
+- migration 038 適用後に `db:retag-layer2-layer4` を実行し、L2/L4 の整合を確認すること
 
 運用中の監視項目:
 - 隣接分野タグ付与率（0件 / 1件 / 2件）

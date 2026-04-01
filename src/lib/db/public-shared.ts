@@ -17,6 +17,7 @@ export type PublicArticleRow = {
   source_type: Article['source_type']
   thumbnail_url: string | null
   thumbnail_emoji: string | null
+  thumbnail_bg_theme: string | null
   content_language: ContentLanguage | null
   published_at: string
   summary_100: string | null
@@ -171,6 +172,7 @@ export function toArticle(row: PublicArticleRow): ArticleWithScore {
     source_type: row.source_type,
     thumbnail_url: row.thumbnail_url,
     thumbnail_emoji: row.thumbnail_emoji,
+    thumbnail_bg_theme: row.thumbnail_bg_theme,
     content_language: row.content_language,
     published_at: new Date(row.published_at),
     summary_100: row.summary_100,

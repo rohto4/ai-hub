@@ -21,12 +21,14 @@ export type DedupResult = {
   candidateKey: string
   matchedTagId: string | null
   matchedTagKey: string | null
+  relation: 'alias' | 'keyword' | 'separate'
   confidence: 'high' | 'low'
 }
 
 type GeminiDedupItem = {
   candidate: string
   matchedTagKey: string | null
+  relation?: 'alias' | 'keyword' | 'separate'
   confidence: 'high' | 'low'
 }
 
@@ -48,17 +50,17 @@ ${tagList}
 ${candidateList}
 
 判定ルール:
-1. 完全に同じ概念であれば matchedTagKey に既存タグのキーを返す
-2. 略称・スペルバリエーション・大文字小文字違いも同じ概念として扱う
-3. 関連はあるが別概念（例: "gpt-4" と "openai"）はマッチさせない
+1. 完全に同じ概念で厳密な表記ゆれなら relation="alias" とし、matchedTagKey に既存タグのキーを返す
+2. 同じタグへ寄せたい検索語・通称・周辺語だが厳密な表記ゆれではない場合は relation="keyword" とする
+3. 関連はあるが別概念（例: "gpt-4" と "openai"）は relation="separate" とし、matchedTagKey=null
 4. 確信が高い場合は confidence="high", 曖昧な場合は confidence="low"
-5. マッチしない場合は matchedTagKey=null
+5. matchedTagKey は alias / keyword のときのみ返す
 6. 出力は JSON のみ。説明不要。
 
 出力形式:
 {
   "items": [
-    { "candidate": "候補キー", "matchedTagKey": "既存タグキー or null", "confidence": "high or low" }
+    { "candidate": "候補キー", "matchedTagKey": "既存タグキー or null", "relation": "alias or keyword or separate", "confidence": "high or low" }
   ]
 }
 
@@ -94,6 +96,7 @@ export async function detectTagDuplicates(
       candidateKey: item.candidate,
       matchedTagId: matched?.tagId ?? null,
       matchedTagKey: matched?.tagKey ?? null,
+      relation: item.relation === 'alias' || item.relation === 'keyword' ? item.relation : 'separate',
       confidence: item.confidence ?? 'low',
     }
   })

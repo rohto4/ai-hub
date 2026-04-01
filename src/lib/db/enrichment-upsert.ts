@@ -14,6 +14,7 @@ type ExistingEnrichedRow = {
   canonical_url: string
   title: string
   thumbnail_url: string | null
+  thumbnail_bg_theme: string | null
   summary_100: string
   summary_200: string | null
   summary_basis: 'full_content' | 'feed_snippet' | 'blocked_snippet' | 'fallback_snippet'
@@ -66,6 +67,18 @@ async function syncEnrichedTags(enrichedArticleId: number, matchedTagIds: string
   }
 }
 
+async function syncEnrichedAdjacentTags(enrichedArticleId: number, adjacentTagIds: string[]): Promise<void> {
+  const sql = getSql()
+  await sql`DELETE FROM articles_enriched_adjacent_tags WHERE enriched_article_id = ${enrichedArticleId}`
+
+  for (const [index, adjacentTagId] of adjacentTagIds.entries()) {
+    await sql`
+      INSERT INTO articles_enriched_adjacent_tags (enriched_article_id, adjacent_tag_id, sort_order)
+      VALUES (${enrichedArticleId}, ${adjacentTagId}, ${index})
+    `
+  }
+}
+
 async function upsertTagCandidates(
   candidateTags: Array<{ candidateKey: string; displayName: string }>,
   rawArticleId: number,
@@ -82,6 +95,34 @@ async function upsertTagCandidates(
         seen_count = tag_candidate_pool.seen_count + 1,
         last_seen_at = now(),
         updated_at = now()
+    `
+  }
+}
+
+async function upsertCanonicalAliasMappings(
+  aliasMappings: Array<{ tagId: string; aliasKey: string }>,
+): Promise<void> {
+  const sql = getSql()
+
+  for (const mapping of aliasMappings) {
+    await sql`
+      INSERT INTO tag_aliases (tag_id, alias_key)
+      VALUES (${mapping.tagId}::uuid, ${mapping.aliasKey})
+      ON CONFLICT (alias_key) DO NOTHING
+    `
+  }
+}
+
+async function upsertCanonicalKeywordMappings(
+  keywordMappings: Array<{ tagId: string; keyword: string }>,
+): Promise<void> {
+  const sql = getSql()
+
+  for (const mapping of keywordMappings) {
+    await sql`
+      INSERT INTO tag_keywords (tag_id, keyword)
+      VALUES (${mapping.tagId}::uuid, ${mapping.keyword})
+      ON CONFLICT (tag_id, keyword) DO NOTHING
     `
   }
 }
@@ -162,6 +203,29 @@ export async function refreshTagArticleCounts(): Promise<void> {
   `
 }
 
+export async function refreshAdjacentTagArticleCounts(): Promise<void> {
+  const sql = getSql()
+  await sql`
+    UPDATE adjacent_tags_master atm
+    SET
+      article_count = COALESCE(counts.article_count, 0),
+      updated_at = now()
+    FROM (
+      SELECT aeat.adjacent_tag_id, COUNT(*)::integer AS article_count
+      FROM articles_enriched_adjacent_tags aeat
+      GROUP BY aeat.adjacent_tag_id
+    ) counts
+    WHERE atm.adjacent_tag_id = counts.adjacent_tag_id
+  `
+
+  await sql`
+    UPDATE adjacent_tags_master
+    SET article_count = 0, updated_at = now()
+    WHERE adjacent_tag_id NOT IN (SELECT DISTINCT adjacent_tag_id FROM articles_enriched_adjacent_tags)
+      AND article_count <> 0
+  `
+}
+
 export async function upsertEnrichedArticle(
   input: UpsertEnrichedInput,
   options: UpsertEnrichedOptions = {},
@@ -207,14 +271,14 @@ export async function upsertEnrichedArticle(
     await sql`
       INSERT INTO articles_enriched_history (
         enriched_article_id, raw_article_id, source_target_id, normalized_url, cited_url, canonical_url,
-        content_language, title, thumbnail_url, summary_100, summary_200, summary_basis, content_path, is_provisional,
+        content_language, title, thumbnail_url, thumbnail_bg_theme, summary_100, summary_200, summary_basis, content_path, is_provisional,
         provisional_reason, dedupe_status, dedupe_group_key, publish_candidate, publication_basis,
         publication_text, summary_input_basis, score, score_reason, ai_processing_state, source_updated_at, topic_group_id,
         summary_embedding, embedding_model, embedding_updated_at, processed_at, created_at, updated_at
       )
       VALUES (
         ${existing.enriched_article_id}, ${existing.raw_article_id}, ${existing.source_target_id}, ${existing.normalized_url},
-        ${existing.cited_url}, ${existing.canonical_url}, ${existing.content_language}, ${existing.title}, ${existing.thumbnail_url}, ${existing.summary_100},
+        ${existing.cited_url}, ${existing.canonical_url}, ${existing.content_language}, ${existing.title}, ${existing.thumbnail_url}, ${existing.thumbnail_bg_theme}, ${existing.summary_100},
         ${existing.summary_200}, ${existing.summary_basis}, ${existing.content_path}, ${existing.is_provisional},
         ${existing.provisional_reason}, ${existing.dedupe_status}, ${existing.dedupe_group_key}, ${existing.publish_candidate},
         ${existing.publication_basis}, ${existing.publication_text}, ${existing.summary_input_basis}, ${existing.score},
@@ -236,6 +300,7 @@ export async function upsertEnrichedArticle(
         canonical_url = ${input.canonicalUrl},
         title = ${input.title},
         thumbnail_url = ${input.thumbnailUrl},
+        thumbnail_bg_theme = ${input.thumbnailBgTheme},
         summary_100 = ${input.summary100},
         summary_200 = ${input.summary200},
         summary_basis = ${input.summaryBasis},
@@ -265,22 +330,28 @@ export async function upsertEnrichedArticle(
     await syncEnrichedSources(existing.enriched_article_id, sourceRows)
 
     await syncEnrichedTags(existing.enriched_article_id, input.matchedTagIds)
+    await syncEnrichedAdjacentTags(existing.enriched_article_id, input.adjacentTagIds)
     await upsertTagCandidates(input.candidateTags, input.rawArticleId)
-    if (refreshTagCounts) await refreshTagArticleCounts()
+    await upsertCanonicalAliasMappings(input.canonicalAliasMappings ?? [])
+    await upsertCanonicalKeywordMappings(input.canonicalKeywordMappings ?? [])
+    if (refreshTagCounts) {
+      await refreshTagArticleCounts()
+      await refreshAdjacentTagArticleCounts()
+    }
     return { enrichedArticleId: existing.enriched_article_id }
   }
 
   const inserted = (await sql`
     INSERT INTO articles_enriched (
       raw_article_id, source_target_id, source_category, source_type, normalized_url, cited_url,
-      canonical_url, title, thumbnail_url, summary_100, summary_200, summary_basis, content_path, is_provisional,
+      canonical_url, title, thumbnail_url, thumbnail_bg_theme, summary_100, summary_200, summary_basis, content_path, is_provisional,
       provisional_reason, dedupe_status, dedupe_group_key, publish_candidate, publication_basis,
       publication_text, summary_input_basis, score, score_reason, ai_processing_state, source_updated_at,
       content_language, topic_group_id, summary_embedding, embedding_model, embedding_updated_at, commercial_use_policy
     )
     VALUES (
       ${input.rawArticleId}, ${input.sourceTargetId}, ${input.sourceCategory}, ${input.sourceType},
-      ${input.normalizedUrl}, ${input.citedUrl}, ${input.canonicalUrl}, ${input.title}, ${input.thumbnailUrl}, ${input.summary100},
+      ${input.normalizedUrl}, ${input.citedUrl}, ${input.canonicalUrl}, ${input.title}, ${input.thumbnailUrl}, ${input.thumbnailBgTheme}, ${input.summary100},
       ${input.summary200}, ${input.summaryBasis}, ${input.contentPath}, ${input.isProvisional},
       ${input.provisionalReason}, ${input.dedupeStatus}, ${input.dedupeGroupKey}, ${input.publishCandidate},
       ${input.publicationBasis}, ${input.publicationText}, ${input.summaryInputBasis}, ${input.score},
@@ -297,8 +368,14 @@ export async function upsertEnrichedArticle(
   await syncEnrichedSources(enrichedArticleId, sourceRows)
 
   await syncEnrichedTags(enrichedArticleId, input.matchedTagIds)
+  await syncEnrichedAdjacentTags(enrichedArticleId, input.adjacentTagIds)
   await upsertTagCandidates(input.candidateTags, input.rawArticleId)
-  if (refreshTagCounts) await refreshTagArticleCounts()
+  await upsertCanonicalAliasMappings(input.canonicalAliasMappings ?? [])
+  await upsertCanonicalKeywordMappings(input.canonicalKeywordMappings ?? [])
+  if (refreshTagCounts) {
+    await refreshTagArticleCounts()
+    await refreshAdjacentTagArticleCounts()
+  }
 
   return { enrichedArticleId }
 }

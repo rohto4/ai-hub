@@ -292,6 +292,7 @@ type ThumbnailRefreshRow = {
   source_type: 'official' | 'blog' | 'news' | 'video' | 'alerts' | 'paper'
   source_category: 'llm' | 'agent' | 'voice' | 'policy' | 'safety' | 'search' | 'news'
   content_language: 'ja' | 'en' | null
+  thumbnail_bg_theme: string | null
   tag_key: string | null
   display_name: string | null
 }
@@ -306,6 +307,7 @@ function groupThumbnailRefreshRows(rows: ThumbnailRefreshRow[]) {
     sourceType: ThumbnailRefreshRow['source_type']
     sourceCategory: ThumbnailRefreshRow['source_category']
     contentLanguage: ThumbnailRefreshRow['content_language']
+    thumbnailBgTheme: string | null
     matchedTags: Array<{ tagKey: string; displayName: string }>
   }>()
 
@@ -328,6 +330,7 @@ function groupThumbnailRefreshRows(rows: ThumbnailRefreshRow[]) {
       sourceType: row.source_type,
       sourceCategory: row.source_category,
       contentLanguage: row.content_language,
+      thumbnailBgTheme: row.thumbnail_bg_theme,
       matchedTags: row.tag_key && row.display_name
         ? [{ tagKey: row.tag_key, displayName: row.display_name }]
         : [],
@@ -352,6 +355,7 @@ export async function refreshThumbnailUrlsForTagId(tagId: string): Promise<{
       ae.source_type,
       ae.source_category,
       ae.content_language,
+      ae.thumbnail_bg_theme,
       tm.tag_key,
       tm.display_name
     FROM articles_enriched ae
@@ -375,6 +379,7 @@ export async function refreshThumbnailUrlsForTagId(tagId: string): Promise<{
       sourceCategory: article.sourceCategory,
       contentLanguage: article.contentLanguage,
       matchedTags: article.matchedTags,
+      thumbnailBgTheme: article.thumbnailBgTheme,
     })
 
     await sql`

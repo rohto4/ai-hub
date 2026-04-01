@@ -1,0 +1,3899 @@
+{
+  "generatedAt": "2026-03-27T15:19:30.380Z",
+  "source": {
+    "judgeMarkdown": "af-20260326/phase1-retag/outputs/judge.md",
+    "aliasPolicy": "All alias review groups are deprecated by human decision in this round."
+  },
+  "currentTags": {
+    "keepAsPrimaryTags": [
+      {
+        "key": "openai",
+        "label": "OpenAI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 833
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "coding-ai",
+        "label": "Coding AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 410
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "google-ai",
+        "label": "Google AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 343
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "phi",
+        "label": "Phi",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 342
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "claude",
+        "label": "Claude",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 321
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "chatgpt",
+        "label": "ChatGPT",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 307
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "gemini",
+        "label": "Gemini",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 283
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "nvidia",
+        "label": "Nvidia",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 264
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "anthropic",
+        "label": "Anthropic",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 198
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "replicate",
+        "label": "Replicate",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 180
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "gpt-5",
+        "label": "GPT-5",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 172
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "claude-code",
+        "label": "Claude Code",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 150
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "qwen",
+        "label": "Qwen",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 102
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "llama",
+        "label": "Llama",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 97
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "voice-ai",
+        "label": "Voice AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 74
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "antigravity",
+        "label": "Antigravity",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 67
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "google-deepmind",
+        "label": "Google DeepMind",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 66
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "udio",
+        "label": "Udio",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 63
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "github-copilot",
+        "label": "GitHub Copilot",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 33
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "o1",
+        "label": "o1 / o3",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 33
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "langchain",
+        "label": "LangChain",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 32
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "deepseek",
+        "label": "DeepSeek",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 29
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "gemma",
+        "label": "Gemma",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 29
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "stable-diffusion",
+        "label": "Stable Diffusion",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 27
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "cohere",
+        "label": "Cohere",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 26
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "nemotron",
+        "label": "Nemotron",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 25
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "cursor",
+        "label": "Cursor",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 24
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "sora",
+        "label": "Sora",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 19
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "gradio",
+        "label": "Gradio",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 18
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "perplexity",
+        "label": "Perplexity",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 16
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "banana",
+        "label": "Nano Banana",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 13
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "dify",
+        "label": "Dify",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 13
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "mistral",
+        "label": "Mistral",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 13
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "stargate",
+        "label": "Stargate",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 13
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "imagen",
+        "label": "Imagen",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 11
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "flux",
+        "label": "Flux",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 10
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "notebooklm",
+        "label": "NotebookLM",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 10
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "xai",
+        "label": "xAI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 10
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "codex",
+        "label": "Codex",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 9
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "nano-banana",
+        "label": "Nano Banana",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 9
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "cline",
+        "label": "Cline",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 8
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "dall-e",
+        "label": "DALL-E",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 8
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "manus",
+        "label": "Manus",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 8
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "veo",
+        "label": "Veo",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 6
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "elevenlabs",
+        "label": "ElevenLabs",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 5
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "grok",
+        "label": "Grok",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 5
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "microsoft-copilot",
+        "label": "Microsoft Copilot",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 5
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "amazon-q",
+        "label": "Amazon Q",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 4
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "devin",
+        "label": "Devin",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 4
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "groundsource",
+        "label": "Groundsource",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 4
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "meta-ai",
+        "label": "Meta AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 4
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "kling",
+        "label": "Kling",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 2
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "llamaindex",
+        "label": "LlamaIndex",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 2
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "stability-ai",
+        "label": "Stability AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 2
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "autogen",
+        "label": "AutoGen",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "crewai",
+        "label": "CrewAI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "heygen",
+        "label": "HeyGen",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "mistral-ai",
+        "label": "Mistral AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "notion-ai",
+        "label": "Notion AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "nvidia-inception",
+        "label": "Nvidia Inception",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "pika",
+        "label": "Pika",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "runway",
+        "label": "Runway",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "windsurf",
+        "label": "Windsurf",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "adobe-firefly",
+        "label": "Adobe Firefly",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 0
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "midjourney",
+        "label": "Midjourney",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 0
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "roocode",
+        "label": "RooCode",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 0
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "suno",
+        "label": "Suno",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 0
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "vercel-ai",
+        "label": "Vercel AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 0
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      }
+    ],
+    "moveToCategory": [
+      {
+        "key": "open source",
+        "label": "oss",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 197
+        },
+        "note": "会話でカテゴリ寄せが妥当とした既存タグ。"
+      },
+      {
+        "key": "enterprise-ai",
+        "label": "Enterprise AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 25
+        },
+        "note": "会話でカテゴリ寄せが妥当とした既存タグ。"
+      }
+    ],
+    "deprecate": [
+      {
+        "key": "llm",
+        "label": "LLM",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 4121
+        },
+        "note": "会話で完全除外に合意した既存タグ。"
+      },
+      {
+        "key": "paper",
+        "label": "Paper",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 1978
+        },
+        "note": "会話で完全除外に合意した既存タグ。"
+      },
+      {
+        "key": "huggingface",
+        "label": "Hugging Face",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 758
+        },
+        "note": "会話で完全除外に合意した既存タグ。"
+      },
+      {
+        "key": "agent",
+        "label": "Agent",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 585
+        },
+        "note": "会話で完全除外に合意した既存タグ。"
+      },
+      {
+        "key": "hugging face",
+        "label": "Hugging Face",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 417
+        },
+        "note": "既存主タグ。固有名詞・製品名・企業名・モデル名・OSS固有名は主タグ側に残す。"
+      },
+      {
+        "key": "rag",
+        "label": "RAG",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 321
+        },
+        "note": "会話で完全除外に合意した既存タグ。"
+      },
+      {
+        "key": "generative-ai",
+        "label": "Generative AI",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 225
+        },
+        "note": "会話で完全除外に合意した既存タグ。"
+      },
+      {
+        "key": "policy",
+        "label": "Policy",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 223
+        },
+        "note": "会話で完全除外に合意した既存タグ。"
+      },
+      {
+        "key": "safety",
+        "label": "Safety",
+        "itemType": "current-tag",
+        "counts": {
+          "articleCount": 194
+        },
+        "note": "会話で完全除外に合意した既存タグ。"
+      }
+    ],
+    "hold": []
+  },
+  "newTagCandidates": {
+    "adoptAsPrimaryTags": [
+      {
+        "key": "llms",
+        "label": "Llms",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 67,
+          "manualReviewRequired": false
+        },
+        "note": "Between the Layers Lies the Truth: Uncertainty Estimation in LLMs Using Intra-Layer Local Information Scores"
+      },
+      {
+        "key": "iclr",
+        "label": "iclr",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 26,
+          "manualReviewRequired": false
+        },
+        "note": "Low-pass Personalized Subgraph Federated Recommendation"
+      },
+      {
+        "key": "vlm",
+        "label": "vlm",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 22,
+          "manualReviewRequired": false
+        },
+        "note": "Understanding Pruning Regimes in Vision-Language Models Through Domain-Aware Layer Selection"
+      },
+      {
+        "key": "lora",
+        "label": "lora",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 14,
+          "manualReviewRequired": false
+        },
+        "note": "Hetero-Net: An Energy-Efficient Resource Allocation and 3D Placement in Heterogeneous LoRa Networks via Multi-Agent Optimization"
+      },
+      {
+        "key": "cvpr",
+        "label": "Cvpr",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 12,
+          "manualReviewRequired": false
+        },
+        "note": "RealUnify: Do Unified Models Truly Benefit from Unification? A Comprehensive Benchmark"
+      },
+      {
+        "key": "gnn",
+        "label": "gnn",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 12,
+          "manualReviewRequired": false
+        },
+        "note": "FastPFRec: A Fast Personalized Federated Recommendation with Secure Sharing"
+      },
+      {
+        "key": "diffusion models",
+        "label": "Diffusion models",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 11,
+          "manualReviewRequired": false
+        },
+        "note": "DiffGraph: An Automated Agent-driven Model Merging Framework for In-the-Wild Text-to-Image Generation"
+      },
+      {
+        "key": "federated learning",
+        "label": "Federated learning",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 11,
+          "manualReviewRequired": false
+        },
+        "note": "Federated Learning Playground"
+      },
+      {
+        "key": "mamba",
+        "label": "Mamba",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 11,
+          "manualReviewRequired": false
+        },
+        "note": "Team LEYA in 10th ABAW Competition: Multimodal Ambivalence/Hesitancy Recognition Approach"
+      },
+      {
+        "key": "mnist",
+        "label": "Mnist",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 11,
+          "manualReviewRequired": false
+        },
+        "note": "Growing Networks with Autonomous Pruning"
+      },
+      {
+        "key": "cifar-10",
+        "label": "Cifar-10",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "Collaborative Adaptive Curriculum for Progressive Knowledge Distillation"
+      },
+      {
+        "key": "vlms",
+        "label": "Vlms",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "Medical Image Spatial Grounding with Semantic Sampling"
+      },
+      {
+        "key": "openclaw",
+        "label": "openclaw",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "When OpenClaw Meets Hospital: Toward an Agentic Operating System for Dynamic Clinical Workflows"
+      }
+    ],
+    "moveToCategory": [],
+    "reject": [
+      {
+        "key": "transformer",
+        "label": "transformer",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 34,
+          "manualReviewRequired": false
+        },
+        "note": "Weber's Law in Transformer Magnitude Representations: Efficient Coding, Representational Geometry, and Psychophysical Laws in Language Models"
+      },
+      {
+        "key": "arxiv",
+        "label": "Arxiv",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 20,
+          "manualReviewRequired": false
+        },
+        "note": "Heavy-Tailed and Long-Range Dependent Noise in Stochastic Approximation: A Finite-Time Analysis"
+      },
+      {
+        "key": "rl",
+        "label": "Rl",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 16,
+          "manualReviewRequired": false
+        },
+        "note": "MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery"
+      },
+      {
+        "key": "ai",
+        "label": "Ai",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 14,
+          "manualReviewRequired": false
+        },
+        "note": "RedacBench: Can AI Erase Your Secrets?"
+      },
+      {
+        "key": "transformers",
+        "label": "Transformers",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 14,
+          "manualReviewRequired": false
+        },
+        "note": "BitSkip: An Empirical Analysis of Quantization and Early Exit Composition in Transformers"
+      },
+      {
+        "key": "chain-of-thought",
+        "label": "chain-of-thought",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 13,
+          "manualReviewRequired": false
+        },
+        "note": "Lie to Me: How Faithful Is Chain-of-Thought Reasoning in Reasoning Models?"
+      },
+      {
+        "key": "evolving",
+        "label": "evolving",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 12,
+          "manualReviewRequired": false
+        },
+        "note": "AETAS: Analysis of Evolving Temporal Affect and Semantics for Legal History"
+      },
+      {
+        "key": "driven",
+        "label": "Driven",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 11,
+          "manualReviewRequired": false
+        },
+        "note": "S3T-Former: A Purely Spike-Driven State-Space Topology Transformer for Skeleton Action Recognition"
+      },
+      {
+        "key": "automated",
+        "label": "Automated",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "Towards Automated Community Notes Generation with Large Vision Language Models for Combating Contextual Deception"
+      },
+      {
+        "key": "clip",
+        "label": "clip",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "Dodgersort: Uncertainty-Aware VLM-Guided Human-in-the-Loop Pairwise Ranking"
+      },
+      {
+        "key": "grpo",
+        "label": "grpo",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "Visual Exclusivity Attacks: Automatic Multimodal Red Teaming via Agentic Planning"
+      },
+      {
+        "key": "large language models",
+        "label": "Large language models",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "Enhancing Safety of Large Language Models via Embedding Space Separation"
+      },
+      {
+        "key": "domain",
+        "label": "Domain",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 9,
+          "manualReviewRequired": false
+        },
+        "note": "RubricRAG: Towards Interpretable and Reliable LLM Evaluation via Domain Knowledge Retrieval for Rubric Generation"
+      },
+      {
+        "key": "information",
+        "label": "information",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 9,
+          "manualReviewRequired": false
+        },
+        "note": "Knowing What's Missing: Assessing Information Sufficiency in Question Answering"
+      },
+      {
+        "key": "machine",
+        "label": "Machine",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 9,
+          "manualReviewRequired": false
+        },
+        "note": "Bridging the Gap Between Climate Science and Machine Learning in Climate Model Emulation"
+      },
+      {
+        "key": "mllms",
+        "label": "mllms",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 9,
+          "manualReviewRequired": false
+        },
+        "note": "Predictive Regularization Against Visual Representation Degradation in Multimodal Large Language Models"
+      },
+      {
+        "key": "moe",
+        "label": "moe",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 9,
+          "manualReviewRequired": false
+        },
+        "note": "Run Qwen3.5 flagship model with 397 billion parameters at 5 – 9 tok/s on a $2,100 desktop! Two $500 GPUs, 32GB RAM, one NVMe drive. Uses Q4_K_M quants"
+      },
+      {
+        "key": "neurips",
+        "label": "Neurips",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 9,
+          "manualReviewRequired": false
+        },
+        "note": "ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking"
+      },
+      {
+        "key": "nlp",
+        "label": "Nlp",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 9,
+          "manualReviewRequired": false
+        },
+        "note": "Select, Label, Evaluate: Active Testing in NLP"
+      },
+      {
+        "key": "prediction",
+        "label": "prediction",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 9,
+          "manualReviewRequired": false
+        },
+        "note": "Precision-Varying Prediction (PVP): Robustifying ASR systems against adversarial attacks"
+      },
+      {
+        "key": "continual",
+        "label": "continual",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "DesCLIP: Robust Continual Learning via General Attribute Descriptions for VLM-Based Visual Recognition"
+      },
+      {
+        "key": "continual learning",
+        "label": "continual learning",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "Stochastic approximation in non-markovian environments revisited"
+      },
+      {
+        "key": "cross",
+        "label": "Cross",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "Cross-site scripting adversarial attacks based on deep reinforcement learning: Evaluation and extension study"
+      },
+      {
+        "key": "dynamics",
+        "label": "dynamics",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "Generalizing Dynamics Modeling More Easily from Representation Perspective"
+      },
+      {
+        "key": "genai",
+        "label": "genai",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "Beyond Detection: Governing GenAI in Academic Peer Review as a Sociotechnical Challenge"
+      },
+      {
+        "key": "eeg",
+        "label": "eeg",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Riding Brainwaves in LLM Space: Understanding Activation Patterns Using Individual Neural Signatures"
+      },
+      {
+        "key": "generalization",
+        "label": "generalization",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Sharper Generalization Bounds for Transformer"
+      },
+      {
+        "key": "grounded",
+        "label": "grounded",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "LGSE: Lexically Grounded Subword Embedding Initialization for Low-Resource Language Adaptation"
+      },
+      {
+        "key": "group",
+        "label": "group",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Demystifying Group Relative Policy Optimization: Its Policy Gradient is a U-Statistic"
+      },
+      {
+        "key": "imagenet",
+        "label": "imagenet",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Show Me What You Don't Know: Efficient Sampling from Invariant Sets for Model Validation"
+      },
+      {
+        "key": "kernel",
+        "label": "kernel",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "A Kernel Space-based Multidimensional Sparse Model for Dynamic PET Image Denoising"
+      },
+      {
+        "key": "kernels",
+        "label": "Kernels",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Bases of Steerable Kernels for Equivariant CNNs: From 2D Rotations to the Lorentz Group"
+      },
+      {
+        "key": "machine learning",
+        "label": "Machine learning",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "On the (In)Security of Loading Machine Learning Models"
+      },
+      {
+        "key": "meets",
+        "label": "meets",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Bot Meets Shortcut: How Can LLMs Aid in Handling Unknown Invariance OOD Scenarios?"
+      },
+      {
+        "key": "planning",
+        "label": "Planning",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Improved Generalized Planning with LLMs through Strategy Refinement and Reflection"
+      },
+      {
+        "key": "processing",
+        "label": "processing",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Leveraging Natural Language Processing and Machine Learning for Evidence-Based Food Security Policy Decision-Making in Data-Scarce Making"
+      },
+      {
+        "key": "reason",
+        "label": "reason",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Native Reasoning Models: Training Language Models to Reason on Unverifiable Data"
+      },
+      {
+        "key": "responses",
+        "label": "Responses",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Evaluating Large Language Models' Responses to Sexual and Reproductive Health Queries in Nepali"
+      }
+    ],
+    "hold": [
+      {
+        "key": "cot",
+        "label": "Cot",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "L2V-CoT: Cross-Modal Transfer of Chain-of-Thought Reasoning via Latent Intervention"
+      },
+      {
+        "key": "federated",
+        "label": "federated",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "Fast convergence of a Federated Expectation-Maximization Algorithm"
+      },
+      {
+        "key": "gpt-4o",
+        "label": "gpt-4o",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 10,
+          "manualReviewRequired": false
+        },
+        "note": "EnterpriseLab: A Full-Stack Platform for developing and deploying agents in Enterprises"
+      },
+      {
+        "key": "generalized",
+        "label": "generalized",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "Seed1.8 Model Card: Towards Generalized Real-World Agency"
+      },
+      {
+        "key": "latent",
+        "label": "Latent",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "ReLaX: Reasoning with Latent Exploration for Large Reasoning Models"
+      },
+      {
+        "key": "mllm",
+        "label": "Mllm",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "ACT as Human: Multimodal Large Language Model Data Annotation with Critical Thinking"
+      },
+      {
+        "key": "rlvr",
+        "label": "rlvr",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "On the Direction of RLVR Updates for LLM Reasoning: Identification and Exploitation"
+      },
+      {
+        "key": "robust",
+        "label": "robust",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "Cloud-Edge Collaborative Large Models for Robust Photovoltaic Power Forecasting"
+      },
+      {
+        "key": "structure",
+        "label": "structure",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 8,
+          "manualReviewRequired": false
+        },
+        "note": "Neural Structure Embedding for Symbolic Regression via Continuous Structure Search and Coefficient Optimization"
+      },
+      {
+        "key": "aaai",
+        "label": "Aaai",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "MARLIN: Multi-Agent Reinforcement Learning for Incremental DAG Discovery"
+      },
+      {
+        "key": "adversarial",
+        "label": "adversarial",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Hybrid Quantum Generative Adversarial Networks for Molecular Simulation and Drug Discovery"
+      },
+      {
+        "key": "attention",
+        "label": "Attention",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "A Multi-Modal CNN-LSTM Framework with Multi-Head Attention and Focal Loss for Real-Time Elderly Fall Detection"
+      },
+      {
+        "key": "clustering",
+        "label": "Clustering",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Research on Individual Trait Clustering and Development Pathway Adaptation Based on the K-means Algorithm"
+      },
+      {
+        "key": "distillation",
+        "label": "distillation",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "On-Policy Context Distillation for Language Models"
+      },
+      {
+        "key": "india",
+        "label": "India",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Accelerating discovery in India through AI-powered science and education"
+      },
+      {
+        "key": "langsmith",
+        "label": "Langsmith",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Join LangChain at Google Cloud Next 2026"
+      },
+      {
+        "key": "sampling",
+        "label": "sampling",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Power-SMC: Low-Latency Sequence-Level Power Sampling for Training-Free LLM Reasoning"
+      },
+      {
+        "key": "spectral",
+        "label": "spectral",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Filtered Spectral Projection for Quantum Principal Component Analysis"
+      },
+      {
+        "key": "speech",
+        "label": "Speech",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Borderless Long Speech Synthesis"
+      },
+      {
+        "key": "stable",
+        "label": "stable",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "A Stable Neural Statistical Dependence Estimator for Autoencoder Feature Analysis"
+      },
+      {
+        "key": "super",
+        "label": "super",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "REVERE: Reflective Evolving Research Engineer for Scientific Workflows"
+      },
+      {
+        "key": "tokens",
+        "label": "tokens",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Support Tokens, Stability Margins, and a New Foundation for Robust LLMs"
+      },
+      {
+        "key": "uncertainty",
+        "label": "uncertainty",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Semantic Self-Distillation for Language Model Uncertainty"
+      },
+      {
+        "key": "vit",
+        "label": "Vit",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 7,
+          "manualReviewRequired": false
+        },
+        "note": "Detached Skip-Links and $R$-Probe: Decoupling Feature Aggregation from Gradient Propagation for MLLM OCR"
+      },
+      {
+        "key": "arm nvidia",
+        "label": "Arm Nvidia",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Offline Voice AI: Arm and NVIDIA Demo Real-Time, Private Assistant on DGX Spark"
+      },
+      {
+        "key": "between",
+        "label": "Between",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Bridging the Gap Between Climate Science and Machine Learning in Climate Model Emulation"
+      },
+      {
+        "key": "chatbots like",
+        "label": "Chatbots Like",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Why AI Chatbots Like Gemini and Claude Develop Personalities"
+      },
+      {
+        "key": "comprehensive",
+        "label": "comprehensive",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "RoboFAC: A Comprehensive Framework for Robotic Failure Analysis and Correction"
+      },
+      {
+        "key": "constrained",
+        "label": "constrained",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Conformal Constrained Policy Optimization for Cost-Effective LLM Agents"
+      },
+      {
+        "key": "deep think",
+        "label": "Deep Think",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Try Deep Think in the Gemini app"
+      },
+      {
+        "key": "develop personalities",
+        "label": "Develop Personalities",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Why AI Chatbots Like Gemini and Claude Develop Personalities"
+      },
+      {
+        "key": "dpo",
+        "label": "Dpo",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "PolicySim: An LLM-Based Agent Social Simulation Sandbox for Proactive Policy Optimization"
+      },
+      {
+        "key": "drive",
+        "label": "Drive",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Causal Evidence that Language Models use Confidence to Drive Behavior"
+      },
+      {
+        "key": "finetuning",
+        "label": "finetuning",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Invisible Safety Threat: Malicious Finetuning for LLM via Steganography"
+      },
+      {
+        "key": "gpt",
+        "label": "gpt",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "EARTalking: End-to-end GPT-style Autoregressive Talking Head Synthesis with Frame-wise Control"
+      },
+      {
+        "key": "gradient",
+        "label": "gradient",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Transformers Trained via Gradient Descent Can Provably Learn a Class of Teacher Models"
+      },
+      {
+        "key": "healthcare",
+        "label": "Healthcare",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Spelling Correction in Healthcare Query-Answer Systems: Methods, Retrieval Impact, and Empirical Evaluation"
+      },
+      {
+        "key": "inception",
+        "label": "Inception",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "NDay, an NVIDIA Inception Member, Launches Self-Service GARAK AI LLM Red Teaming ..."
+      },
+      {
+        "key": "inception member",
+        "label": "Inception Member",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "NDay, an NVIDIA Inception Member, Launches Self-Service GARAK AI LLM Red Teaming ..."
+      },
+      {
+        "key": "like develop",
+        "label": "Like Develop",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Why AI Chatbots Like Gemini and Claude Develop Personalities"
+      },
+      {
+        "key": "linear",
+        "label": "linear",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Coordinate Encoding on Linear Grids for Physics-Informed Neural Networks"
+      },
+      {
+        "key": "mathematical",
+        "label": "mathematical",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Deconstructing Multimodal Mathematical Reasoning: Towards a Unified Perception-Alignment-Reasoning Paradigm"
+      },
+      {
+        "key": "mixture-of-experts",
+        "label": "mixture-of-experts",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Holistic Scaling Laws for Optimal Mixture-of-Experts Architecture Optimization"
+      },
+      {
+        "key": "nvidia demo",
+        "label": "Nvidia Demo",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Offline Voice AI: Arm and NVIDIA Demo Real-Time, Private Assistant on DGX Spark"
+      },
+      {
+        "key": "oracle",
+        "label": "oracle",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "ORACLE: Optimizing Reasoning Abilities of Large Language Models via Constraint-Led Synthetic Data Elicitation"
+      },
+      {
+        "key": "personalities",
+        "label": "Personalities",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Why AI Chatbots Like Gemini and Claude Develop Personalities"
+      },
+      {
+        "key": "prompt injection",
+        "label": "Prompt injection",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "The Autonomy Tax: Defense Training Breaks LLM Agents"
+      },
+      {
+        "key": "pytorch",
+        "label": "pytorch",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "MiSiSUn: Minimum Simplex Semisupervised Unmixing"
+      },
+      {
+        "key": "quantum",
+        "label": "quantum",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Hybrid Quantum Generative Adversarial Networks for Molecular Simulation and Drug Discovery"
+      },
+      {
+        "key": "robot",
+        "label": "Robot",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "The Robot's Inner Critic: Self-Refinement of Social Behaviors through VLM-based Replanning"
+      },
+      {
+        "key": "selection",
+        "label": "Selection",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "When Agents Disagree: The Selection Bottleneck in Multi-Agent LLM Pipelines"
+      },
+      {
+        "key": "sft",
+        "label": "sft",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Clinical Cognition Alignment for Gastrointestinal Diagnosis with Multimodal LLMs"
+      },
+      {
+        "key": "shap",
+        "label": "Shap",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Interpretable Multiple Myeloma Prognosis with Observational Medical Outcomes Partnership Data"
+      },
+      {
+        "key": "simulation",
+        "label": "simulation",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Differentiable Simulation of Hard Contacts with Soft Gradients for Learning and Control"
+      },
+      {
+        "key": "social",
+        "label": "social",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Avoiding Over-smoothing in Social Media Rumor Detection with Pre-trained Propagation Tree Transformer"
+      },
+      {
+        "key": "strategies",
+        "label": "Strategies",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Evaluating Prompting Strategies for Chart Question Answering with Large Language Models"
+      },
+      {
+        "key": "visual",
+        "label": "visual",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 6,
+          "manualReviewRequired": false
+        },
+        "note": "Towards Unified World Models for Visual Navigation via Memory-Augmented Planning and Foresight"
+      },
+      {
+        "key": "aistats",
+        "label": "aistats",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "On the Interplay of Priors and Overparametrization in Bayesian Neural Network Posteriors"
+      },
+      {
+        "key": "arabic",
+        "label": "Arabic",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Structured Prompting for Arabic Essay Proficiency: A Trait-Centric Evaluation Approach"
+      },
+      {
+        "key": "architecture",
+        "label": "Architecture",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "An Agentic Multi-Agent Architecture for Cybersecurity Risk Management"
+      },
+      {
+        "key": "balanced",
+        "label": "balanced",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Improving Safety Alignment via Balanced Direct Preference Optimization"
+      },
+      {
+        "key": "bedrock",
+        "label": "bedrock",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Accelerating custom entity recognition with Claude tool use in Amazon Bedrock - AWS"
+      },
+      {
+        "key": "collaborative",
+        "label": "collaborative",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Cloud-Edge Collaborative Large Models for Robust Photovoltaic Power Forecasting"
+      },
+      {
+        "key": "contextual",
+        "label": "contextual",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Understanding Contextual Recall in Transformers: How Finetuning Enables In-Context Reasoning over Pretraining Knowledge"
+      },
+      {
+        "key": "delivers",
+        "label": "Delivers",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "NVIDIA Vera CPU Delivers High Performance, Bandwidth, and Efficiency for AI Factories"
+      },
+      {
+        "key": "department",
+        "label": "Department",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Google DeepMind supports U.S. Department of Energy on Genesis: a national mission to accelerate innovation and scientific discovery"
+      },
+      {
+        "key": "document",
+        "label": "document",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Unlocking Multimodal Document Intelligence: From Current Triumphs to Future Frontiers of Visual Document Retrieval"
+      },
+      {
+        "key": "dynamic",
+        "label": "dynamic",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "DIP: Efficient Large Multimodal Model Training with Dynamic Interleaved Pipeline"
+      },
+      {
+        "key": "evolutionary",
+        "label": "evolutionary",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "FormalEvolve: Neuro-Symbolic Evolutionary Search for Diverse and Prover-Effective Autoformalization"
+      },
+      {
+        "key": "expert",
+        "label": "Expert",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "SAGE: Sustainable Agent-Guided Expert-tuning for Culturally Attuned Translation in Low-Resource Southeast Asia"
+      },
+      {
+        "key": "fidelity",
+        "label": "Fidelity",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Evaluating the Reliability and Fidelity of Automated Judgment Systems of Large Language Models"
+      },
+      {
+        "key": "flow matching",
+        "label": "Flow matching",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Warm-Start Flow Matching for Guaranteed Fast Text/Image Generation"
+      },
+      {
+        "key": "gap between",
+        "label": "Gap Between",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Bridging the Gap Between Climate Science and Machine Learning in Climate Model Emulation"
+      },
+      {
+        "key": "gpt-2",
+        "label": "Gpt-2",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "An Empirical Study of SFT-DPO Interaction and Parameterization in Small Language Models"
+      },
+      {
+        "key": "groundsource turning",
+        "label": "Groundsource Turning",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Introducing Groundsource: Turning news reports into data with Gemini"
+      },
+      {
+        "key": "incremental",
+        "label": "incremental",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "RAIE: Region-Aware Incremental Preference Editing with LoRA for LLM-based Recommendation"
+      },
+      {
+        "key": "informed",
+        "label": "Informed",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Community-Informed AI Models for Police Accountability"
+      },
+      {
+        "key": "infrastructure",
+        "label": "Infrastructure",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "AEGIS: An Operational Infrastructure for Post-Market Governance of Adaptive Medical AI Under US and EU Regulations"
+      },
+      {
+        "key": "introducing groundsource",
+        "label": "Introducing Groundsource",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Introducing Groundsource: Turning news reports into data with Gemini"
+      },
+      {
+        "key": "jepa",
+        "label": "Jepa",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Probing the Latent World: Emergent Discrete Symbols and Physical Structure in Latent Representations"
+      },
+      {
+        "key": "lstm",
+        "label": "lstm",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Fusing Memory and Attention: A study on LSTM, Transformer and Hybrid Architectures for Symbolic Music Generation"
+      },
+      {
+        "key": "matching",
+        "label": "matching",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Flow Matching from Viewpoint of Proximal Operators"
+      },
+      {
+        "key": "method",
+        "label": "Method",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "A Pragmatic Method for Comparing Clusterings with Overlaps and Outliers"
+      },
+      {
+        "key": "mlp",
+        "label": "Mlp",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Less is More: Towards Simple Graph Contrastive Learning"
+      },
+      {
+        "key": "modality",
+        "label": "Modality",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "On the Cone Effect and Modality Gap in Medical Vision-Language Embeddings"
+      },
+      {
+        "key": "multiple",
+        "label": "Multiple",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Rethinking Multiple-Choice Questions for RLVR: Unlocking Potential via Distractor Design"
+      },
+      {
+        "key": "nvfp4",
+        "label": "Nvfp4",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "MXNorm: Reusing MXFP block scales for efficient tensor normalisation"
+      },
+      {
+        "key": "operational",
+        "label": "Operational",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "AEGIS: An Operational Infrastructure for Post-Market Governance of Adaptive Medical AI Under US and EU Regulations"
+      },
+      {
+        "key": "parallel",
+        "label": "Parallel",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Stability of Sequential and Parallel Coordinate Ascent Variational Inference"
+      },
+      {
+        "key": "personalized",
+        "label": "personalized",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Spiking Personalized Federated Learning for Brain-Computer Interface-Enabled Immersive Communication"
+      },
+      {
+        "key": "pinn",
+        "label": "pinn",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Verifiable Error Bounds for Physics-Informed Neural KKL Observers"
+      },
+      {
+        "key": "pinns",
+        "label": "pinns",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Randomness and signal propagation in physics-informed neural networks (PINNs): A neural PDE perspective"
+      },
+      {
+        "key": "powers",
+        "label": "Powers",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "How NVIDIA Dynamo 1.0 Powers Multi-Node Inference at Production Scale"
+      },
+      {
+        "key": "ppo",
+        "label": "ppo",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Proximal Policy Optimization in Path Space: A Schr\\\"odinger Bridge Perspective"
+      },
+      {
+        "key": "preference",
+        "label": "Preference",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Preference-Driven Multi-Objective Combinatorial Optimization with Conditional Computation"
+      },
+      {
+        "key": "preview",
+        "label": "Preview",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Gemini 2.5 Pro Preview: even better coding performance"
+      },
+      {
+        "key": "prompting",
+        "label": "Prompting",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Evaluating Prompting Strategies for Chart Question Answering with Large Language Models"
+      },
+      {
+        "key": "random forest",
+        "label": "Random forest",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Spatio-Temporal Grid Intelligence: A Hybrid Graph Neural Network and LSTM Framework for Robust Electricity Theft Detection"
+      },
+      {
+        "key": "relu",
+        "label": "relu",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Multilevel Picard approximations and deep neural networks with ReLU, leaky ReLU, and softplus activation overcome the curse of dimensionality when approximating semilinear parabolic partial differential equations in $L^p$-sense"
+      },
+      {
+        "key": "review",
+        "label": "Review",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "The IJCNN 2025 Review Process"
+      },
+      {
+        "key": "reward",
+        "label": "Reward",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "TIPS: Turn-Level Information-Potential Reward Shaping for Search-Augmented LLMs"
+      },
+      {
+        "key": "rlhf",
+        "label": "Rlhf",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Reinforcement Learning from Multi-Source Imperfect Preferences: Best-of-Both-Regimes Regret"
+      },
+      {
+        "key": "routing",
+        "label": "Routing",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Geometric Mixture-of-Experts with Curvature-Guided Adaptive Routing for Graph Representation Learning"
+      },
+      {
+        "key": "scientific",
+        "label": "scientific",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "The AI Scientific Community: Agentic Virtual Lab Swarms"
+      },
+      {
+        "key": "scope",
+        "label": "Scope",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "SCOPE: Semantic Coreset with Orthogonal Projection Embeddings for Federated learning"
+      },
+      {
+        "key": "series",
+        "label": "series",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Rethinking Multimodal Fusion for Time Series: Auxiliary Modalities Need Constrained Fusion"
+      },
+      {
+        "key": "sgd",
+        "label": "Sgd",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Two-Time-Scale Learning Dynamics: A Population View of Neural Network Training"
+      },
+      {
+        "key": "software",
+        "label": "Software",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "From Human Interfaces to Agent Interfaces: Rethinking Software Design in the Age of AI-Native Systems"
+      },
+      {
+        "key": "space",
+        "label": "space",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Characterizing State Space Model and Hybrid Language Model Performance with Long Context"
+      },
+      {
+        "key": "sparse",
+        "label": "sparse",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "CALM: Class-Conditional Sparse Attention Vectors for Large Audio-Language Models"
+      },
+      {
+        "key": "specific",
+        "label": "Specific",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Build a Domain-Specific Embedding Model in Under a Day"
+      },
+      {
+        "key": "target",
+        "label": "target",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "VorTEX: Various overlap ratio for Target speech EXtraction"
+      },
+      {
+        "key": "utility",
+        "label": "Utility",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Utility-Guided Agent Orchestration for Efficient LLM Tool Use"
+      },
+      {
+        "key": "vae",
+        "label": "vae",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "Spherical VAE with Cluster-Aware Feasible Regions: Guaranteed Prevention of Posterior Collapse"
+      },
+      {
+        "key": "virtual",
+        "label": "virtual",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 5,
+          "manualReviewRequired": false
+        },
+        "note": "The AI Scientific Community: Agentic Virtual Lab Swarms"
+      },
+      {
+        "key": "accelerated",
+        "label": "Accelerated",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "mlx-vis: GPU-Accelerated Dimensionality Reduction and Visualization on Apple Silicon"
+      },
+      {
+        "key": "access",
+        "label": "Access",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Improving Hugging Face Model Access for Kaggle Users"
+      },
+      {
+        "key": "accuracy",
+        "label": "accuracy",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "PivotRL: High Accuracy Agentic Post-Training at Low Compute Cost"
+      },
+      {
+        "key": "actions",
+        "label": "actions",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Agent Control Protocol: Admission Control for Agent Actions"
+      },
+      {
+        "key": "adaptation",
+        "label": "adaptation",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Pruned Adaptation Modules: A Simple yet Strong Baseline for Continual Foundation Models"
+      },
+      {
+        "key": "aligned",
+        "label": "aligned",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "LEAF: Language-EEG Aligned Foundation Model for Brain-Computer Interfaces"
+      },
+      {
+        "key": "anatomy",
+        "label": "anatomy",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "The Anatomy of an Edit: Mechanism-Guided Activation Steering for Knowledge Editing"
+      },
+      {
+        "key": "asr",
+        "label": "Asr",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Demonstration of Adapt4Me: An Uncertainty-Aware Authoring Environment for Personalizing Automatic Speech Recognition to Non-normative Speech"
+      },
+      {
+        "key": "augmentation",
+        "label": "augmentation",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "DALDALL: Data Augmentation for Lexical and Semantic Diverse in Legal Domain by leveraging LLM-Persona"
+      },
+      {
+        "key": "automatic",
+        "label": "automatic",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Generalizable Self-Evolving Memory for Automatic Prompt Optimization"
+      },
+      {
+        "key": "banana pro",
+        "label": "Banana Pro",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Introducing Nano Banana Pro"
+      },
+      {
+        "key": "bert",
+        "label": "bert",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "An Industrial-Scale Retrieval-Augmented Generation Framework for Requirements Engineering: Empirical Evaluation with Automotive Manufacturing Data"
+      },
+      {
+        "key": "biases",
+        "label": "biases",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Problems with Chinchilla Approach 2: Systematic Biases in IsoFLOP Parabola Fits"
+      },
+      {
+        "key": "blueprint",
+        "label": "Blueprint",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "A Blueprint for Self-Evolving Coding Agents in Vehicle Aerodynamic Drag Prediction"
+      },
+      {
+        "key": "board",
+        "label": "board",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "A Multidisciplinary AI Board for Multimodal Dementia Characterization and Risk Assessment"
+      },
+      {
+        "key": "brain",
+        "label": "Brain",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Alzheimer's Disease Brain Network Mining"
+      },
+      {
+        "key": "builder",
+        "label": "Builder",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "New in Agent Builder: all new agent chat, file uploads + tool registry"
+      },
+      {
+        "key": "clare",
+        "label": "Clare",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "CLaRE-ty Amid Chaos: Quantifying Representational Entanglement to Predict Ripple Effects in LLM Editing"
+      },
+      {
+        "key": "cnn",
+        "label": "Cnn",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Adaptive Relative Pose Estimation Framework with Dual Noise Tuning for Safe Approaching Maneuvers"
+      },
+      {
+        "key": "collaborate",
+        "label": "Collaborate",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Consilium: When Multiple LLMs Collaborate"
+      },
+      {
+        "key": "comparison",
+        "label": "comparison",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Empirical Comparison of Agent Communication Protocols for Task Orchestration"
+      },
+      {
+        "key": "compute",
+        "label": "compute",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Sonny: Breaking the Compute Wall in Medium-Range Weather Forecasting"
+      },
+      {
+        "key": "conditional",
+        "label": "Conditional",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "MCLR: Improving Conditional Modeling in Visual Generative Models via Inter-Class Likelihood-Ratio Maximization and Establishing the Equivalence between Classifier-Free Guidance and Alignment Objectives"
+      },
+      {
+        "key": "conformal prediction",
+        "label": "Conformal prediction",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Flow-based Conformal Prediction for Multi-dimensional Time Series"
+      },
+      {
+        "key": "countries",
+        "label": "Countries",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Introducing OpenAI for Countries"
+      },
+      {
+        "key": "critical",
+        "label": "critical",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Sparse but Critical: A Token-Level Analysis of Distributional Shifts in RLVR Fine-Tuning of LLMs"
+      },
+      {
+        "key": "curvature",
+        "label": "Curvature",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Sobolev--Ricci Curvature"
+      },
+      {
+        "key": "cyber",
+        "label": "Cyber",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Operationalising Cyber Risk Management Using AI: Connecting Cyber Incidents to MITRE ATT&CK Techniques, Security Controls, and Metrics"
+      },
+      {
+        "key": "data processing",
+        "label": "Data Processing",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Scaling AI-based Data Processing with Hugging Face + Dask"
+      },
+      {
+        "key": "dataset",
+        "label": "Dataset",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "CN-Buzz2Portfolio: A Chinese-Market Dataset and Benchmark for LLM-Based Macro and Sector Asset Allocation from Daily Trending Financial News"
+      },
+      {
+        "key": "detect",
+        "label": "detect",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "What \"Not\" to Detect: Negation-Aware VLMs via Structured Reasoning and Token Merging"
+      },
+      {
+        "key": "detection",
+        "label": "detection",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Learn from Foundation Model: Fruit Detection Model without Manual Annotation"
+      },
+      {
+        "key": "differentiable",
+        "label": "differentiable",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Model Predictive Control with Differentiable World Models for Offline Reinforcement Learning"
+      },
+      {
+        "key": "difficulty",
+        "label": "Difficulty",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Evaluating Game Difficulty in Tetris Block Puzzle"
+      },
+      {
+        "key": "diffusion llms",
+        "label": "Diffusion llms",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Dependency-Aware Parallel Decoding via Attention for Diffusion LLMs"
+      },
+      {
+        "key": "diffusion transformer",
+        "label": "Diffusion transformer",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "VSSFlow: Unifying Video-conditioned Sound and Speech Generation via Joint Learning"
+      },
+      {
+        "key": "distributed",
+        "label": "distributed",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Delightful Distributed Policy Gradient"
+      },
+      {
+        "key": "dlm",
+        "label": "dlm",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Confidence-Based Decoding is Provably Efficient for Diffusion Language Models"
+      },
+      {
+        "key": "drl",
+        "label": "drl",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "RE-SAC: Disentangling aleatoric and epistemic risks in bus fleet control: A stable and robust ensemble DRL approach"
+      },
+      {
+        "key": "eacl",
+        "label": "Eacl",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Modeling Turn-Taking with Semantically Informed Gestures"
+      },
+      {
+        "key": "efficient reasoning",
+        "label": "Efficient Reasoning",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "The Art of Efficient Reasoning: Data, Reward, and Optimization"
+      },
+      {
+        "key": "embedding",
+        "label": "Embedding",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Spectral Tempering for Embedding Compression in Dense Passage Retrieval"
+      },
+      {
+        "key": "embodied",
+        "label": "Embodied",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Evolving Embodied Intelligence: Graph Neural Network--Driven Co-Design of Morphology and Control in Soft Robotics"
+      },
+      {
+        "key": "empirical",
+        "label": "empirical",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Multi-Domain Empirical Bayes for Linearly-Mixed Causal Representations"
+      },
+      {
+        "key": "engine",
+        "label": "Engine",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Memory Bear AI Memory Science Engine for Multimodal Affective Intelligence: A Technical Report"
+      },
+      {
+        "key": "entire",
+        "label": "entire",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Gitは『何を変えたか』は残せる──でも『なぜ変えたか』は消えていた"
+      },
+      {
+        "key": "entropy",
+        "label": "entropy",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Maximum Entropy Relaxation of Multi-Way Cardinality Constraints for Synthetic Population Generation"
+      },
+      {
+        "key": "estimation",
+        "label": "Estimation",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Between the Layers Lies the Truth: Uncertainty Estimation in LLMs Using Intra-Layer Local Information Scores"
+      },
+      {
+        "key": "europe",
+        "label": "Europe",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "The EU Code of Practice and future of AI in Europe"
+      },
+      {
+        "key": "experimental",
+        "label": "Experimental",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Optimal Experimental Design for Reliable Learning of History-Dependent Constitutive Laws"
+      },
+      {
+        "key": "facts",
+        "label": "Facts",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "FACTS Grounding: A new benchmark for evaluating the factuality of large language models"
+      },
+      {
+        "key": "formalevolve",
+        "label": "formalevolve",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "FormalEvolve: Neuro-Symbolic Evolutionary Search for Diverse and Prover-Effective Autoformalization"
+      },
+      {
+        "key": "frontier framework",
+        "label": "Frontier Framework",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Updating the Frontier Safety Framework"
+      },
+      {
+        "key": "gemma scope",
+        "label": "Gemma Scope",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Google releases Gemma 2 2B, ShieldGemma and Gemma Scope"
+      },
+      {
+        "key": "gemma-3",
+        "label": "gemma-3",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "AdditiveLLM2: A Multi-modal Large Language Model for Additive Manufacturing"
+      },
+      {
+        "key": "geneval",
+        "label": "geneval",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "InjectFlow: Weak Guides Strong via Orthogonal Injection for Flow Matching"
+      },
+      {
+        "key": "gpt instant",
+        "label": "Gpt Instant",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "GPT-5.1 Instant and GPT-5.1 Thinking System Card Addendum"
+      },
+      {
+        "key": "gpu",
+        "label": "gpu",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Modernizing Amdahl's Law: How AI Scaling Laws Shape Computer Architecture"
+      },
+      {
+        "key": "grained",
+        "label": "Grained",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "FB-CLIP: Fine-Grained Zero-Shot Anomaly Detection with Foreground-Background Disentanglement"
+      },
+      {
+        "key": "grounding",
+        "label": "Grounding",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Evaluating Evidence Grounding Under User Pressure in Instruction-Tuned Language Models"
+      },
+      {
+        "key": "healthbench",
+        "label": "healthbench",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Guideline-grounded retrieval-augmented generation for ophthalmic clinical decision support"
+      },
+      {
+        "key": "imitation",
+        "label": "imitation",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Non-Adversarial Imitation Learning Provably Free of Compounding Errors: The Role of Bellman Constraints"
+      },
+      {
+        "key": "individual",
+        "label": "Individual",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Research on Individual Trait Clustering and Development Pathway Adaptation Based on the K-means Algorithm"
+      },
+      {
+        "key": "infonce",
+        "label": "infonce",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "A Multihead Continual Learning Framework for Fine-Grained Fashion Image Retrieval with Contrastive Learning and Exponential Moving Average Distillation"
+      },
+      {
+        "key": "injection",
+        "label": "Injection",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Prompt Injection as Role Confusion"
+      },
+      {
+        "key": "instruction",
+        "label": "instruction",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Multi-Task Instruction Tuning via Data Scheduling for Low-Resource Arabic AudioLLMs"
+      },
+      {
+        "key": "interaction",
+        "label": "Interaction",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Fusing Driver Perceived and Physical Risk for Safety Critical Scenario Screening in Autonomous Driving"
+      },
+      {
+        "key": "interspeech",
+        "label": "interspeech",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Voice Privacy from an Attribute-based Perspective"
+      },
+      {
+        "key": "iot",
+        "label": "Iot",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Model-Driven Learning-Based Physical Layer Authentication for Mobile Wi-Fi Devices"
+      },
+      {
+        "key": "knowledge graph",
+        "label": "Knowledge graph",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Towards Intelligent Geospatial Data Discovery: a knowledge graph-driven multi-agent framework powered by large language models"
+      },
+      {
+        "key": "lean 4",
+        "label": "Lean 4",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Exponential Family Discriminant Analysis: Generalizing LDA-Style Generative Classification to Non-Gaussian Models"
+      },
+      {
+        "key": "learning large",
+        "label": "Learning Large",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "A Method for Learning Large-Scale Computational Construction Grammars from Semantically Annotated Corpora"
+      },
+      {
+        "key": "llm inference",
+        "label": "Llm Inference",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Deploying Disaggregated LLM Inference Workloads on Kubernetes"
+      },
+      {
+        "key": "llm leaderboard",
+        "label": "Llm Leaderboard",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "CLARIN-PT-LDB: An Open LLM Leaderboard for Portuguese to assess Language, Culture and Civility"
+      },
+      {
+        "key": "management",
+        "label": "Management",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Operationalising Cyber Risk Management Using AI: Connecting Cyber Incidents to MITRE ATT&CK Techniques, Security Controls, and Metrics"
+      },
+      {
+        "key": "master",
+        "label": "master",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Grounded Chess Reasoning in Language Models via Master Distillation"
+      },
+      {
+        "key": "medical",
+        "label": "medical",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Multi-Method Validation of Large Language Model Medical Translation Across High- and Low-Resource Languages"
+      },
+      {
+        "key": "missing",
+        "label": "missing",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Large Language Models for Missing Data Imputation: Understanding Behavior, Hallucination Effects, and Control Mechanisms"
+      },
+      {
+        "key": "mixture",
+        "label": "Mixture",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "LightMoE: Reducing Mixture-of-Experts Redundancy through Expert Replacing"
+      },
+      {
+        "key": "mixture experts",
+        "label": "Mixture Experts",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "LightMoE: Reducing Mixture-of-Experts Redundancy through Expert Replacing"
+      },
+      {
+        "key": "modular",
+        "label": "Modular",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "FinRL-X: An AI-Native Modular Infrastructure for Quantitative Trading"
+      },
+      {
+        "key": "natural",
+        "label": "natural",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Leveraging Natural Language Processing and Machine Learning for Evidence-Based Food Security Policy Decision-Making in Data-Scarce Making"
+      },
+      {
+        "key": "neural network",
+        "label": "Neural Network",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Restoring Neural Network Plasticity for Faster Transfer Learning"
+      },
+      {
+        "key": "novel",
+        "label": "novel",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "A Novel TSK Fuzzy System Incorporating Multi-view Collaborative Transfer Learning for Personalized Epileptic EEG Detection"
+      },
+      {
+        "key": "nvidia vera",
+        "label": "Nvidia Vera",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Inside the NVIDIA Vera Rubin Platform: Six New Chips, One AI Supercomputer"
+      },
+      {
+        "key": "operator",
+        "label": "Operator",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "UniFluids: Unified Neural Operator Learning with Conditional Flow-matching"
+      },
+      {
+        "key": "pca",
+        "label": "Pca",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Collaborative Adaptive Curriculum for Progressive Knowledge Distillation"
+      },
+      {
+        "key": "pde",
+        "label": "pde",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Randomness and signal propagation in physics-informed neural networks (PINNs): A neural PDE perspective"
+      },
+      {
+        "key": "pdes",
+        "label": "pdes",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "FastLSQ: Solving PDEs in One Shot via Fourier Features with Exact Analytical Derivatives"
+      },
+      {
+        "key": "physics informed",
+        "label": "Physics Informed",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Sparsely-Supervised Data Assimilation via Physics-Informed Schr\\\"odinger Bridge"
+      },
+      {
+        "key": "practice",
+        "label": "Practice",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "The EU Code of Practice and future of AI in Europe"
+      },
+      {
+        "key": "prior",
+        "label": "prior",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Multitask-Informed Prior for In-Context Learning on Tabular Data: Application to Steel Property Prediction"
+      },
+      {
+        "key": "process",
+        "label": "process",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "SHAining on Process Mining: Explaining Event Log Characteristics Impact on Algorithms"
+      },
+      {
+        "key": "product",
+        "label": "Product",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Powering Product Discovery in ChatGPT - OpenAI"
+      },
+      {
+        "key": "python",
+        "label": "Python",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Simulation-based Inference with the Python Package sbijax"
+      },
+      {
+        "key": "qwen3",
+        "label": "Qwen3",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "The Art of Efficient Reasoning: Data, Reward, and Optimization"
+      },
+      {
+        "key": "qwen3-4b",
+        "label": "qwen3-4b",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "EvoIdeator: Evolving Scientific Ideas through Checklist-Grounded Reinforcement Learning"
+      },
+      {
+        "key": "reddit",
+        "label": "Reddit",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Interpretable Early Warnings using Machine Learning in an Online Game-experiment"
+      },
+      {
+        "key": "reliability",
+        "label": "Reliability",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Evaluating the Reliability and Fidelity of Automated Judgment Systems of Large Language Models"
+      },
+      {
+        "key": "responses api",
+        "label": "Responses Api",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "New tools and features in the Responses API"
+      },
+      {
+        "key": "right",
+        "label": "right",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Curveball Steering: The Right Direction To Steer Isn't Always Linear"
+      },
+      {
+        "key": "robotic",
+        "label": "robotic",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Energy-Aware Reinforcement Learning for Robotic Manipulation of Articulated Components in Infrastructure Operation and Maintenance"
+      },
+      {
+        "key": "robotics brings",
+        "label": "Robotics Brings",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Gemini Robotics brings AI into the physical world"
+      },
+      {
+        "key": "sample",
+        "label": "sample",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Token Sample Complexity of Attention"
+      },
+      {
+        "key": "selective",
+        "label": "Selective",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Investigating layer-selective transfer learning of QAOA parameters for Max-Cut problem"
+      },
+      {
+        "key": "sequential",
+        "label": "Sequential",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Stability of Sequential and Parallel Coordinate Ascent Variational Inference"
+      },
+      {
+        "key": "server",
+        "label": "Server",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "TAPAS: Efficient Two-Server Asymmetric Private Aggregation Beyond Prio(+)"
+      },
+      {
+        "key": "service",
+        "label": "Service",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Foundry Agent Service is GA: private networking, Voice Live, and enterprise-grade evaluations"
+      },
+      {
+        "key": "shortcut",
+        "label": "shortcut",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Mitigating Shortcut Reasoning in Language Models: A Gradient-Aware Training Approach"
+      },
+      {
+        "key": "society",
+        "label": "society",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "From Thinker to Society: Security in Hierarchical Autonomy Evolution of AI Agents"
+      },
+      {
+        "key": "sparsity",
+        "label": "Sparsity",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Scaling Attention via Feature Sparsity"
+      },
+      {
+        "key": "steering",
+        "label": "steering",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Latent Policy Steering with Embodiment-Agnostic Pretrained World Models"
+      },
+      {
+        "key": "stochastic",
+        "label": "stochastic",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "High-Fidelity Modeling of Stochastic Chemical Dynamics on Complex Manifolds: A Multi-Scale SIREN-PINN Framework for the Curvature-Perturbed Ginzburg-Landau Equation"
+      },
+      {
+        "key": "subspace",
+        "label": "subspace",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "SSAM: Singular Subspace Alignment for Merging Multimodal Large Language Models"
+      },
+      {
+        "key": "suite",
+        "label": "Suite",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "FACTS Benchmark Suite: Systematically evaluating the factuality of large language models"
+      },
+      {
+        "key": "supply",
+        "label": "Supply",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "The Economics of AI Supply Chain Regulation"
+      },
+      {
+        "key": "supply chain",
+        "label": "Supply Chain",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "The Economics of AI Supply Chain Regulation"
+      },
+      {
+        "key": "survey",
+        "label": "Survey",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "A Survey of Reinforcement Learning For Economics"
+      },
+      {
+        "key": "time series",
+        "label": "Time Series",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Deep Autocorrelation Modeling for Time-Series Forecasting: Progress and Prospects"
+      },
+      {
+        "key": "topology",
+        "label": "topology",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Reasoning Topology Matters: Network-of-Thought for Complex Reasoning Tasks"
+      },
+      {
+        "key": "trace",
+        "label": "Trace",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "TRACE: Trajectory Recovery with State Propagation Diffusion for Urban Mobility"
+      },
+      {
+        "key": "train",
+        "label": "Train",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Easily Train Models with H100 GPUs on NVIDIA DGX Cloud"
+      },
+      {
+        "key": "transfer",
+        "label": "Transfer",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Guided Transfer Learning for Discrete Diffusion Models"
+      },
+      {
+        "key": "understand",
+        "label": "understand",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Do LLMs Understand Collaborative Signals? Diagnosis and Repair"
+      },
+      {
+        "key": "unsupervised",
+        "label": "Unsupervised",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Unsupervised Feature Selection via Robust Autoencoder and Adaptive Graph Learning"
+      },
+      {
+        "key": "verifiable",
+        "label": "verifiable",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Instruction-Tuned, but Not More Verifiable Instruction-Following: A Cross-Task Diagnosis for LoRA Adapters"
+      },
+      {
+        "key": "vertex",
+        "label": "Vertex",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Deploy Meta Llama 3.1 405B on Google Cloud Vertex AI"
+      },
+      {
+        "key": "vision-language models",
+        "label": "Vision-language models",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "RobotArena $\\infty$: Scalable Robot Benchmarking via Real-to-Sim Translation"
+      },
+      {
+        "key": "vla",
+        "label": "Vla",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "RobotArena $\\infty$: Scalable Robot Benchmarking via Real-to-Sim Translation"
+      },
+      {
+        "key": "vulnerability",
+        "label": "Vulnerability",
+        "itemType": "new-tag-candidate",
+        "counts": {
+          "seenCount": 4,
+          "manualReviewRequired": false
+        },
+        "note": "Learnability and Privacy Vulnerability are Entangled in a Few Critical Weights"
+      }
+    ],
+    "deprecate": []
+  },
+  "currentCategories": {
+    "keep": [
+      {
+        "key": "official",
+        "label": "official",
+        "itemType": "current-source-type",
+        "counts": {
+          "publishedArticleCount": 1717
+        },
+        "note": "現行 source_type。表示導線の既存軸。"
+      },
+      {
+        "key": "paper",
+        "label": "paper",
+        "itemType": "current-source-type",
+        "counts": {
+          "publishedArticleCount": 965
+        },
+        "note": "現行 source_type。表示導線の既存軸。"
+      },
+      {
+        "key": "blog",
+        "label": "blog",
+        "itemType": "current-source-type",
+        "counts": {
+          "publishedArticleCount": 456
+        },
+        "note": "現行 source_type。表示導線の既存軸。"
+      },
+      {
+        "key": "search",
+        "label": "search",
+        "itemType": "current-source-category",
+        "counts": {
+          "publishedArticleCount": 55
+        },
+        "note": "将来カテゴリ候補 search-rag への寄せ先候補。"
+      },
+      {
+        "key": "news",
+        "label": "news",
+        "itemType": "current-source-category",
+        "counts": {
+          "publishedArticleCount": 8
+        },
+        "note": "現行 source_category。1周目後の大きな導線変更で再設計対象。"
+      },
+      {
+        "key": "video",
+        "label": "video",
+        "itemType": "current-source-type",
+        "counts": {
+          "publishedArticleCount": 0
+        },
+        "note": "現行 source_type。表示導線の既存軸。"
+      }
+    ],
+    "moveToCategory": [],
+    "deprecate": [
+      {
+        "key": "llm",
+        "label": "llm",
+        "itemType": "current-source-category",
+        "counts": {
+          "publishedArticleCount": 3332
+        },
+        "note": "会話でカテゴリからも不要とした現行 source_category。"
+      },
+      {
+        "key": "alerts",
+        "label": "alerts",
+        "itemType": "current-source-type",
+        "counts": {
+          "publishedArticleCount": 469
+        },
+        "note": "現行 source_type。表示導線の既存軸。"
+      },
+      {
+        "key": "agent",
+        "label": "agent",
+        "itemType": "current-source-category",
+        "counts": {
+          "publishedArticleCount": 126
+        },
+        "note": "会話でカテゴリからも不要とした現行 source_category。"
+      },
+      {
+        "key": "voice",
+        "label": "voice",
+        "itemType": "current-source-category",
+        "counts": {
+          "publishedArticleCount": 34
+        },
+        "note": "会話でカテゴリからも不要とした現行 source_category。"
+      }
+    ],
+    "hold": [
+      {
+        "key": "news",
+        "label": "news",
+        "itemType": "current-source-type",
+        "counts": {
+          "publishedArticleCount": 32
+        },
+        "note": "現行 source_type。表示導線の既存軸。"
+      }
+    ]
+  },
+  "aliases": {
+    "deprecate": [
+      {
+        "groupId": "alias-group-001",
+        "comparableKey": "llm",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "llm",
+        "terms": [
+          "llm",
+          "llms"
+        ]
+      },
+      {
+        "groupId": "alias-group-002",
+        "comparableKey": "huggingface",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "huggingface",
+        "terms": [
+          "hugging face",
+          "huggingface"
+        ]
+      },
+      {
+        "groupId": "alias-group-003",
+        "comparableKey": "transformer",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "transformer",
+        "terms": [
+          "transformer",
+          "transformers"
+        ]
+      },
+      {
+        "groupId": "alias-group-004",
+        "comparableKey": "vlm",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "vlm",
+        "terms": [
+          "vlm",
+          "vlms"
+        ]
+      },
+      {
+        "groupId": "alias-group-005",
+        "comparableKey": "mllm",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "mllms",
+        "terms": [
+          "mllm",
+          "mllms"
+        ]
+      },
+      {
+        "groupId": "alias-group-006",
+        "comparableKey": "dynamic",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "dynamics",
+        "terms": [
+          "dynamic",
+          "dynamics"
+        ]
+      },
+      {
+        "groupId": "alias-group-007",
+        "comparableKey": "kernel",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "kernel",
+        "terms": [
+          "kernel",
+          "kernels"
+        ]
+      },
+      {
+        "groupId": "alias-group-008",
+        "comparableKey": "pinn",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "pinn",
+        "terms": [
+          "pinn",
+          "pinns"
+        ]
+      },
+      {
+        "groupId": "alias-group-009",
+        "comparableKey": "pde",
+        "decision": "廃止",
+        "recommendedCanonicalKey": "pde",
+        "terms": [
+          "pde",
+          "pdes"
+        ]
+      }
+    ]
+  }
+}

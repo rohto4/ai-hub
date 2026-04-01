@@ -1,6 +1,6 @@
 # AI Trend Hub 着手順チェックリスト
 
-最終更新: 2026-03-25
+最終更新: 2026-03-27
 
 ## 1. このファイルの目的
 
@@ -18,11 +18,20 @@
 
 ### 優先
 
+- [ ] 今回用 artifact を `af-20260326/` 系ディレクトリへ切り出す
+- [ ] 主タグの完全除外リストを 1周目フローへ反映する
+- [ ] `title + summary100 + summary200` を入力に 1周目判定を回す
+- [ ] 50〜200件チャンクで 1周目 output を生成する
+- [ ] 新規立項タグ候補を件数付きで集計する
+- [ ] ユーザー提示用の新規立項タグ候補一覧を作る
 - [ ] `arxiv-ai` backlog の現状を確認する
 - [x] `arxiv-ai` の 5 か月超 raw を enrich claim 前に除外する
 - [x] `arxiv-ai` を L4 で 2 か月保持にするローテーション条件を実装する
 - [ ] `job_run_id=563` の `hourly-fetch` が停滞か完了かを確認する
 - [ ] enrich を回す場合の件数・時間帯・Gemini API 影響を整理する
+- [x] migration 038 を適用する（adjacent tags / thumbnail_bg_theme）
+- [ ] 1周目反映前に `db:retag-layer2-layer4` の入力 / 出力設計を見直す
+- [ ] retag 後の L2/L4 件数整合を確認する（主タグ/隣接タグ/テーマ）
 
 ### 後続
 
@@ -33,6 +42,9 @@
 - [ ] 後からアイコン追加したタグの `thumbnail_url` 再計算方針を確定する
 - [ ] tag alias 管理 UI の要否を確定する
 - [ ] `push_subscriptions.genres` rename の影響範囲を確認する
+- [ ] 隣接分野タグの30〜50件監査を実施する
+- [ ] Gemini監査出力（`artifacts/gemini-tag-rebuild/outputs`）をレビューする
+- [ ] 2周目着手前にカテゴリ / 属性設計を確定する
 
 ## 4. 再開時確認
 

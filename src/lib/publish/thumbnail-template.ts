@@ -30,6 +30,7 @@ export type ThumbnailTemplateInput = {
   sourceCategory: SourceCategory
   contentLanguage: ContentLanguage | null
   matchedTags: MatchedTagReference[]
+  thumbnailBgTheme?: string | null
 }
 
 function normalizeText(value: string): string {
@@ -113,7 +114,12 @@ function selectDisplayTags(input: ThumbnailTemplateInput): { tags: RankedTag[]; 
   return { tags: visible, overflowCount }
 }
 
-function resolveBackground(sourceType: SourceType, sourceCategory: SourceCategory): string {
+function resolveBackground(
+  sourceType: SourceType,
+  sourceCategory: SourceCategory,
+  thumbnailBgTheme?: string | null,
+): string {
+  if (thumbnailBgTheme) return thumbnailBgTheme
   if (sourceType === 'paper') return 'paper'
   if (sourceType === 'news') return 'news'
   if (sourceType === 'alerts') return 'alerts'
@@ -144,7 +150,7 @@ export function buildInternalThumbnailUrl(input: ThumbnailTemplateInput): string
     return null
   }
 
-  const background = resolveBackground(input.sourceType, input.sourceCategory)
+  const background = resolveBackground(input.sourceType, input.sourceCategory, input.thumbnailBgTheme)
   const layout = resolveLayout(registeredTags.length, overflowCount)
   const variant = ['a', 'b', 'c'][hashString(input.canonicalUrl) % 3] ?? 'a'
   const encodedTags = registeredTags.map((tag) => slugifyTag(tag.tagKey)).join(',')
@@ -182,6 +188,16 @@ type RenderPayload = {
 }
 
 const BACKGROUNDS: Record<string, { start: string; end: string; accent: string; texture?: string }> = {
+  'adj-infra': { start: '#dbeafe', end: '#93c5fd', accent: '#1e3a8a' },
+  'adj-security': { start: '#fee2e2', end: '#fca5a5', accent: '#7f1d1d' },
+  'adj-robotics': { start: '#e2e8f0', end: '#94a3b8', accent: '#0f172a' },
+  'adj-media': { start: '#f5d0fe', end: '#c4b5fd', accent: '#581c87' },
+  'adj-finance': { start: '#dcfce7', end: '#86efac', accent: '#14532d' },
+  'adj-healthcare': { start: '#fecdd3', end: '#fda4af', accent: '#9f1239' },
+  'adj-education': { start: '#fde68a', end: '#fcd34d', accent: '#78350f' },
+  'adj-legal': { start: '#e0e7ff', end: '#a5b4fc', accent: '#312e81' },
+  'adj-gaming': { start: '#ddd6fe', end: '#a78bfa', accent: '#4c1d95' },
+  'adj-hardware': { start: '#cffafe', end: '#67e8f9', accent: '#155e75' },
   paper: { start: '#f8fafc', end: '#cbd5e1', accent: '#0f172a' },
   news: { start: '#fef3c7', end: '#fb7185', accent: '#7c2d12' },
   alerts: { start: '#dbeafe', end: '#a78bfa', accent: '#312e81' },
