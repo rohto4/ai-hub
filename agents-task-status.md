@@ -1,6 +1,6 @@
-﻿# Agents Task Status
+# Agents Task Status
 
-最終更新: 2026-03-28
+最終更新: 2026-04-02
 
 運用ルール:
 - 最新 50 件を目安に残し、古い行は下から削る
@@ -9,95 +9,48 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
-- 2026-03-30 | done | `ui-memo` 14/15/16/19/20 を再調整 | footer はカード上段の緑枠内幅を基準に 4 列+隙間=100% へ再計算し、関連トピック左線・LANG 表示削除・shadow/hover に加えて上段白エリア高さも固定化
-- 2026-03-31 | done | 短文カードの白エリア高さを再修正 | 100文字モードでもタイトル2行+メタ+要約4行が欠けないよう、上段白エリアの固定高さを 176px に引き上げ
-- 2026-03-31 | done | 短文カードを全高 215px 基準へ再配分 | 白エリア 168px・footer 35px・外余白 4px 系に再配分し、カード全体を短くしつつ内容が収まるよう調整
-- 2026-03-31 | done | 短長カードの外周余白を統一 | 白エリア外周と footer 下余白の差をなくすため、カード外周マージンを共通 4px に揃え、長文モード全高を 296px に再計算
-- 2026-03-31 | done | デスクトップ用カスタムカーソルを追加 | 通常カーソルを隠し、発光した「ロボット + 左上紙飛行機」カーソルを追従表示する `CustomCursor` を layout / global CSS に接続
+- 2026-04-02 | done | Mercari Engineering Blog を source 追加 | seed.mjs に id:055 を追加、RSS疎通確認(100件insert)、PROJECT.md/batch-ops.md を更新、db:run-hourly-fetch を package.json に登録
+- 2026-04-02 | done | GitHub Actions schedule を全 workflow に追加・復旧 | hourly-fetch/:00, hourly-enrich/8回, hourly-publish/:50, daily-tag-dedup/02:30, daily-db-backup/18:15, monthly-public-archive(新規)/毎月1日
+- 2026-04-02 | done | docs 整理・バッチ運用資料を整備 | guide-backup/mock/init/dim2_memo 削除、batch-ops.md 新規、batch-reforme-spec.md を imp/ に移動、refactoring-plan.md 削除、run-hourly-compute-ranks CLI 追加
+- 2026-04-02 | done | `docs/imp` / `docs/spec` を現行実装へ追随 | batch 名称・schedule・manual pending・隣接分野タグ・カテゴリ導線・`hourly-compute-ranks` の記述をコード基準へ更新
+- 2026-04-02 | done | `docs/imp` と `docs/spec/04-data-model-and-sql.md` を圧縮 | 履歴ノイズと重複説明を削り、`imp` は現況/未決/次、`spec` は現行仕様中心へ再整理
+- 2026-04-02 | done | 定時 batch の schedule を docs へ同期 | `data-flow` と `implementation-plan` を schedule 復旧後の前提へ更新
+- 2026-04-02 | done | `monthly-public-archive` と ranks CLI を反映 | batch 改善の現況を docs に反映し、batch 系参照先を `batch-reforme-spec` / `batch-ops` へ整理
 - 2026-03-31 | done | カスタムカーソル SVG を編集しやすく分離 | `CustomCursorArt.tsx` に紙飛行機 / アンテナ / 頭 / 耳 / 目を分割し、形状編集しやすい構成へ整理
-- 2026-03-30 | done | Home の自動更新系を停止 | 開きっぱなし時の自動受信・自動復帰をやめるため、`return focus` 復元を削除し、PWA/service worker は `NEXT_PUBLIC_ENABLE_PWA_INSTALL=true` のときだけ有効化する形へ変更
-- 2026-03-28 | done | 導線評価の進め方を変更 | `screen-flow` / `flowchart` の草案追加後、図だけでは判断しづらいと整理。次は Web 実装を先に進め、実画面を見てカテゴリ・主タグ・周辺分野タグ導線を評価する方針へ切替
-- 2026-03-28 | done | 新導線の草案を docs に追加 | `screen-flow` と `flowchart` に vNext draft を追記。カテゴリ=サイドバー導線、周辺分野タグ=当面通常タグ導線、主タグ/カテゴリ/周辺分野タグの役割分担を相談できる状態にした
-- 2026-03-28 | done | Phase 1 正本の新規タグ案を DB 反映 | `final-tag-decisions.json` から新規主タグ13件を昇格し、`llm` / `agent` など broad tag とカテゴリ寄せ対象を inactive 化。`retag-layer2-layer4` で L2 6028 件を洗い替え、deprecated tag の L2/L4 付与を除去
-- 2026-03-28 | done | タグ整理の実行方針を更新 | カテゴリはサイドバー導線、周辺分野タグは当面通常タグと同じクリック導線、将来の視覚マッピングページとタグTBL再編は後続へ整理
-- 2026-03-28 | done | 優先タスクをタグ整理と公開導線へ切替 | 719/720 の原因確認は完了済みとして SQL 深掘りを外し、主タグ / 新規立項タグ / カテゴリ / 周辺分野タグ整理とウェブ導線確立を最優先へ更新。`paper` 専用タグマスタ案は後続へ保留
-- 2026-03-28 | done | paper 専用タグ群の必要性を方針化 | `arxiv-ai` は基礎研究寄りで既存主タグに落ちにくいと整理。`paper` 専用研究タグ群を `implementation-wait` / `imp-*` に引き継ぎ、次は無タグ論文分析と allowlist 試験投入
-- 2026-03-28 | done | canonicalTagHints prompt を調整して再 live run | job_run_id=720 で canonical keyword 8件を確認。主タグ付きは4/20でコホート差が大きく、次は無タグ記事の原因分析へ進む
-- 2026-03-28 | done | OpenAI fallback を 20→10→5 分割再試行に対応 | job_run_id=719 で 20件 full_content を manual_pending なしで完了。主タグ16件・候補45件増を確認、canonical alias/keyword はまだ 0 件で次は prompt 調整
-- 2026-03-28 | done | enrich live run の実地確認と Neon SQL 修正 | `enrichment-raw.ts` の interval SQL を直して job_run_id=716/717/718 で 20件バッチ実行を確認。Gemini 429 と OpenAI parse 失敗で全件 manual_pending、次は OpenAI structured output の受け取り見直し
-- 2026-03-28 | done | 本文ベース canonical tag hints を enrich に追加 | `full_content` 記事で同一 AI 応答から alias/keyword 寄せヒントを受けて `tag_aliases` / `tag_keywords` へ高信頼反映、`daily-tag-dedup` も alias/keyword 分岐へ更新。次は live run で増分確認
-- 2026-03-27 | done | 1周目 retag 方針を固定 | カテゴリは先に確定せず属性として扱い、完全除外タグ・カテゴリ候補・`af-20260326/` 専用 artifact 方針を `imp-*` へ反映
-- 2026-03-26 | done | 隣接分野タグ + 背景テーマ基盤を実装 | migration 038、enrich/publish/UI反映、`db:retag-layer2-layer4` と Gemini 支援プロンプト（`artifacts/gemini-tag-rebuild/`）を追加
-- 2026-03-26 | done | Gemini enrich part-008 を Codex実行で生成 | `output-templates/ai-enrich-outputs-part-008.json` と `outputs/ai-enrich-outputs-part-008.json` を 100件で生成し、件数・ID順・文字数・タグ整合の検証を通過
-- 2026-03-26 | done | Gemini enrich part-002 を新フォーマットで全件再生成 | `outputs/ai-enrich-outputs-part-002.json` を 200 件で再出力し、`matchedTagKeys/proposedTags`・文字数・ID順の検証を通過
-- 2026-03-26 | done | Gemini CLI backlog 1500件の artifact を生成 | `prepare-gemini-cli-enrich-artifacts.ts` を追加し、`artifact/gemini-cli-enrich-backlog-1500/` に 8 chunk の input / prompt / manifest を出力
-- 2026-03-26 | done | Gemini prompt を title/summary 分離 + 既存タグ優先へ調整 | `prompt-part001.md` を主 prompt に整理し、`matchedTagKeys` 最大5・`proposedTags` 最大2・`tag-master.json` 参照へ更新
-- 2026-03-26 | done | part-001 の初回 Gemini 出力をざっくり監査 | 内容方向は概ね妥当だが `summary100/200` の文字数超過が多く、prompt を再調整した
-- 2026-03-25 | done | enrich 20件実効化と scheduled 一時停止 | AI 要約バッチの 10 件 clamp を外して `maxDuration=600` へ延長、手動 backlog 吸収のため GitHub Actions scheduled を外して `workflow_dispatch` のみにした
-- 2026-03-25 | done | `arxiv-ai` の監視項目と再判断条件を判断待ちへ追加 | backlog・24h流入・enrich処理量・公開面露出を継続監視し、2週間〜1か月で再評価する条件を `implementation-wait.md` に固定
-- 2026-03-25 | done | ジョブログ件数の意味をレコード単位へ整理 | `daily-enrich` / `hourly-fetch` / `compute-ranks` の processed/success/failed を揃え、オールサクセス時に `n:n` になりやすく修正
-- 2026-03-25 | done | 定時 enrich を 20件 x 8回/時 に拡張 | `daily-enrich` の基本設定を 20 件へ、scheduler を `:05〜:40` の 8 回に変更し build/type-check を確認
-- 2026-03-25 | done | `arxiv-ai` の現況件数を確認 | `articles_raw total=1870 / unprocessed=1840`、5か月超 raw 0 件、L4 の 2か月超 0 件を確認
-- 2026-03-25 | done | `arxiv-ai` の source 別保持ロジックを実装 | 5か月超 raw を enrich skip、L4 は 2か月保持になるよう `source-retention` と enrich/archive を更新
-- 2026-03-25 | done | `arxiv-ai` 保持方針を docs に反映 | 5か月超 raw は enrich 対象外、L4 は 2か月保持上限で運用する方針を plan/status/hangover/checklist/data-flow に反映
-- 2026-03-25 | done | init docs の圧縮方針を整理 | `docs/initfile-refactoring.md` を追加し、初期読込 docs の削減余地を整理
-- 2026-03-23 | done | hourly-fetch の継続失敗 2 件を切り分けて修正 | google-ai-blog は RSS object 混在を collector 側で吸収し 20件取得確認、anthropic-news は feed 404 のため停止・seed も inactive 化
-- 2026-03-22 | done | thumbnail_url backfill を追加して実 DB へ再反映 | db:backfill-thumbnail-urls で articles_enriched 3424件更新、public_articles 1908件同期
-- 2026-03-22 | done | 旧 /api/thumb URL の 400 を解消 | icon 未登録タグだけの旧 query でも glyph fallback 描画にして後方互換を維持
-- 2026-03-22 | done | サムネイルの旧キャッシュ残留と弱い icon 合成を是正 | /api/thumb URL に version を追加、registered icon 0件は thumbnail_emoji fallback に戻す
-- 2026-03-22 | done | サムネイルを文字なし icon-only 合成へ変更 | /api/thumb を inline SVG アイコン描画へ切替、1/2/3/overflow レイアウトを四角内に再配置
-- 2026-03-22 | done | タグ昇格時の icon_pending 可視化を追加 | /admin/tags に normalized key と ready/pending を表示し、promote API / admin logs に hasThumbnailAsset を追加
-- 2026-03-22 | done | thumbnail 用の主要タグアイコン資産を追加 | public/thumbs/icons を追加し、thumbnail-tag-registry と /api/thumb 描画を更新
-- 2026-03-22 | done | spec に migration 035/036 の schema 反映を追記 | 04-data-model-and-sql.md と implementation-plan/checklist/hangover を同期更新
-- 2026-03-22 | done | 設計書類を最新化してコミット・プッシュ | data-flow.md / imp-hangover.md / agents-task-status.md を更新
+- 2026-03-31 | done | デスクトップ用カスタムカーソルを追加 | 通常カーソルを隠し、発光した「ロボット + 左上紙飛行機」カーソルを追従表示する `CustomCursor` を layout / global CSS に接続
+- 2026-03-31 | done | 短長カードの外周余白を統一 | 白エリア外周と footer 下余白の差をなくすため、カード外周マージンを共通 4px に揃え、長文モード全高を 296px に再計算
+- 2026-03-31 | done | 短文カードを全高 215px 基準へ再配分 | 白エリア 168px・footer 35px・外余白 4px 系に再配分し、カード全体を短くしつつ内容が収まるよう調整
+- 2026-03-31 | done | 短文カードの白エリア高さを再修正 | 100文字モードでもタイトル2行+メタ+要約4行が欠けないよう、上段白エリアの固定高さを 176px に引き上げ
+- 2026-03-30 | done | `ui-memo` 14/15/16/19/20 を再調整 | footer 比率、関連トピック左線、LANG 表示削除、shadow/hover、上段白エリア高さを反映
+- 2026-03-30 | done | Home の自動更新系を停止 | `return focus` 復元を削除し、PWA/service worker を env opt-in に変更
+- 2026-03-28 | done | 導線評価を Web 実装優先へ切替 | 図だけではなく実画面を見ながらカテゴリ・主タグ・周辺分野タグ導線を評価する方針へ更新
+- 2026-03-28 | done | 新導線の草案を docs に追加 | `screen-flow` と `flowchart` にカテゴリ / 主タグ / 周辺分野タグの役割分担を追記
+- 2026-03-28 | done | Phase 1 正本の新規タグ案を DB 反映 | 新規主タグ 13 件を昇格し、broad tag を inactive 化して L2/L4 を洗い替え
+- 2026-03-28 | done | タグ整理の実行方針を更新 | カテゴリはサイドバー導線、周辺分野タグは通常タグ導線、将来の視覚マッピングは後続へ整理
+- 2026-03-28 | done | 優先タスクをタグ整理と公開導線へ切替 | SQL 深掘りより公開面導線確立を最優先へ更新
+- 2026-03-28 | done | paper 専用タグ群の必要性を方針化 | `paper` / `arxiv-ai` 向け研究系タグ群の検討を後続タスクへ分離
+- 2026-03-28 | done | canonicalTagHints prompt を調整して再 live run | `canonicalKeywordCount` の発火を確認し、次は無タグ記事分析へ進む状態に整理
+- 2026-03-28 | done | OpenAI fallback を 20→10→5 分割再試行に対応 | manual_pending なしで 20 件 full_content を完了可能にした
+- 2026-03-28 | done | enrich live run の実地確認と Neon SQL 修正 | `enrichment-raw.ts` の interval SQL を修正し live run を再開
+- 2026-03-28 | done | 本文ベース canonical tag hints を enrich に追加 | alias / keyword 寄せを `tag_aliases` / `tag_keywords` へ高信頼反映
+- 2026-03-27 | done | 1 周目 retag 方針を固定 | 完全除外タグ・カテゴリ候補・専用 artifact 方針を `imp-*` に反映
+- 2026-03-26 | done | 隣接分野タグ + 背景テーマ基盤を実装 | migration 038、enrich/publish/UI反映、retag と Gemini 支援プロンプトを追加
+- 2026-03-26 | done | Gemini enrich backlog artifact を整備 | backlog 用 input / prompt / manifest と part 出力の検証を進めた
+- 2026-03-25 | done | 定時 enrich を 20件 x 8回/時 に拡張 | scheduler、route、docs を実運用前提に更新
+- 2026-03-25 | done | `arxiv-ai` の監視項目と再判断条件を判断待ちへ追加 | backlog・流入・露出・コストの観測条件を固定
+- 2026-03-25 | done | `arxiv-ai` の source 別保持ロジックを実装 | 5 か月超 raw を enrich skip、L4 は 2 か月保持へ更新
+- 2026-03-23 | done | hourly-fetch の継続失敗 2 件を切り分けて修正 | google-ai-blog は collector 側で吸収、anthropic-news は inactive 化
+- 2026-03-22 | done | thumbnail_url backfill を追加して実 DB へ再反映 | `articles_enriched` と `public_articles` の既存データへ再同期
+- 2026-03-22 | done | 旧 `/api/thumb` URL の 400 を解消 | glyph fallback 描画で後方互換を維持
+- 2026-03-22 | done | サムネイルを icon-only 合成へ変更 | `/api/thumb` を inline SVG 描画へ切替
+- 2026-03-22 | done | タグ昇格時の icon_pending 可視化を追加 | `/admin/tags` に ready/pending を表示
 - 2026-03-22 | done | daily-tag-dedup にマージ時の遡及タグ付けを追加 | L2/L4 両方に ILIKE 遡及 INSERT を追加
-- 2026-03-22 | done | 日次タグ重複検出ジョブを追加 | Gemini で候補↔既存タグを照合・自動統合・遡及タグ付け
-- 2026-03-22 | done | タグ候補を固有名詞限定・閾値 >= 4・STOPWORDS 拡充 | 5304件から 2500超を棄却
-- 2026-03-22 | done | タグ昇格を AI 固有名詞抽出に切り替え | enrich プロンプトに properNounTags を追加
-- 2026-03-22 | done | タグ昇格時の tag_key を URL-safe に正規化 | スペースをハイフンへ変換
-- 2026-03-22 | done | タグレビュー文脈表示・保留・棄却・候補戻しを追加 | AdminTagsClient を改善
-- 2026-03-22 | done | タグ昇格時に根拠記事へ自動タグ付け | L2/L4 へ ILIKE 遡及 INSERT
+- 2026-03-22 | done | 日次タグ重複検出ジョブを追加 | Gemini で候補と既存タグを照合し自動統合
+- 2026-03-22 | done | タグ候補を固有名詞限定へ絞り込み | 閾値と stopwords を調整してノイズを削減
+- 2026-03-22 | done | タグ昇格を AI 固有名詞抽出に切り替え | enrich プロンプトに `properNounTags` を追加
 - 2026-03-22 | done | ジョブログ管理画面を追加 | `/admin/jobs` と `compute-ranks` の job_runs 記録を追加
-- 2026-03-22 | done | en 記事タイトルの日本語翻訳修正 + 1622 件バックフィル | `titleJa` と backfill スクリプトを追加
-- 2026-03-21 夜 | done | 最終仕上げを実施 | OGP API・sitemap.xml・robots.txt・description 修正・HomeStats 言語カウント追加
-- 2026-03-21 夜 | done | admin Phase 3 一式を実装 | login/articles/tags/sources/jobs・認証・hide_article・tag 昇格・is_active
-- 2026-03-21 夜 | done | hasDatabaseColumn 二重クエリを廃止 | `content_language` を常時取得
-- 2026-03-21 夜 | done | compute-ranks を全件1回読み込み + 4window 並列 upsert に最適化 | DELETE 廃止・ON CONFLICT DO UPDATE
-- 2026-03-21 夜 | done | public_article_sources bigint 型バグを修正・全件バックフィル | 2件→2504件 に回復
-- 2026-03-21 15:10 | done | `content_language` / 内部サムネイル / 日本語ソース前準備を実装 | migration 035、`thumbnail_url`、seed 追加
-- 2026-03-21 13:31 | done | タグ昇格時の画像資産運用を計画化 | registry / icon_pending / 再計算方針を docs に追記
-- 2026-03-21 13:22 | done | サムネイル合成方針を実装計画へ反映 | 固定優先順位なし・title/summary 出現順を採用
-- 2026-03-21 13:05 | done | GHA 前提の順序をチェックリストへ反映 | `content_language`・`thumbnail_url`・日本語ソース投入をゲート化
-- 2026-03-21 12:08 | done | 実装着手順チェックリストを追加 | `implementation-checklist.md` を新設
-- 2026-03-20 23:59 | done | Home action 再分割 | `useHomeActions` を `derived/article/share` に分割
-- 2026-03-20 23:46 | done | 機能単位へ追加分割 | `public-articles` を rankings/listings/detail に再分割
-- 2026-03-20 23:15 | done | T2-B public-feed 分割 | `public-feed` を 5 ファイル + barrel に分割
-- 2026-03-20 22:58 | done | Tier1 リファクタリングを先行実施 | `mock4` 削除、Home 分割、`/feed.xml` 分離
-- 2026-03-20 15:05 | done | DB バックアップ基盤を追加 | 全 DB バックアップと日次 GitHub Actions を追加
-- 2026-03-20 12:10 | done | 計画タスクを20件へ拡張 | `content_language`→日本語ソース→公開面→管理画面→ランキング調整へ分解
-- 2026-03-20 12:00 | done | `implementation-plan.md` / `imp-status.md` 更新 | `content_language` 先行導入前提の計画に更新
-- 2026-03-18 10:15 | done | L4 公開ページ群を実装 | ranking/search/detail/category/tags/about/feed を追加
-- 2026-03-18 10:12 | done | mock4 を作成 | Home/Ranking/Search/Detail/Category/Tag/About/Feed/PWA/Share/Topic Group を確認可能にした
-- 2026-03-18 10:08 | done | Home 導線を再整理 | source lane を `official/alerts/blog/paper/news` に統一
-- 2026-03-18 10:05 | done | `public-feed.ts` 拡張 | tag/detail/feed query と `public_key` 導線を追加
-- 2026-03-18 07:30 | done | 絵文字サムネイル backfill | `public_articles` に `thumbnail_emoji` を反映
-- 2026-03-18 07:24 | done | paper タグ制限を DB 反映 | `source_type='paper'` は `paper` タグのみへ固定
-- 2026-03-18 07:22 | done | migration 031/032 適用 | `thumbnail_emoji` 列と `paper` タグを追加
-- 2026-03-18 07:18 | done | snippet 整合強化を実装 | prompt 制約 + 軽い整合チェックを追加
-- 2026-03-18 03:12 | done | 公開候補 10 件を抜き取り監査 | summary 切れ・snippet ずれ・paper タグ誤付与を確認
-- 2026-03-18 03:10 | done | 非日本語 title 一括補正 | `articles_enriched` / `public_articles` とも残件 0
-- 2026-03-18 03:08 | done | 翻訳 artifact 保存 | `artifacts/title-translations-non-ja-20260318.json` 出力
-- 2026-03-18 03:00 | done | backlog 1882 件の title 漏れ確認 | backlog 分の非日本語 title は 0
-- 2026-03-18 02:58 | done | `implementation-plan.md` 再構成 | L2→L4 要件定義中心に更新
-- 2026-03-18 02:56 | done | `implementation-wait.md` 更新 | 分類方針、publish 高速化、残 title を整理
-- 2026-03-18 02:55 | done | `imp-status.md` 更新 | import・分類再同期・publish 試行結果を追記
-- 2026-03-18 02:54 | done | `imp-hangover.md` 更新 | 次セッション向け引き継ぎを追加
-- 2026-03-18 02:53 | done | `docs/spec/04-data-model-and-sql.md` 補強 | 表示分類は L4 派生概念と明記
-- 2026-03-18 02:52 | done | L2/L4 是正 SQL 保存 | `docs/imp/sql/2026-03-18-l2-l4-data-realign.sql` を作成
-- 2026-03-18 02:51 | done | `articles_enriched.source_type` 再同期 | 1866 行修正、不一致 0
-- 2026-03-18 02:50 | done | title 補正 13 件反映 | Neon の `articles_enriched.title` を更新
-- 2026-03-18 02:49 | done | `public_articles` 分布確認 | published 911、official 736、alerts 145、blog 30
-- 2026-03-25 | done | batch 名称を `enrich-worker` / `hourly-compute-ranks` に統一 | route・job_name・admin 表示・主要 docs の命名を実運用に合わせて整理
-
-- 2026-03-26 | done | Gemini enrich part-005 を Codex実行で生成 | `artifact/gemini-cli-enrich-backlog-1500/outputs/ai-enrich-outputs-part-005.json` を 200件で生成し、`matchedTagKeys/proposedTags`・文字数制約・ID重複なしを検証
-
+- 2026-03-21 | done | 最終仕上げを実施 | OGP API・sitemap.xml・robots.txt・言語カウントを追加
+- 2026-03-21 | done | admin Phase 3 一式を実装 | login/articles/tags/sources/jobs・認証・hide_article・tag 昇格・is_active を追加
+- 2026-03-21 | done | `content_language` / 内部サムネイル / 日本語ソース前準備を実装 | migration、`thumbnail_url`、seed を追加
+- 2026-03-20 | done | Home と公開面の分割を進めた | Home 分割、`public-feed` 分割、`/feed.xml` 分離を実施
+- 2026-03-18 | done | L4 公開ページ群を実装 | ranking/search/detail/category/tags/about/feed を追加

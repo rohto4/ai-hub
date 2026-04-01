@@ -1,6 +1,6 @@
 # データモデル設計（Neon/PostgreSQL v4）
 
-最終更新: 2026-03-26
+最終更新: 2026-04-02
 
 ## 1. 設計原則
 
@@ -34,15 +34,15 @@
 
 ## 1.2 安定文字列 ID
 
-1. 数値主キーの可読性を補うため、主要な運用テーブルには文字列 ID を追加する
-2. 文字列 ID は主キーとは別列で保持し、既存データを消さず後付けできる形にする
-3. 現在の導入対象:
-   - `articles_raw.raw_id`
-   - `articles_raw_history.raw_history_id`
-   - `articles_enriched.enriched_id`
-   - `articles_enriched_history.enriched_history_id`
-   - `job_runs.job_id`
-   - `job_run_items.job_item_id`
+数値主キーとは別に、主要な運用テーブルには文字列 ID を持たせる。
+
+対象:
+- `articles_raw.raw_id`
+- `articles_raw_history.raw_history_id`
+- `articles_enriched.enriched_id`
+- `articles_enriched_history.enriched_history_id`
+- `job_runs.job_id`
+- `job_run_items.job_item_id`
 
 ## 2. レイヤーと主テーブル
 
@@ -52,24 +52,30 @@
 2. `layer2`
    - `articles_enriched`
    - `articles_enriched_history`
+   - `articles_enriched_sources`
    - `articles_enriched_tags`
    - `articles_enriched_adjacent_tags`
    - `tags_master`
-   - `adjacent_tags_master`
-   - `adjacent_tag_keywords`
+   - `tag_keywords`
    - `tag_aliases`
    - `tag_candidate_pool`
+   - `adjacent_tags_master`
+   - `adjacent_tag_keywords`
+   - `topic_groups`
 3. `layer3`
    - `activity_logs`
    - `activity_metrics_hourly`
    - `admin_operation_logs`
    - `priority_processing_queue`
+   - `job_runs`
+   - `job_run_items`
 4. `layer4`
    - `public_articles`
    - `public_article_sources`
    - `public_article_tags`
    - `public_article_adjacent_tags`
    - `public_rankings`
+   - `public_articles_history`
 
 ## 3. 補助テーブル
 
@@ -78,8 +84,6 @@
 3. `source_priority_rules`
 4. `push_subscriptions`
 5. `digest_logs`
-6. `adjacent_tags_master`
-7. `adjacent_tag_keywords`
 
 ## 4. 主テーブル概要
 
@@ -89,22 +93,25 @@
 
 1. `source_key`
 2. `display_name`
-3. `fetch_kind`（rss / api / alerts / manual ― 取得方法）
-4. `source_category`（llm / agent / voice / policy / safety / search / news ― トピック分類）
-5. `source_type`（official / blog / news / video / alerts ― ソース種別。Web カード表示分岐に使う）
+3. `fetch_kind`（rss / api / alerts / manual）
+4. `source_category`（llm / agent / voice / policy / safety / search / news）
+5. `source_type`（official / blog / news / video / alerts / paper）
 6. `content_access_policy`
-7. `fetch_interval_minutes`
-8. `supports_update_detection`
+7. `content_language`
+8. `commercial_use_policy`
+9. `fetch_interval_minutes`
+10. `supports_update_detection`
 
 #### `source_type` の値定義
 
 | 値 | 意味 | 現在の該当ソース |
 |---|---|---|
 | `official` | 企業・組織の公式技術ブログ | Google AI, Anthropic, OpenAI, Microsoft, AWS, HuggingFace, NVIDIA, Meta |
-| `blog` | 個人・コミュニティブログ | （将来追加予定） |
+| `blog` | 個人・コミュニティブログ | 将来追加予定 |
 | `news` | ニュースメディア / まとめサイト | AI News Roundup（inactive） |
-| `video` | 動画（YouTube 等） | （将来追加予定） |
-| `alerts` | Google Alerts（discovery feed） | 全 Google Alerts ソース |
+| `video` | 動画（YouTube 等） | 将来追加予定 |
+| `alerts` | Google Alerts（discovery feed） | Google Alerts 系 |
+| `paper` | 論文・プレプリント導線 | arXiv 系 |
 
 ### 4.2 `articles_raw`
 
@@ -133,15 +140,16 @@
 1. `domain`
 2. `fetch_policy`
 3. `summary_policy`
-4. `observed_article_count`
-5. `latest_article_url`
-6. `first_seen_at`
-7. `last_seen_at`
-8. `notes`
+4. `commercial_use_policy`
+5. `observed_article_count`
+6. `latest_article_url`
+7. `first_seen_at`
+8. `last_seen_at`
+9. `notes`
 
 ### 4.4 `articles_raw_history`
 
-1. `articles_raw` と同等カラムを持ち、`archived_at` を追加する
+`articles_raw` と同等カラムに `archived_at` を加える。
 
 ### 4.5 `tags_master`
 
@@ -154,11 +162,15 @@
 5. `article_count`
 6. `last_seen_at`
 
-### 4.6 `tag_aliases`
+### 4.6 `tag_keywords`
 
-1. 同義語や表記揺れを `tags_master` に束ねる
+既存タグへ寄せる keyword を保持する。
 
-### 4.7 `tag_candidate_pool`
+### 4.7 `tag_aliases`
+
+同義語や表記揺れを `tags_master` に束ねる。
+
+### 4.8 `tag_candidate_pool`
 
 主な列:
 
@@ -170,43 +182,45 @@
 6. `latest_trends_score`
 7. `promoted_tag_id`
 
-### 4.8 `articles_enriched`
+### 4.9 `articles_enriched`
 
 主な列:
 
 1. `raw_article_id`
 2. `source_target_id`
-3. `source_category` ← migration 024 追加。`source_targets.source_category` を enrich 時にコピー（llm / agent / voice / policy / safety / search / news）
-4. `source_type` ← migration 026 追加。`source_targets.source_type` を enrich 時にコピー（official / blog / news / video / alerts）
-5. `content_language` ← migration 035 追加。`source_targets.content_language` を enrich 時にコピー（初期値は `ja` / `en`）
-6. `normalized_url`
-7. `cited_url`
-8. `canonical_url`
-9. `title`
-10. `thumbnail_url`
-11. `thumbnail_bg_theme` ← migration 038 追加。隣接分野タグから決定
-12. `summary_100`
-13. `summary_200`
-14. `summary_basis`
-15. `content_path`
-16. `is_provisional`
-17. `provisional_reason`
-18. `dedupe_status`
-19. `dedupe_group_key`
-20. `publish_candidate`
-21. `publication_basis`
-22. `publication_text`
-23. `summary_input_basis`
-24. `score`（0〜100 整数。コンテンツ品質スコア。ランキング initial value に使う）
-25. `score_reason`
-26. `ai_processing_state`
-27. `source_updated_at`
-28. `topic_group_id` ← migration 035 追加。将来の Topic Group 用受け口。初期は `NULL`
-29. `processed_at`
+3. `source_category`
+4. `source_type`
+5. `content_language`
+6. `commercial_use_policy`
+7. `normalized_url`
+8. `cited_url`
+9. `canonical_url`
+10. `title`
+11. `thumbnail_url`
+12. `thumbnail_bg_theme`
+13. `summary_100`
+14. `summary_200`
+15. `summary_basis`
+16. `summary_embedding`
+17. `content_path`
+18. `is_provisional`
+19. `provisional_reason`
+20. `dedupe_status`
+21. `dedupe_group_key`
+22. `publish_candidate`
+23. `publication_basis`
+24. `publication_text`
+25. `summary_input_basis`
+26. `score`
+27. `score_reason`
+28. `ai_processing_state`
+29. `source_updated_at`
+30. `topic_group_id`
+31. `processed_at`
 
-#### `source_category` の値定義（このプロジェクト固有）
+#### `source_category` の値定義
 
-このプロジェクトの `source_category` は **トピック分類**であり、dim2_memo の display-layout 分類（news/paper/community 等）とは別軸。
+このプロジェクトの `source_category` はトピック分類であり、表示分類とは別軸。
 
 | 値 | 対象ソース例 |
 |---|---|
@@ -218,23 +232,11 @@
 | `search` | Google Alerts: RAG |
 | `news` | 一般 AI ニュース系 |
 
-表示レイアウト（カード型 / リスト型）の分岐は `content_access_policy` + `summary_input_basis` から導出する。
-
-#### 表示分類との関係
-
-Web の表示分類（例: `news / community / paper / overseas / oss`）を扱いたい場合でも、  
-`source_category` をその用途へ上書きしてはならない。
-
-理由:
-
-1. `source_category` は topic filter の基盤
-2. 表示分類は `source_type`、タグ、ソース固有 metadata を組み合わせた **L4 派生概念**だから
-
-必要なら `public_articles` の API 層または view 層で `display_category` 相当を派生させる。
+表示分類は `source_type`、タグ、ソース固有 metadata を組み合わせた L4 派生概念として扱う。
 
 #### `score` の計算方式
 
-```
+```text
 base:        content_path=full → 70 / snippet → 45
 加算:        matchedTagCount × 8
 加算:        summarySource が manual_pending 以外 → +6
@@ -245,14 +247,19 @@ base:        content_path=full → 70 / snippet → 45
 #### `content_language` の扱い
 
 1. SSOT は `source_targets.content_language`
-2. migration 035 で既存ソースを `ja` / `en` に backfill 済み
-3. enrich で `articles_enriched.content_language` へコピーする
-4. publish で `public_articles.content_language` へコピーする
-5. 公開面では言語バッジ表示や件数集計に使うが、現時点で言語フィルタ UI は未実装
+2. enrich で `articles_enriched.content_language` にコピーする
+3. publish で `public_articles.content_language` にコピーする
+4. 公開面では言語バッジ表示や件数集計に使う
 
-### 4.8.1 `topic_groups`
+#### `commercial_use_policy` の扱い
 
-migration 035 で先行追加した将来用テーブル。現時点では Topic Group 本実装前の受け口に留める。
+1. `source_targets` と `observed_article_domains` の最厳値を `articles_enriched` に保存する
+2. `prohibited` でも enrich データは保持する
+3. publish では `prohibited` を公開しない
+
+### 4.10 `topic_groups`
+
+将来の Topic Group 実装用の受け口。
 
 主な列:
 
@@ -262,28 +269,31 @@ migration 035 で先行追加した将来用テーブル。現時点では Topic
 
 運用方針:
 
-1. `articles_enriched.topic_group_id` / `public_articles.topic_group_id` は初期は `NULL`
-2. embedding 生成・類似度判定・グループ化バッチを入れるまでは公開 UI で使わない
-3. Topic Group 本実装は pgvector ベースの別フェーズで行う
+1. `articles_enriched.topic_group_id` / `public_articles.topic_group_id` は当面 `NULL`
+2. embedding 生成・類似度判定・グループ化 batch が揃うまで公開 UI では使わない
 
-### 4.9 `articles_enriched_history`
+### 4.11 `articles_enriched_history`
 
-1. `articles_enriched` 更新時の旧版保管
+`articles_enriched` 更新時の旧版保管。`commercial_use_policy` も含めて保持する。
 
-### 4.10 `articles_enriched_tags`
+### 4.12 `articles_enriched_sources`
+
+L2 の source provenance を保持する。`selected / supporting / rejected` を記録する。
+
+### 4.13 `articles_enriched_tags`
 
 1. `enriched_article_id`
 2. `tag_id`
 3. `tag_source`
 4. `is_primary`
 
-### 4.10.1 `articles_enriched_adjacent_tags`
+### 4.14 `articles_enriched_adjacent_tags`
 
 1. `enriched_article_id`
 2. `adjacent_tag_id`
-3. `sort_order`（0〜1 を想定）
+3. `sort_order`
 
-### 4.10.2 `adjacent_tags_master`
+### 4.15 `adjacent_tags_master`
 
 1. `tag_key`
 2. `display_name`
@@ -292,108 +302,121 @@ migration 035 で先行追加した将来用テーブル。現時点では Topic
 5. `is_active`
 6. `article_count`
 
-### 4.10.3 `adjacent_tag_keywords`
+### 4.16 `adjacent_tag_keywords`
 
 1. `adjacent_tag_id`
 2. `keyword`
 3. `is_case_sensitive`
 
-### 4.11 `activity_logs`
+### 4.17 `activity_logs`
 
-1. ウェブサイトの行動明細
+ウェブサイトの行動明細。
 
-### 4.12 `activity_metrics_hourly`
+### 4.18 `activity_metrics_hourly`
 
-1. 毎時ランキング計算の集計ソース
+毎時ランキング計算の集計ソース。
 
-### 4.13 `admin_operation_logs`
+### 4.19 `admin_operation_logs`
 
-1. 運営操作の監査ログ
+運営操作の監査ログ。
 
-### 4.14 `priority_processing_queue`
+### 4.20 `priority_processing_queue`
 
-1. 即時運営操作の反映
+優先処理用の内部キュー。即時運営操作の拡張用途に予約する。
 
-### 4.15 `public_articles`
+### 4.21 `public_articles`
 
-サイトが読む公開記事本体。`hourly-publish` ジョブが `articles_enriched` から転送して upsert する。
+サイトが読む公開記事本体。`hourly-publish` が `articles_enriched` から転送して upsert する。
 
-主な列（migration 025 / 027 / 031 / 035 追加分を含む）:
+主な列:
 
-1. `enriched_article_id` ← `articles_enriched` への FK
+1. `enriched_article_id`
 2. `primary_source_target_id`
-3. `public_key`（スラッグ等の公開 ID）
+3. `public_key`
 4. `canonical_url`
 5. `display_title`
 6. `display_summary_100`
 7. `display_summary_200`
-8. `thumbnail_url`（OGP 画像。NULL 許容。シェア時は `/api/og` で動的生成）
-9. `visibility_status`（published / hidden / suppressed）
+8. `thumbnail_url`
+9. `visibility_status`
 10. `original_published_at`
-11. `source_category` ← migration 025 追加。トピック分類（llm / agent 等）
-12. `source_type` ← migration 026 追加。ソース種別（official / blog / news / video / alerts）
-13. `content_language` ← migration 035 追加。`articles_enriched.content_language` を publish 時にコピー（`ja` / `en`）
-14. `summary_input_basis` ← migration 025 追加。Web 表示ラベル分岐に使う
-15. `publication_basis` ← migration 025 追加。full_summary / source_snippet
-16. `content_score` ← migration 025 追加。`articles_enriched.score` を転写（0〜100）
-17. `thumbnail_emoji` ← migration 031 追加。`thumbnail_url` が空の間の暫定カード表示用
-18. `thumbnail_bg_theme` ← migration 038 追加。`articles_enriched.thumbnail_bg_theme` を publish 時にコピー
-19. `critique` ← migration 027 追加。批評テキスト（将来実装。初期は NULL）
-20. `topic_group_id` ← migration 035 追加。将来の Topic Group 用受け口。初期は `NULL`
+11. `source_category`
+12. `source_type`
+13. `content_language`
+14. `summary_input_basis`
+15. `publication_basis`
+16. `content_score`
+17. `thumbnail_emoji`
+18. `thumbnail_bg_theme`
+19. `critique`
+20. `topic_group_id`
 21. `public_refreshed_at`
 
 #### スコアの役割分担
 
 | カラム | 用途 |
 |---|---|
-| `articles_enriched.score` | コンテンツ品質スコア（0〜100）。enrich 時に計算 |
-| `public_articles.content_score` | 同上を Layer 4 に転写。初期ランキング・一覧ソートに使う |
-| `public_rankings.score` | アクティビティ込みの最終ランキングスコア（将来実装） |
+| `articles_enriched.score` | コンテンツ品質スコア |
+| `public_articles.content_score` | L4 に転写した一覧・初期ランキング用スコア |
+| `public_rankings.score` | アクティビティ込みの最終ランキングスコア |
 
 #### thumbnail の方針
 
-- `thumbnail_url` は内部テンプレートの `/api/thumb` を返す運用へ移行済み
-- `thumbnail_bg_theme` は隣接分野タグ（最大2件）から決定する
-- **表示用**: source_type / source_category / tags + `thumbnail_bg_theme` を使った内部テンプレート合成
-- **シェア用（OGP）**: `/api/og?id=xxx` エンドポイントで動的生成
-- 元記事の `<meta og:image>` は必須ではない
+- `thumbnail_url` は内部テンプレートの `/api/thumb` を返す
+- `thumbnail_bg_theme` は隣接分野タグから決定する
+- 表示用は `source_type` / `source_category` / tags と背景テーマを使った内部テンプレート合成
+- シェア用は `/api/og` で動的生成する
 - アイコン未整備やテンプレ解決不可の記事では `thumbnail_emoji` をフォールバックに使う
 
 #### L4 API で持つべき補助軸
 
-公開面は少なくとも次の 3 軸を分けて扱う。
-
 1. topic filter: `source_category`
 2. source lane: `source_type`
-3. trend/entity filter: tags（`public_article_tags`）
+3. trend/entity filter: tags
 
-この 3 軸を混ぜて 1 個の `category` パラメータへ押し込まない。
+この 3 軸を 1 つの `category` パラメータへ混ぜない。
 
-#### source_type=paper のタグ方針
+#### `source_type=paper` のタグ方針
 
-`source_type='paper'` の記事は、当面 `paper` タグだけを付ける。
+当面は `paper` タグだけを付ける。
 
 理由:
 
 1. 論文本文は一般語やモデル名の誤ヒットが多い
 2. キーワード由来の企業・製品タグがノイズになりやすい
-3. まずは「論文であること」だけを安定して表現する方を優先する
+3. まずは「論文であること」を安定して表現する方を優先する
 
-### 4.16 `public_article_sources`
+### 4.22 `public_article_sources`
 
-1. 公開記事と関連ソースの紐付け
+公開記事と関連ソースの紐付け。`source_key` / `source_display_name` / `selection_status` の snapshot も保持する。
 
-### 4.17 `public_article_tags`
+### 4.23 `public_article_tags`
 
-1. 公開記事と表示タグの紐付け
+公開記事と表示タグの紐付け。
 
-### 4.17.1 `public_article_adjacent_tags`
+### 4.24 `public_article_adjacent_tags`
 
-1. 公開記事と隣接分野タグの紐付け
+公開記事と隣接分野タグの紐付け。
 
-### 4.18 `public_rankings`
+### 4.25 `public_rankings`
 
-1. 各時間窓の公開順位
+各時間窓の公開順位。
+
+### 4.26 `public_articles_history`
+
+`public_articles` の公開スナップショット履歴。
+
+主な追加列:
+
+1. `public_article_history_id`
+2. `archive_reason`
+3. `archived_at`
+
+保持方針:
+
+1. `public_articles` の主要列をほぼそのまま保持する
+2. `content_language` / `topic_group_id` も保持する
+3. 初期の `archive_reason` は `age_out`
 
 ## 5. 確定重複と類似重複
 
@@ -442,9 +465,13 @@ migration 035 で先行追加した将来用テーブル。現時点では Topic
    - 1 年保持を初期方針とする
 3. `articles_enriched_history`
    - 版追跡のため保持
-4. `activity_logs`
+4. `public_articles`
+   - 半年以内の公開集合を維持し、月次で `public_articles_history` に退避する
+5. `arxiv-ai`
+   - L4 では 2 か月保持上限の例外運用とする
+6. `activity_logs`
    - 長期保持可
-5. `digest_logs`
+7. `digest_logs`
    - 再送制御と監査のため保持
 
 ## 9. layer3 / layer4 に受け渡す最低項目
@@ -462,87 +489,4 @@ migration 035 で先行追加した将来用テーブル。現時点では Topic
 2. タグ追加だけ、必要なら人手レビューを挟めるようにする
 3. `layer4` はサイト表示専用の安定層として扱う
 4. 公開面は `layer2` を直接参照しない
-
-## 11. 2026-03-19 additions
-
-1. `articles_enriched.summary_embedding`
-   - `vector(1536)`
-   - generated from `title + summary`
-   - used for initial semantic duplicate detection
-2. `articles_enriched_sources`
-   - keeps `selected / supporting / rejected` source provenance for L2
-3. `public_article_sources.source_key / source_display_name / selection_status`
-   - keeps L4 source-name snapshots even when source master labels change later
-
-## 12. 2026-03-20 additions
-
-### 12.1 commercial_use_policy（migration 034）
-
-ToS 調査結果を永続化し、商用利用可否をレイヤーをまたいで管理する仕組みを追加。
-
-1. `source_targets.commercial_use_policy`
-   - `'permitted' | 'prohibited' | 'unknown'`、DEFAULT `'permitted'`
-   - ソース単位の商用利用可否。新規ソース追加時に必ず設定する
-
-2. `observed_article_domains.commercial_use_policy`
-   - `'permitted' | 'prohibited' | 'unknown'`、DEFAULT `'unknown'`
-   - ドメイン単位の商用利用可否。ToS 調査結果を蓄積する台帳
-   - 2026-03-20 初期投入: prohibited 6件（itmedia/techcrunch/nikkei系/qiita）、permitted 6件
-
-3. `articles_enriched.commercial_use_policy`
-   - `'permitted' | 'prohibited' | 'unknown'`、DEFAULT `'permitted'`
-   - enrich 時に `source_targets` + `observed_article_domains` の最厳値を保存
-   - **prohibited でも enrich データは保持する**（非商用利用への流用を残すため）
-
-4. `articles_enriched_history.commercial_use_policy`
-   - 上記と同じ型・用途。履歴テーブルへの伝播分
-
-#### フィルタリングポイント
-
-- enrich: 常に実行（フィルタなし）。`commercial_use_policy` を記録するのみ
-- publish（`hourly-publish`）: `COALESCE(ae.commercial_use_policy, 'permitted') != 'prohibited'` の記事のみ公開
-
-#### 恒久ルール
-
-- 広告掲載・課金・収益化を行う場合は「商用利用」に該当する（費用回収目的も含む）
-- 新規ソース追加・収益化機能追加時は必ず ToS 再確認し `observed_article_domains` を更新する
-- 詳細は `docs/guide/PROJECT.md` の「商用利用と ToS の恒久ルール」セクションを参照
-
-### 12.2 `public_articles` の公開件数
-
-- `hourly-publish` の bulk upsert 化（unnest ベース）により L4 に 2371 件が公開済み（2026-03-20）
-- `hourly-publish` は 200 件チャンクで処理し、失敗時は 10 件→1 件のフォールバック構成
-## 13. 2026-03-21 additions
-
-### 13.1 `public_articles_history`
-
-1. migration 036 で追加された、`public_articles` の公開スナップショット履歴テーブル
-2. `public_articles` の主要列をほぼそのまま保持する
-3. 主な追加カラム:
-   - `public_article_history_id`
-   - `archive_reason`
-   - `archived_at`
-4. migration 036 時点で `content_language` / `topic_group_id` も履歴側へ保持する
-5. 初期の archive reason は `age_out`
-6. `public_articles` から月次 age-out された行を退避する
-
-### 13.2 monthly public archive
-
-1. 毎月 1 回、`COALESCE(public_articles.original_published_at, public_articles.created_at) < now() - interval '6 months'` の行を archive 対象とする
-2. 対象行を `public_articles_history` に INSERT してから `public_articles` から DELETE する
-3. `public_article_sources` / `public_article_tags` / `public_rankings` は `public_articles` 削除時の cascade で整理する
-4. 目的:
-   - 公開集合を半年以内へ保つ
-   - `compute-ranks` と公開 query の母集団を自然に減らす
-   - 半年超の記事は履歴としてのみ保持する
-5. `monthly-public-archive` ジョブは `job_runs` にも記録し、`/admin/jobs` で監査できる
-
-## 14. 2026-03-26 additions
-
-### 14.1 adjacent tags and thumbnail background theme（migration 038）
-
-1. `adjacent_tags_master` / `adjacent_tag_keywords` を追加
-2. `articles_enriched_adjacent_tags` / `public_article_adjacent_tags` を追加
-3. `articles_enriched.thumbnail_bg_theme` / `public_articles.thumbnail_bg_theme` を追加
-4. enrich 時に `title + summary_200` から隣接分野タグを 1〜2 件抽出し、背景テーマを決定する
-5. publish 時に L2 の隣接タグと背景テーマを L4 へ同期する
+5. `commercial_use_policy='prohibited'` は publish 対象外とする

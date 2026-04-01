@@ -1,15 +1,15 @@
-name: hourly-fetch
+name: monthly-public-archive
 
 on:
   schedule:
-    - cron: '0 * * * *'   # 毎時 :00 に hourly-fetch を起動
+    - cron: '0 3 1 * *'   # 毎月 1 日 03:00 UTC
   workflow_dispatch:
 
 jobs:
-  hourly-fetch:
+  monthly-public-archive:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Layer 1 fetch job
+      - name: Run monthly public archive job
         env:
           APP_URL: ${{ secrets.APP_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
@@ -17,4 +17,4 @@ jobs:
           curl --fail --show-error --silent \
             -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
-            "${APP_URL}/api/cron/hourly-fetch?limit=20"
+            "${APP_URL}/api/cron/monthly-public-archive"

@@ -1,6 +1,6 @@
 # 収集・要約・公開パイプライン仕様（v4）
 
-最終更新: 2026-03-15
+最終更新: 2026-04-02
 
 ## 1. フロー全体
 
@@ -77,15 +77,17 @@
 
 1. AI がタグ候補を出す
 2. `tags_master` と `tag_aliases` に照合する
-3. 一致したものだけを標準タグとして付ける
-4. 一致しなかったものは `tag_candidate_pool` に蓄積する
+3. `matchedTagKeys` は既存主タグとして `articles_enriched_tags` に保存する
+4. `properNounTags` のうち未採用候補は `tag_candidate_pool` に蓄積する
+5. `summaryInputBasis=full_content` のときだけ `canonicalTagHints` を使って `tag_aliases` / `tag_keywords` へ高信頼寄せを行う
+6. `title + summary_200` から隣接分野タグを抽出し、`articles_enriched_adjacent_tags` と `thumbnail_bg_theme` を更新する
 
-### 6.2 日次昇格
+### 6.2 日次統合
 
-1. `tag_candidate_pool` の件数を集計する
-2. P0 は高閾値（`seen_count >= 8` 目安）を超えた候補だけ Google Trends と照合する
-3. Trends と一致した候補は `tags_master` に追加する
-4. 追加済みタグを持つ既存記事は、次の毎時バッチで再タグ付けする
+1. `daily-tag-dedup` が `tag_candidate_pool` と既存タグを照合する
+2. AI とルールベースで alias / keyword / 保留を判定する
+3. 必要に応じて `tag_aliases` / `tag_keywords` を更新する
+4. 昇格済みタグや統合結果は retag / publish で反映する
 
 ### 6.3 手動レビュー
 
@@ -124,7 +126,7 @@
 3. URL 正規化を行う
 4. `articles_raw` に投入する
 
-### 9.2 日次: 整形
+### 9.2 毎時: 整形
 
 1. `articles_raw` から未処理データを取る
 2. まず `source_targets.content_access_policy` を判定する
@@ -140,42 +142,48 @@
    - 未判定 domain は `provisional_reason=domain_needs_review`
 11. 要約 100 / 200 を生成する
    - provider 順は `Gemini(primary) -> Gemini(secondary) -> OpenAI gpt-5-mini`
-   - 両 provider が失敗した行は `template fallback` を使わず `manual_pending` に回す
-   - `manual_pending` 行は `hold` のまま DB に保持し、手動 import 用 JSON を出力する
-10. タグ候補抽出とタグ照合を行う
-11. 確定重複判定を行う
-10. `articles_enriched` と `articles_enriched_tags` に保存する
-12. `source_snippet` 行は snippet を要約した結果を公開面に使う
-13. `hold` 行だけ `publish_candidate=false` にする
-12. `tag_candidate_pool` を更新する
-13. `articles_raw.is_processed = true` を更新する
+   - 両 provider が失敗した行は `manual_pending` に回す
+   - `manual_pending` 行は `hold` のまま DB に保持し、手動 import 用 JSON を `artifacts/manual-pending/` へ出力する
+12. AI は `properNounTags` と `matchedTagKeys` を返す
+13. `summaryInputBasis=full_content` のときだけ `canonicalTagHints` を返し、既存タグへの alias / keyword 寄せに使う
+14. `title + summary_200` から隣接分野タグを抽出し、`thumbnail_bg_theme` を決定する
+15. タグ候補抽出とタグ照合を行う
+16. 確定重複判定を行う
+17. `articles_enriched`、`articles_enriched_tags`、`articles_enriched_adjacent_tags` に保存する
+18. `source_snippet` 行は snippet を要約した結果を公開面に使う
+19. `hold` 行だけ `publish_candidate=false` にする
+20. `tag_candidate_pool` を更新する
+21. `articles_raw.is_processed = true` を更新する
 
 ### 9.3 毎時: 公開反映
 
 1. `articles_enriched` から公開候補を抽出する
 2. `source_priority_rules` で代表ソースを決める
-3. `public_articles` / `public_article_sources` / `public_article_tags` を更新する
-4. `activity_metrics_hourly` を使って `public_rankings` を更新する
-5. `priority_processing_queue` があれば先に反映する
+3. `commercial_use_policy='prohibited'` は publish 対象外にする
+4. `public_articles` / `public_article_sources` / `public_article_tags` / `public_article_adjacent_tags` を更新する
+5. `public_articles` には `content_language`、`thumbnail_bg_theme`、`thumbnail_emoji` も転写する
+6. publish 後段で `hourly-compute-ranks` が `public_rankings` を更新する
+7. `priority_processing_queue` は将来拡張用で、現時点では必須経路に入れない
 
-### 9.4 日次: タグ候補集計
+### 9.4 日次: タグ候補統合
 
-1. 一定件数超の候補を抽出する
-2. Google Trends と照合する
-3. 一致候補を `tags_master` に昇格させる
-4. 次回毎時バッチで再タグ付け対象に入れる
+1. `daily-tag-dedup` が `tag_candidate_pool` と既存タグを照合する
+2. AI とルールベースで alias / keyword / 保留を判定する
+3. 必要に応じて `tag_aliases` / `tag_keywords` を更新する
+4. 昇格済みタグや統合結果は次回の retag / publish で反映する
 
-### 9.5 週次: アーカイブ
+### 9.5 月次: 公開アーカイブ
 
-1. `articles_raw` の 1 か月超データを `articles_raw_history` へ移す
-2. 古い補助データを整理する
+1. `public_articles` の半年超データを `public_articles_history` へ移す
+2. `public_article_tags` / `public_article_sources` / `public_rankings` は cascade で整理する
+3. `arxiv-ai` は例外として L4 で 2 か月保持上限にする
 
 ## 10. 失敗時ハンドリング
 
 1. 抽出失敗:
    - `snippet` ベースで継続する
 2. AI 失敗:
-   - 記事単位で再試行し、上限超過後はスキップする
+   - provider fallback と batch 分割を試し、それでも失敗したものは `manual_pending` に回す
 3. 永続化失敗:
    - `last_error` に記録し、他記事は継続する
 4. 公開反映失敗:

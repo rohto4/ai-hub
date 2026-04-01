@@ -1,6 +1,8 @@
 name: hourly-enrich
 
 on:
+  schedule:
+    - cron: '5,10,15,20,25,30,35,40 * * * *'   # 毎時 :05〜:40 の 8 回
   workflow_dispatch:
 
 jobs:

@@ -152,13 +152,12 @@
 3. 一致したタグだけ `articles_enriched_tags` に保存する
 4. 一致しない候補は `tag_candidate_pool` に蓄積する
 
-### 8.2 日次昇格
+### 8.2 日次統合
 
-1. `seen_count` が一定以上の候補を抽出する
-2. Google Trends と照合する
-3. 一致した候補を `tags_master` に追加する
-4. 必要なら `tag_aliases` も追加する
-5. 次の毎時バッチで再タグ付け対象に入れる
+1. `daily-tag-dedup` が候補と既存タグを照合する
+2. alias / keyword / 保留を判定する
+3. 必要なら `tag_aliases` / `tag_keywords` を追加する
+4. 統合結果は次回の retag / publish で反映する
 
 ### 8.3 手動レビュー
 
@@ -175,14 +174,15 @@
 2. URL 正規化
 3. `articles_raw` へ投入
 
-### 9.2 Daily enrich
+### 9.2 Hourly enrich
 
 1. 未処理 raw 回収
 2. `full` / `snippet` 判定
 3. 要約生成
-4. タグ照合
-5. 確定重複判定
-6. `articles_enriched` 保存
+4. 主タグ照合 + 候補蓄積
+5. 隣接分野タグ + `thumbnail_bg_theme` 付与
+6. 確定重複判定
+7. `articles_enriched` 保存
 
 ### 9.3 Hourly publish
 

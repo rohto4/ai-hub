@@ -1,6 +1,8 @@
 name: hourly-publish
 
 on:
+  schedule:
+    - cron: '50 * * * *'   # 毎時 :50 に publish + ranks を起動
   workflow_dispatch:
 
 jobs:
