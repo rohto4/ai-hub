@@ -1,6 +1,6 @@
 # Agents Task Status
 
-最終更新: 2026-04-02
+最終更新: 2026-04-03
 
 運用ルール:
 - 最新 50 件を目安に残し、古い行は下から削る
@@ -9,6 +9,12 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-04-03 | done | `/admin/enrich-queue` に 8 サイクル実行を追加 | `runHourlyLayer12(maxEnrichBatches=8)` を admin API に接続し、即時実行ボタンから押せるようにした
+- 2026-04-03 | done | `/admin/enrich-queue` を追加 | backlog/ジョブ状態/推奨フォロー/即時実行を 1 画面化、admin API で refresh と簡易ジョブ実行に対応、type-check 通過
+- 2026-04-03 | done | 旧 Gemini enrich artifact の反映状況を照合 | `1500` 出力中 `1489` 件は現 `articles_enriched` に残存、欠落 `11` 件は `articles_enriched_history` に存在すると確認
+- 2026-04-03 | done | enrich 行列解消の一時タスク盤を追加 | `db:check-layer12` で backlog=1325 を確認、Gemini CLI/旧artifact を棚卸しし、`docs/imp/enrich-queue-taskboard.md` で実行順と残論点を管理開始
+- 2026-04-02 | done | タグ専用フロー節の準備を docs に追加 | `implementation-plan.md` に `flowchart.md` 追加手順を記載、`implementation-wait.md` にユーザー確定事項を分離、`imp-status.md` に反映
+- 2026-04-02 | done | 初回読込ガイドから checklist 参照を削除 | `docs/handoff-next-prompt.md` と `docs/memo/memo.txt` の廃止ファイル参照を整理、主タグ/周辺分野タグは分離基盤導入後の公開導線評価フェーズと確認
 - 2026-04-02 | done | Mercari Engineering Blog を source 追加 | seed.mjs に id:055 を追加、RSS疎通確認(100件insert)、PROJECT.md/batch-ops.md を更新、db:run-hourly-fetch を package.json に登録
 - 2026-04-02 | done | GitHub Actions schedule を全 workflow に追加・復旧 | hourly-fetch/:00, hourly-enrich/8回, hourly-publish/:50, daily-tag-dedup/02:30, daily-db-backup/18:15, monthly-public-archive(新規)/毎月1日
 - 2026-04-02 | done | docs 整理・バッチ運用資料を整備 | guide-backup/mock/init/dim2_memo 削除、batch-ops.md 新規、batch-reforme-spec.md を imp/ に移動、refactoring-plan.md 削除、run-hourly-compute-ranks CLI 追加

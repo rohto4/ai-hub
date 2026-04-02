@@ -21,6 +21,10 @@ export default function AdminDashboard() {
           <h2 className="text-white font-semibold text-lg mb-1">ジョブログ</h2>
           <p className="text-gray-400 text-sm">hourly-fetch / enrich-worker / hourly-publish / hourly-compute-ranks の実行履歴と失敗ログ</p>
         </Link>
+        <Link href="/admin/enrich-queue" className="block p-6 bg-gray-900 rounded-lg hover:bg-gray-800 border border-gray-800">
+          <h2 className="text-white font-semibold text-lg mb-1">Enrich Ops</h2>
+          <p className="text-gray-400 text-sm">backlog、推奨フォロープラン、即時実行を 1 画面で確認</p>
+        </Link>
       </div>
     </div>
   )

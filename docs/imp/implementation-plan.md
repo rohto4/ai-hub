@@ -27,6 +27,7 @@
 4. 実装した Web を見ながらカテゴリ配置とタグ導線を評価する
 5. タグ参照 SQL を使って、新規立項タグ候補の次ラウンド判断を進める
 6. enrich 本線と CLI import 線の副作用差を減らす
+7. enrich backlog の解消手順を `docs/imp/enrich-queue-taskboard.md` で管理し、通常 enrich と CLI 追いつき線の使い分けを詰める
 
 ## 3. 現在の固定方針
 
@@ -102,6 +103,38 @@
 2. `hourly-fetch` の source 単位 backoff 制御を導入する
 3. `cron-health-check` の要否を判断する
 4. `weekly-archive` の要否を判断する
+
+## 4.1 `flowchart.md` にタグ専用フロー節を追加する道筋
+
+目的:
+- タグ関連テーブル、候補蓄積、昇格、retag、publish、自動反映の全体像を `docs/imp/flowchart.md` の 1 節で再読できるようにする
+- 新しい設計書は増やさず、必要時にこの節を参照すれば現在の構成が追える状態を作る
+
+進め方:
+1. 対象範囲を固定する
+   - 主タグ系: `tags_master` / `tag_keywords` / `tag_aliases` / `tag_candidate_pool`
+   - 周辺分野タグ系: `adjacent_tags_master` / `adjacent_tag_keywords`
+   - 自動反映: enrich / `daily-tag-dedup` / retag / publish
+2. まず現行コード基準で「本線 enrich」と「CLI import 線」の副作用差を洗い出す
+3. `flowchart.md` にタグ専用の章を追加し、少なくとも以下を分けて図示する
+   - 辞書テーブル
+   - 候補蓄積と review / promote
+   - L2 付与
+   - L4 同期
+   - 例外経路と未一致経路
+4. 図を見ながら、公開導線で重要な区別だけを残して粒度を調整する
+5. 今後の作業でタグ周りを触る前提資料として使い、差分が出たら同じターンで更新する
+
+この作業で確認したいこと:
+1. 主タグと周辺分野タグをどこまで別章で分けるか
+2. `tag_candidate_pool` と `daily-tag-dedup` を運用フローとしてどこまで図に出すか
+3. `paper` 系の将来分岐を「将来ノード」として先置きするか、現行図からは外すか
+
+完了条件:
+1. `docs/imp/flowchart.md` にタグ専用節が追加されている
+2. 実装済みの主タグ / 周辺分野タグ / 自動反映の関係を、図だけで追える
+3. 本線 enrich と CLI import 線の差が、少なくとも注記で読める
+4. 必要なユーザー判断は `implementation-wait.md` に分離されている
 
 ## 5. 後回しでよいもの
 
