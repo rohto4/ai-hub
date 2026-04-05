@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import {
+  getAdminPagePath,
+  isHiddenInternalAdminPath,
+  toInternalAdminApiPath,
+  toInternalAdminPagePath,
+} from '@/lib/admin-path'
 
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1'])
 
@@ -29,17 +35,32 @@ function checkAdminAuth(request: NextRequest): boolean {
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // admin UI の保護: /admin/* は ADMIN_SECRET cookie が必要
-  if (pathname.startsWith('/admin')) {
-    if (pathname === '/admin/login') {
-      return NextResponse.next()
+  if (isHiddenInternalAdminPath(pathname)) {
+    return new NextResponse('Not Found', { status: 404 })
+  }
+
+  const internalAdminApiPath = toInternalAdminApiPath(pathname)
+  if (internalAdminApiPath) {
+    const url = request.nextUrl.clone()
+    url.pathname = internalAdminApiPath
+    return NextResponse.rewrite(url)
+  }
+
+  const internalAdminPagePath = toInternalAdminPagePath(pathname)
+  if (internalAdminPagePath) {
+    if (internalAdminPagePath === '/admin/login') {
+      const url = request.nextUrl.clone()
+      url.pathname = internalAdminPagePath
+      return NextResponse.rewrite(url)
     }
     if (!checkAdminAuth(request)) {
-      const loginUrl = new URL('/admin/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
+      const loginUrl = new URL(getAdminPagePath('/login'), request.url)
+      loginUrl.searchParams.set('redirect', `${pathname}${request.nextUrl.search}`)
       return NextResponse.redirect(loginUrl)
     }
-    return NextResponse.next()
+    const url = request.nextUrl.clone()
+    url.pathname = internalAdminPagePath
+    return NextResponse.rewrite(url)
   }
 
   const lockdownEnabled = process.env.LOCKDOWN_PROD_SITE === 'true'

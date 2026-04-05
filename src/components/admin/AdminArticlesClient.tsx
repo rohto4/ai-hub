@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { getAdminApiPath } from '@/lib/admin-path'
 
 export type AdminArticleRow = {
   id: string
@@ -23,7 +24,7 @@ export function AdminArticlesClient({ initialArticles }: { initialArticles: Admi
     const action = article.visibility_status === 'published' ? 'hide' : 'unhide'
     setLoading(article.id)
     try {
-      const res = await fetch(`/api/admin/articles/${article.id}`, {
+      const res = await fetch(getAdminApiPath(`/articles/${article.id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getAdminPagePath, isSafeAdminRedirectPath } from '@/lib/admin-path'
 
 export const runtime = 'nodejs'
 
@@ -11,7 +12,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'invalid secret' }, { status: 401 })
   }
 
-  const redirectTo = body.redirect ?? '/admin'
+  const requestedRedirect = body.redirect ?? getAdminPagePath()
+  const redirectTo = isSafeAdminRedirectPath(requestedRedirect) ? requestedRedirect : getAdminPagePath()
   const response = NextResponse.json({ success: true, redirect: redirectTo })
   response.cookies.set('admin_session', adminSecret, {
     httpOnly: true,

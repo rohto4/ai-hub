@@ -1,5 +1,7 @@
 import type { UiArticle } from '@/components/home/home-state-shared'
+import { ArticleTagGroups } from '@/components/shared/ArticleTagGroups'
 import { ArticleThumbnail } from '@/components/shared/ArticleThumbnail'
+import { getArticleCategoryLabel } from '@/lib/site/navigation'
 
 export function SummaryModal({
   article,
@@ -10,6 +12,11 @@ export function SummaryModal({
   onClose: () => void
   onOpenArticle: (articleId: string) => void
 }) {
+  const categoryLabel = getArticleCategoryLabel({
+    sourceType: article.source_type,
+    sourceCategory: article.sourceCategory,
+  })
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4" onClick={onClose}>
       <div
@@ -44,10 +51,11 @@ export function SummaryModal({
             />
             <div className="min-w-0 flex-1 pr-6">
               <div className="mb-1.5 flex flex-wrap gap-1.5 text-[10px]">
-                <span className="rounded-full bg-[#dbeafe] px-2 py-0.5 font-bold text-[#1d4ed8]">{article.source_type}</span>
-                <span className="rounded-full bg-[#f6f0ea] px-2 py-0.5 font-bold text-accent-darker">
-                  {article.sourceCategory}
-                </span>
+                {categoryLabel ? (
+                  <span className="rounded-full bg-[#f6f0ea] px-2 py-0.5 font-bold text-accent-darker">
+                    {categoryLabel}
+                  </span>
+                ) : null}
                 <span className="text-muted">{article.published_at.toLocaleDateString('ja-JP')}</span>
               </div>
               <h3 className="text-[15px] font-extrabold leading-tight">{article.title}</h3>
@@ -57,6 +65,13 @@ export function SummaryModal({
           <p className="mt-4 text-[13px] leading-[1.8] text-[#4f5969]">
             {article.summary_200 ?? article.summary_100 ?? '要約は準備中です。'}
           </p>
+
+          <ArticleTagGroups
+            primaryTags={article.primaryTags.slice(0, 3)}
+            adjacentTags={article.adjacentTags.slice(0, 2)}
+            className="mt-4"
+            onLinkClick={(event) => event.stopPropagation()}
+          />
 
           <p className="mt-3 text-center text-[11px] text-muted">クリックで元記事を開きます</p>
         </div>

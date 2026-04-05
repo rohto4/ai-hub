@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { getAdminApiPath } from '@/lib/admin-path'
 
 type TagCandidate = {
   tagKey: string
@@ -22,7 +23,7 @@ function getAdminSecret(): string {
 }
 
 async function callTagApi(body: Record<string, unknown>) {
-  return fetch('/api/admin/tags', {
+  return fetch(getAdminApiPath('/tags'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -33,7 +34,7 @@ async function callTagApi(body: Record<string, unknown>) {
 }
 
 async function fetchCandidates(status: ViewTab): Promise<TagCandidate[]> {
-  const res = await fetch(`/api/admin/tags?status=${status}`, {
+  const res = await fetch(`${getAdminApiPath('/tags')}?status=${status}`, {
     headers: { Authorization: `Bearer ${getAdminSecret()}` },
   })
   if (!res.ok) return []

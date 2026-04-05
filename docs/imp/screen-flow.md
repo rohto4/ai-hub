@@ -1,6 +1,6 @@
 # AI Trend Hub Screen Flow
 
-最終更新: 2026-04-02
+最終更新: 2026-04-03
 
 ## 1. 目的
 
@@ -30,6 +30,7 @@
 15. Admin Tags `/admin/tags`
 16. Admin Sources `/admin/sources`
 17. Admin Jobs `/admin/jobs`
+18. Admin Enrich Queue `/admin/enrich-queue`
 
 ## 3. 画面別の主な読み先
 
@@ -42,6 +43,7 @@
 - Admin Tags: `tag_candidate_pool`, `tags_master`, `tag_keywords`
 - Admin Sources: `source_targets`
 - Admin Jobs: `job_runs`, `job_run_items`
+- Admin Enrich Queue: `articles_raw`, `articles_enriched`, `job_runs`, `source_targets`
 
 ## 4. 現在の前提
 

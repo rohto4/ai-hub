@@ -94,7 +94,7 @@ export function PublicDiscoveryRail({
         <div className="site-eyebrow">Adjacent Tags</div>
         <h2 className="mt-2 text-lg font-black tracking-[-0.03em] text-[color:var(--color-ink)]">周辺分野タグ</h2>
         <p className="mt-2 text-sm leading-6 text-[color:var(--color-subtle)]">
-          当面は通常タグと同じクリック導線として扱い、見せ方の評価を先に進めます。
+          主タグとは見せ方を分けつつ、当面は同じクリック挙動でユーザーが意識的にフィルタを調整できる形を優先します。
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           {adjacentTags.slice(0, 12).map((tag) => (

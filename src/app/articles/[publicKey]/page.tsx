@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ArticleTagGroups } from '@/components/shared/ArticleTagGroups'
 import { ArticleThumbnail } from '@/components/shared/ArticleThumbnail'
 import { PublicArticleList } from '@/components/site/PublicArticleList'
 import { EmptyPanel, PublicScaffold } from '@/components/site/PublicScaffold'
 import { isDatabaseConfigured } from '@/lib/db'
 import { getPublicArticleDetail, listLatestPublicArticles } from '@/lib/db/public-feed'
+import { getArticleCategoryLabel } from '@/lib/site/navigation'
 
 export async function generateMetadata({
   params,
@@ -62,6 +64,12 @@ export default async function ArticleDetailPage({
     sourceCategory: article.sourceCategory,
     sourceType: article.source_type,
   })
+  const categoryLabel = getArticleCategoryLabel({
+    sourceType: article.source_type,
+    sourceCategory: article.sourceCategory,
+    primaryTagKeys: article.tags.map((tag) => tag.tagKey),
+    adjacentTagKeys: article.adjacentTags.map((tag) => tag.tagKey),
+  })
 
   return (
     <PublicScaffold title={article.title} description={article.summary_100 ?? article.title}>
@@ -79,8 +87,9 @@ export default async function ArticleDetailPage({
             />
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex flex-wrap gap-2 text-xs">
-                <span className="rounded-full bg-[#dbeafe] px-2 py-1 font-bold text-[#1d4ed8]">{article.source_type}</span>
-                <span className="rounded-full bg-[#f6f0ea] px-2 py-1 font-bold text-accent-darker">{article.sourceCategory}</span>
+                {categoryLabel ? (
+                  <span className="rounded-full bg-[#f6f0ea] px-2 py-1 font-bold text-accent-darker">{categoryLabel}</span>
+                ) : null}
                 <span className="text-muted">{article.published_at.toLocaleString('ja-JP')}</span>
               </div>
               <h2 className="text-2xl font-extrabold leading-tight">{article.title}</h2>
@@ -88,21 +97,20 @@ export default async function ArticleDetailPage({
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-2">
-            {article.tags.map((tag) => (
-              <Link key={tag.tagKey} href={`/tags/${tag.tagKey}`} className="rounded-full bg-accent-light px-3 py-1 text-xs font-bold text-accent-dark">
-                #{tag.displayName}
-              </Link>
-            ))}
-          </div>
+          <ArticleTagGroups primaryTags={article.tags} adjacentTags={article.adjacentTags} className="mt-6" />
 
           <div className="mt-6 flex flex-wrap gap-3">
             <a href={article.url} target="_blank" rel="noreferrer" className="rounded-2xl bg-btn-dark px-4 py-3 text-sm font-bold text-white">
               元記事を開く
             </a>
-            <Link href={`/category/${article.source_type}`} className="rounded-2xl bg-accent-light px-4 py-3 text-sm font-bold text-accent-dark">
-              同じ source_type を見る
-            </Link>
+            {article.siteCategory ? (
+              <Link
+                href={`/category/${article.siteCategory.slug}`}
+                className="rounded-2xl bg-accent-light px-4 py-3 text-sm font-bold text-accent-dark"
+              >
+                {article.siteCategory.label} を見る
+              </Link>
+            ) : null}
           </div>
         </article>
 

@@ -12,11 +12,10 @@
 4. docs/imp/imp-hangover.md
 5. docs/imp/imp-status.md
 6. docs/imp/implementation-plan.md
-7. docs/imp/implementation-checklist.md
-8. docs/imp/implementation-wait.md
-9. docs/imp/data-flow.md
-10. docs/spec/04-data-model-summary.md
-11. agents-task-status.md
+7. docs/imp/implementation-wait.md
+8. docs/imp/data-flow.md
+9. docs/spec/04-data-model-summary.md
+10. agents-task-status.md
 
 読了後、最初に以下を短く整理してください。
 - 実装予定範囲
@@ -36,4 +35,5 @@
 
 - 初回読込から `screen-flow.md` を外し、必要時だけ `flowchart.md` を読む前提
 - `04-data-model-and-sql.md` 本文の代わりに `04-data-model-summary.md` を初回読込対象にした
+- `implementation-checklist.md` は廃止済みのため、初回読込対象から外した
 - `imp-status` と `agents-task-status` は圧縮済みだが、さらに重くなったら再度見直す

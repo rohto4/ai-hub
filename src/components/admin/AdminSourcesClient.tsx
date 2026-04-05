@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { getAdminApiPath } from '@/lib/admin-path'
 
 type AdminSource = {
   sourceTargetId: string
@@ -24,7 +25,7 @@ export function AdminSourcesClient({ initialSources }: { initialSources: AdminSo
     const isActive = !source.isActive
     setLoading(source.sourceTargetId)
     try {
-      const res = await fetch('/api/admin/sources', {
+      const res = await fetch(getAdminApiPath('/sources'), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

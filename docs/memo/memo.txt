@@ -1,40 +1,94 @@
-下記読んで
-G:\devwork\ai-summary\docs\guide\claude
-G:\devwork\ai-summary\docs\guide\README.md
+最初にこのファイルを読んでください（参照のみ、変更不可）：
+1. docs/guide/codex/AGENTS.md
+
+読み終わったら以下のファイルを順番に読んでください（参照のみ、変更不可）：
+2. docs/guide/COMMON.md
+3. docs/guide/PROJECT.md 
+4. docs/imp/imp-hangover.md
+5. docs/imp/imp-status.md
+6. docs/imp/implementation-plan.md 
+7. docs/imp/implementation-wait.md 
+8. docs/imp/screen-flow.md 
+9. docs/imp/data-flow.md
+10. docs/spec/04-data-model-and-sql.md 
+11. agents-task-status.md
+
+#############20260328
+現状
+
+- ユーザーは af-20260326/phase1-retag/outputs/judge.md を置いた。
+- その判断を正本化したものが af-20260326/phase1-retag/outputs/final-tag-decisions.md
+- alias 判定は今回ラウンドでは全件「alias としては採用しない」 
+- tag_aliases 追加は行わない 
+- 候補語は alias 統合せず、通常のタグ判断側で 廃止 / 不採用 / 保留 を決める
+- 次の関心は「今後の定時 enrich で、本文ベースのタグ付与が改善されるか」。 
 
 
-どうせ詳細は直で記事を確認しに行くので、詳細画面はいりません。 
-タッチしたら300文字版要約を開くか、そのまま遷移先を開くかの2択で良いと思います。
-シェアするタイミングは300文字版を見たタイミングか、記事から戻ってきたタイミングになると思うので、
-戻ってきたタイミングでページの中がその記事にフォーカスされているのがいいです 
-記事サムネイルが横長すぎて、16:9で出力しても大部分が表示されない問題があります。
-左に真四角か16-9のサムネを表示して、要約やボタン類を右に持ってくるカードの配置にするのがいいかと思いますが、ほかに案はある？ 
-シェア文はAIHubというタグを付けるかつけないかの設定が欲しいです。つけるにしてもURLより後ろ。記事の要素のタグは要りません。
-詳細はこちら→もいらない
-シェア文を出す画面は画面遷移しない（ポップアップ）シェア対象のボタン複数とコピーボタンまで必須
-投稿先を選択する画面が必要なもののみ、そのボタンを選択したら投稿先の設定画面が開くように。Misskeyなど。
-あと共通として、絵文字は使わず、Pencilのアイコンを使用する。（あとから置換予定）
-ダイジェストにサムネイルほしい
-後から追加する予定で初期で入れるか未定だが、ランキング表示のバージョンでは、その記事の各種ポイント表示も欲しい
-非ログインで保存する場合のボタンを、「非ログイン（ブラウザ依存）」くらい
-興味分野が少し少ない気がするので、拡張して
-興味分野の通知画面に何が出るようにするか（日刊の最上位サマリでいいか）を検討したい
-ローディング画面は素晴らしい。
-HTMLである程度ブラッシュアップしてからPencilに持っていきますので、ここで改善してHTMLでもう一回見せてください。
-古いバージョンは
+今回までに作った成果物 
+ 
+- 判断結果 manifest
+- /G:/devwork/ai-summary/af-20260326/phase1-retag/outputs/final-tag-decisions.json 
+- /G:/devwork/ai-summary/af-20260326/phase1-retag/outputs/final-tag-decisions.md 
+- alias review 
+- /G:/devwork/ai-summary/af-20260326/phase1-retag/tag-alias-review.json
+- /G:/devwork/ai-summary/af-20260326/phase1-retag/tag-alias-review.html
+ 
+実装済み変更 
+ 
+- 本文あり記事の enrich で、Gemini/OpenAI に matchedTagKeys を返させるようにした。 
+- matchedTagKeys は既存タグマスタからのみ選ばせる。
+- properNounTags は既存タグにない固有名詞候補として返させる。
+- summaryInputBasis === full_content のときだけ AI 選定タグを主タグへ反映。
+- source_snippet / title_only では AI 選定タグは使わず、保守的に既存 keyword match のみ。
+- phase1 除外タグは AI 主タグ候補から除外。
+- paper や source_category を主タグへ機械的に足す挙動は止めた。
+ 
+主な編集ファイル 
+ 
+- /G:/devwork/ai-summary/src/lib/ai/prompts/enrich-batch-ja.ts 
+- /G:/devwork/ai-summary/src/lib/ai/enrich.ts
+- /G:/devwork/ai-summary/src/lib/enrich/ai-primary-tags.ts 
+- /G:/devwork/ai-summary/src/lib/enrich/persist-enriched.ts
+- /G:/devwork/ai-summary/src/lib/jobs/enrich-worker.ts 
+- tests: 
+- /G:/devwork/ai-summary/src/lib/enrich/ai-primary-tags.test.ts
+- /G:/devwork/ai-summary/src/lib/ai/prompts/enrich-batch-ja.test.ts
+- /G:/devwork/ai-summary/src/lib/tags/phase1-decisions.test.ts 
+ 
+ 
+未実施の重要確認 
+ユーザーが次に見たいのはこの2点。
+ 
+1. enrich が 10件/20件まとめて Gemini に問い合わせているか 
+2. Gemini がタグマスタ外の候補を返し、tag_candidate_pool が増えるか
+ 
+コード上は Yes だが、live run 未確認。 
+ 
+次セッションの最優先タスク 
+ 
+1. 少量の live run 
+- 例: npx tsx scripts/run-enrich-worker.ts --limit 20 --summary-batch-size 20 --max-summary-batches 1
+2. 確認すること
+- job_runs / job_run_items で batch size と処理件数
+- articles_enriched_tags で本文あり記事のタグ付与変化
+- tag_candidate_pool の増分
+3. 必要なら before/after を集計
+- 対象 raw_article_id 群の articles_enriched_tags
+- tag_candidate_pool.seen_count 増分 
+4. その結果をユーザーへ報告
+ 
+注意点 
+ 
+- まだ DB 反映 SQL は作っていない。
+- final-tag-decisions.* は正本扱い。 
+- alias は今回ラウンドでは全件廃止で扱う。 
+- 前にやった「タグ数の統計」は、公開記事の現行タグに対して廃止/カテゴリ移管だけ当てたベースラインで、新規採用タグ再付与前。
+- persist-enriched.ts の candidateTagCount ログはまだ旧 rule-based 候補数を見ていて、観測値としては少し古い。必要なら live run 前後で直してよい。
+- Phase 1 の判断結果の正本は final-tag-decisions.md / json です。judge.md は元入力で、反映や実装判断は final-tag-decisions.* を基準にしてください。
 
-300文字 / 共有 / 保存 / 批評
+#############20260330
+現状
 
-
-下記読んで
-G:\devwork\ai-summary\docs\guide\codex.md
-G:\devwork\ai-summary\docs\guide\README.md
-
-
-- `docs/guide/README.md` — 全エージェント共通ルール・スキル一覧・スラッシュコマンド一覧
-- `docs/guide/claude	/CLAUDE.md` — Claude 固有の行動規範・技術基準
-
-G:\devwork\ai-summary\docs\init\getdata_youken_prompt.md
-
-G:\devwork\ai-summary\docs\init\getdata_db_spec.md
-G:\devwork\ai-summary\docs\init\getdata_youken_prompt.md
+- Pencilとui-memo.mdを主に使用してUIを調整中。
+- 原則モックで表示する場所はなし。デバッグ環境のみで表示する項目などui-memo.mdで定義済。
+- 

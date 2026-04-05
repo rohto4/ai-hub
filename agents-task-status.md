@@ -1,6 +1,6 @@
 # Agents Task Status
 
-最終更新: 2026-04-02
+最終更新: 2026-04-05
 
 運用ルール:
 - 最新 50 件を目安に残し、古い行は下から削る
@@ -9,6 +9,28 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-04-05 | done | 管理画面 URL を env prefix 化しタグ UI を 2 段表示へ整理 | `ADMIN_PATH_PREFIX` / `NEXT_PUBLIC_ADMIN_PATH_PREFIX` で外向き admin URL を隠し、middleware で内部 `/admin` / `/api/admin` へ rewrite する構成へ変更。主タグ / 周辺分野タグは見た目を分けつつ同じ `/tags/:tagKey` 挙動で辿れる 2 段表示へ共通化した。build / type-check / tsx test 通過
+- 2026-04-05 | done | `hourly-publish` 候補抽出を pending 定義へ同期 | `listPublishCandidates()` が `publish_candidate=true` 全件を毎回拾っていたため、`public_refreshed_at < articles_enriched.updated_at` または未公開のものだけを候補にするよう修正。毎時 publish が未反映 / 再反映待ちだけを処理する状態へ戻した。build / type-check 通過
+- 2026-04-05 | doing | バックエンド最終確定と publish 前 wait 解消セッションを開始 | 起点 docs と `imp-*` を再読し、主タグ / 親子タグ / 周辺分野タグは L2 確定・publish 転写の方針を確認。次は publish 前後の未確定処理と wait を洗い、公開面実装前に潰せる backend 残件を詰める
+- 2026-04-05 | done | 親子タグ relation の batch 運用方針を docs に固定 | 親子タグの意味論は L2 で完結し、新しい定時 batch は増やさない方針を `implementation-plan` / `implementation-wait` / `imp-status` / `11-batch-job-design` に追記した。relation 更新時の既存データ反映は `retag-layer2-layer4`、`hourly-publish` は転写のみと明文化した
+- 2026-04-05 | done | 公開面のタグ導線とカテゴリ定義を補正 | 注目タグから phase1 除外タグを外し、`Claude` と `Claude Code` の重複も抑止した。カード / 一覧 / モーダルのタグを `/tags/:tagKey` リンク化し、`関連トピック` は最優先タグかカテゴリへ遷移する実リンクへ変更。`NEWS` は `news + alerts + blog` の公開カテゴリとして再定義した。type-check とテスト通過
+- 2026-04-05 | done | alias と親子タグの責務を分離して設計へ反映 | `tag_aliases` は表記揺れの正規化専用と明文化し、親子タグは別 relation で扱う方針を `docs/imp` / `docs/spec` に追記した。`src/lib/tags/focus-tags.ts` の `claude-code -> claude` 特例を削除し、UI が誤ったデータ設計を隠さない状態へ戻した
+- 2026-04-05 | done | batch 設計書と実装計画を現行 backend 状態へ同期 | `docs/spec/11-batch-job-design.md` に現行 schedule、publish pending 定義、`paper` fallback、`voice/search/news` のカテゴリ専用、`tag_aliases` と親子タグ relation の切り分けを反映した。`implementation-plan.md` に backend を次の 1 回の改善で一旦確定させる見立てを追記した
+- 2026-04-05 | done | 親子タグ relation を L2 backend で確定させる実装を追加 | migration `039_add_tag_relations.sql` を追加し、`tag_relations` を導入した。enrich 本線、CLI import、`retag-layer2-layer4` で子 canonical tag 一致時に親 canonical tag まで展開してから `articles_enriched_tags` を保存するように変更した。L4 は L2 を転写するだけの構成に戻した
+- 2026-04-05 | done | `voice/search/news` をカテゴリ専用として確定 | 主タグへは昇格させず、未主タグ 61 件はカテゴリ専用ソースとして許容する方針で固定
+- 2026-04-05 | done | paper 未タグ残件を圧縮し random 露出へ score 重みを導入 | `scripts/retag-layer2-layer4.ts` を再修正して paper にも source_category fallback を載せ、L2/L4 未主タグを 1770 -> 61 まで圧縮した。残件は `voice/search/news` で tags_master 不在キーのみ。Home の random は `content_score` ベースの weighted selection に変更し、テスト 6 件と type-check を通した
+- 2026-04-05 | done | タグ洗い替えと score 反映状況を点検 | L2/L4 未主タグは 3222 -> 1770 まで改善したが完了ではなく、残りはほぼ paper 系。scripts/retag-layer2-layer4.ts の paper 分岐を修正して再実行した。score は ranking 計算には反映済みだが、random/latest/search の露出確率には未適用と確認
+- 2026-04-05 | done | 一覧系に実タグ表示を復帰 | public_articles 一覧取得 SQL に主タグ / 周辺分野タグプレビューを追加し、Home カード・公開一覧・要約モーダルで表示するように修正。内部カテゴリ値は出さず、実タグだけ見える状態へ戻した。type-check 通過
+- 2026-04-05 | done | 公開面から raw カテゴリ値を除去 | source_category / source_type の生値がタグっぽく見えていたため、Home カード・要約モーダル・公開一覧・記事詳細を SITE_CATEGORIES ベースの表示へ寄せ、llm / gent / lerts などを直接出さないようにした。type-check 通過
+- 2026-04-05 | done | publish 件数が減らない原因を修正 | 原因は publish_candidate=true の L2 全件を『publish 待ち』として数えていた集計定義で、batch 不具合ではなかった。public_articles.public_refreshed_at と rticles_enriched.updated_at を比較する pending 件数へ変更し、admin 表示を publish 未反映 に更新、type-check 通過
+- 2026-04-05 | done | 公開面のタグ / カテゴリ導線を整合 | /tags/:tagKey を主タグ+周辺分野タグの統合導線へ更新し、記事詳細で adjacent tag 表示と SITE_CATEGORIES 基準のカテゴリ CTA 解決を追加、type-check 通過
+- 2026-04-05 | done | 主タグ・周辺分野タグ・カテゴリ更新セッションの実行計画を確定 | `docs/guide/*` と `docs/imp/*` を読了し、今回は『データ設計最新化 → publish 未反映完了 → backfill/検証』の順で進める方針を `implementation-plan.md` に反映
+- 2026-04-03 | done | `/admin/enrich-queue` に 8 サイクル実行を追加 | `runHourlyLayer12(maxEnrichBatches=8)` を admin API に接続し、即時実行ボタンから押せるようにした
+- 2026-04-03 | done | `/admin/enrich-queue` を追加 | backlog/ジョブ状態/推奨フォロー/即時実行を 1 画面化、admin API で refresh と簡易ジョブ実行に対応、type-check 通過
+- 2026-04-03 | done | 旧 Gemini enrich artifact の反映状況を照合 | `1500` 出力中 `1489` 件は現 `articles_enriched` に残存、欠落 `11` 件は `articles_enriched_history` に存在すると確認
+- 2026-04-03 | done | enrich 行列解消の一時タスク盤を追加 | `db:check-layer12` で backlog=1325 を確認、Gemini CLI/旧artifact を棚卸しし、`docs/imp/enrich-queue-taskboard.md` で実行順と残論点を管理開始
+- 2026-04-02 | done | タグ専用フロー節の準備を docs に追加 | `implementation-plan.md` に `flowchart.md` 追加手順を記載、`implementation-wait.md` にユーザー確定事項を分離、`imp-status.md` に反映
+- 2026-04-02 | done | 初回読込ガイドから checklist 参照を削除 | `docs/handoff-next-prompt.md` と `docs/memo/memo.txt` の廃止ファイル参照を整理、主タグ/周辺分野タグは分離基盤導入後の公開導線評価フェーズと確認
 - 2026-04-02 | done | Mercari Engineering Blog を source 追加 | seed.mjs に id:055 を追加、RSS疎通確認(100件insert)、PROJECT.md/batch-ops.md を更新、db:run-hourly-fetch を package.json に登録
 - 2026-04-02 | done | GitHub Actions schedule を全 workflow に追加・復旧 | hourly-fetch/:00, hourly-enrich/8回, hourly-publish/:50, daily-tag-dedup/02:30, daily-db-backup/18:15, monthly-public-archive(新規)/毎月1日
 - 2026-04-02 | done | docs 整理・バッチ運用資料を整備 | guide-backup/mock/init/dim2_memo 削除、batch-ops.md 新規、batch-reforme-spec.md を imp/ に移動、refactoring-plan.md 削除、run-hourly-compute-ranks CLI 追加
