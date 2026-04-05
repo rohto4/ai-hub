@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { getAdminApiPath } from '@/lib/admin-path'
 
 type JobRun = {
   id: number
@@ -67,7 +68,7 @@ export function AdminJobsClient({ initialRuns }: { initialRuns: JobRun[] }) {
     setError(null)
     try {
       const param = jobName === 'all' ? '' : `&job=${encodeURIComponent(jobName)}`
-      const data = await apiFetch<{ runs: JobRun[] }>(`/api/admin/jobs?limit=50${param}`)
+      const data = await apiFetch<{ runs: JobRun[] }>(`${getAdminApiPath('/jobs')}?limit=50${param}`)
       setRuns(data.runs)
     } catch (err) {
       setError(err instanceof Error ? err.message : '取得失敗')
@@ -79,7 +80,7 @@ export function AdminJobsClient({ initialRuns }: { initialRuns: JobRun[] }) {
   const fetchFailedItems = useCallback(async (runId: number) => {
     if (failedItems[runId]) return // キャッシュ済み
     try {
-      const data = await apiFetch<{ failedItems: FailedItem[] }>(`/api/admin/jobs/${runId}`)
+      const data = await apiFetch<{ failedItems: FailedItem[] }>(getAdminApiPath(`/jobs/${runId}`))
       setFailedItems((prev) => ({ ...prev, [runId]: data.failedItems }))
     } catch (err) {
       console.error('failed items fetch error:', err)

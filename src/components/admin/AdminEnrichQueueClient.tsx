@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { getAdminApiPath } from '@/lib/admin-path'
 import type {
   AdminEnrichActionKey,
   EnrichQueueDashboardData,
@@ -41,6 +42,12 @@ function formatDateTime(value: string | null): string {
   })
 }
 
+function formatEndLabel(job: EnrichQueueJobRow): string {
+  if (job.finishedAt) return formatDateTime(job.finishedAt)
+  if (job.status === 'running') return '進行中'
+  return '未実行'
+}
+
 function formatDuration(seconds: number): string {
   if (seconds <= 0) return '-'
   if (seconds < 60) return `${seconds}s`
@@ -50,6 +57,25 @@ function formatDuration(seconds: number): string {
 }
 
 function JobRow({ job }: { job: EnrichQueueJobRow }) {
+  const effectiveProcessedCount =
+    job.status === 'running'
+      ? Math.max(job.processedCount, job.liveProcessedCount + job.liveFailedCount + job.liveSkippedCount)
+      : job.processedCount
+
+  const progressLabel =
+    job.status === 'running' && effectiveProcessedCount > 0
+      ? `途中経過 ${effectiveProcessedCount}`
+      : job.status === 'running'
+        ? '応答待ち'
+        : null
+
+  const enrichScheduleLabel =
+    job.jobName === 'enrich-worker' &&
+    typeof job.scheduleRunsCompleted === 'number' &&
+    typeof job.scheduleRunsPlanned === 'number'
+      ? `${job.scheduleRunsCompleted}/${job.scheduleRunsPlanned} 回完了`
+      : null
+
   const statusStyle =
     job.status === 'completed'
       ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
@@ -65,6 +91,13 @@ function JobRow({ job }: { job: EnrichQueueJobRow }) {
         <div>
           <p className="text-sm font-semibold text-white">{job.jobName}</p>
           <p className="mt-1 text-xs text-slate-400">{job.scheduleLabel}</p>
+          {enrichScheduleLabel ? (
+            <p className="mt-1 text-xs text-cyan-300">
+              {enrichScheduleLabel}
+              {job.scheduleRunsRunning ? ` / 実行中 ${job.scheduleRunsRunning}` : ''}
+              {job.scheduleRunsFailed ? ` / 失敗 ${job.scheduleRunsFailed}` : ''}
+            </p>
+          ) : null}
         </div>
         <span className={`rounded-full border px-2 py-1 text-[11px] font-medium ${statusStyle}`}>
           {job.status}
@@ -77,11 +110,12 @@ function JobRow({ job }: { job: EnrichQueueJobRow }) {
         </div>
         <div>
           <p className="text-slate-500">終了</p>
-          <p>{formatDateTime(job.finishedAt)}</p>
+          <p>{formatEndLabel(job)}</p>
         </div>
         <div>
           <p className="text-slate-500">処理</p>
-          <p>{job.processedCount}</p>
+          <p>{effectiveProcessedCount}</p>
+          {progressLabel ? <p className="mt-1 text-[11px] text-cyan-300">{progressLabel}</p> : null}
         </div>
         <div>
           <p className="text-slate-500">所要時間</p>
@@ -163,7 +197,7 @@ export function AdminEnrichQueueClient({
     startTransition(async () => {
       setError(null)
       try {
-        const next = await apiFetch<EnrichQueueDashboardData>('/api/admin/enrich-queue')
+        const next = await apiFetch<EnrichQueueDashboardData>(getAdminApiPath('/enrich-queue'))
         setData(next)
       } catch (nextError) {
         setError(nextError instanceof Error ? nextError.message : '更新に失敗しました')
@@ -181,7 +215,7 @@ export function AdminEnrichQueueClient({
         action: AdminEnrichActionKey
         result: unknown
         data: EnrichQueueDashboardData
-      }>('/api/admin/enrich-queue', {
+      }>(getAdminApiPath('/enrich-queue'), {
         method: 'POST',
         body: JSON.stringify({ action }),
       })
@@ -198,7 +232,7 @@ export function AdminEnrichQueueClient({
     { label: '未処理 backlog', value: data.summary.rawUnprocessed, note: `今すぐ裁ける ${data.summary.rawDueNow} / ロック中 ${data.summary.rawLocked}` },
     { label: '24h 超 backlog', value: data.summary.rawOver24h, note: '古い未処理' },
     { label: 'manual_pending', value: data.summary.manualPending, note: '別ライン回収' },
-    { label: 'publish 待ち', value: data.summary.publishCandidatesReady, note: 'L4 反映候補' },
+    { label: 'publish 未反映', value: data.summary.publishCandidatesPending, note: 'L4 未反映 / 再反映待ち' },
     { label: '稼働中ジョブ', value: data.summary.currentRunningJobs, note: 'job_runs.status=running' },
     { label: '理論解消時間', value: `${data.summary.estimatedDrainHoursAtScheduledRate}h`, note: '160件/時の単純計算' },
   ]

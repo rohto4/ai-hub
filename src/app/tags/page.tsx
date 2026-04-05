@@ -70,7 +70,7 @@ export default async function TagsPage() {
           />
           <TagSection
             title="周辺分野タグ"
-            description="文脈補助と将来のマッピング導線に育てる前提で、当面は通常タグと同じクリック導線に寄せています。"
+            description="主タグとは別段で見せつつ、当面は同じクリック導線でユーザーが意識的に絞り込みを調整できるようにしています。"
             tags={adjacentTags}
             tone="adjacent"
           />

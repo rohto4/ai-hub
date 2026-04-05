@@ -1,6 +1,6 @@
 # AI Trend Hub 実装ステータス
 
-最終更新: 2026-04-03
+最終更新: 2026-04-05
 
 運用ルール:
 - 先頭には必ず「現在の状態」と「次の確認事項」を置く
@@ -11,7 +11,13 @@
 
 - Layer 1 → Layer 2 → Layer 4 の自動パイプラインは稼働済み
 - `content_language`、日本語ソース 14 件、`thumbnail_url`、admin Phase 3、OGP、sitemap、robots は実装済み
-- `daily-tag-dedup`、隣接分野タグ、`thumbnail_bg_theme`、L2/L4 retag まで含めてタグ系の基本運用は実装済み
+- daily-tag-dedup、隣接分野タグ、`thumbnail_bg_theme`、L2/L4 retag まで含めてタグ系の基本運用は実装済み
+- `/tags/:tagKey` は主タグ・周辺分野タグの両方をまとめて辿れる状態まで反映した
+- 記事詳細では主タグに加えて周辺分野タグも表示し、カテゴリ導線は `SITE_CATEGORIES` 基準で解決するようにした
+- 主タグと周辺分野タグは UI 上で別段表示にしつつ、当面は同じ `/tags/:tagKey` 挙動でユーザーが意識的にフィルタ調整できる方向で進める
+- retag を再実行し、`paper / llm` に偏っていた未主タグは L2/L4 ともに 1770 件から 61 件まで圧縮した
+- 残る 61 件の `voice/search/news` は主タグへは昇格させず、カテゴリ専用として扱う方針で固定した
+- Home の random 露出は `content_score` ベースの weighted selection に切り替えた。latest と search は従来どおり時系列優先のまま維持する
 - `hourly-compute-ranks` は最適化済みだが、係数調整は未着手
 - Topic Group はスキーマ受け口のみで、本実装は未着手
 - 定時 batch は GitHub Actions schedule を復旧済みで、月次 archive workflow も追加済み
@@ -71,6 +77,7 @@
 3. 周辺分野タグを通常タグと同様にクリック可能な導線として実装する
 4. 実画面を見ながら導線を評価し、必要な修正点を洗う
 5. タグ参照 SQL を使って次ラウンドの昇格 / 保留判断を進める
+6. `SITE_CATEGORIES` の各 slug に十分な公開件数が出るかを実データで確認する
 
 ### 後続
 
@@ -96,3 +103,25 @@
 7. enrich backlog 実測と追いつき線の棚卸しを行い、一時管理ファイル `docs/imp/enrich-queue-taskboard.md` を追加した
 8. `/admin/enrich-queue` を追加し、backlog 件数、job 状態、推奨フォロープラン、即時実行を 1 画面で見られるようにした
 9. `/admin/enrich-queue` の即時実行に 8 サイクル回復ボタンを追加した
+10. 2026-04-05: 公開面のタグ / カテゴリ導線を更新し、`listArticlesByAnyTag()` で主タグと周辺分野タグの混在キーを同一 URL で辿れるようにした。記事詳細では `public_article_adjacent_tags` を読み、カテゴリ CTA は `SITE_CATEGORIES` と一致する slug だけを出すようにした`r`n11. 2026-04-05: `/admin/enrich-queue` の publish 件数定義を修正した。従来は `publish_candidate=true` の L2 全件を数えていたため publish 後も減らず、未反映件数に見えなかった。`public_articles.public_refreshed_at` と `articles_enriched.updated_at` の比較で、L4 未反映 / 再反映待ちだけを数えるように変更した`r`n12. 2026-04-05: 公開面のカード / モーダル / 一覧 / 記事詳細から raw の `source_category` / `source_type` 表示を外し、`SITE_CATEGORIES` 基準のラベルへ寄せた。`llm` / `agent` / `alerts` などの内部値をタグのように見せないようにした
+- 2026-04-05: `hourly-publish` の候補抽出も `/admin/enrich-queue` と同じ pending 定義へ揃えた。従来は `publish_candidate=true` の completed 記事を毎回全件再転写していたため、定時 publish の負荷と「未反映」概念が docs とずれていた。`public_refreshed_at` が `articles_enriched.updated_at` より古いもの、または未公開のものだけを publish 対象にするよう修正した
+- 2026-04-05: 管理画面の外向き URL を env ベースの prefix へ切り替えられるようにした。middleware で外部 prefix から内部 `/admin` / `/api/admin` へ rewrite し、固定 `/admin` 露出を避けつつ `ADMIN_SECRET` / cookie 認証は維持した
+- 2026-04-05: 公開面のタグ表示を `主タグ / 周辺分野タグ` の 2 段へ揃えた。見た目は分けるが、当面はどちらも同じ `/tags/:tagKey` 導線で動かし、ユーザーが意識的にフィルタ調整できる前提に寄せた
+- 2026-04-04: `arxiv-ai` enrich backlog �� Gemini CLI ���ŏ����B`artifact/gemini-cli-enrich-arxiv-ai-20260404/` �𐶐����A`970�� / 10 chunk` �� `run-ai-enrich-gemini.ts` �Ŋ����B�e part import ��� `db:retag-layer2-layer4` ����s���A`raw_unprocessed` �� `1741 -> 763`�B
+- 2026-04-04: `import-ai-enrich-outputs.ts` ����P���ACLI import ���ł� `properNounTags -> candidateTags`, adjacent tag ����, `thumbnail_bg_theme`, `thumbnail_url`, `sourceDisplayName`, `contentLanguage` ��ۑ�����悤�ɂ����B`arxiv-ai` artifact 10 part ��� import �ς݁B
+## 2026-04-05 タグ意味論の現況
+
+- `tag_aliases` は現状、表記揺れを canonical tag に正規化する用途にのみ使われている。
+- 親子タグの自動展開は `tag_relations` を使って L2 保存前に行うよう実装した。
+- したがって、親タグ補完は表示側ではなく backend 側で確定し、L4 は L2 の tag 結果を転写するだけに戻した。
+- relation 展開は `hourly-enrich` と `retag-layer2-layer4` の責務であり、`hourly-publish` は L2 の結果を写すだけに留めている。
+- 新しい定時 batch は追加していない。relation 更新時の既存データ反映は、既存の `retag-layer2-layer4` を backfill 手段として使う。
+- この回避は [focus-tags.ts](G:\devwork\ai-summary\src\lib\tags\focus-tags.ts) から削除済みで、relation semantics 実装前の実データ状態がそのまま見えるように戻した。
+- 次の設計課題は、`tag_relations` の管理運用と relation 付与手順の整備である。
+
+## 2026-04-05 batch 設計 docs の同期
+
+- [11-batch-job-design.md](G:\devwork\ai-summary\docs\spec\11-batch-job-design.md) を現行 batch 実装へ追随させた。
+- `tag_aliases` は表記揺れ正規化専用、親子タグ relation は `tag_relations` で L2 保存前に展開する構成を batch 設計へ反映した。
+- `public_refreshed_at` 基準の publish pending 定義、`paper` fallback、`voice/search/news` のカテゴリ専用、Home random の weighted selection を追記した。
+- backend 側は、relation 管理運用と CLI import 線の副作用差を除けば、一旦固定できる状態に近い。

@@ -17,6 +17,7 @@
 | Firebase Admin SDK | `FIREBASE_PROJECT_ID` `FIREBASE_CLIENT_EMAIL` `FIREBASE_PRIVATE_KEY` | server auth / internal API | ログイン同期や管理画面着手に必要 |
 | VAPID キー | `VAPID_PUBLIC_KEY` `VAPID_PRIVATE_KEY` `VAPID_SUBJECT` | push subscribe / digest cron | Web Push 実送信を有効化できる |
 | Cron Secret | `CRON_SECRET` | internal cron routes | Vercel Cron から安全に叩ける |
+| Admin URL Prefix | `ADMIN_PATH_PREFIX` または `NEXT_PUBLIC_ADMIN_PATH_PREFIX` | 管理画面 UI / admin API の外向き URL | `/admin` を固定公開せず、推測しにくい prefix にできる |
 
 ## 後から必要になるもの
 

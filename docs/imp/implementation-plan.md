@@ -1,10 +1,10 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-04-02
+最終更新: 2026-04-05
 
 ## 1. 現在のフェーズ
 
-主要機能の実装フェーズはほぼ完了。現在は、タグ再構築 1 周目の結果を踏まえて公開面導線を整え、運用を安定化するフェーズとする。
+主要機能の実装フェーズはほぼ完了。現在は、タグ再構築 1 周目の結果を踏まえて公開面導線を整え、運用を安定化するフェーズとする。次の 1 回の改善で backend 側をいったん確定させ、その後は公開面の見た目調整を主軸に移る。
 
 実装済み:
 - Layer 1 → Layer 2 → Layer 4 パイプライン
@@ -21,13 +21,36 @@
 
 ## 2. いま優先すること
 
-1. 主タグ・新規立項タグ・カテゴリ・周辺分野タグの役割分担を公開面へ落とし込む
-2. カテゴリを公開面サイドバー導線として実装する
-3. 周辺分野タグを当面通常タグと同様にクリック可能な導線として実装する
-4. 実装した Web を見ながらカテゴリ配置とタグ導線を評価する
-5. タグ参照 SQL を使って、新規立項タグ候補の次ラウンド判断を進める
-6. enrich 本線と CLI import 線の副作用差を減らす
-7. enrich backlog の解消手順を `docs/imp/enrich-queue-taskboard.md` で管理し、通常 enrich と CLI 追いつき線の使い分けを詰める
+1. `docs/spec/11-batch-job-design.md` と `implementation-plan.md` を現行 batch 実装に合わせ、backend の現況を再読可能にする
+2. 主タグ・周辺分野タグ・カテゴリのデータ設計を現行コード基準で最新化する
+3. publish 系で未反映のまま残っている主タグ / 周辺分野タグ / カテゴリ反映を完了させる
+4. カテゴリを公開面サイドバー導線として実装し、主タグ導線と役割が衝突しないよう整理する
+5. 周辺分野タグを当面通常タグと同様にクリック可能な導線として実装する
+6. 実装した Web を見ながらカテゴリ配置とタグ導線を評価する
+7. タグ参照 SQL を使って、新規立項タグ候補の次ラウンド判断を進める
+8. enrich 本線と CLI import 線の副作用差を減らす
+9. enrich backlog の解消手順を `docs/imp/enrich-queue-taskboard.md` で管理し、通常 enrich と CLI 追いつき線の使い分けを詰める
+
+## 2.1 このセッションの実行計画
+
+1. 現行コードと docs を突き合わせ、主タグ / 周辺分野タグ / カテゴリの保存先・参照先・publish 経路の差分を洗い出す
+2. 差分を踏まえて、破壊的変更なしで進められるデータ設計更新を先に反映する
+3. `hourly-publish` と関連 join / query / UI で未反映箇所を埋め、L2 → L4 → 公開面の整合を取る
+4. 必要な backfill / retag / publish 再実行手順を `batch-ops.md` と `batch-sequence.md` 基準で実施する
+5. 公開面でカテゴリ導線とタグ導線を確認し、残件があれば `implementation-wait.md` へ切り出す
+
+今回の主眼:
+- backend の主タグ / 親タグ / 子タグ / 周辺分野タグの処理境界を、このセッションで読み直せる形まで固める
+- publish 前後に残っている wait をできるだけ解消し、定時 Actions の運用を「通常実行で回る」状態へ寄せる
+- 公開面の見せ方に注力する前に、backend・batch・docs 側で先に潰せる残件を優先して処理する
+
+このセッションで特に確認する軸:
+- `tags_master` / `adjacent_tags_master` / `SITE_CATEGORIES` の役割境界
+- `articles_enriched*` から `public_articles*` への反映漏れ
+- publish 後のタグ一覧・カテゴリ一覧・記事詳細での表示整合
+- batch 本線と CLI 追いつき線の副作用差が今回の反映対象に残っていないか
+- `paper / llm` に偏る未主タグ残件の圧縮経路
+- `content_score` をランキング以外の公開露出へどう反映するか
 
 ## 3. 現在の固定方針
 
@@ -89,7 +112,20 @@
 - 周辺分野タグ: 当面は通常タグと同じクリック導線
 - `paper` 専用タグマスタは後続タスクとして保留
 
-### 3.6 enrich / batch 運用
+### 3.6 今回セッションで固定する実装順
+
+1. データ設計更新
+   - 主タグ / 周辺分野タグ / カテゴリの現在地をコード基準で確認
+   - publish が依存する selector / mapper / query の責務を揃える
+2. publish 反映完了
+   - L2 → L4 の upsert 対象
+   - `public_article_tags` / `public_article_adjacent_tags` / カテゴリ導線用データ
+   - 公開面の一覧 / 詳細 / サイドバー参照
+3. backfill / 検証
+   - 必要に応じて retag, publish, ranks を再実行
+   - UI spot check と docs 追随
+
+### 3.7 enrich / batch 運用
 
 - `hourly-enrich` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40`
 - `enrich-worker` の基本設定は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
@@ -140,8 +176,7 @@
 
 1. Topic Group
 2. `critique` UI
-3. `ADMIN_PATH_PREFIX` 動的化
-4. `push_subscriptions.genres` rename
+3. `push_subscriptions.genres` rename
 5. tag alias 管理 UI
 6. `paper` 専用タグマスタと切替ロジック
 7. 周辺分野タグの視覚マッピングページ
@@ -155,3 +190,23 @@
 - `scripts/backup-neon-all.mjs`
 - `vercel.json`
 - GitHub Actions の大きな運用方針変更
+## 2026-04-05 タグ意味論の整理
+
+- `tag_aliases` は、完全に同一意味の表記揺れを canonical tag に正規化する用途に限定する。
+- alias の例: `ClaudeCode` -> `claude-code`、`Claude Code` -> `claude-code`
+- alias を、親子タグの表現や UI 上の重複抑止ルールとして使ってはいけない。
+- 親子タグは alias とは別概念とし、子の canonical tag が一致した場合は子と親の両方を付与する。
+- 例: `cowork` は独立した canonical tag のまま残し、`claude` の子として定義されていれば、記事には `cowork` と `claude` の両方が付く。
+- 現行 schema には親子タグ relation がないため、タグ個別の IF ではなく専用の relation table を追加する前提で扱う。
+- ある canonical tag が存在するとき別の canonical tag を UI で隠すような回避策は採らない。公開面の表示はデータ設計に従わせる。
+
+## 2026-04-05 backend 確定の見立て
+
+- 定時 batch の種類、schedule、入口 route、CLI は現行実装でほぼ固定できている。
+- enrich / publish / ranks / archive の主経路は確定済みで、backend 側の残論点は relation 管理運用と CLI import 線の副作用差に絞られている。
+- 親子タグ relation は `tag_relations` を使って L2 保存前に展開する方針で実装済み。
+- relation 展開は L2 の責務として扱い、`hourly-enrich` と `retag-layer2-layer4` の中で完結させる。
+- 新しい定時 batch は増やさない。relation 追加や変更時の既存データ反映は、既存の `retag-layer2-layer4` を正式な backfill 手段として使う。
+- `hourly-publish` は L2 で確定した tag join を L4 に転写するだけとし、親子タグの判断や補完は持たせない。
+- 次に backend で詰めるのは、relation をどの画面 / SQL / 運用手順で管理するかと、CLI import 線の完全追随である。
+- この2点が固まれば、backend は一度固定し、以後は公開面の導線・見た目調整を主軸に進める。

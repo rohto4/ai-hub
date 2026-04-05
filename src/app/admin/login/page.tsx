@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { getAdminApiPath, getAdminPagePath } from '@/lib/admin-path'
 
 function LoginForm() {
   const router = useRouter()
@@ -14,8 +15,8 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const redirect = searchParams.get('redirect') ?? '/admin'
-    const res = await fetch('/api/admin/login', {
+    const redirect = searchParams.get('redirect') ?? getAdminPagePath()
+    const res = await fetch(getAdminApiPath('/login'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ secret, redirect }),

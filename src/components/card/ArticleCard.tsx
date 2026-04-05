@@ -1,7 +1,10 @@
 'use client'
 
+import Link from 'next/link'
+import { ArticleTagGroups } from '@/components/shared/ArticleTagGroups'
 import { ArticleThumbnail } from '@/components/shared/ArticleThumbnail'
 import type { ActionType, Article } from '@/lib/db/types'
+import { getArticleCategoryLabel, getRelatedTopicLink } from '@/lib/site/navigation'
 
 interface Props {
   article: Article & { score?: number }
@@ -12,15 +15,6 @@ interface Props {
   onCardClick: (articleId: string) => void
   onOpenArticle: (articleId: string) => void
   onAction: (type: ActionType, articleId: string) => void
-}
-
-const sourceLabel: Record<Article['source_type'], string> = {
-  official: 'official',
-  alerts: 'alerts',
-  blog: 'blog',
-  paper: 'paper',
-  news: 'news',
-  video: 'video',
 }
 
 const languageLabel: Record<NonNullable<Article['content_language']>, string> = {
@@ -46,13 +40,18 @@ export function ArticleCard({
     article.summary_100 ??
     '要約を準備中です。'
   const isLongSummary = summaryMode === 200
-  const tagLine = [
-    `#${article.sourceCategory}`,
-    `#${sourceLabel[article.source_type]}`,
-    article.content_language ? `#${languageLabel[article.content_language]}` : null,
-  ]
-    .filter(Boolean)
-    .join(' ')
+  const categoryLabel = getArticleCategoryLabel({
+    sourceType: article.source_type,
+    sourceCategory: article.sourceCategory,
+    primaryTagKeys: article.primaryTags.map((tag) => tag.tagKey),
+    adjacentTagKeys: article.adjacentTags.map((tag) => tag.tagKey),
+  })
+  const relatedTopicLink = getRelatedTopicLink({
+    sourceType: article.source_type,
+    sourceCategory: article.sourceCategory,
+    primaryTagKeys: article.primaryTags.map((tag) => tag.tagKey),
+    adjacentTagKeys: article.adjacentTags.map((tag) => tag.tagKey),
+  })
 
   return (
     <article
@@ -107,9 +106,11 @@ export function ArticleCard({
                 emojiClassName="text-[28px]"
               />
             </button>
-            <div className="mt-[6px] text-center text-[9px] font-bold lowercase leading-none text-black">
-              {sourceLabel[article.source_type]}
-            </div>
+            {categoryLabel ? (
+              <div className="mt-[6px] text-center text-[9px] font-bold leading-none text-black">
+                {categoryLabel}
+              </div>
+            ) : null}
           </div>
 
           <div className="min-w-0">
@@ -125,13 +126,23 @@ export function ArticleCard({
             </button>
 
             <div className="mt-[9px] flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1 text-[11px] font-bold leading-[1.45] text-[#8d8b90]">
-                {tagLine}
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap gap-1.5 text-[11px] font-bold leading-[1.45] text-[#8d8b90]">
+                  {categoryLabel ? <span>#{categoryLabel}</span> : null}
+                  {article.content_language ? <span>#{languageLabel[article.content_language]}</span> : null}
+                </div>
               </div>
               <div className="shrink-0 pl-2 text-[11px] font-bold text-[#8d8b90]">
                 {numericScore != null ? `Score ${numericScore.toFixed(1)}` : 'Score --'}
               </div>
             </div>
+
+            <ArticleTagGroups
+              primaryTags={article.primaryTags.slice(0, 2)}
+              adjacentTags={article.adjacentTags.slice(0, 1)}
+              compact
+              className="mt-[8px]"
+            />
 
             <div
               className={
@@ -157,11 +168,20 @@ export function ArticleCard({
           columnGap: '1.2%',
         }}
       >
-        <ActionButton
-          label="関連トピック"
-          variant="topic"
-          onClick={() => onAction('topic_group_open', article.id)}
-        />
+        {relatedTopicLink ? (
+          <ActionLink
+            href={relatedTopicLink.href}
+            label={relatedTopicLink.label}
+            variant="topic"
+            onClick={() => onAction('topic_group_open', article.id)}
+          />
+        ) : (
+          <ActionButton
+            label="関連トピック"
+            variant="topic"
+            onClick={() => onAction('topic_group_open', article.id)}
+          />
+        )}
         <ActionButton
           label={isSaved ? '保存済み' : '後で読む'}
           onClick={() => onAction(isSaved ? 'unsave' : 'save', article.id)}
@@ -212,5 +232,38 @@ function ActionButton({
     >
       <span className="truncate">{label}</span>
     </button>
+  )
+}
+
+function ActionLink({
+  href,
+  label,
+  variant = 'default',
+  onClick,
+}: {
+  href: string
+  label: string
+  variant?: 'default' | 'share' | 'topic'
+  onClick?: () => void
+}) {
+  const isShare = variant === 'share'
+  const isTopic = variant === 'topic'
+
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="inline-flex h-7 min-w-0 items-center justify-center border px-2 text-[11px] font-bold transition-colors"
+      style={{
+        borderColor: isTopic ? 'transparent' : isShare ? '#e17e00' : '#d7b898',
+        background: isTopic ? 'transparent' : isShare ? '#f59313' : '#fff8f1',
+        color: isShare ? '#ffffff' : '#a35b2e',
+        borderLeft: isTopic ? '3px solid #c77719' : undefined,
+        boxShadow: 'none',
+        fontFamily: 'JetBrains Mono, var(--font-family-base)',
+      }}
+    >
+      <span className="truncate">{label}</span>
+    </Link>
   )
 }
