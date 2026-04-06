@@ -36,6 +36,7 @@
 - `/admin/enrich-queue` は `paper / non-paper` を分離表示し、`arxiv-ai` など paper backlog が大きくても通常記事側の健全性を別で見えるようにした
 - enrich 実行は `queueType` 引数で `non-paper` と `paper` に分け、job_runs も `enrich-worker` / `enrich-worker-paper` として別管理する構成へ寄せた
 - `/admin/enrich-queue` の即時実行も `non-paper lane` / `paper lane` / 共通処理に分け、同じ route を引数違いで叩けるようにした
+- GitHub Actions も `hourly-enrich-non-paper` と `hourly-enrich-paper` に分離し、scheduled enrich は paper / non-paper を別 job として回す構成へ更新した
 
 ## 3. 現在有効な運用状態
 
@@ -50,6 +51,7 @@
 
 - `enrich-worker` は `queueType=non-paper` を既定とし、`limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
 - `paper` 系は同じ実装を `queueType=paper` で実行し、job 名は `enrich-worker-paper` として残す
+- GitHub Actions の scheduled enrich は `non-paper` を毎時 8 回、`paper` を毎時 :45 の 1 回で分離運用する
 - `hourly-enrich` は毎時 8 回、`hourly-publish` は毎時 `:50`
 - `hourly-compute-ranks` は publish 後段で実行し、CLI 実行入口も追加済み
 - 本文取得記事では `canonicalTagHints` による `tag_aliases` / `tag_keywords` 自動反映が動く前提

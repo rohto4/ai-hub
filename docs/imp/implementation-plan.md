@@ -134,6 +134,7 @@
 - `hourly-enrich` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40`
 - `enrich-worker` の基本設定は `queueType=non-paper`, `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
 - 同じ route / 実装を `queueType=paper` でも実行でき、job_runs では `enrich-worker-paper` として別管理する
+- GitHub Actions は `hourly-enrich-non-paper` と `hourly-enrich-paper` に分け、paper は毎時 :45 の低優先度運用とする
 - `hourly-publish` は毎時 `:50`
 - `monthly-public-archive` は毎月 1 日 `03:00 UTC`
 - 詳細仕様は `docs/imp/batch-reforme-spec.md`、運用手順は `docs/imp/batch-ops.md` を参照する

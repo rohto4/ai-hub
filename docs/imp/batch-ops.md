@@ -1,6 +1,6 @@
 # バッチ運用リファレンス
 
-最終更新: 2026-04-02
+最終更新: 2026-04-07
 
 > 定時バッチ・フォローバッチの現状、運用手順、改善論点をまとめた恒久運用資料。
 > 実装タスクは `implementation-plan.md`、判断待ちは `implementation-wait.md` に分離する。
@@ -12,7 +12,8 @@
 | バッチ | workflow ファイル | schedule 状態 | cron route | 備考 |
 |---|---|---|---|---|
 | `hourly-fetch` | `hourly-layer12.yml` | schedule 有効 | `/api/cron/hourly-fetch` | workflow 名と route 名はずれている |
-| `hourly-enrich` | `hourly-enrich.yml` | schedule 有効 | `/api/cron/enrich-worker` | 毎時 8 回実行 |
+| `hourly-enrich-non-paper` | `hourly-enrich.yml` | schedule 有効 | `/api/cron/enrich-worker?queueType=non-paper` | 毎時 8 回実行 |
+| `hourly-enrich-paper` | `hourly-enrich-paper.yml` | schedule 有効 | `/api/cron/enrich-worker?queueType=paper` | 毎時 :45 に 1 回実行 |
 | `hourly-publish` | `hourly-publish.yml` | schedule 有効 | `/api/cron/hourly-publish` + `/api/cron/hourly-compute-ranks` | publish と ranks が 1 workflow に直列 |
 | `hourly-compute-ranks` | `hourly-publish.yml` の後段 | schedule 有効 | `/api/cron/hourly-compute-ranks` | CLI 実行も可能 |
 | `daily-tag-dedup` | `daily-tag-dedup.yml` | schedule 有効 | `/api/cron/daily-tag-dedup` | 候補統合・保留整理を担当 |
@@ -30,7 +31,8 @@
 | バッチ | cron 式 | 備考 |
 |---|---|---|
 | `hourly-fetch` | `0 * * * *` | 毎時 :00 |
-| `hourly-enrich` (×8) | `5,10,15,20,25,30,35,40 * * * *` | 毎時 :05〜:40、8 回 |
+| `hourly-enrich-non-paper` (×8) | `5,10,15,20,25,30,35,40 * * * *` | 毎時 :05〜:40、8 回 |
+| `hourly-enrich-paper` | `45 * * * *` | 毎時 :45、1 回 |
 | `hourly-publish` + ranks | `50 * * * *` | 毎時 :50 |
 | `daily-tag-dedup` | `30 2 * * *` | 毎日 02:30 UTC |
 | `daily-db-backup` | `15 18 * * *` | 毎日 18:15 UTC |
@@ -75,7 +77,7 @@
 | コマンド | 用途 | 基本呼び出し例 |
 |---|---|---|
 | `db:run-hourly-fetch` | hourly-fetch の手動実行 | `npm run db:run-hourly-fetch -- --limit 20 [--source-key <key>]` |
-| `db:run-enrich-worker` | enrich-worker の手動実行 | `npm run db:run-enrich-worker -- --limit 20 --summary-batch-size 20 --max-summary-batches 1` |
+| `db:run-enrich-worker` | enrich-worker の手動実行 | `npm run db:run-enrich-worker -- --queue-type non-paper --limit 20 --summary-batch-size 20 --max-summary-batches 1` |
 | `db:prepare-gemini-cli-enrich` | 追いつき enrich の入力生成 | `npm run db:prepare-gemini-cli-enrich` |
 | `db:import-ai-enrich-outputs` | Gemini CLI 結果の DB 反映 | import 後は必ず `db:retag-layer2-layer4` を続ける |
 | `db:requeue-raw` | raw を再処理待ちへ戻す | 対象を絞ってから実行 |

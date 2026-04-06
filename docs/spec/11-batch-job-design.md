@@ -1,6 +1,6 @@
 # バッチジョブ設計
 
-最終更新: 2026-04-02
+最終更新: 2026-04-07
 
 > **注意**: このファイルは 2026-03-15 の設計書です。現在の実装状態・運用手順は `docs/imp/batch-ops.md` が正です。
 > 本ファイルは仕様の設計根拠として保持し、実装が変わったときに合わせて更新します。
@@ -11,6 +11,14 @@
 > - GitHub Actions schedule は 2026-04-02 に復旧済み
 > - `monthly-public-archive` は workflow / route / job 実装済み
 > - `priority-queue-worker` と `weekly-archive` は未実装の後続論点
+> - `paper` は通常の主タグ照合 + `source_category` fallback で retag する
+> - `voice` / `search` / `news` はカテゴリ専用キーとして扱う
+> - Home random は `public_articles.content_score` ベースの weighted selection を使う
+> - `tag_aliases` は表記揺れ正規化専用であり、親子タグ relation は `tag_relations` で L2 保存前に展開する
+> - 親子タグの意味論は L2 で完結させ、新しい定時 batch は増やさない
+> - relation 変更時の既存データ反映は `retag-layer2-layer4` を使い、`hourly-publish` は L2 の結果を転写するだけに留める
+> - `/admin/enrich-queue` の publish 件数は「publish 可能件数」ではなく `public_refreshed_at` 基準の未反映件数へ修正済み
+> - scheduled enrich は `hourly-enrich-non-paper` と `hourly-enrich-paper` に分離し、`queueType` 引数で同じ route を切り替える
 
 ## 1. 目的
 
@@ -21,7 +29,7 @@
 
 1. P0 ではジョブを責務単位で分割する
 2. 時間粒度と責務粒度は一致させない
-3. enrich は `enrich-worker` として、運用上は毎時の小分け実行前提で扱う
+3. enrich は `enrich-worker` / `enrich-worker-paper` として、運用上は `queueType` 切替で別ジョブ運用する
 4. 要約 API 呼び出しは 1 記事ずつではなく、`summaryBatchSize=20` を基本とする
 5. Gemini / OpenAI へ渡す要約指示は固定テンプレートファイルを使い、毎回同じルールを明示する
 6. 毎時運用は `fetch -> enrich` を直列にし、enrich は小分けで回す
@@ -29,6 +37,7 @@
 8. 記事単位失敗でスキップし、ジョブ全体は止めない
 9. ローカル定期実行と GitHub Actions scheduled の両方から呼べる entrypoint にする
 10. GitHub Actions からは各 cron route を直接叩く
+11. alias 正規化と親子タグ展開は分けて扱い、タグ個別の UI 特例で意味論を補正しない
 
 ## 3. P0 で必要なジョブ一覧
 
@@ -82,6 +91,8 @@
   - `articles_raw`
   - `tags_master`
   - `tag_aliases`
+  - `tag_keywords`
+  - `adjacent_tag_keywords`
 
 - 主処理
   - 未処理または再整形対象の raw を小分けで取得する
@@ -102,11 +113,15 @@
     - 両 provider が落ちた場合は `manual_pending` に回す
     - `manual_pending` 行は `hold` のまま保持し、手動 import 用 JSON を `artifacts/manual-pending/` へ出力する
   - `summaryInputBasis=full_content` のときだけ `canonicalTagHints` を受け、`tag_aliases` / `tag_keywords` への高信頼寄せに使う
+    - ここで扱うのは表記揺れや検索語の canonical 寄せだけとする
   - `title + summary_200` から隣接分野タグを 1〜2 件抽出し、`thumbnail_bg_theme` を決定する
   - タグ候補を抽出する
   - `tags_master` / `tag_aliases` に照合する
     - 一致タグを `articles_enriched_tags` へ保存する
     - 未採用タグを `tag_candidate_pool` へ蓄積する
+  - 一致した子 canonical tag は `tag_relations` によって親 canonical tag まで展開してから `articles_enriched_tags` に保存する
+  - `paper` は通常の主タグ照合を行い、必要に応じて `source_category` fallback を加える
+  - `voice` / `search` / `news` はカテゴリ専用キーとして扱い、主タグへは昇格させない
   - URL 一致と headline signature で重複を判定する
   - `articles_enriched` を upsert する
   - 更新時は旧版を `articles_enriched_history` に退避する
@@ -139,6 +154,7 @@
 ### 4.3 `hourly-publish`
 
 > `layer2` と運用データを使って `layer4` を更新する公開反映ジョブ。
+> 親子タグの判断や補完は持たず、L2 で確定済みの tag join をそのまま転写する。
 
 - 目的
   - `layer2` と `layer3` を使って、公開層 `layer4` を更新する
@@ -153,11 +169,13 @@
 - 主処理
   - 公開候補を抽出する
   - `commercial_use_policy='prohibited'` を除外する
+  - `public_articles.public_refreshed_at` と `articles_enriched.updated_at` を比較し、未反映または再反映待ちだけを pending として扱う
   - 重複群ごとに代表ソースを決める
   - `public_articles` を更新する
   - `public_article_sources` を更新する
   - `public_article_tags` を更新する
   - `public_article_adjacent_tags` を更新する
+  - Home random は publish 後の `public_articles.content_score` を使って weighted selection で露出する
 
 ### 4.4 `hourly-compute-ranks`
 
@@ -195,6 +213,8 @@
   - alias / keyword / 保留を判定する
   - 必要なら `tag_aliases` / `tag_keywords` を追加する
   - 候補の `review_status` を更新する
+  - ここで追加する `tag_aliases` は canonical tag への表記揺れ正規化用途に限定する
+  - `tag_relations` の追加や relation の見直しは別運用とし、このジョブの責務には含めない
 
 ### 4.6 `monthly-public-archive`
 
@@ -228,3 +248,25 @@
 5. `hourly-compute-ranks` は `/api/cron/hourly-compute-ranks`
 6. `hourly-enrich.yml` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40` の 8 回実行する
 7. `hourly-publish.yml` は毎時 `:50` に publish と ranks を直列実行する
+8. `daily-tag-dedup.yml` は毎日 `02:30 UTC` に実行する
+9. `monthly-public-archive.yml` は毎月 1 日 `03:00 UTC` に実行する
+
+## 6. バックエンド確定断面（2026-04-05）
+
+この時点で backend 側は、次の断面までを現行固定とみなす。
+
+1. 定時ジョブの種類と schedule
+2. `fetch -> enrich -> publish -> compute-ranks` の毎時直列運用
+3. `daily-tag-dedup` による alias / keyword 自動寄せ
+4. 親子タグ relation は L2 で展開し、`hourly-publish` は L2 結果を転写するだけに留める
+5. relation 変更時の既存データ反映は、新 batch を増やさず `retag-layer2-layer4` を backfill 手段として使う
+6. `paper` の主タグ fallback と `voice/search/news` のカテゴリ専用運用
+7. `public_articles.content_score` を使った Home random の weighted selection
+8. publish pending を `public_refreshed_at` 基準で見る管理画面定義
+
+未確定として残すもの:
+
+1. `tag_relations` の管理 UI / 運用フロー
+2. `priority-queue-worker`
+3. `weekly-archive`
+4. CLI import 線と通常 enrich の副作用完全統合
