@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { getAdminPagePath } from '@/lib/admin-path'
 
+export const dynamic = 'force-dynamic'
+
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
