@@ -1,6 +1,6 @@
 # AI Trend Hub 実装ステータス
 
-最終更新: 2026-04-05
+最終更新: 2026-04-07
 
 運用ルール:
 - 先頭には必ず「現在の状態」と「次の確認事項」を置く
@@ -33,6 +33,10 @@
 - `paper` 専用タグ群は必要性が高いが、公開導線確立の後に扱う
 - enrich backlog 解消は運用上の優先タスクとして扱い、現況・実測・次アクションは `docs/imp/enrich-queue-taskboard.md` で一時管理する
 - backlog 件数、ジョブ状態、推奨フォロープラン、即時実行を見やすくするため、内部ページ `/admin/enrich-queue` を追加した
+- `/admin/enrich-queue` は `paper / non-paper` を分離表示し、`arxiv-ai` など paper backlog が大きくても通常記事側の健全性を別で見えるようにした
+- enrich 実行は `queueType` 引数で `non-paper` と `paper` に分け、job_runs も `enrich-worker` / `enrich-worker-paper` として別管理する構成へ寄せた
+- `/admin/enrich-queue` の即時実行も `non-paper lane` / `paper lane` / 共通処理に分け、同じ route を引数違いで叩けるようにした
+- GitHub Actions も `hourly-enrich-non-paper` と `hourly-enrich-paper` に分離し、scheduled enrich は paper / non-paper を別 job として回す構成へ更新した
 
 ## 3. 現在有効な運用状態
 
@@ -45,7 +49,9 @@
 
 ### 3.2 enrich / publish / ranking
 
-- `enrich-worker` は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
+- `enrich-worker` は `queueType=non-paper` を既定とし、`limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
+- `paper` 系は同じ実装を `queueType=paper` で実行し、job 名は `enrich-worker-paper` として残す
+- GitHub Actions の scheduled enrich は `non-paper` を毎時 8 回、`paper` を毎時 :45 の 1 回で分離運用する
 - `hourly-enrich` は毎時 8 回、`hourly-publish` は毎時 `:50`
 - `hourly-compute-ranks` は publish 後段で実行し、CLI 実行入口も追加済み
 - 本文取得記事では `canonicalTagHints` による `tag_aliases` / `tag_keywords` 自動反映が動く前提
@@ -64,7 +70,7 @@
 3. `paper` / `arxiv-ai` に通常記事と別の研究系タグ群が必要かを後続で判断する
 4. `hourly-compute-ranks` の係数を実データで見直すタイミングを判断する
 5. `flowchart.md` に追加するタグ専用節で、どこまで詳細に経路差分を見せるか
-6. enrich backlog を通常本線で吸い切るか、Gemini CLI 追いつき線を主に使うか
+6. paper backlog をどこまで通常本線で吸うか、別ライン運用をどこまで強めるか
 7. `/admin/enrich-queue` の推奨実行ボタンをどこまで増やすか
 8. `/admin/enrich-queue` の 8 サイクル実行を通常運用ボタンとして残すか
 

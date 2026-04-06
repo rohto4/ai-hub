@@ -1,6 +1,6 @@
 # Agents Task Status
 
-最終更新: 2026-04-05
+最終更新: 2026-04-07
 
 運用ルール:
 - 最新 50 件を目安に残し、古い行は下から削る
@@ -9,6 +9,9 @@
 - ユーザー判断待ちはこのファイルではなく `docs/imp/implementation-wait.md` に残す
 
 現在キュー:
+- 2026-04-07 | done | GitHub Actions の enrich schedule を paper / non-paper 分離へ更新 | `hourly-enrich.yml` を non-paper 専用にし、`hourly-enrich-paper.yml` を追加して scheduled enrich を 2 系統へ分離。non-paper は毎時 8 回、paper は毎時 :45 の 1 回で運用する形へ docs も同期した
+- 2026-04-07 | done | enrich job を `queueType` で paper / non-paper 分離 | `runDailyEnrich()`・cron route・`hourly-layer12`・admin 即時実行を `queueType` 引数で統一し、job_runs は `enrich-worker` / `enrich-worker-paper` に分離した。管理画面の即時実行とジョブ表示も lane 別に更新。tsx test / type-check / build 通過
+- 2026-04-07 | done | Enrich Queue Ops を paper / non-paper 分離へ再設計 | `/admin/enrich-queue` の summary / source backlog / 推奨アクションを paper と通常記事で分離表示し、通常 claim では `source_type='paper'` を後順位にした。`arxiv-ai` が backlog を押し上げても non-paper 側の健康状態を別で判断できる状態へ更新。tsx test / type-check / build 通過
 - 2026-04-05 | done | 管理画面 URL を env prefix 化しタグ UI を 2 段表示へ整理 | `ADMIN_PATH_PREFIX` / `NEXT_PUBLIC_ADMIN_PATH_PREFIX` で外向き admin URL を隠し、middleware で内部 `/admin` / `/api/admin` へ rewrite する構成へ変更。主タグ / 周辺分野タグは見た目を分けつつ同じ `/tags/:tagKey` 挙動で辿れる 2 段表示へ共通化した。build / type-check / tsx test 通過
 - 2026-04-05 | done | `hourly-publish` 候補抽出を pending 定義へ同期 | `listPublishCandidates()` が `publish_candidate=true` 全件を毎回拾っていたため、`public_refreshed_at < articles_enriched.updated_at` または未公開のものだけを候補にするよう修正。毎時 publish が未反映 / 再反映待ちだけを処理する状態へ戻した。build / type-check 通過
 - 2026-04-05 | doing | バックエンド最終確定と publish 前 wait 解消セッションを開始 | 起点 docs と `imp-*` を再読し、主タグ / 親子タグ / 周辺分野タグは L2 確定・publish 転写の方針を確認。次は publish 前後の未確定処理と wait を洗い、公開面実装前に潰せる backend 残件を詰める

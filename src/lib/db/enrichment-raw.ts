@@ -30,6 +30,7 @@ type RawArticleRow = {
 }
 
 const ENRICH_CLAIM_MINUTES = 30
+type EnrichQueueType = 'all' | 'non-paper' | 'paper'
 
 export async function listRawArticlesForEnrichment(
   limit = 50,
@@ -131,8 +132,15 @@ export async function listRawArticlesForEnrichment(
 export async function claimRawArticlesForEnrichment(
   limit = 10,
   sourceKey?: string | null,
+  queueType: EnrichQueueType = sourceKey ? 'all' : 'non-paper',
 ): Promise<RawArticleForEnrichment[]> {
   const sql = getSql()
+  const queueFilterSql =
+    queueType === 'paper'
+      ? sql`AND st.source_type = 'paper'`
+      : queueType === 'non-paper'
+        ? sql`AND COALESCE(st.source_type, '') <> 'paper'`
+        : sql``
   const rows = (sourceKey
     ? await sql`
         WITH candidate_rows AS (
@@ -187,9 +195,13 @@ export async function claimRawArticlesForEnrichment(
         WITH candidate_rows AS (
           SELECT ar.raw_article_id, ar.created_at
           FROM articles_raw ar
+          JOIN source_targets st ON st.source_target_id = ar.source_target_id
           WHERE ar.is_processed = false
             AND ar.process_after <= now()
-          ORDER BY ar.created_at ASC
+            ${queueFilterSql}
+          ORDER BY
+            CASE WHEN st.source_type = 'paper' THEN 1 ELSE 0 END ASC,
+            ar.created_at ASC
           FOR UPDATE OF ar SKIP LOCKED
           LIMIT ${limit}
         ),
@@ -272,8 +284,17 @@ export async function markRawProcessed(rawArticleId: number): Promise<void> {
   `
 }
 
-export async function skipExpiredRawArticlesForEnrichment(sourceKey?: string | null): Promise<number> {
+export async function skipExpiredRawArticlesForEnrichment(
+  sourceKey?: string | null,
+  queueType: EnrichQueueType = sourceKey ? 'all' : 'non-paper',
+): Promise<number> {
   const sql = getSql()
+  const queueFilterSql =
+    queueType === 'paper'
+      ? sql`AND st.source_type = 'paper'`
+      : queueType === 'non-paper'
+        ? sql`AND COALESCE(st.source_type, '') <> 'paper'`
+        : sql``
   const rows = (sourceKey
     ? await sql`
         UPDATE articles_raw ar
@@ -308,6 +329,7 @@ export async function skipExpiredRawArticlesForEnrichment(sourceKey?: string | n
         FROM source_targets st
         WHERE st.source_target_id = ar.source_target_id
           AND ar.is_processed = false
+          ${queueFilterSql}
           AND ar.source_published_at IS NOT NULL
           AND ar.source_published_at < now() - (
             CASE

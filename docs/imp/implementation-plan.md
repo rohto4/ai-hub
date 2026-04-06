@@ -1,6 +1,6 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-04-05
+最終更新: 2026-04-07
 
 ## 1. 現在のフェーズ
 
@@ -30,6 +30,8 @@
 7. タグ参照 SQL を使って、新規立項タグ候補の次ラウンド判断を進める
 8. enrich 本線と CLI import 線の副作用差を減らす
 9. enrich backlog の解消手順を `docs/imp/enrich-queue-taskboard.md` で管理し、通常 enrich と CLI 追いつき線の使い分けを詰める
+10. Enrich Queue Ops では `paper / non-paper` を分離し、通常運転の健全性と paper backlog を別に判断できるようにする
+11. enrich 実行ルールは batch 数を増やさず、同じ route / job 実装を `queueType` 引数で `paper / non-paper` に分ける
 
 ## 2.1 このセッションの実行計画
 
@@ -51,6 +53,8 @@
 - batch 本線と CLI 追いつき線の副作用差が今回の反映対象に残っていないか
 - `paper / llm` に偏る未主タグ残件の圧縮経路
 - `content_score` をランキング以外の公開露出へどう反映するか
+- `paper` backlog を通常本線からどこまで切り離して運用するか
+- `queueType=paper` を Actions 側でどう割り当てるか
 
 ## 3. 現在の固定方針
 
@@ -128,7 +132,9 @@
 ### 3.7 enrich / batch 運用
 
 - `hourly-enrich` は毎時 `:05 / :10 / :15 / :20 / :25 / :30 / :35 / :40`
-- `enrich-worker` の基本設定は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
+- `enrich-worker` の基本設定は `queueType=non-paper`, `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
+- 同じ route / 実装を `queueType=paper` でも実行でき、job_runs では `enrich-worker-paper` として別管理する
+- GitHub Actions は `hourly-enrich-non-paper` と `hourly-enrich-paper` に分け、paper は毎時 :45 の低優先度運用とする
 - `hourly-publish` は毎時 `:50`
 - `monthly-public-archive` は毎月 1 日 `03:00 UTC`
 - 詳細仕様は `docs/imp/batch-reforme-spec.md`、運用手順は `docs/imp/batch-ops.md` を参照する
