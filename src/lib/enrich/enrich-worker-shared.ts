@@ -36,6 +36,7 @@ export interface DailyEnrichOptions {
   sourceKey?: string | null
   summaryBatchSize?: number
   maxSummaryBatches?: number
+  queueType?: 'all' | 'non-paper' | 'paper'
 }
 
 export interface PreparedEnrichArticle {

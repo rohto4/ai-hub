@@ -52,9 +52,12 @@ export type EnrichQueueRecommendation = {
 }
 
 export type AdminEnrichActionKey =
-  | 'run-hourly-layer12-recovery'
-  | 'run-hourly-layer12-8cycles'
-  | 'run-enrich-worker'
+  | 'run-hourly-layer12-recovery-non-paper'
+  | 'run-hourly-layer12-recovery-paper'
+  | 'run-hourly-layer12-8cycles-non-paper'
+  | 'run-hourly-layer12-8cycles-paper'
+  | 'run-enrich-worker-non-paper'
+  | 'run-enrich-worker-paper'
   | 'run-enrich-arxiv'
   | 'run-hourly-fetch'
   | 'run-publish-and-ranks'
@@ -95,7 +98,8 @@ export type EnrichQueueDashboardData = {
 
 const JOB_SCHEDULE_LABEL: Record<string, string> = {
   'hourly-fetch': '毎時 :00',
-  'enrich-worker': '毎時 :05〜:40 の 8 回',
+  'enrich-worker': '毎時 :05〜:40 の 8 回 / non-paper',
+  'enrich-worker-paper': '同 route / paper 実行',
   'hourly-publish': '毎時 :50',
   'hourly-compute-ranks': 'publish 後段',
   'daily-tag-dedup': '毎日 02:30 UTC',
@@ -105,6 +109,7 @@ const JOB_SCHEDULE_LABEL: Record<string, string> = {
 const TRACKED_JOBS = [
   'hourly-fetch',
   'enrich-worker',
+  'enrich-worker-paper',
   'hourly-publish',
   'hourly-compute-ranks',
   'daily-tag-dedup',
@@ -138,7 +143,7 @@ export function buildRecommendations(input: {
       id: 'recovery-cycle',
       title: 'まずは 1 サイクルだけ追いつき運転',
       reason: `non-paper の今すぐ裁ける未処理が ${input.rawDueNowNonPaper} 件あるため、fetch + enrich を短い 1 サイクルで回して純減するかを先に確認する。`,
-      actionKey: 'run-hourly-layer12-recovery',
+      actionKey: 'run-hourly-layer12-recovery-non-paper',
       actionLabel: '推奨回復を実行',
     })
   }
@@ -188,8 +193,8 @@ export function buildRecommendations(input: {
       id: 'enrich-health',
       title: 'enrich-worker の単発実行で現況を再確認',
       reason: '最新の enrich 状態が弱いため、20件設定の標準実行で現況を取り直してから追いつき線の判断をする。',
-      actionKey: 'run-enrich-worker',
-      actionLabel: '標準 enrich を 1 回実行',
+      actionKey: 'run-enrich-worker-non-paper',
+      actionLabel: 'non-paper enrich を 1 回実行',
     })
   }
 
@@ -391,21 +396,24 @@ export async function getEnrichQueueDashboardData(): Promise<EnrichQueueDashboar
       WHERE rn = 1
       ORDER BY ranked.started_at DESC
     ` as unknown as Promise<LatestJobRow[]>,
-    (sql`
+    sql`
       SELECT
+        job_name,
         COUNT(*)::int AS planned_runs,
         COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_runs,
         COUNT(*) FILTER (WHERE status = 'running')::int AS running_runs,
         COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_runs
       FROM job_runs
-      WHERE job_name = 'enrich-worker'
+      WHERE job_name = ANY(${['enrich-worker', 'enrich-worker-paper']}::text[])
         AND started_at >= date_trunc('hour', now())
+      GROUP BY job_name
     ` as unknown as Promise<Array<{
+      job_name: string
       planned_runs: number | string
       completed_runs: number | string
       running_runs: number | string
       failed_runs: number | string
-    }>>).then((rows) => rows[0]),
+    }>>,
   ])
 
   const rawUnprocessed = toNumber(rawSummaryRow.raw_unprocessed)
@@ -414,6 +422,7 @@ export async function getEnrichQueueDashboardData(): Promise<EnrichQueueDashboar
   const rawUnprocessedPaper = toNumber(rawSummaryRow.raw_unprocessed_paper)
   const topNonPaperSource = topNonPaperSources[0]
   const topPaperSource = topPaperSources[0]
+  const enrichWindowByJob = new Map(enrichWindowRow.map((row) => [row.job_name, row]))
   const jobs = TRACKED_JOBS.map((jobName) => {
     const row = latestJobRows.find((job) => job.job_name === jobName)
     const status: EnrichQueueJobRow['status'] =
@@ -436,11 +445,12 @@ export async function getEnrichQueueDashboardData(): Promise<EnrichQueueDashboar
       liveSkippedCount: toNumber(row?.live_skipped_count),
     }
 
-    if (jobName === 'enrich-worker') {
-      baseJob.scheduleRunsPlanned = 8
-      baseJob.scheduleRunsCompleted = toNumber(enrichWindowRow?.completed_runs)
-      baseJob.scheduleRunsRunning = toNumber(enrichWindowRow?.running_runs)
-      baseJob.scheduleRunsFailed = toNumber(enrichWindowRow?.failed_runs)
+    if (jobName === 'enrich-worker' || jobName === 'enrich-worker-paper') {
+      const enrichWindow = enrichWindowByJob.get(jobName)
+      baseJob.scheduleRunsPlanned = jobName === 'enrich-worker' ? 8 : toNumber(enrichWindow?.planned_runs)
+      baseJob.scheduleRunsCompleted = toNumber(enrichWindow?.completed_runs)
+      baseJob.scheduleRunsRunning = toNumber(enrichWindow?.running_runs)
+      baseJob.scheduleRunsFailed = toNumber(enrichWindow?.failed_runs)
     }
 
     return baseJob

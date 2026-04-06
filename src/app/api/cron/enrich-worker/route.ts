@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
 
   const limitParam = request.nextUrl.searchParams.get('limit')
   const sourceKey = request.nextUrl.searchParams.get('sourceKey')
+  const queueTypeParam = request.nextUrl.searchParams.get('queueType')
   const summaryBatchSizeParam = request.nextUrl.searchParams.get('summaryBatchSize')
   const maxSummaryBatchesParam = request.nextUrl.searchParams.get('maxSummaryBatches')
   const parsedLimit = limitParam ? Number(limitParam) : 50
@@ -33,7 +34,13 @@ export async function POST(request: NextRequest) {
   const maxSummaryBatches = Number.isFinite(parsedMaxSummaryBatches)
     ? Math.max(1, Math.min(100, parsedMaxSummaryBatches))
     : undefined
+  const queueType =
+    queueTypeParam === 'paper' || queueTypeParam === 'all' || queueTypeParam === 'non-paper'
+      ? queueTypeParam
+      : sourceKey
+        ? 'all'
+        : 'non-paper'
 
-  const result = await runDailyEnrich({ limit, sourceKey, summaryBatchSize, maxSummaryBatches })
+  const result = await runDailyEnrich({ limit, sourceKey, queueType, summaryBatchSize, maxSummaryBatches })
   return NextResponse.json(result)
 }

@@ -34,7 +34,8 @@
 - enrich backlog 解消は運用上の優先タスクとして扱い、現況・実測・次アクションは `docs/imp/enrich-queue-taskboard.md` で一時管理する
 - backlog 件数、ジョブ状態、推奨フォロープラン、即時実行を見やすくするため、内部ページ `/admin/enrich-queue` を追加した
 - `/admin/enrich-queue` は `paper / non-paper` を分離表示し、`arxiv-ai` など paper backlog が大きくても通常記事側の健全性を別で見えるようにした
-- 通常 `enrich-worker` の raw claim は `source_type='paper'` を後順位にし、サイト運用に直結する non-paper を先に処理する構成へ寄せた
+- enrich 実行は `queueType` 引数で `non-paper` と `paper` に分け、job_runs も `enrich-worker` / `enrich-worker-paper` として別管理する構成へ寄せた
+- `/admin/enrich-queue` の即時実行も `non-paper lane` / `paper lane` / 共通処理に分け、同じ route を引数違いで叩けるようにした
 
 ## 3. 現在有効な運用状態
 
@@ -47,7 +48,8 @@
 
 ### 3.2 enrich / publish / ranking
 
-- `enrich-worker` は `limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
+- `enrich-worker` は `queueType=non-paper` を既定とし、`limit=20`, `summaryBatchSize=20`, `maxSummaryBatches=1`
+- `paper` 系は同じ実装を `queueType=paper` で実行し、job 名は `enrich-worker-paper` として残す
 - `hourly-enrich` は毎時 8 回、`hourly-publish` は毎時 `:50`
 - `hourly-compute-ranks` は publish 後段で実行し、CLI 実行入口も追加済み
 - 本文取得記事では `canonicalTagHints` による `tag_aliases` / `tag_keywords` 自動反映が動く前提

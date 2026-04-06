@@ -17,25 +17,51 @@ export const maxDuration = 300
 
 async function runAction(action: AdminEnrichActionKey) {
   switch (action) {
-    case 'run-hourly-layer12-recovery':
+    case 'run-hourly-layer12-recovery-non-paper':
       return runHourlyLayer12({
         fetchLimit: 20,
         enrichBatchSize: 20,
         maxEnrichBatches: 2,
         summaryBatchSize: 20,
+        queueType: 'non-paper',
       })
-    case 'run-hourly-layer12-8cycles':
+    case 'run-hourly-layer12-recovery-paper':
+      return runHourlyLayer12({
+        fetchLimit: 20,
+        enrichBatchSize: 20,
+        maxEnrichBatches: 2,
+        summaryBatchSize: 20,
+        queueType: 'paper',
+      })
+    case 'run-hourly-layer12-8cycles-non-paper':
       return runHourlyLayer12({
         fetchLimit: 20,
         enrichBatchSize: 20,
         maxEnrichBatches: 8,
         summaryBatchSize: 20,
+        queueType: 'non-paper',
       })
-    case 'run-enrich-worker':
+    case 'run-hourly-layer12-8cycles-paper':
+      return runHourlyLayer12({
+        fetchLimit: 20,
+        enrichBatchSize: 20,
+        maxEnrichBatches: 8,
+        summaryBatchSize: 20,
+        queueType: 'paper',
+      })
+    case 'run-enrich-worker-non-paper':
       return runDailyEnrich({
         limit: 20,
         summaryBatchSize: 20,
         maxSummaryBatches: 1,
+        queueType: 'non-paper',
+      })
+    case 'run-enrich-worker-paper':
+      return runDailyEnrich({
+        limit: 20,
+        summaryBatchSize: 20,
+        maxSummaryBatches: 1,
+        queueType: 'paper',
       })
     case 'run-enrich-arxiv':
       return runDailyEnrich({
@@ -43,6 +69,7 @@ async function runAction(action: AdminEnrichActionKey) {
         sourceKey: 'arxiv-ai',
         summaryBatchSize: 20,
         maxSummaryBatches: 1,
+        queueType: 'paper',
       })
     case 'run-hourly-fetch':
       return runHourlyFetch({ limit: 20 })

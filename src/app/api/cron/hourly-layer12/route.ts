@@ -38,12 +38,18 @@ export async function POST(request: NextRequest) {
     1,
     20,
   )
+  const queueTypeParam = request.nextUrl.searchParams.get('queueType')
+  const queueType =
+    queueTypeParam === 'paper' || queueTypeParam === 'all' || queueTypeParam === 'non-paper'
+      ? queueTypeParam
+      : 'non-paper'
 
   const result = await runHourlyLayer12({
     fetchLimit,
     enrichBatchSize,
     maxEnrichBatches,
     summaryBatchSize,
+    queueType,
   })
 
   return NextResponse.json(result)

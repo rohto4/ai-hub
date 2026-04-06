@@ -1,4 +1,4 @@
-import { runDailyEnrich, type DailyEnrichResult } from '@/lib/jobs/enrich-worker'
+import { runDailyEnrich, type DailyEnrichResult, type EnrichQueueType } from '@/lib/jobs/enrich-worker'
 import { runHourlyFetch, type HourlyFetchResult } from '@/lib/jobs/hourly-fetch'
 
 export interface HourlyLayer12Options {
@@ -6,6 +6,7 @@ export interface HourlyLayer12Options {
   enrichBatchSize?: number
   maxEnrichBatches?: number
   summaryBatchSize?: number
+  queueType?: EnrichQueueType
 }
 
 export interface HourlyLayer12Result {
@@ -36,6 +37,7 @@ export async function runHourlyLayer12(
     1,
     Math.min(20, options.summaryBatchSize ?? DEFAULT_SUMMARY_BATCH_SIZE),
   )
+  const queueType = options.queueType ?? 'non-paper'
 
   const fetch = await runHourlyFetch(fetchLimit)
   const enrichRuns: DailyEnrichResult[] = []
@@ -44,6 +46,7 @@ export async function runHourlyLayer12(
     const enrichResult = await runDailyEnrich({
       limit: enrichBatchSize,
       summaryBatchSize,
+      queueType,
     })
     enrichRuns.push(enrichResult)
 
