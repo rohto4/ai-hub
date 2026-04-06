@@ -187,9 +187,12 @@ export async function claimRawArticlesForEnrichment(
         WITH candidate_rows AS (
           SELECT ar.raw_article_id, ar.created_at
           FROM articles_raw ar
+          JOIN source_targets st ON st.source_target_id = ar.source_target_id
           WHERE ar.is_processed = false
             AND ar.process_after <= now()
-          ORDER BY ar.created_at ASC
+          ORDER BY
+            CASE WHEN st.source_type = 'paper' THEN 1 ELSE 0 END ASC,
+            ar.created_at ASC
           FOR UPDATE OF ar SKIP LOCKED
           LIMIT ${limit}
         ),

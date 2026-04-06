@@ -1,6 +1,6 @@
 # AI Trend Hub 実装ステータス
 
-最終更新: 2026-04-05
+最終更新: 2026-04-07
 
 運用ルール:
 - 先頭には必ず「現在の状態」と「次の確認事項」を置く
@@ -33,6 +33,8 @@
 - `paper` 専用タグ群は必要性が高いが、公開導線確立の後に扱う
 - enrich backlog 解消は運用上の優先タスクとして扱い、現況・実測・次アクションは `docs/imp/enrich-queue-taskboard.md` で一時管理する
 - backlog 件数、ジョブ状態、推奨フォロープラン、即時実行を見やすくするため、内部ページ `/admin/enrich-queue` を追加した
+- `/admin/enrich-queue` は `paper / non-paper` を分離表示し、`arxiv-ai` など paper backlog が大きくても通常記事側の健全性を別で見えるようにした
+- 通常 `enrich-worker` の raw claim は `source_type='paper'` を後順位にし、サイト運用に直結する non-paper を先に処理する構成へ寄せた
 
 ## 3. 現在有効な運用状態
 
@@ -64,7 +66,7 @@
 3. `paper` / `arxiv-ai` に通常記事と別の研究系タグ群が必要かを後続で判断する
 4. `hourly-compute-ranks` の係数を実データで見直すタイミングを判断する
 5. `flowchart.md` に追加するタグ専用節で、どこまで詳細に経路差分を見せるか
-6. enrich backlog を通常本線で吸い切るか、Gemini CLI 追いつき線を主に使うか
+6. paper backlog をどこまで通常本線で吸うか、別ライン運用をどこまで強めるか
 7. `/admin/enrich-queue` の推奨実行ボタンをどこまで増やすか
 8. `/admin/enrich-queue` の 8 サイクル実行を通常運用ボタンとして残すか
 

@@ -130,6 +130,7 @@ function SourceRow({ row }: { row: EnrichQueueSourceRow }) {
   return (
     <tr className="border-t border-slate-800 text-sm text-slate-200">
       <td className="px-3 py-2 font-mono text-xs text-sky-300">{row.sourceKey}</td>
+      <td className="px-3 py-2 text-xs text-slate-500">{row.sourceType}</td>
       <td className="px-3 py-2 text-right">{row.rawUnprocessed}</td>
       <td className="px-3 py-2 text-right text-slate-400">{row.rawProcessed}</td>
       <td className="px-3 py-2 text-right text-slate-500">{row.rawTotal}</td>
@@ -229,12 +230,34 @@ export function AdminEnrichQueueClient({
   }
 
   const cards = [
-    { label: '未処理 backlog', value: data.summary.rawUnprocessed, note: `今すぐ裁ける ${data.summary.rawDueNow} / ロック中 ${data.summary.rawLocked}` },
-    { label: '24h 超 backlog', value: data.summary.rawOver24h, note: '古い未処理' },
+    {
+      label: '通常 backlog',
+      value: data.summary.rawUnprocessedNonPaper,
+      note: `今すぐ ${data.summary.rawDueNowNonPaper} / ロック中 ${data.summary.rawLockedNonPaper}`,
+    },
+    {
+      label: 'paper backlog',
+      value: data.summary.rawUnprocessedPaper,
+      note: `今すぐ ${data.summary.rawDueNowPaper} / ロック中 ${data.summary.rawLockedPaper}`,
+    },
+    {
+      label: 'paper 比率',
+      value: `${data.summary.paperSharePercent}%`,
+      note: `全 backlog ${data.summary.rawUnprocessed} 件中`,
+    },
+    {
+      label: '24h 超 backlog',
+      value: data.summary.rawOver24h,
+      note: `通常 ${data.summary.rawOver24hNonPaper} / paper ${data.summary.rawOver24hPaper}`,
+    },
     { label: 'manual_pending', value: data.summary.manualPending, note: '別ライン回収' },
     { label: 'publish 未反映', value: data.summary.publishCandidatesPending, note: 'L4 未反映 / 再反映待ち' },
     { label: '稼働中ジョブ', value: data.summary.currentRunningJobs, note: 'job_runs.status=running' },
-    { label: '理論解消時間', value: `${data.summary.estimatedDrainHoursAtScheduledRate}h`, note: '160件/時の単純計算' },
+    {
+      label: '通常解消時間',
+      value: `${data.summary.estimatedDrainHoursNonPaper}h`,
+      note: `total ${data.summary.estimatedDrainHoursAtScheduledRate}h / paper ${data.summary.estimatedDrainHoursPaper}h`,
+    },
   ]
 
   return (
@@ -313,8 +336,16 @@ export function AdminEnrichQueueClient({
             ))}
           </div>
           <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/80 p-4 text-xs text-slate-400">
-            <p>最大 backlog source: <span className="font-mono text-sky-300">{data.summary.topSourceKey ?? 'n/a'}</span></p>
-            <p className="mt-1">pending: {data.summary.topSourcePending}</p>
+            <p>
+              最大通常 source:{' '}
+              <span className="font-mono text-sky-300">{data.summary.topNonPaperSourceKey ?? 'n/a'}</span>
+            </p>
+            <p className="mt-1">pending: {data.summary.topNonPaperSourcePending}</p>
+            <p className="mt-3">
+              最大 paper source:{' '}
+              <span className="font-mono text-cyan-300">{data.summary.topPaperSourceKey ?? 'n/a'}</span>
+            </p>
+            <p className="mt-1">pending: {data.summary.topPaperSourcePending}</p>
           </div>
         </div>
       </section>
@@ -329,29 +360,59 @@ export function AdminEnrichQueueClient({
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-800 bg-slate-950/80 p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-white">source 別 backlog</h2>
-            <p className="mt-1 text-sm text-slate-400">未処理が多い source から並べています。</p>
+      <section className="grid gap-4 xl:grid-cols-2">
+        <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-white">通常 source backlog</h2>
+              <p className="mt-1 text-sm text-slate-400">paper 以外の未処理が多い source から並べています。</p>
+            </div>
+          </div>
+          <div className="mt-4 overflow-x-auto">
+            <table className="min-w-full">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-[0.18em] text-slate-500">
+                  <th className="px-3 py-2">source</th>
+                  <th className="px-3 py-2">type</th>
+                  <th className="px-3 py-2 text-right">unprocessed</th>
+                  <th className="px-3 py-2 text-right">processed</th>
+                  <th className="px-3 py-2 text-right">total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.topNonPaperSources.map((row) => (
+                  <SourceRow key={row.sourceKey} row={row} />
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-        <div className="mt-4 overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="text-left text-xs uppercase tracking-[0.18em] text-slate-500">
-                <th className="px-3 py-2">source</th>
-                <th className="px-3 py-2 text-right">unprocessed</th>
-                <th className="px-3 py-2 text-right">processed</th>
-                <th className="px-3 py-2 text-right">total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.topSources.map((row) => (
-                <SourceRow key={row.sourceKey} row={row} />
-              ))}
-            </tbody>
-          </table>
+
+        <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-white">paper source backlog</h2>
+              <p className="mt-1 text-sm text-slate-400">入力時点で paper な source を別枠で追います。</p>
+            </div>
+          </div>
+          <div className="mt-4 overflow-x-auto">
+            <table className="min-w-full">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-[0.18em] text-slate-500">
+                  <th className="px-3 py-2">source</th>
+                  <th className="px-3 py-2">type</th>
+                  <th className="px-3 py-2 text-right">unprocessed</th>
+                  <th className="px-3 py-2 text-right">processed</th>
+                  <th className="px-3 py-2 text-right">total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.topPaperSources.map((row) => (
+                  <SourceRow key={row.sourceKey} row={row} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </div>

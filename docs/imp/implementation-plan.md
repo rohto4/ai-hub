@@ -1,6 +1,6 @@
 # AI Trend Hub 実装計画
 
-最終更新: 2026-04-05
+最終更新: 2026-04-07
 
 ## 1. 現在のフェーズ
 
@@ -30,6 +30,7 @@
 7. タグ参照 SQL を使って、新規立項タグ候補の次ラウンド判断を進める
 8. enrich 本線と CLI import 線の副作用差を減らす
 9. enrich backlog の解消手順を `docs/imp/enrich-queue-taskboard.md` で管理し、通常 enrich と CLI 追いつき線の使い分けを詰める
+10. Enrich Queue Ops では `paper / non-paper` を分離し、通常運転の健全性と paper backlog を別に判断できるようにする
 
 ## 2.1 このセッションの実行計画
 
@@ -51,6 +52,7 @@
 - batch 本線と CLI 追いつき線の副作用差が今回の反映対象に残っていないか
 - `paper / llm` に偏る未主タグ残件の圧縮経路
 - `content_score` をランキング以外の公開露出へどう反映するか
+- `paper` backlog を通常本線からどこまで切り離して運用するか
 
 ## 3. 現在の固定方針
 
