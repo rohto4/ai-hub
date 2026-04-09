@@ -90,6 +90,7 @@ export type PublicArticleDetail = ArticleWithScore & {
     displayName: string
     sourceType: Article['source_type']
   }>
+  siteCategory: import('@/lib/site/navigation').SiteCategory | null
 }
 
 export const PERIOD_INTERVAL: Record<RankPeriod, string> = {
@@ -185,6 +186,8 @@ export function toArticle(row: PublicArticleRow): ArticleWithScore {
     updated_at: new Date(row.updated_at),
     score: Number(row.score),
     breakdown: row.breakdown ?? undefined,
+    primaryTags: [],
+    adjacentTags: [],
   }
 }
 

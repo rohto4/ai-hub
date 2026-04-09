@@ -1,5 +1,6 @@
 import { getSql } from '@/lib/db'
 import type { TagKeywordReference, TagReference } from '@/lib/tags/match'
+import type { TagRelation } from '@/lib/tags/relations'
 
 type TagRow = {
   id: string
@@ -31,6 +32,24 @@ export async function listCollectionTagKeywords(): Promise<TagKeywordReference[]
     keyword: row.keyword,
     isCaseSensitive: row.is_case_sensitive,
   }))
+}
+
+export async function listActiveTagRelations(): Promise<TagRelation[]> {
+  const sql = getSql()
+  try {
+    const rows = (await sql`
+      SELECT tr.parent_tag_id, tr.child_tag_id
+      FROM tag_relations tr
+      JOIN tags_master p ON p.tag_id = tr.parent_tag_id AND p.is_active = true
+      JOIN tags_master c ON c.tag_id = tr.child_tag_id AND c.is_active = true
+    `) as { parent_tag_id: string; child_tag_id: string }[]
+    return rows.map((row) => ({
+      parentTagId: row.parent_tag_id,
+      childTagId: row.child_tag_id,
+    }))
+  } catch {
+    return []
+  }
 }
 
 export async function listActiveTagReferences(): Promise<TagReference[]> {

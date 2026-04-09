@@ -63,3 +63,30 @@ export const SITE_CATEGORIES: SiteCategory[] = [
 export function findSiteCategory(slug: string): SiteCategory | null {
   return SITE_CATEGORIES.find((category) => category.slug === slug) ?? null
 }
+
+type ArticleCategoryParams = {
+  sourceType: string
+  sourceCategory: string
+  primaryTagKeys?: string[]
+  adjacentTagKeys?: string[]
+}
+
+function resolveArticleSiteCategory(params: ArticleCategoryParams): SiteCategory | null {
+  const { sourceType, sourceCategory, primaryTagKeys = [], adjacentTagKeys = [] } = params
+  const bySourceType = SITE_CATEGORIES.find((c) => c.kind === 'source-type' && c.queryValue === sourceType)
+  if (bySourceType) return bySourceType
+  const bySourceCategory = SITE_CATEGORIES.find((c) => c.kind === 'source-category' && c.queryValue === sourceCategory)
+  if (bySourceCategory) return bySourceCategory
+  const allTagKeys = [...primaryTagKeys, ...adjacentTagKeys]
+  return SITE_CATEGORIES.find((c) => c.kind === 'tag' && allTagKeys.includes(c.queryValue)) ?? null
+}
+
+export function getArticleCategoryLabel(params: ArticleCategoryParams): string | null {
+  return resolveArticleSiteCategory(params)?.label ?? null
+}
+
+export function getRelatedTopicLink(params: ArticleCategoryParams): { href: string; label: string } | null {
+  const category = resolveArticleSiteCategory(params)
+  if (!category) return null
+  return { href: `/category/${category.slug}`, label: category.label }
+}

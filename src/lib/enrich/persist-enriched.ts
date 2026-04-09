@@ -30,6 +30,7 @@ export async function processSummaryBatches(params: {
   tagReferences: Awaited<ReturnType<typeof import('@/lib/db/tags').listActiveTagReferences>>
   tagKeywords: Awaited<ReturnType<typeof import('@/lib/db/tags').listCollectionTagKeywords>>
   adjacentTagKeywords: Awaited<ReturnType<typeof import('@/lib/db/adjacent-tags').listAdjacentTagKeywords>>
+  impliedTagIdsByChild: Map<string, string[]>
   aiPrimaryTagOptions: ReturnType<typeof buildAiPrimaryTagOptions>
   items: DailyEnrichItemResult[]
   manualPendingExports: ManualPendingExportItem[]
