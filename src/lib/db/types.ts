@@ -47,6 +47,11 @@ export type ActionType =
   | 'search'
   | 'digest_click'
 
+export type ArticleTag = {
+  tagKey: string
+  displayName: string
+}
+
 export interface Article {
   id: string
   publicKey?: string
@@ -67,6 +72,8 @@ export interface Article {
   topic_group_id: string | null
   created_at: Date
   updated_at: Date
+  primaryTags: ArticleTag[]
+  adjacentTags: ArticleTag[]
 }
 
 export interface RankBreakdown {

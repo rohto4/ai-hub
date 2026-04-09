@@ -1,6 +1,7 @@
 import { getSql } from '@/lib/db'
 import type { PublicArticleDetail } from '@/lib/db/public-shared'
 import { ArticleSourceRow, ArticleTagRow, PUBLIC_DISPLAY_MAX_AGE, PublicArticleRow, toArticle } from '@/lib/db/public-shared'
+import { findSiteCategory } from '@/lib/site/navigation'
 
 export async function getPublicArticleDetail(publicKey: string): Promise<PublicArticleDetail | null> {
   const sql = getSql()
@@ -22,7 +23,7 @@ export async function getPublicArticleDetail(publicKey: string): Promise<PublicA
   const row = articleRows[0]
   if (!row) return null
 
-  const [tagRows, sourceRows] = await Promise.all([
+  const [tagRows, sourceRows, adjacentTagRows] = await Promise.all([
     (sql`
       SELECT tm.tag_key, tm.display_name, pat.sort_order
       FROM public_article_tags pat
@@ -39,17 +40,43 @@ export async function getPublicArticleDetail(publicKey: string): Promise<PublicA
       WHERE pas.public_article_id = ${row.id}
       ORDER BY pas.is_primary DESC, pas.source_priority DESC
     `) as unknown as Promise<ArticleSourceRow[]>,
+    (sql`
+      SELECT atm.tag_key, atm.display_name, paat.sort_order
+      FROM public_article_adjacent_tags paat
+      JOIN adjacent_tags_master atm ON atm.adjacent_tag_id = paat.adjacent_tag_id
+      WHERE paat.public_article_id = ${row.id}
+      ORDER BY paat.sort_order ASC
+    `) as unknown as Promise<ArticleTagRow[]>,
   ])
+
+  const tags = tagRows.map((tag) => ({ tagKey: tag.tag_key, displayName: tag.display_name }))
+  const adjacentTags = adjacentTagRows.map((tag) => ({ tagKey: tag.tag_key, displayName: tag.display_name }))
+  const primaryTagKeys = tags.map((t) => t.tagKey)
+  const adjacentTagKeys = adjacentTags.map((t) => t.tagKey)
+  const siteCategory =
+    findSiteCategory(row.source_type) ??
+    findSiteCategory(row.source_category) ??
+    primaryTagKeys.reduce<ReturnType<typeof findSiteCategory>>(
+      (found, key) => found ?? findSiteCategory(key),
+      null,
+    ) ??
+    adjacentTagKeys.reduce<ReturnType<typeof findSiteCategory>>(
+      (found, key) => found ?? findSiteCategory(key),
+      null,
+    )
 
   const article = toArticle(row)
   return {
     ...article,
+    primaryTags: tags,
+    adjacentTags,
     publicKey: row.public_key,
-    tags: tagRows.map((tag) => ({ tagKey: tag.tag_key, displayName: tag.display_name })),
+    tags,
     sources: sourceRows.map((source) => ({
       sourceKey: source.source_key,
       displayName: source.display_name,
       sourceType: source.source_type,
     })),
+    siteCategory: siteCategory ?? null,
   }
 }
